@@ -25,8 +25,15 @@ Windows 用の日本語入力ソフトです。[Mozc](https://github.com/google/
 ## 動作環境
 
 - Windows 11（64 ビット、x64）で動作を確かめています。
+- Linux（Ubuntu 24.04、x64、ibus）は試用版です。
 
 ## インストール
+
+### Linux（ibus、試用版）
+
+配布ページの `compound-ime-<版>-linux-x64.tar.gz` を展開し、`sudo ./install.sh` を実行します。そのあと `ibus restart` をして、入力方式の設定で「コンパウンドIME」を追加します。外すときは `sudo ./uninstall.sh` です。Ubuntu 24.04 で、ibus 経由の変換までを確かめています（実際の画面での打ち心地は未確認です）。
+
+### ウィンドウズ
 
 1. リリースのページから `CompoundIME_<版>_x64.msi` を取得して実行します。
 2. インストール中に変換モデルを公式の配布元から取得します（約 74MB）。

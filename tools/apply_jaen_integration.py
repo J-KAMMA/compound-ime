@@ -2630,4 +2630,254 @@ edit("engine/BUILD.bazel", """    name = "engine_converter",
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
 
+# Linux 対応（製品名の変更のあと）: 節: Linux でも変換エンジン（azooKey）を使えるようにする。
+#
+# ウィンドウズでは azookey-engine.dll を LoadLibrary で読み、設定はレジストリから読む。
+# Linux では libazookey-engine.so を dlopen で読み、設定は
+# ~/.config/compound-ime/settings（「名前=数値」の行）から読む。
+# モデルは ~/.local/share/compound-ime/models/ か /usr/share/compound-ime/models/、
+# 学習データは ~/.local/share/compound-ime/azookey_memory に置く。
+# 試験用の環境変数（MYIME_HERMETIC_TEST など）はウィンドウズと同じ意味で使える。
+A = "converter/azookey_immutable_converter.cc"
+edit(A, """#ifdef _WIN32
+#include <windows.h>
+#endif
+""", """#ifdef _WIN32
+#include <windows.h>
+#else
+#include <dlfcn.h>
+#endif
+""")
+
+# Linux: dlopen と dlsym で同じ関数を読む。
+edit(A, """#else
+    LOG(WARNING) << "AzooKey DLL loading is only supported on Windows";
+#endif
+  }""", """#else
+    std::string directory;
+    const char* override_directory = std::getenv("MYIME_AZOOKEY_DLL_DIR");
+    if (IsHermeticTestMode() && override_directory != nullptr &&
+        override_directory[0] == '/') {
+      directory = override_directory;
+    } else {
+      // このプログラム（mozc_server など）と同じフォルダ。
+      Dl_info info;
+      if (dladdr(reinterpret_cast<void*>(&AzooKeyDllLoader::GetInstance), &info) &&
+          info.dli_fname != nullptr) {
+        directory = info.dli_fname;
+        const size_t slash = directory.rfind('/');
+        directory = slash == std::string::npos ? "" : directory.substr(0, slash);
+      }
+    }
+    if (directory.empty()) {
+      load_error_ = "engine directory unknown";
+      return;
+    }
+    const std::string so_path = directory + "/libazookey-engine.so";
+    LOG(INFO) << "AzooKey engine load path: " << so_path;
+    dll_handle_ = dlopen(so_path.c_str(), RTLD_NOW | RTLD_LOCAL);
+    if (!dll_handle_) {
+      const char* error = dlerror();
+      LOG(ERROR) << "Failed to load libazookey-engine.so: " << (error ? error : "");
+      load_error_ = absl::StrCat("dlopen error ", error ? error : "");
+      return;
+    }
+#define MYIME_LOAD(name) name = reinterpret_cast<name##Func>(dlsym(dll_handle_, #name))
+    MYIME_LOAD(Initialize);
+    MYIME_LOAD(Shutdown);
+    MYIME_LOAD(ConvertText);
+    MYIME_LOAD(ConvertTextWithContext);
+    MYIME_LOAD(GetZenzaiStatus);
+    MYIME_LOAD(FreeString);
+    MYIME_LOAD(SetZenzaiEnabled);
+    MYIME_LOAD(SetZenzaiUseGpu);
+    MYIME_LOAD(SetZenzaiInferenceLimit);
+    MYIME_LOAD(SetZenzaiWeightPath);
+    MYIME_LOAD(SetTypoCorrectionEnabled);
+    MYIME_LOAD(SetTypoCorrectionUseAi);
+    MYIME_LOAD(SetTypoCorrectionBudget);
+    MYIME_LOAD(SetUserDictionary);
+#undef MYIME_LOAD
+    if (!Initialize || !ConvertText || !FreeString) {
+      LOG(ERROR) << "Failed to load essential functions from libazookey-engine.so";
+      load_error_ = "required exports missing";
+      UnloadDll();
+      return;
+    }
+#endif
+  }""")
+edit(A, """#ifdef _WIN32
+    if (dll_handle_) {
+      FreeLibrary(dll_handle_);
+      dll_handle_ = nullptr;
+    }
+#endif""", """#ifdef _WIN32
+    if (dll_handle_) {
+      FreeLibrary(dll_handle_);
+      dll_handle_ = nullptr;
+    }
+#else
+    if (dll_handle_) {
+      dlclose(dll_handle_);
+      dll_handle_ = nullptr;
+    }
+#endif""")
+edit(A, """namespace {
+// Helper function to convert UTF-8 to wide string
+std::wstring Utf8ToWideForRegistry(const std::string& utf8) {""", """namespace {
+#ifdef _WIN32
+// Helper function to convert UTF-8 to wide string
+std::wstring Utf8ToWideForRegistry(const std::string& utf8) {""")
+edit(A, """  return result;
+}
+
+// Write Zenzai status to registry for cross-process communication""", """  return result;
+}
+#endif  // _WIN32
+
+// Write Zenzai status to registry for cross-process communication""")
+
+E = "converter/engine_config.cc"
+edit(E, """#ifdef _WIN32
+#include <shlobj.h>
+#include <windows.h>
+#endif
+""", """#ifdef _WIN32
+#include <shlobj.h>
+#include <windows.h>
+#else
+#include <sys/stat.h>
+
+#include <fstream>
+#endif
+""")
+# 設定: ~/.config/compound-ime/settings の「名前=数値」。
+edit(E, """  return value;
+#else
+  return std::nullopt;
+#endif
+}
+
+bool ReadHkcuMozcDwordAsBool(""", """  return value;
+#else
+  if (IsHermeticTestMode()) {
+    return std::nullopt;
+  }
+  const char* config = std::getenv("XDG_CONFIG_HOME");
+  const char* home = std::getenv("HOME");
+  const std::string path =
+      config && config[0] ? std::string(config) + "/compound-ime/settings"
+      : home              ? std::string(home) + "/.config/compound-ime/settings"
+                          : "";
+  if (path.empty()) return std::nullopt;
+  std::ifstream file(path);
+  const std::wstring wide_name(value_name);
+  const std::string name(wide_name.begin(), wide_name.end());  // 名前は英数字だけ
+  std::string line;
+  while (std::getline(file, line)) {
+    if (line.rfind(name + "=", 0) == 0) {
+      char* end = nullptr;
+      const unsigned long value = std::strtoul(line.c_str() + name.size() + 1, &end, 10);
+      if (end != line.c_str() + name.size() + 1) return static_cast<uint32_t>(value);
+    }
+  }
+  return std::nullopt;
+#endif
+}
+
+bool ReadHkcuMozcDwordAsBool(""")
+edit(E, """#else
+  static const bool is_hermetic_test = false;
+  return is_hermetic_test;
+#endif
+}""", """#else
+  static const bool is_hermetic_test = [] {
+    const char* value = std::getenv("MYIME_HERMETIC_TEST");
+    return value != nullptr && std::string(value) == "1";
+  }();
+  return is_hermetic_test;
+#endif
+}
+
+#ifndef _WIN32
+namespace {
+// ~/.local/share/compound-ime/<name>/（XDG_DATA_HOME があればその下）
+std::string LinuxDataDirectory(const std::string& name) {
+  const char* data = std::getenv("XDG_DATA_HOME");
+  const char* home = std::getenv("HOME");
+  if (data && data[0]) return std::string(data) + "/compound-ime/" + name + "/";
+  if (home) return std::string(home) + "/.local/share/compound-ime/" + name + "/";
+  return "";
+}
+
+void MakeDirectories(const std::string& path) {
+  for (size_t i = 1; i < path.size(); ++i) {
+    if (path[i] == '/') mkdir(path.substr(0, i).c_str(), 0700);
+  }
+  mkdir(path.c_str(), 0700);
+}
+}  // namespace
+#endif  // _WIN32""")
+edit(E, """    return base + "\\\\CompoundIME\\\\models\\\\";
+  }
+#endif
+  return "";
+}
+
+std::string GetZenzaiInstallModelDirectory() {""", """    return base + "\\\\CompoundIME\\\\models\\\\";
+  }
+#else
+  if (!IsHermeticTestMode()) return LinuxDataDirectory("models");
+#endif
+  return "";
+}
+
+std::string GetZenzaiInstallModelDirectory() {""")
+edit(E, """    return base + "\\\\CompoundIME\\\\models\\\\";
+  }
+#endif
+  return "";
+}
+
+std::string GetZenzaiModelDirectory() {""", """    return base + "\\\\CompoundIME\\\\models\\\\";
+  }
+#else
+  if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/";
+#endif
+  return "";
+}
+
+std::string GetZenzaiModelDirectory() {""")
+edit(E, """    return "";
+  }
+#endif
+  const std::string user_path = GetZenzaiUserModelDirectory() + kZenzaiModelName;""", """    return "";
+  }
+#else
+  if (IsHermeticTestMode()) {
+    const char* weight = std::getenv("MYIME_AZOOKEY_ZENZAI_WEIGHT");
+    return weight ? weight : "";
+  }
+#endif
+  const std::string user_path = GetZenzaiUserModelDirectory() + kZenzaiModelName;""")
+edit(E, """    return internal::WideToUtf8(dir);
+  }
+#endif
+  return "";
+}""", """    return internal::WideToUtf8(dir);
+  }
+#else
+  if (IsHermeticTestMode()) {
+    const char* test_tmpdir = std::getenv("TEST_TMPDIR");
+    return test_tmpdir ? std::string(test_tmpdir) + "/azookey_memory" : "";
+  }
+  std::string dir = LinuxDataDirectory("azookey_memory");
+  if (dir.empty()) return "";
+  dir.pop_back();  // 末尾の「/」を除く
+  MakeDirectories(dir);
+  return dir;
+#endif
+  return "";
+}""")
+
 print("applied")

@@ -28,7 +28,11 @@ void CorrectionLog::Record(std::string_view kind, std::string_view key, std::str
                            std::string_view chosen) {
   const std::time_t now = std::chrono::system_clock::to_time_t(std::chrono::system_clock::now());
   std::tm local{};
+#ifdef _WIN32
   localtime_s(&local, &now);
+#else
+  localtime_r(&now, &local);
+#endif
   char stamp[32];
   std::strftime(stamp, sizeof(stamp), "%Y-%m-%dT%H:%M", &local);
   const std::string line = std::string(stamp) + "\t" + Clean(kind) + "\t" + Clean(key) + "\t" +

@@ -184,12 +184,71 @@ edit("gui/about_dialog/about_dialog.ui", "<string>Copyright 2026 Google LLC. All
 # Downloader identities.
 edit("win32/custom_action/custom_action.cc", 'L"MozcInstaller/1.0"', f'L"{ASCII}Installer/1.0"')
 edit("gui/zenzai_download/zenzai_download_dialog.cc", 'L"MozcZenzaiDownloader/1.0"', f'L"{ASCII}ZenzaiDownloader/1.0"')
+# Linux 版の名前: 節: Linux 版の名前と置き場所を公式の Mozc と分ける。
+#
+# /usr/lib/mozc → /usr/lib/compound-ime、~/.config/mozc → ~/.config/compound-ime、
+# ibus の部品名 com.google.IBus.Mozc → org.compoundime.IBus.CompoundIME、
+# エンジン名 mozc-jp → compound-ime-jp など。ウィンドウズ版には影響しない。
+
+
+def edit(path, old, new, count=1):
+    p = src / path
+    t = p.read_text(encoding="utf-8")
+    assert t.count(old) == count, (path, old[:70], t.count(old))
+    p.write_text(t.replace(old, new), encoding="utf-8", newline="")
+
+
+edit("config.bzl", '''LINUX_MOZC_ICONS_DIR = "/usr/share/icons/mozc"
+LINUX_MOZC_SERVER_DIR = "/usr/lib/mozc"''', '''LINUX_MOZC_ICONS_DIR = "/usr/share/icons/compound-ime"
+LINUX_MOZC_SERVER_DIR = "/usr/lib/compound-ime"''')
+edit("config.bzl", '''IBUS_MOZC_INSTALL_DIR = "/usr/share/ibus-mozc"''', '''IBUS_MOZC_INSTALL_DIR = "/usr/share/ibus-compound-ime"''')
+edit("config.bzl", '''IBUS_MOZC_PATH = "/usr/lib/ibus-mozc/ibus-engine-mozc"''',
+     '''IBUS_MOZC_PATH = "/usr/lib/ibus-compound-ime/ibus-engine-compound-ime"''')
+edit("config.bzl", '''EMACS_MOZC_CLIENT_DIR = "/usr/share/emacs/site-lisp/emacs-mozc"''',
+     '''EMACS_MOZC_CLIENT_DIR = "/usr/share/emacs/site-lisp/emacs-compound-ime"''')
+
+S = "base/system_util.cc"
+edit(S, 'constexpr absl::string_view kMozcServerDir = "/usr/lib/mozc";',
+     'constexpr absl::string_view kMozcServerDir = "/usr/lib/compound-ime";')
+edit(S, 'constexpr absl::string_view kMozcDocumentDir = "/usr/lib/mozc/documents";',
+     'constexpr absl::string_view kMozcDocumentDir = "/usr/lib/compound-ime/documents";')
+edit(S, '      return FileUtil::JoinPath(pw.pw_dir, ".mozc");', '      return FileUtil::JoinPath(pw.pw_dir, ".compound-ime");')
+edit(S, '    std::string old_dir = FileUtil::JoinPath(home, ".mozc");', '    std::string old_dir = FileUtil::JoinPath(home, ".compound-ime");')
+edit(S, '      return FileUtil::JoinPath(xdg_config_home, "mozc");', '      return FileUtil::JoinPath(xdg_config_home, "compound-ime");')
+edit(S, '    return FileUtil::JoinPath(home, ".config/mozc");', '    return FileUtil::JoinPath(home, ".config/compound-ime");')
+
+edit("unix/ibus/path_util.cc", '#define MOZC_IBUS_INSTALL_DIR "/usr/share/ibus-mozc"',
+     '#define MOZC_IBUS_INSTALL_DIR "/usr/share/ibus-compound-ime"')
+G = "unix/ibus/gen_mozc_xml.py"
+edit(G, "      'name': 'com.google.IBus.Mozc',", "      'name': 'org.compoundime.IBus.CompoundIME',")
+edit(G, "      'author': 'Google LLC',", "      'author': 'CompoundIME contributors',")
+edit(G, "      'homepage': 'https://github.com/google/mozc',", f"      'homepage': '{URL}',")
+edit(G, "      'textdomain': 'ibus-mozc',", "      'textdomain': 'ibus-compound-ime',")
+edit(G, "  product_name = PRODUCT_NAMES[options.branding]", f"  product_name = '{JA}'")
+
+C = "unix/ibus/ibus_config.textproto"
+edit(C, '''  name : "mozc-jp"
+  longname : "Mozc"''', f'''  name : "compound-ime-jp"
+  longname : "{JA}"''')
+edit(C, '''  name : "mozc-on"
+  longname : "Mozc:あ"''', f'''  name : "compound-ime-on"
+  longname : "{JA}:あ"''')
+edit(C, '''  name : "mozc-off"
+  longname : "Mozc:A_"''', f'''  name : "compound-ime-off"
+  longname : "{JA}:A_"''')
+edit("unix/build_package.py", "        'mozc.xml': os.path.join(args.ibus_component_dir, 'mozc.xml'),",
+     "        'mozc.xml': os.path.join(args.ibus_component_dir, 'compound-ime.xml'),")
+edit(G, "<!-- * $XDG_CONFIG_HOME/mozc/ibus_config.textproto -->", "<!-- * $XDG_CONFIG_HOME/compound-ime/ibus_config.textproto -->")
+edit(G, "<!-- * $HOME/.config/mozc/ibus_config.textproto -->", "<!-- * $HOME/.config/compound-ime/ibus_config.textproto -->")
+edit(G, "<!-- * $HOME/.mozc/ibus_config.textproto -->", "<!-- * $HOME/.compound-ime/ibus_config.textproto -->")
+
 # Product icon (input switcher, settings tool, Apps list).
 import subprocess  # noqa: E402
 icons = src / "data/images/win"
 subprocess.run([sys.executable, str(Path(__file__).with_name("make_compound_icon.py")), str(icons)], check=True)
 (icons / "product_icon.ico").write_bytes((icons / "compound_ime.ico").read_bytes())
 (icons / "product_icon_langbar.ico").write_bytes((icons / "compound_ime_langbar.ico").read_bytes())
-for name in ("compound_ime.ico", "compound_ime_langbar.ico", "compound_ime-256.png"):
+for name in ("compound_ime.ico", "compound_ime_langbar.ico", "compound_ime-256.png",
+             "compound_ime.svg", "compound_ime_langbar-64.png"):
     (icons / name).unlink()
 print("branding applied")

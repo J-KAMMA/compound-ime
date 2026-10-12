@@ -114,3 +114,38 @@ Bazel で作った各部品と、手順 6 の DLL・`*.resources`、`docs/credit
 `--output <msi>` `--branding Mozc` `--arch x64` `--vs_install_dir <VS>\VC` `--azookey_dll_dir <engine フォルダー>` `--version_file <mozc_version.txt>` `--mozc_server` `--mozc_tool` `--mozc_tip64` `--mozc_tip32` `--mozc_renderer` `--mozc_broker` `--mozc_cache_service` `--custom_action <mozc_installer_helper.dll>` `--icon_path <src>/data/images/win/product_icon.ico` `--credit_file docs/credits_en.html` `--qt_core_dll <src>/third_party/qt/bin/Qt6Core.dll` `--wxs_path <src>/win32/installer/installer_oss_64bit.wxs` `--wix_path <wix.cmd>`
 
 azooKey の絵文字辞書（`EmojiDictionary`）は上流に許諾の記載がないため、`AzooKeyKanaKanjiConverter_*.resources` から除いて同梱します。絵文字は Mozc のデータから出ます。
+
+## 10. Linux 版（ibus、試用版）
+
+Ubuntu 24.04（x64）で確かめています。ウィンドウズ版と同じ手順 2〜5 で作業ツリーを用意したあと、次のようにします。
+
+1. 道具と部品を入れる:
+   ```
+   sudo apt install -y clang cmake ninja-build libibus-1.0-dev ibus qt6-base-dev libgtk-3-dev \
+     gnupg2 libcurl4-openssl-dev libncurses-dev libncurses6 libxml2-dev libz3-dev python3-pil
+   ```
+   Swift 6.3.3（Ubuntu 24.04 用、https://download.swift.org/swift-6.3.3-release/ubuntu2404/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE-ubuntu24.04.tar.gz 、署名は https://www.swift.org/keys/all-keys.asc で確認）を `<work>/swift` に展開し、bazelisk を用意します。Mozc の Linux 版の組み立ては `ld.lld` という名前のリンカーを探すので、`ld.lld-18` へのリンクを作った道具フォルダーを渡します。
+2. llama.cpp（手順 1 の版に `patches/llama-utf8.patch` を当てたもの）を共有ライブラリーとして組み立てる:
+   ```
+   cmake -S <work>/llama.cpp -B <work>/llama.cpp/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
+     -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DLLAMA_CURL=OFF \
+     -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF
+   cmake --build <work>/llama.cpp/build
+   ```
+3. 変換エンジンを Linux 用に直して組み立てる:
+   ```
+   python3 tools/apply_linux_engine_port.py <work>/myime/src
+   cd <work>/myime/src/swift-engine
+   swift build -c release -Xlinker -L<work>/llama.cpp/build/bin -Xlinker -lllama -Xlinker -lggml -Xlinker -lggml-base \
+     -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath
+   ```
+4. Mozc の Linux 版を組み立てる（`apply_jaen_integration.py` が Linux 用の書き換えと名前の変更も済ませています）:
+   ```
+   cd <src>
+   bazelisk build --config oss_linux -c opt --nocheck_visibility \
+     --action_env=PATH=<tools>:/usr/bin:/bin --host_action_env=PATH=<tools>:/usr/bin:/bin \
+     --linkopt=-B<tools> --host_linkopt=-B<tools> //unix:package
+   ```
+5. 配布物を作る: `bash tools/make_linux_bundle.sh <版> <work> <このリポジトリ>`。`<work>/dist/compound-ime-<版>-linux-x64.tar.gz` ができます。中の `install.sh` を sudo で実行すると `/usr/lib/compound-ime` などに入り、変換モデルを公式から取得します。公式の Mozc（`/usr/lib/mozc`、ibus の `mozc-jp`）とは名前も置き場所も別です。
+
+試験: `session_handler_main`（`//session:session_handler_main`）で手順 9 と同じ一括試験ができます。開発者の環境では 1,298 入力のうち 1,279 がウィンドウズ版と同じ結果で、残りは人工知能の計算のわずかな差による同点付近の入れ替わりでした。

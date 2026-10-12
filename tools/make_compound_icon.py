@@ -8,6 +8,8 @@ Writes
                             white rounded square, so it reads on dark and light
                             taskbars; no cams and bolder lines for 16-24 px
   compound_ime-256.png      preview of the product icon
+  compound_ime.svg          product icon as SVG (Linux)
+  compound_ime_langbar-64.png  the input-mode icon as PNG (Linux)
 """
 import argparse
 import math
@@ -93,6 +95,18 @@ def draw_langbar(size, scale=8):
     return img.resize((size, size), Image.LANCZOS)
 
 
+def svg():
+    """The product icon as SVG (Linux icon themes): the same strokes, halo then line."""
+    paths = []
+    for color, extra in (("#ffffff", 2.0), ("#111111", 0.0)):
+        for points, rel in strokes():
+            width = 1.9 * rel + extra
+            d = "M" + " L".join(f"{x:.2f},{y:.2f}" for x, y in points[::4] + [points[-1]])
+            paths.append(f'<path d="{d}" fill="none" stroke="{color}" stroke-width="{width:.2f}" '
+                         'stroke-linecap="round" stroke-linejoin="round"/>')
+    return ('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">' + "".join(paths) + "</svg>\n")
+
+
 def save_ico(images, path):
     images[-1].save(path, sizes=[im.size for im in images], append_images=images[:-1])
 
@@ -106,6 +120,8 @@ def main():
     images[-1].save(args.out / "compound_ime-256.png")
     save_ico(images, args.out / "compound_ime.ico")
     save_ico([draw_langbar(size) for size in LANGBAR_SIZES], args.out / "compound_ime_langbar.ico")
+    (args.out / "compound_ime.svg").write_text(svg(), encoding="utf-8")
+    draw_langbar(64).save(args.out / "compound_ime_langbar-64.png")
     print("icon", args.out / "compound_ime.ico")
 
 
