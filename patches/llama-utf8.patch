@@ -1,0 +1,22 @@
+diff --git a/ggml/src/ggml-backend-reg.cpp b/ggml/src/ggml-backend-reg.cpp
+index d0d68be..5042e21 100644
+--- a/ggml/src/ggml-backend-reg.cpp
++++ b/ggml/src/ggml-backend-reg.cpp
+@@ -392,7 +392,7 @@ ggml_backend_t ggml_backend_init_best(void) {
+ 
+ // Dynamic loading
+ ggml_backend_reg_t ggml_backend_load(const char * path) {
+-    return get_reg().load_backend(path, false);
++    return get_reg().load_backend(fs::u8path(path), false);
+ }
+ 
+ void ggml_backend_unload(ggml_backend_reg_t reg) {
+@@ -490,7 +490,7 @@ static ggml_backend_reg_t ggml_backend_load_best(const char * name, bool silent,
+         search_paths.push_back(get_executable_path());
+         search_paths.push_back(fs::current_path());
+     } else {
+-        search_paths.push_back(user_search_path);
++        search_paths.push_back(fs::u8path(user_search_path));
+     }
+ 
+     int best_score = 0;
