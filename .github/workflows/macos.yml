@@ -22,7 +22,7 @@ jobs:
 
       - name: 上流のソースと土台の改修
         run: |
-          set -e
+          set -eo pipefail
           W=$GITHUB_WORKSPACE
           git clone -q https://github.com/unok/myime.git myime
           git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
@@ -33,7 +33,7 @@ jobs:
 
       - name: 生成器と改造の適用
         run: |
-          set -e
+          set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
           python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow
           PY=$W/venv/bin/python
@@ -51,7 +51,7 @@ jobs:
 
       - name: 変換エンジン（Swift）
         run: |
-          set -e
+          set -eo pipefail
           cd $GITHUB_WORKSPACE/myime/src/swift-engine
           swift --version
           cp $GITHUB_WORKSPACE/repo/tools/swift-Package.resolved Package.resolved
@@ -60,13 +60,13 @@ jobs:
 
       - name: Mozc（試験用ツール）
         run: |
-          set -e
+          set -eo pipefail
           cd $GITHUB_WORKSPACE/myime/mozc/src
           bazelisk build --config oss_macos -c opt --nocheck_visibility //session:session_handler_main 2>&1 | tail -30
 
       - name: 変換の一括試験
         run: |
-          set -e
+          set -eo pipefail
           W=$GITHUB_WORKSPACE; E=$W/engine; mkdir -p $E
           R=$W/myime/src/swift-engine/.build/release
           cp $R/libazookey-engine.dylib $E/

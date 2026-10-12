@@ -1,7 +1,10 @@
-"""節: 変換エンジン（Swift）を Linux でも組み立てられるようにする。
+"""変換エンジン（Swift）を Linux と Mac でも組み立てられるようにする。
 
-_strdup（ウィンドウズの関数）を Linux では strdup で代わりに用意し、
-標準エラーへの書き込みは並行処理の検査に通る書き方にする。
+  python tools/apply_linux_engine_port.py <MyIME の src>
+
+_strdup（ウィンドウズの関数）を strdup で代わりに用意し、標準エラーへの
+書き込みは並行処理の検査に通る書き方にする。Mac では変換部品と同じく
+macOS 13 以降を対象にする。
 """
 import sys
 from pathlib import Path
@@ -34,4 +37,12 @@ new = """#endif
 }"""
 assert t.count(old) == 1
 p.write_text(t.replace(old, new), encoding="utf-8", newline="")
+pkg = src / "swift-engine/Package.swift"
+t = pkg.read_text(encoding="utf-8")
+old = """    name: "azookey-engine",
+    products: ["""
+assert t.count(old) == 1
+pkg.write_text(t.replace(old, """    name: "azookey-engine",
+    platforms: [.macOS(.v13)],
+    products: ["""), encoding="utf-8", newline="")
 print("engine port ok")
