@@ -44,7 +44,16 @@ bool IsSmallKana(const Chunk& chunk) {
 
 int64_t ForeignCost(const std::vector<Chunk>& chunks) {
   int64_t cost = 0;
-  for (const Chunk& chunk : chunks) cost += ForeignWeight(chunk);
+  for (size_t i = 0; i < chunks.size(); ++i) {
+    cost += ForeignWeight(chunks[i]);
+    // ん then a doubled-key っ ("meeting|ga" read as めえてぃんっが) hardly
+    // occurs in Japanese; it is an English word ending in -ng/-nk/... before
+    // a kana starting with the same consonant.
+    if (i > 0 && chunks[i].conversion.starts_with("っ") && !IsSmallKana(chunks[i]) &&
+        chunks[i - 1].conversion.ends_with("ん")) {
+      cost += kWeakForeignCost;
+    }
+  }
   return cost;
 }
 

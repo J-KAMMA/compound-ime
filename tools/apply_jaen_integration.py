@@ -2626,6 +2626,90 @@ edit("engine/BUILD.bazel", """    name = "engine_converter",
         "//base:const",
 """)
 
+# 英単語の入った文の人工知能: 節: 英単語の入った文でも、人工知能が前後の語を見て選ぶ。
+#
+# 英単語は確定済みの文節（FIXED_VALUE）になり、文全体を人工知能に見せる処理は
+# 確定済みの文節があると働かない。そのため「iPhoneをかいたい」の「かいたい」は
+# 普段の順位（解体）のままだった。英単語で区切られた日本語の部分（2文節以上）
+# ごとに、文全体のときと同じ処理を行い、英単語とほかの部分を前後の文として渡す。
+# 時間の上限（MYIME_AI_BUDGET_MS）は同じ。MYIME_ENGLISH_CONTEXT=0 で元の動作に戻る。
+E = "engine/engine.cc"
+edit(E, """    if (compare_context)
+      PreferWholePhrase(options, *mozc_, *azoo_, prefetch_.get(), deadline, pos_matcher_, segments, left_context, right_context, original);""",
+     """    if (compare_context)
+      PreferWholePhrase(options, *mozc_, *azoo_, prefetch_.get(), deadline, pos_matcher_, segments, left_context, right_context, original);
+    static const bool english_context = [] {
+      const char* value = std::getenv("MYIME_ENGLISH_CONTEXT");
+      return !value || std::string_view(value) != "0";
+    }();
+    if (english_context && configured_neural_)
+      PreferWholePhraseRuns(options, *mozc_, *azoo_, prefetch_.get(), deadline, pos_matcher_, segments, left_context, right_context);""")
+
+edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.tsv); a
+  // first candidate from the user's history is never moved.""", """  // Runs of Japanese segments between English words (FIXED_VALUE segments,
+  // which the whole-sentence query skips): the whole-sentence query on each
+  // run of two or more segments, the English words and the other runs given
+  // as its left and right text ("iPhone|を|かいたい" → 買いたい).
+  static void PreferWholePhraseRuns(const ConversionOptions& options,
+                                    const ImmutableConverterInterface& mozc,
+                                    const ImmutableConverterInterface& azoo,
+                                    WholePhrasePrefetch* prefetch,
+                                    std::chrono::steady_clock::time_point deadline,
+                                    const dictionary::PosMatcher& pos, Segments* segments,
+                                    std::string_view left, std::string_view right) {
+    const size_t count = segments->conversion_segments_size();
+    if (segments->resized() || count < 3 || count > 128) return;
+    std::vector<std::string> values;
+    bool has_fixed = false;
+    for (const auto& segment : segments->conversion_segments()) {
+      values.push_back(segment.candidates_size() ? segment.candidate(0).value : "");
+      has_fixed |= segment.segment_type() == Segment::FIXED_VALUE;
+    }
+    if (!has_fixed) return;
+    for (size_t begin = 0; begin < count;) {
+      if (segments->conversion_segment(begin).segment_type() != Segment::FREE) { ++begin; continue; }
+      size_t end = begin;
+      while (end < count && segments->conversion_segment(end).segment_type() == Segment::FREE) ++end;
+      if (end - begin >= 2 && std::chrono::steady_clock::now() < deadline) {
+        Segments run(*segments);
+        const size_t history = run.history_segments_size();
+        if (end < count) run.erase_segments(history + end, count - end);
+        if (begin > 0) run.erase_segments(history, begin);
+        std::vector<std::vector<const converter::Candidate*>> original;
+        for (const auto& segment : run.conversion_segments())
+          original.emplace_back(segment.candidates().begin(), segment.candidates().end());
+        std::string run_left(left), run_right;
+        for (size_t i = 0; i < begin; ++i) run_left += values[i];
+        for (size_t i = end; i < count; ++i) run_right += values[i];
+        run_right += right;
+        PreferWholePhrase(options, mozc, azoo, prefetch, deadline, pos, &run, run_left, run_right, original);
+        // Copy the chosen first candidates back (not when the run was re-segmented).
+        bool same = run.conversion_segments_size() == end - begin;
+        for (size_t i = begin; same && i < end; ++i)
+          same = run.conversion_segment(i - begin).key() == segments->conversion_segment(i).key();
+        for (size_t i = begin; same && i < end; ++i) {
+          const auto& chosen = run.conversion_segment(i - begin).candidate(0);
+          auto* segment = segments->mutable_conversion_segment(i);
+          // A katakana first candidate (a loanword such as ベース) is not swapped
+          // for another katakana spelling of the typed kana (バセ).
+          // (Compared on the content word: ベースに / バセに.)
+          if (Util::GetScriptType(segment->candidate(0).content_value) == Util::KATAKANA &&
+              Util::GetScriptType(chosen.content_value) == Util::KATAKANA &&
+              segment->candidate(0).content_value != chosen.content_value) continue;
+          for (size_t k = 1; k < segment->candidates_size(); ++k) {
+            if (segment->candidate(k).value == chosen.value && segment->candidate(k).key == chosen.key) {
+              segment->move_candidate(static_cast<int>(k), 0);
+              break;
+            }
+          }
+        }
+      }
+      begin = end;
+    }
+  }
+  // Context cues pick among homophones (tools/data/homophone-cues.tsv); a
+  // first candidate from the user's history is never moved.""")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

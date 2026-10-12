@@ -31,7 +31,7 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
-    {"nu", "ぬ"}, {"xn", "ん"}};
+    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -45,6 +45,10 @@ std::vector<Chunk> Parse(std::string_view raw) {
       const std::string key(raw.substr(i, best));
       chunks.push_back({key, kTable.at(key), ""});
       i += best;
+    } else if (i + 1 < raw.size() && raw[i + 1] == raw[i] && raw[i] != 'n' &&
+               std::string_view("aiueo").find(raw[i]) == std::string_view::npos) {
+      chunks.push_back({std::string(1, raw[i]), "っ", ""});  // doubled key: っ
+      ++i;
     } else if (raw[i] == 'n' && i + 1 < raw.size()) {
       chunks.push_back({"n", "ん", ""});
       ++i;
@@ -68,7 +72,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -104,6 +108,8 @@ int main() {
   Expect(english("chatgptttenani") == "chatgpt|", "a word may end before tte");
   Expect(english("slackkaramita") == "slack|", "a word may end before the same key (slack + kara)");
   Expect(english("linuxnokoma") == "linux|", "xn is ん, not a small kana: it may be cut");
+  Expect(english("meetinggaarimasu") == "meeting|", "-ng before ga: んっ is not Japanese");
+  Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");
   Expect(english("tokyonimita") == "tokyo|", "Hepburn place name before a particle");
   Expect(english("kyouhatokyo") == "tokyo|", "Hepburn place name at the end");
   Expect(english("oosakanimita").empty(), "not inside the normal spelling oosaka");
