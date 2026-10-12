@@ -70,6 +70,6 @@ CompoundIME is based on Mozc (https://github.com/google/mozc, BSD-3-Clause) and 
 
 ## Contact
 
-For a copy of the Qt source on physical media or for any question about this offer: <contact address to be filled in before release>.
+For a copy of the Qt source on physical media or for any question about this offer: please open an issue at https://github.com/J-KAMMA/compound-ime/issues.
 
 Qt is a trademark of The Qt Company Ltd. CompoundIME is not affiliated with or endorsed by The Qt Company.
