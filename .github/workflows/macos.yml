@@ -178,7 +178,7 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
           cd $S
-          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package_files 2>&1 | tail -5
+          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package_files > $W/bazel.log 2>&1 || { grep -B3 -A15 "ERROR\|error:" $W/bazel.log | head -80; exit 1; }
           rm -rf $W/pkg && mkdir $W/pkg && cd $W/pkg && unzip -q $S/bazel-bin/mac/package_files.zip
           find . -maxdepth 6 -name "*.app" | head -20
           CONV=$(find . -path "*CompoundIME.app/Contents/Resources/CompoundIMEConverter.app" -maxdepth 8 | head -1)
