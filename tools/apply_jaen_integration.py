@@ -2757,7 +2757,11 @@ edit(A, """#else
       load_error_ = "engine directory unknown";
       return;
     }
+#ifdef __APPLE__
+    const std::string so_path = directory + "/libazookey-engine.dylib";
+#else
     const std::string so_path = directory + "/libazookey-engine.so";
+#endif
     LOG(INFO) << "AzooKey engine load path: " << so_path;
     dll_handle_ = dlopen(so_path.c_str(), RTLD_NOW | RTLD_LOCAL);
     if (!dll_handle_) {

@@ -1,0 +1,101 @@
+# Mac 版を組み立てて、変換の一括試験を流す（試用段階）。
+name: macOS
+
+on:
+  push:
+    branches: [mac]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15
+    timeout-minutes: 330
+    env:
+      USE_BAZEL_VERSION: 9.0.2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: 上流のソースと土台の改修
+        run: |
+          set -e
+          W=$GITHUB_WORKSPACE
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init --recursive
+          git -C myime/mozc apply --whitespace=nowarn $W/repo/patches/mozc-base.patch
+          git -C myime apply --whitespace=nowarn $W/repo/patches/myime-engine.patch
+          git -C myime/mozc log -1 --format='mozc %h'
+
+      - name: 生成器と改造の適用
+        run: |
+          set -e
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
+          python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow
+          PY=$W/venv/bin/python
+          $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
+          mkdir -p $W/ut
+          curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
+            https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
+          echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | shasum -a 256 -c
+          bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
+          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
+          cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
+          $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
+          $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+
+      - name: 変換エンジン（Swift）
+        run: |
+          set -e
+          cd $GITHUB_WORKSPACE/myime/src/swift-engine
+          swift --version
+          cp $GITHUB_WORKSPACE/repo/tools/swift-Package.resolved Package.resolved
+          swift build -c release 2>&1 | tail -30
+          ls -la .build/release | grep -E "dylib|bundle|framework" || true
+
+      - name: Mozc（試験用ツール）
+        run: |
+          set -e
+          cd $GITHUB_WORKSPACE/myime/mozc/src
+          bazelisk build --config oss_macos -c opt --nocheck_visibility //session:session_handler_main 2>&1 | tail -30
+
+      - name: 変換の一括試験
+        run: |
+          set -e
+          W=$GITHUB_WORKSPACE; E=$W/engine; mkdir -p $E
+          R=$W/myime/src/swift-engine/.build/release
+          cp $R/libazookey-engine.dylib $E/
+          cp -R $R/*.bundle $E/ 2>/dev/null || true
+          cp -R $R/*.framework $E/ 2>/dev/null || true
+          cp $W/myime/mozc/src/bazel-bin/session/session_handler_main $E/
+          curl -fsSL -o $W/model.gguf \
+            https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
+          echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | shasum -a 256 -c
+          head -20 $W/repo/tests/conversion/inputs.txt > $W/small.txt
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/small.txt $W/small.tsv 1
+          cat $W/small.tsv
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/repo/tests/conversion/inputs.txt $W/mac.tsv 3
+          python3 - <<'PY'
+          import os
+          W = os.environ["GITHUB_WORKSPACE"]
+          def load(p):
+              return {l.split("\t")[0]: l.rstrip("\n").split("\t")[2] for l in open(p, encoding="utf-8")}
+          a = load(f"{W}/repo/tests/conversion/expected-windows-139.tsv")
+          b = load(f"{W}/mac.tsv")
+          same = sum(a.get(k) == v for k, v in b.items())
+          print(f"Mac {len(b)} 件、ウィンドウズ版と同じ {same} 件")
+          PY
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-results
+          path: |
+            mac.tsv
+            small.tsv
+          if-no-files-found: ignore
