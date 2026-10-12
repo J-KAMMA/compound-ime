@@ -11,6 +11,8 @@ permissions:
 
 jobs:
   build:
+    # 変換の一括試験。コミットの文に [試験なし] があれば飛ばす
+    if: ${{ !contains(github.event.head_commit.message, '[試験なし]') }}
     runs-on: macos-15
     timeout-minutes: 330
     env:
@@ -98,4 +100,67 @@ jobs:
           path: |
             mac.tsv
             small.tsv
+          if-no-files-found: ignore
+
+  package:
+    runs-on: macos-15
+    timeout-minutes: 330
+    env:
+      USE_BAZEL_VERSION: 9.0.2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: 上流のソースと土台の改修
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init --recursive
+          git -C myime/mozc apply --whitespace=nowarn $W/repo/patches/mozc-base.patch
+          git -C myime apply --whitespace=nowarn $W/repo/patches/myime-engine.patch
+          git -C myime/mozc log -1 --format='mozc %h'
+
+      - name: 生成器と改造の適用
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
+          python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow
+          PY=$W/venv/bin/python
+          $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
+          mkdir -p $W/ut
+          curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
+            https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
+          echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | shasum -a 256 -c
+          bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
+          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
+          cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
+          $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
+          $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+
+      - name: Qt 6.9.1（Mac 用、設定画面に使う）
+        run: |
+          set -eo pipefail
+          S=$GITHUB_WORKSPACE/myime/mozc/src
+          mkdir -p $S/third_party_cache
+          curl -fsSL -o $S/third_party_cache/qtbase-everywhere-src-6.9.1.tar.xz             https://download.qt.io/archive/qt/6.9/6.9.1/submodules/qtbase-everywhere-src-6.9.1.tar.xz
+          echo "40caedbf83cc9a1959610830563565889878bc95f115868bbf545d1914acf28e  $S/third_party_cache/qtbase-everywhere-src-6.9.1.tar.xz" | shasum -a 256 -c
+          cd $S && python3 build_tools/build_qt.py --release --confirm_license --macos_cpus=arm64 2>&1 | tail -15
+          ls third_party/qt
+
+      - name: Mac の配布物（まず公式のまま）
+        run: |
+          set -eo pipefail
+          cd $GITHUB_WORKSPACE/myime/mozc/src
+          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package 2>&1 | tail -40
+          ls -la bazel-bin/mac/
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mac-package
+          path: myime/mozc/src/bazel-bin/mac/*.pkg
           if-no-files-found: ignore
