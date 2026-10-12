@@ -188,8 +188,8 @@ edit("gui/zenzai_download/zenzai_download_dialog.cc", 'L"MozcZenzaiDownloader/1.
 import subprocess  # noqa: E402
 icons = src / "data/images/win"
 subprocess.run([sys.executable, str(Path(__file__).with_name("make_compound_icon.py")), str(icons)], check=True)
-for name in ("product_icon.ico", "product_icon_langbar.ico"):
-    (icons / name).write_bytes((icons / "compound_ime.ico").read_bytes())
-(icons / "compound_ime.ico").unlink()
-(icons / "compound_ime-256.png").unlink()
+(icons / "product_icon.ico").write_bytes((icons / "compound_ime.ico").read_bytes())
+(icons / "product_icon_langbar.ico").write_bytes((icons / "compound_ime_langbar.ico").read_bytes())
+for name in ("compound_ime.ico", "compound_ime_langbar.ico", "compound_ime-256.png"):
+    (icons / name).unlink()
 print("branding applied")

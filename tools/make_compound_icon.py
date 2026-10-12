@@ -1,9 +1,13 @@
-"""Draw the CompoundIME icon: a compound bow (cams at the limb tips) with an
-arrow pointing up, black lines with a white halo so that one icon reads on both
-light and dark taskbars.
+"""Draw the CompoundIME icons: a compound bow with an arrow pointing up.
 
   python tools/make_compound_icon.py <out-dir>
-Writes compound_ime.ico (16-256 px) and compound_ime-256.png.
+Writes
+  compound_ime.ico          product icon (installer, Apps list, settings tool):
+                            black lines with a white halo, cams at the limb tips
+  compound_ime_langbar.ico  input-mode icon on the taskbar: a black bow on a
+                            white rounded square, so it reads on dark and light
+                            taskbars; no cams and bolder lines for 16-24 px
+  compound_ime-256.png      preview of the product icon
 """
 import argparse
 import math
@@ -12,7 +16,9 @@ from pathlib import Path
 from PIL import Image, ImageDraw
 
 SIZES = (16, 20, 24, 32, 40, 48, 64, 128, 256)
+LANGBAR_SIZES = (16, 20, 24, 32, 40, 48, 64)
 BLACK, WHITE = (17, 17, 17, 255), (255, 255, 255, 255)
+BADGE = (245, 245, 245, 255)
 
 
 def cubic(p0, p1, p2, p3, n=200):
@@ -45,6 +51,22 @@ def strokes():
     yield list(segment((9.6, 6.5), (12, 3.5))) + list(segment((12, 3.5), (14.4, 6.5))), 1.0
 
 
+def small_strokes():
+    """The taskbar shape: limbs low and wide, V string, a clear arrow head."""
+    yield list(cubic((2.2, 15.5), (5.5, 9.5), (18.5, 9.5), (21.8, 15.5))), 1.0
+    yield list(segment((2.6, 15.6), (12, 19.5))) + list(segment((12, 19.5), (21.4, 15.6))), 0.55
+    yield list(segment((12, 22.5), (12, 2.5))), 1.0
+    yield list(segment((8.6, 6.2), (12, 2.5))) + list(segment((12, 2.5), (15.4, 6.2))), 1.0
+
+
+def stamp(d, points, r, unit, color, shrink=1.0, centre=12):
+    for x, y in points:
+        if shrink != 1.0:
+            x, y = centre + (x - centre) * shrink, centre + (y - centre) * shrink
+        x, y = x * unit, y * unit
+        d.ellipse((x - r, y - r, x + r, y + r), fill=color)
+
+
 def draw(size, scale=8):
     s = size * scale
     unit = s / 24
@@ -52,15 +74,27 @@ def draw(size, scale=8):
     d = ImageDraw.Draw(img)
     line = (2.3 if size <= 20 else 1.9) * unit
     halo = line + (2.2 if size <= 20 else 2.0) * unit
-    for color, width in ((WHITE, halo), (BLACK, line)):
+    for color in (WHITE, BLACK):
         for points, rel in strokes():
-            r = (width if color == WHITE else width * rel) / 2
-            if color == WHITE:
-                r = (line * rel + (halo - line)) / 2
-            for x, y in points:
-                x, y = x * unit, y * unit
-                d.ellipse((x - r, y - r, x + r, y + r), fill=color)
+            r = (line * rel + (halo - line)) / 2 if color == WHITE else line * rel / 2
+            stamp(d, points, r, unit, color)
     return img.resize((size, size), Image.LANCZOS)
+
+
+def draw_langbar(size, scale=8):
+    s = size * scale
+    unit = s / 24
+    img = Image.new("RGBA", (s, s), (0, 0, 0, 0))
+    d = ImageDraw.Draw(img)
+    d.rounded_rectangle((0.5 * unit, 0.5 * unit, s - 0.5 * unit, s - 0.5 * unit), radius=4.5 * unit, fill=BADGE)
+    line = (2.6 if size <= 24 else 2.2) * unit
+    for points, rel in small_strokes():
+        stamp(d, points, line * rel / 2, unit, BLACK, shrink=0.78)
+    return img.resize((size, size), Image.LANCZOS)
+
+
+def save_ico(images, path):
+    images[-1].save(path, sizes=[im.size for im in images], append_images=images[:-1])
 
 
 def main():
@@ -70,8 +104,8 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     images = [draw(size) for size in SIZES]
     images[-1].save(args.out / "compound_ime-256.png")
-    images[-1].save(args.out / "compound_ime.ico", sizes=[(s, s) for s in SIZES],
-                    append_images=images[:-1])
+    save_ico(images, args.out / "compound_ime.ico")
+    save_ico([draw_langbar(size) for size in LANGBAR_SIZES], args.out / "compound_ime_langbar.ico")
     print("icon", args.out / "compound_ime.ico")
 
 
