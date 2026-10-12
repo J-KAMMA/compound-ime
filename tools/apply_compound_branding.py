@@ -242,6 +242,94 @@ edit(G, "<!-- * $XDG_CONFIG_HOME/mozc/ibus_config.textproto -->", "<!-- * $XDG_C
 edit(G, "<!-- * $HOME/.config/mozc/ibus_config.textproto -->", "<!-- * $HOME/.config/compound-ime/ibus_config.textproto -->")
 edit(G, "<!-- * $HOME/.mozc/ibus_config.textproto -->", "<!-- * $HOME/.compound-ime/ibus_config.textproto -->")
 
+# Mac 版の名前: 節: Mac 版の名前と置き場所を公式の Mozc と分ける。
+#
+# /Library/Input Methods/Mozc.app → CompoundIME.app（中の MozcConverter.app なども
+# CompoundIMEConverter.app などに）、識別子 org.mozc.inputmethod.Japanese →
+# org.compoundime.inputmethod.Japanese、学習データ ~/Library/Application Support/Mozc
+# → .../CompoundIME、入力メニューの名前を「コンパウンドIME」に。ウィンドウズ版と
+# Linux 版には影響しない。
+
+
+def edit(path, old, new, count=1):
+    p = src / path
+    t = p.read_text(encoding="utf-8")
+    assert t.count(old) == count, (path, old[:70], t.count(old))
+    p.write_text(t.replace(old, new), encoding="utf-8", newline="")
+
+
+edit("config.bzl", 'MACOS_BUNDLE_ID_PREFIX = "org.mozc.inputmethod.Japanese"',
+     'MACOS_BUNDLE_ID_PREFIX = "org.compoundime.inputmethod.Japanese"')
+edit("mac/BUILD.bazel", "    bundle_name = BRANDING,\n", '    bundle_name = "CompoundIME",\n')
+edit("server/BUILD.bazel", '    bundle_name = BRANDING + "Converter",', '    bundle_name = "CompoundIMEConverter",')
+edit("renderer/BUILD.bazel", '    bundle_name = BRANDING + "Renderer",', '    bundle_name = "CompoundIMERenderer",')
+edit("gui/tool/BUILD.bazel", '    bundle_name = BRANDING + "Prelauncher",', '    bundle_name = "CompoundIMEPrelauncher",')
+
+# Info.plist の差し込み値（実行ファイル名・識別子・表示名）
+T = "build_tools/tweak_info_plist.py"
+edit(T, """    domain_prefix = 'org.mozc'
+    product_name = 'Mozc'""", """    domain_prefix = 'org.compoundime'
+    product_name = 'CompoundIME'""")
+edit(T, """      'BRANDING':
+          options.branding,""", """      'BRANDING':
+          'CompoundIME' if options.branding == 'Mozc' else options.branding,""")
+edit(T, "  copyright_message = u'© %d Google Inc.' % _COPYRIGHT_YEAR",
+     "  copyright_message = u'© %d CompoundIME contributors' % _COPYRIGHT_YEAR")
+S = "build_tools/tweak_info_plist_strings.py"
+edit(S, """        'CF_BUNDLE_NAME_EN': 'Mozc',
+        'CF_BUNDLE_NAME_JA': 'Mozc',""", f"""        'CF_BUNDLE_NAME_EN': 'CompoundIME',
+        'CF_BUNDLE_NAME_JA': '{JA}',""")
+edit(S, "        'INPUT_MODE_ANNOTATION': 'Mozc',", f"        'INPUT_MODE_ANNOTATION': '{JA}',")
+
+edit("base/mac/mac_util.mm", 'const char kProjectPrefix[] = "org.mozc.inputmethod.Japanese.";',
+     'const char kProjectPrefix[] = "org.compoundime.inputmethod.Japanese.";')
+edit("base/system_util.cc", '    return FileUtil::JoinPath(dir, "Mozc");', '    return FileUtil::JoinPath(dir, "CompoundIME");')
+
+A = "mac/ActivatePane/ActivatePane.mm"
+edit(A, 'static const unsigned char kInstalledLocation[] = "/Library/Input Methods/Mozc.app";',
+     'static const unsigned char kInstalledLocation[] = "/Library/Input Methods/CompoundIME.app";')
+edit(A, '    @"/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Converter.plist",',
+     '    @"/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Converter.plist",')
+edit(A, '    @"/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Renderer.plist", nil};',
+     '    @"/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist", nil};')
+edit(A, 'static NSString *const kSourceID = @"org.mozc.inputmethod.Japanese";',
+     'static NSString *const kSourceID = @"org.compoundime.inputmethod.Japanese";')
+U = "mac/Uninstaller/Uninstaller.mm"
+edit(U, '      "/Library/Input Methods/Mozc.app",', '      "/Library/Input Methods/CompoundIME.app",')
+edit(U, '      "/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Converter.plist",',
+     '      "/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Converter.plist",')
+edit(U, '      "/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Renderer.plist", "/Applications/Mozc",',
+     '      "/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist", "/Applications/CompoundIME",')
+
+# 起動用の設定（LaunchAgents）: 名前と中身
+L = src / "mac/installer/LaunchAgents"
+for part in ("Converter", "Renderer"):
+    old = L / f"org.mozc.inputmethod.Japanese.{part}.plist"
+    text = old.read_text(encoding="utf-8")
+    text = text.replace("/Library/Input Methods/Mozc.app/Contents/Resources/Mozc" + part + ".app/Contents/MacOS/Mozc" + part,
+                        "/Library/Input Methods/CompoundIME.app/Contents/Resources/CompoundIME" + part +
+                        ".app/Contents/MacOS/CompoundIME" + part)
+    text = text.replace("org.mozc.inputmethod.Japanese.", "org.compoundime.inputmethod.Japanese.")
+    assert "mozc" not in text.lower(), text
+    (L / f"org.compoundime.inputmethod.Japanese.{part}.plist").write_text(text, encoding="utf-8", newline="")
+    old.unlink()
+edit("mac/installer/BUILD.bazel", """        "LaunchAgents/org.mozc.inputmethod.Japanese.Converter.plist",
+        "LaunchAgents/org.mozc.inputmethod.Japanese.Renderer.plist",""",
+     """        "LaunchAgents/org.compoundime.inputmethod.Japanese.Converter.plist",
+        "LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist",""")
+edit("mac/installer/distribution.xml", "org.mozc.pkg.JapaneseInput", "org.compoundime.pkg.JapaneseInput", 5)
+edit("mac/installer/distribution.xml", "    <title>Mozc</title>", f"    <title>{JA}</title>")
+edit("mac/build_package.py", "    identifier = 'org.mozc.pkg.JapaneseInput'", "    identifier = 'org.compoundime.pkg.JapaneseInput'")
+P = "mac/installer/postflight_template.sh"
+edit(P, "/usr/bin/killall MozcConverter", "/usr/bin/killall CompoundIMEConverter")
+edit(P, "/usr/bin/killall MozcRenderer", "/usr/bin/killall CompoundIMERenderer")
+edit(P, "/usr/bin/killall Mozc > /dev/null", "/usr/bin/killall CompoundIME > /dev/null")
+W = "mac/tweak_installer_files.py"
+edit(W, "  name = 'Mozc' if oss else 'GoogleJapaneseInput'", "  name = 'CompoundIME' if oss else 'GoogleJapaneseInput'")
+edit(W, """    name = 'Mozc'
+    folder = 'Mozc'""", """    name = 'CompoundIME'
+    folder = 'CompoundIME'""")
+
 # Product icon (input switcher, settings tool, Apps list).
 import subprocess  # noqa: E402
 icons = src / "data/images/win"

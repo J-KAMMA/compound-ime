@@ -2968,4 +2968,40 @@ edit(E, """    return internal::WideToUtf8(dir);
   return "";
 }""")
 
+# Mac の置き場所: 節: Mac でのモデルと学習データの置き場所（Linux 対応のあと）。
+#
+# Mac では ~/Library/Application Support/CompoundIME/models と
+# /Library/Application Support/CompoundIME/models（配布物の導入時に取得）を見て、
+# 人工知能の学習データは ~/Library/Application Support/CompoundIME/azookey_memory に置く。
+# 導入時の処理（postflight）で、変換モデルを公式の配布元から取得して SHA-256 を照合する。
+E = "converter/engine_config.cc"
+edit(E, """std::string LinuxDataDirectory(const std::string& name) {
+  const char* data = std::getenv("XDG_DATA_HOME");
+  const char* home = std::getenv("HOME");""", """std::string LinuxDataDirectory(const std::string& name) {
+  const char* home = std::getenv("HOME");
+#ifdef __APPLE__
+  if (home) return std::string(home) + "/Library/Application Support/CompoundIME/" + name + "/";
+#endif  // __APPLE__
+  const char* data = std::getenv("XDG_DATA_HOME");""")
+edit(E, """  if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/";""",
+     """#ifdef __APPLE__
+  if (!IsHermeticTestMode()) return "/Library/Application Support/CompoundIME/models/";
+#else   // __APPLE__
+  if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/";
+#endif  // __APPLE__""")
+
+edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 変換モデル（zenz-v3.2-small、約74MB）を公式の配布元から取得し、SHA-256 を照合する
+M="/Library/Application Support/CompoundIME/models"
+MODEL="$M/ggml-model-Q5_K_M.gguf"
+SUM=29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673
+/bin/mkdir -p "$M"
+if ! echo "$SUM  $MODEL" | /usr/bin/shasum -a 256 -c -s 2>/dev/null; then
+  /usr/bin/curl -fsL -o "$MODEL.part" \\
+    https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf \\
+    && echo "$SUM  $MODEL.part" | /usr/bin/shasum -a 256 -c -s && /bin/mv "$MODEL.part" "$MODEL"
+  /bin/rm -f "$MODEL.part"
+fi
+
+/usr/bin/true""")
+
 print("applied")

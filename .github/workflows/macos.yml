@@ -151,16 +151,59 @@ jobs:
           cd $S && python3 build_tools/build_qt.py --release --confirm_license --macos_cpus=arm64 2>&1 | tail -15
           ls third_party/qt
 
-      - name: Mac の配布物（まず公式のまま）
+      - name: 変換エンジン（Swift、配布物用）
         run: |
           set -eo pipefail
-          cd $GITHUB_WORKSPACE/myime/mozc/src
-          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package 2>&1 | tail -40
-          ls -la bazel-bin/mac/
+          cd $GITHUB_WORKSPACE/myime/src/swift-engine
+          cp $GITHUB_WORKSPACE/repo/tools/swift-Package.resolved Package.resolved
+          swift build -c release 2>&1 | tail -5
+          otool -L .build/release/libazookey-engine.dylib | head -20
+          otool -l .build/release/libazookey-engine.dylib | grep -A2 LC_RPATH | grep path || true
+          ls .build/release | grep -E "bundle|framework"
+
+      - name: 弓の絵（Mac 用 .icns）
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; I=$W/icons; $W/venv/bin/python $W/repo/tools/make_compound_icon.py $I
+          mkdir -p $I/product.iconset
+          for s in 16 32 128 256 512; do
+            sips -z $s $s $I/compound_ime-256.png --out $I/product.iconset/icon_${s}x${s}.png >/dev/null
+            d=$((s*2)); sips -z $d $d $I/compound_ime-256.png --out $I/product.iconset/icon_${s}x${s}@2x.png >/dev/null
+          done
+          iconutil -c icns $I/product.iconset -o $W/myime/mozc/src/data/images/mac/product_icon.icns
+          ls -la $W/myime/mozc/src/data/images/mac/product_icon.icns
+
+      - name: Mac の配布物
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
+          cd $S
+          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package_files 2>&1 | tail -5
+          rm -rf $W/pkg && mkdir $W/pkg && cd $W/pkg && unzip -q $S/bazel-bin/mac/package_files.zip
+          find . -maxdepth 6 -name "*.app" | head -20
+          CONV=$(find . -path "*CompoundIME.app/Contents/Resources/CompoundIMEConverter.app" -maxdepth 8 | head -1)
+          echo "converter: $CONV"; test -n "$CONV"
+          ER=$W/myime/src/swift-engine/.build/release
+          cp $ER/libazookey-engine.dylib "$CONV/Contents/MacOS/"
+          mkdir -p "$CONV/Contents/Frameworks"
+          for f in $ER/*.framework; do [ -e "$f" ] && cp -R "$f" "$CONV/Contents/Frameworks/"; done
+          for b in $ER/*.bundle; do cp -R "$b" "$CONV/"; cp -R "$b" "$CONV/Contents/Resources/"; done
+          # 外した絵文字辞書（許諾の記載がない）
+          find "$CONV" -type d -name EmojiDictionary -prune -exec rm -rf {} +
+          install_name_tool -add_rpath @loader_path/../Frameworks "$CONV/Contents/MacOS/libazookey-engine.dylib" 2>/dev/null || true
+          cp $W/repo/docs/credits_en.html "$(dirname "$CONV")/credits_en.html"
+          APP=$(dirname "$(dirname "$(dirname "$CONV")")")
+          codesign --force --deep -s - "$APP"
+          codesign --verify --deep "$APP" && echo "署名（簡易）を確認"
+          zip -qry $W/package_files_compound.zip installer
+          cd $S
+          PYTHONPATH=$S python3 mac/build_package.py --input $W/package_files_compound.zip --output $W/CompoundIME.pkg --oss --codesign_identity - --keychain ""
+          ls -la $W/CompoundIME.pkg
+          pkgutil --payload-files $W/CompoundIME.pkg | grep -E "libazookey|ggml|llama|\.bundle$" | head -10
 
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: mac-package
-          path: myime/mozc/src/bazel-bin/mac/*.pkg
+          path: CompoundIME.pkg
           if-no-files-found: ignore
