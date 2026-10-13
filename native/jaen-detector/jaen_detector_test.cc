@@ -82,7 +82,8 @@ int main() {
   lexicon.Add("slack", true);
   lexicon.Add("nec", true);
   lexicon.Add("chatgpt", true);
-  for (const char* w : {"london", "mac", "sumo"}) lexicon.AddSignalOnly(w);
+  for (const char* w : {"dog", "cat"}) lexicon.Add(w);
+  for (const char* w : {"london", "mac", "sumo", "gand"}) lexicon.AddSignalOnly(w);
   lexicon.AddSignalOnly("kite");  // already a word: stays a plain word
   const auto split = [&](std::string_view raw) {
     return std::pair{jaen::SplitEnglish(Parse(raw), lexicon, Parse), std::string(raw)};
@@ -115,6 +116,7 @@ int main() {
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
+  Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
     const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ"};

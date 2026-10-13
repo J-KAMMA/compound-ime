@@ -235,6 +235,17 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     return std::ranges::any_of(japanese, [&](const auto& r) { return r.first <= i && j <= r.second; });
   };
 
+  // A lexicon word of 3+ letters running over edge e of a span ("dog" over
+  // the start of "gand" in dogandcat): a rarer word there is not taken.
+  const auto word_across = [&](size_t e) {
+    for (size_t a = e >= kMaxWordLength ? e - kMaxWordLength : 0; a < e; ++a) {
+      for (size_t b = std::max(e + 1, a + 3); b <= std::min(n, a + kMaxWordLength); ++b) {
+        if (lexicon.Contains(std::string_view(raw).substr(a, b - a))) return true;
+      }
+    }
+    return false;
+  };
+
   // English candidates by start position: (end, cost).
   std::vector<std::vector<std::pair<size_t, int64_t>>> english(n);
   for (size_t i = 0; i < n; ++i) {
@@ -260,7 +271,9 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
       if (signal_only) {
-        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0) cost = kSpanCost - length;
+        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && !word_across(i) && !word_across(j)) {
+          cost = kSpanCost - length;
+        }
       } else if (ForeignCost(parse(word)) > 0) {
         cost = kSpanCost - length;
       } else if (word.size() >= kMinPlainWordLength &&
