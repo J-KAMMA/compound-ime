@@ -330,6 +330,15 @@ edit(W, """    name = 'Mozc'
     folder = 'Mozc'""", """    name = 'CompoundIME'
     folder = 'CompoundIME'""")
 
+# 消去用アプリの名前（UninstallCompoundIME.app）
+edit("mac/BUILD.bazel", """                      oss = "Mozc",
+                      prod = "GoogleJapaneseInput",
+                  ),
+    infoplists = ["Uninstaller/Info.plist"],""", """                      oss = "CompoundIME",
+                      prod = "GoogleJapaneseInput",
+                  ),
+    infoplists = ["Uninstaller/Info.plist"],""")
+
 # Product icon (input switcher, settings tool, Apps list).
 import subprocess  # noqa: E402
 icons = src / "data/images/win"
