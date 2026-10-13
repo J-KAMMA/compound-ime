@@ -2793,6 +2793,12 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
 
+# （実験用）分け方の記録: JAEN_DEBUG=1 で、打ったキーの読み方と英単語の分け方を書き出す。
+edit("converter/converter.cc", "  if (!split) return {};\n",
+     (REPO / "native/jaen-detector/debug_pieces.inc").read_text(encoding="utf-8") + "  if (!split) return {};\n")
+if "#include <cstdio>\n" not in (src / "converter/converter.cc").read_text(encoding="utf-8"):
+    edit("converter/converter.cc", "#include <cstdlib>\n", "#include <cstdio>\n#include <cstdlib>\n")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

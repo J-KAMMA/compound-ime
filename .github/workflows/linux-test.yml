@@ -99,6 +99,9 @@ jobs:
             https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
           echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
           T=$W/repo/tests/conversion; mkdir -p $W/results
+          # （実験用）崩れた変換の分け方の記録
+          { printf 'SEND_KEY\tON\n'; while IFS= read -r r; do printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nCLEAR_ALL\nRESET_CONTEXT\nSEND_KEY\tON\n' "$r"; done < $T/debug-garble.txt; } > $W/garble.tsv
+          JAEN_DEBUG=1 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$W/model.gguf TEST_TMPDIR=$W/gp $E/session_handler_main --input $W/garble.tsv --profile $W/gp --dictionary oss 2>&1 >/dev/null | grep "^JAEN" | awk '!seen[$0]++' | head -200 || true
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/jaen270.txt $W/results/jaen270.tsv 4
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/jaen200b.json > $W/jaen200b.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/jaen200b.txt $W/results/jaen200b.tsv 4
