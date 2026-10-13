@@ -2743,6 +2743,19 @@ edit(C, """      segment->set_key(text);
       PutTypedValueFirst(shown, segment);
       typed.emplace_back(text, shown);""")
 
+# 2語をつないだ英単語: 節: 2語をつないだ英単語の一覧（tools/data/english-joined.txt）を組み込む。
+#
+# 続けて打った英単語は、つないだ形がこの一覧（または英単語の一覧）にあれば
+# 1語のまま（download）、なければ空白を入れて表示する（weekly report）。
+joined = (REPO / "tools/data/english-joined.txt").read_text(encoding="ascii").split()
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + "inline constexpr const char* kJoinedWords[] = {\n"
+               + "".join(f'    "{w}",\n' for w in joined) + "};\n", encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n",
+     "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

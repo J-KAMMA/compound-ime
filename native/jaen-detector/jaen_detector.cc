@@ -87,6 +87,15 @@ const Lexicon::Place* Lexicon::FindPlace(std::string_view spelling) const {
   return it == places_.end() ? nullptr : &it->second;
 }
 
+void Lexicon::AddJoined(std::string_view word) {
+  if (auto lower = Normalize(word)) joined_.insert(*std::move(lower));
+}
+
+bool Lexicon::IsJoined(std::string_view word) const {
+  const auto lower = Normalize(word);
+  return lower && joined_.contains(*lower);
+}
+
 bool Lexicon::IsCurated(std::string_view word) const {
   const auto lower = Normalize(word);
   const auto it = lower ? words_.find(*lower) : words_.end();
@@ -289,7 +298,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       // concatenation is no word ("weekly report", not "down load").
       const size_t first_end = pieces.back().spaces.empty() ? pieces.back().end : pieces.back().spaces.back();
       const std::string_view joined = std::string_view(raw).substr(b.from, first_end - b.from);
-      if (!lexicon.Contains(joined)) pieces.back().spaces.push_back(j);
+      if (!lexicon.Contains(joined) && !lexicon.IsJoined(joined)) pieces.back().spaces.push_back(j);
       pieces.back().begin = b.from;
     } else {
       pieces.push_back({b.from, j, b.english});

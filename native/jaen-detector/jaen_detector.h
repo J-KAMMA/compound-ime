@@ -58,9 +58,15 @@ class Lexicon {
   void AddPlace(std::string_view spelling, std::string_view surface, std::string_view standard);
   const Place* FindPlace(std::string_view spelling) const;
 
+  // Words made of two shorter words (download, backup): two such typed words
+  // are shown without a space between them.
+  void AddJoined(std::string_view word);
+  bool IsJoined(std::string_view word) const;
+
  private:
   std::unordered_map<std::string, bool> words_;
   std::unordered_map<std::string, Place> places_;
+  std::unordered_set<std::string> joined_;
 };
 
 // Lowercase form of a valid lexicon word ([a-z'], starting with a letter, up

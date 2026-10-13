@@ -133,6 +133,10 @@ int main() {
     const auto joined = jaen::SplitEnglish(Parse("downloadshita"), lexicon, Parse);
     Expect(!joined.empty() && joined[0].english && joined[0].spaces.size() == 1,
            "down|load (no word 'download' in this lexicon) gets a space too");
+    jaen::Lexicon with_joined = lexicon;
+    with_joined.AddJoined("download");
+    const auto one = jaen::SplitEnglish(Parse("downloadshita"), with_joined, Parse);
+    Expect(!one.empty() && one[0].english && one[0].spaces.empty(), "a joined word keeps no space");
   }
 
   Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");
