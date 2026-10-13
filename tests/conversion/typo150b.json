@@ -1,0 +1,1055 @@
+{
+ "description": "ローマ字入力の打ち間違い直しの試験 150 文（typo150b。typo150 とは別の文で、実装を見ずに作成）。typo 100 件は正しい文に打ち間違いを1か所だけ入れたもので、打ち間違えた結果もかなとして読める。u001-u020 母音の重複、u021-u040 母音の抜け（伸ばす音の抜けと、それ以外の母音の抜け）、u041-u060 となりの文字の入れ替え、u061-u080 隣のキーの押し間違い、u081-u100 余分な1文字。control 50 件（u101-u150）は打ち間違いに見えるが正しい入力（母音の連続、促音・撥音の連続、似た別の語、地名・人名）で、直してはいけない。",
+ "items": [
+  {
+   "id": "u001",
+   "category": "typo",
+   "romaji": "raishuunouchiawaseenoshiryouwojunbisuru",
+   "correct_romaji": "raishuunouchiawasenoshiryouwojunbisuru",
+   "intended": "来週の打ち合わせの資料を準備する"
+  },
+  {
+   "id": "u002",
+   "category": "typo",
+   "romaji": "nabenimizuuwoiretehinikakeru",
+   "correct_romaji": "nabenimizuwoiretehinikakeru",
+   "intended": "鍋に水を入れて火にかける"
+  },
+  {
+   "id": "u003",
+   "category": "typo",
+   "romaji": "tamagowofutaatsuwaru",
+   "correct_romaji": "tamagowofutatsuwaru",
+   "intended": "卵を二つ割る"
+  },
+  {
+   "id": "u004",
+   "category": "typo",
+   "romaji": "rejidefukurowokotowaatta",
+   "correct_romaji": "rejidefukurowokotowatta",
+   "intended": "レジで袋を断った"
+  },
+  {
+   "id": "u005",
+   "category": "typo",
+   "romaji": "gogokaraaharerurashii",
+   "correct_romaji": "gogokaraharerurashii",
+   "intended": "午後から晴れるらしい"
+  },
+  {
+   "id": "u006",
+   "category": "typo",
+   "romaji": "otoutogakazeedenekondeiru",
+   "correct_romaji": "otoutogakazedenekondeiru",
+   "intended": "弟が風邪で寝込んでいる"
+  },
+  {
+   "id": "u007",
+   "category": "typo",
+   "romaji": "rikanojikkendeshippaaishita",
+   "correct_romaji": "rikanojikkendeshippaishita",
+   "intended": "理科の実験で失敗した"
+  },
+  {
+   "id": "u008",
+   "category": "typo",
+   "romaji": "shuumatsuhaniwadeyasaiwosodaateteiru",
+   "correct_romaji": "shuumatsuhaniwadeyasaiwosodateteiru",
+   "intended": "週末は庭で野菜を育てている"
+  },
+  {
+   "id": "u009",
+   "category": "typo",
+   "romaji": "gyuunikuwoyaasukukaeta",
+   "correct_romaji": "gyuunikuwoyasukukaeta",
+   "intended": "牛肉を安く買えた"
+  },
+  {
+   "id": "u010",
+   "category": "typo",
+   "romaji": "shoruiinihankowoosu",
+   "correct_romaji": "shoruinihankowoosu",
+   "intended": "書類に判子を押す"
+  },
+  {
+   "id": "u011",
+   "category": "typo",
+   "romaji": "musumeenotanjoubiwoiwau",
+   "correct_romaji": "musumenotanjoubiwoiwau",
+   "intended": "娘の誕生日を祝う"
+  },
+  {
+   "id": "u012",
+   "category": "typo",
+   "romaji": "maibannnerumaeniniikkiwokaiteiru",
+   "correct_romaji": "maibannnerumaeninikkiwokaiteiru",
+   "intended": "毎晩寝る前に日記を書いている"
+  },
+  {
+   "id": "u013",
+   "category": "typo",
+   "romaji": "sentakuumonowotorikomu",
+   "correct_romaji": "sentakumonowotorikomu",
+   "intended": "洗濯物を取り込む"
+  },
+  {
+   "id": "u014",
+   "category": "typo",
+   "romaji": "yuugatakarayukiininarusouda",
+   "correct_romaji": "yuugatakarayukininarusouda",
+   "intended": "夕方から雪になるそうだ"
+  },
+  {
+   "id": "u015",
+   "category": "typo",
+   "romaji": "sobogatsukemonowookuttekuureta",
+   "correct_romaji": "sobogatsukemonowookuttekureta",
+   "intended": "祖母が漬物を送ってくれた"
+  },
+  {
+   "id": "u016",
+   "category": "typo",
+   "romaji": "buchounihoukokushowodaashita",
+   "correct_romaji": "buchounihoukokushowodashita",
+   "intended": "部長に報告書を出した"
+  },
+  {
+   "id": "u017",
+   "category": "typo",
+   "romaji": "taiikunojugyoudehaashitta",
+   "correct_romaji": "taiikunojugyoudehashitta",
+   "intended": "体育の授業で走った"
+  },
+  {
+   "id": "u018",
+   "category": "typo",
+   "romaji": "reitoukoninikuuwoshimau",
+   "correct_romaji": "reitoukoninikuwoshimau",
+   "intended": "冷凍庫に肉をしまう"
+  },
+  {
+   "id": "u019",
+   "category": "typo",
+   "romaji": "ottogasaarawoarattekureta",
+   "correct_romaji": "ottogasarawoarattekureta",
+   "intended": "夫が皿を洗ってくれた"
+  },
+  {
+   "id": "u020",
+   "category": "typo",
+   "romaji": "atarashiishumiwosagaashiteiru",
+   "correct_romaji": "atarashiishumiwosagashiteiru",
+   "intended": "新しい趣味を探している"
+  },
+  {
+   "id": "u021",
+   "category": "typo",
+   "romaji": "sojikiwokaketa",
+   "correct_romaji": "soujikiwokaketa",
+   "intended": "掃除機をかけた"
+  },
+  {
+   "id": "u022",
+   "category": "typo",
+   "romaji": "raigetsukararyokingaagaru",
+   "correct_romaji": "raigetsukararyoukingaagaru",
+   "intended": "来月から料金が上がる"
+  },
+  {
+   "id": "u023",
+   "category": "typo",
+   "romaji": "senzagasukunakunatta",
+   "correct_romaji": "senzaigasukunakunatta",
+   "intended": "洗剤が少なくなった"
+  },
+  {
+   "id": "u024",
+   "category": "typo",
+   "romaji": "aninokekkonshikideasatsuwoshita",
+   "correct_romaji": "aninokekkonshikideaisatsuwoshita",
+   "intended": "兄の結婚式で挨拶をした"
+  },
+  {
+   "id": "u025",
+   "category": "typo",
+   "romaji": "kyuryoubimadesetsuyakusuru",
+   "correct_romaji": "kyuuryoubimadesetsuyakusuru",
+   "intended": "給料日まで節約する"
+  },
+  {
+   "id": "u026",
+   "category": "typo",
+   "romaji": "taifuunoeikyodedenshagatomatta",
+   "correct_romaji": "taifuunoeikyoudedenshagatomatta",
+   "intended": "台風の影響で電車が止まった"
+  },
+  {
+   "id": "u027",
+   "category": "typo",
+   "romaji": "ketaidenwanojuudengakireta",
+   "correct_romaji": "keitaidenwanojuudengakireta",
+   "intended": "携帯電話の充電が切れた"
+  },
+  {
+   "id": "u028",
+   "category": "typo",
+   "romaji": "kouchosenseinohanashiganagakatta",
+   "correct_romaji": "kouchousenseinohanashiganagakatta",
+   "intended": "校長先生の話が長かった"
+  },
+  {
+   "id": "u029",
+   "category": "typo",
+   "romaji": "tofuwomisoshiruniireru",
+   "correct_romaji": "toufuwomisoshiruniireru",
+   "intended": "豆腐を味噌汁に入れる"
+  },
+  {
+   "id": "u030",
+   "category": "typo",
+   "romaji": "kazokudedobutsuennniitta",
+   "correct_romaji": "kazokudedoubutsuennniitta",
+   "intended": "家族で動物園に行った"
+  },
+  {
+   "id": "u031",
+   "category": "typo",
+   "romaji": "anegatsuhandefukuwokatta",
+   "correct_romaji": "anegatsuuhandefukuwokatta",
+   "intended": "姉が通販で服を買った"
+  },
+  {
+   "id": "u032",
+   "category": "typo",
+   "romaji": "chichihamaiasataisowosuru",
+   "correct_romaji": "chichihamaiasataisouwosuru",
+   "intended": "父は毎朝体操をする"
+  },
+  {
+   "id": "u033",
+   "category": "typo",
+   "romaji": "jukunoshukudagaooi",
+   "correct_romaji": "jukunoshukudaigaooi",
+   "intended": "塾の宿題が多い"
+  },
+  {
+   "id": "u034",
+   "category": "typo",
+   "romaji": "fuutonikittewoharu",
+   "correct_romaji": "fuutounikittewoharu",
+   "intended": "封筒に切手を貼る"
+  },
+  {
+   "id": "u035",
+   "category": "typo",
+   "romaji": "eganokansouwohanashiatta",
+   "correct_romaji": "eiganokansouwohanashiatta",
+   "intended": "映画の感想を話し合った"
+  },
+  {
+   "id": "u036",
+   "category": "typo",
+   "romaji": "tenkiyohowokakuninsuru",
+   "correct_romaji": "tenkiyohouwokakuninsuru",
+   "intended": "天気予報を確認する"
+  },
+  {
+   "id": "u037",
+   "category": "typo",
+   "romaji": "yakyunoshiaiwominiiku",
+   "correct_romaji": "yakyuunoshiaiwominiiku",
+   "intended": "野球の試合を見に行く"
+  },
+  {
+   "id": "u038",
+   "category": "typo",
+   "romaji": "ryourikyoshitsunikayoihajimeta",
+   "correct_romaji": "ryourikyoushitsunikayoihajimeta",
+   "intended": "料理教室に通い始めた"
+  },
+  {
+   "id": "u039",
+   "category": "typo",
+   "romaji": "safuwootoshita",
+   "correct_romaji": "saifuwootoshita",
+   "intended": "財布を落とした"
+  },
+  {
+   "id": "u040",
+   "category": "typo",
+   "romaji": "rakyakuniochawodashita",
+   "correct_romaji": "raikyakuniochawodashita",
+   "intended": "来客にお茶を出した"
+  },
+  {
+   "id": "u041",
+   "category": "typo",
+   "romaji": "misenomeanigyouretsugadekiteiru",
+   "correct_romaji": "misenomaenigyouretsugadekiteiru",
+   "intended": "店の前に行列ができている"
+  },
+  {
+   "id": "u042",
+   "category": "typo",
+   "romaji": "mainichiobentuowotsukutteiru",
+   "correct_romaji": "mainichiobentouwotsukutteiru",
+   "intended": "毎日お弁当を作っている"
+  },
+  {
+   "id": "u043",
+   "category": "typo",
+   "romaji": "yuushokunoatodesarawoaaru",
+   "correct_romaji": "yuushokunoatodesarawoarau",
+   "intended": "夕食の後で皿を洗う"
+  },
+  {
+   "id": "u044",
+   "category": "typo",
+   "romaji": "amedeshaiigachuushininatta",
+   "correct_romaji": "amedeshiaigachuushininatta",
+   "intended": "雨で試合が中止になった"
+  },
+  {
+   "id": "u045",
+   "category": "typo",
+   "romaji": "hahagadaidokorodesakanwaoyaiteiru",
+   "correct_romaji": "hahagadaidokorodesakanawoyaiteiru",
+   "intended": "母が台所で魚を焼いている"
+  },
+  {
+   "id": "u046",
+   "category": "typo",
+   "romaji": "denkidiagatakakunatta",
+   "correct_romaji": "denkidaigatakakunatta",
+   "intended": "電気代が高くなった"
+  },
+  {
+   "id": "u047",
+   "category": "typo",
+   "romaji": "shainshokuduodehirugohanwotaberu",
+   "correct_romaji": "shainshokudoudehirugohanwotaberu",
+   "intended": "社員食堂で昼ご飯を食べる"
+  },
+  {
+   "id": "u048",
+   "category": "typo",
+   "romaji": "takuhiabinwouketotta",
+   "correct_romaji": "takuhaibinwouketotta",
+   "intended": "宅配便を受け取った"
+  },
+  {
+   "id": "u049",
+   "category": "typo",
+   "romaji": "asakaraatamagaomio",
+   "correct_romaji": "asakaraatamagaomoi",
+   "intended": "朝から頭が重い"
+  },
+  {
+   "id": "u050",
+   "category": "typo",
+   "romaji": "kodomoonkutsugachiisakunatta",
+   "correct_romaji": "kodomonokutsugachiisakunatta",
+   "intended": "子供の靴が小さくなった"
+  },
+  {
+   "id": "u051",
+   "category": "typo",
+   "romaji": "ekinobiatendeshinbunwokau",
+   "correct_romaji": "ekinobaitendeshinbunwokau",
+   "intended": "駅の売店で新聞を買う"
+  },
+  {
+   "id": "u052",
+   "category": "typo",
+   "romaji": "madoguchideshoriuwouketoru",
+   "correct_romaji": "madoguchideshoruiwouketoru",
+   "intended": "窓口で書類を受け取る"
+  },
+  {
+   "id": "u053",
+   "category": "typo",
+   "romaji": "okyakusamanishiryuowowatasu",
+   "correct_romaji": "okyakusamanishiryouwowatasu",
+   "intended": "お客様に資料を渡す"
+  },
+  {
+   "id": "u054",
+   "category": "typo",
+   "romaji": "yoruhanaberyoruinishiyou",
+   "correct_romaji": "yoruhanaberyourinishiyou",
+   "intended": "夜は鍋料理にしよう"
+  },
+  {
+   "id": "u055",
+   "category": "typo",
+   "romaji": "kouennnosakuragamankiada",
+   "correct_romaji": "kouennnosakuragamankaida",
+   "intended": "公園の桜が満開だ"
+  },
+  {
+   "id": "u056",
+   "category": "typo",
+   "romaji": "otuotonishukudaiwooshieta",
+   "correct_romaji": "otoutonishukudaiwooshieta",
+   "intended": "弟に宿題を教えた"
+  },
+  {
+   "id": "u057",
+   "category": "typo",
+   "romaji": "kiaginojikangakawatta",
+   "correct_romaji": "kaiginojikangakawatta",
+   "intended": "会議の時間が変わった"
+  },
+  {
+   "id": "u058",
+   "category": "typo",
+   "romaji": "sofutoshuogiwosashita",
+   "correct_romaji": "sofutoshougiwosashita",
+   "intended": "祖父と将棋を指した"
+  },
+  {
+   "id": "u059",
+   "category": "typo",
+   "romaji": "gasshuonorenshuugahajimatta",
+   "correct_romaji": "gasshounorenshuugahajimatta",
+   "intended": "合唱の練習が始まった"
+  },
+  {
+   "id": "u060",
+   "category": "typo",
+   "romaji": "hikidashinookkuarategamidetekita",
+   "correct_romaji": "hikidashinookukarategamidetekita",
+   "intended": "引き出しの奥から手紙が出てきた"
+  },
+  {
+   "id": "u061",
+   "category": "typo",
+   "romaji": "sentakukigajowareta",
+   "correct_romaji": "sentakukigakowareta",
+   "intended": "洗濯機が壊れた"
+  },
+  {
+   "id": "u062",
+   "category": "typo",
+   "romaji": "yaoyafedaikonwokatta",
+   "correct_romaji": "yaoyadedaikonwokatta",
+   "intended": "八百屋で大根を買った"
+  },
+  {
+   "id": "u063",
+   "category": "typo",
+   "romaji": "ashiranoasahahierurashii",
+   "correct_romaji": "ashitanoasahahierurashii",
+   "intended": "明日の朝は冷えるらしい"
+  },
+  {
+   "id": "u064",
+   "category": "typo",
+   "romaji": "kodomowomukaeniiju",
+   "correct_romaji": "kodomowomukaeniiku",
+   "intended": "子供を迎えに行く"
+  },
+  {
+   "id": "u065",
+   "category": "typo",
+   "romaji": "heyanodenkiwotsukera",
+   "correct_romaji": "heyanodenkiwotsuketa",
+   "intended": "部屋の電気をつけた"
+  },
+  {
+   "id": "u066",
+   "category": "typo",
+   "romaji": "kaishanochikakudechuushokuwotoeu",
+   "correct_romaji": "kaishanochikakudechuushokuwotoru",
+   "intended": "会社の近くで昼食をとる"
+  },
+  {
+   "id": "u067",
+   "category": "typo",
+   "romaji": "kasawokashitenoratta",
+   "correct_romaji": "kasawokashitemoratta",
+   "intended": "傘を貸してもらった"
+  },
+  {
+   "id": "u068",
+   "category": "typo",
+   "romaji": "torinikuwohitokichidainikiru",
+   "correct_romaji": "torinikuwohitokuchidainikiru",
+   "intended": "鶏肉を一口大に切る"
+  },
+  {
+   "id": "u069",
+   "category": "typo",
+   "romaji": "kamonariganatteiru",
+   "correct_romaji": "kaminariganatteiru",
+   "intended": "雷が鳴っている"
+  },
+  {
+   "id": "u070",
+   "category": "typo",
+   "romaji": "kazokuseyuushokuwokakomu",
+   "correct_romaji": "kazokudeyuushokuwokakomu",
+   "intended": "家族で夕食を囲む"
+  },
+  {
+   "id": "u071",
+   "category": "typo",
+   "romaji": "senpainishigitowoosowatta",
+   "correct_romaji": "senpainishigotowoosowatta",
+   "intended": "先輩に仕事を教わった"
+  },
+  {
+   "id": "u072",
+   "category": "typo",
+   "romaji": "shikennnigoukakushira",
+   "correct_romaji": "shikennnigoukakushita",
+   "intended": "試験に合格した"
+  },
+  {
+   "id": "u073",
+   "category": "typo",
+   "romaji": "otsuriwoukeroru",
+   "correct_romaji": "otsuriwouketoru",
+   "intended": "お釣りを受け取る"
+  },
+  {
+   "id": "u074",
+   "category": "typo",
+   "romaji": "tenpueawoageru",
+   "correct_romaji": "tenpurawoageru",
+   "intended": "天ぷらを揚げる"
+  },
+  {
+   "id": "u075",
+   "category": "typo",
+   "romaji": "imoutohaasabebouwoshita",
+   "correct_romaji": "imoutohaasanebouwoshita",
+   "intended": "妹は朝寝坊をした"
+  },
+  {
+   "id": "u076",
+   "category": "typo",
+   "romaji": "kinjonomekoniesawoageta",
+   "correct_romaji": "kinjononekoniesawoageta",
+   "intended": "近所の猫に餌をあげた"
+  },
+  {
+   "id": "u077",
+   "category": "typo",
+   "romaji": "ryoushuushowomiratta",
+   "correct_romaji": "ryoushuushowomoratta",
+   "intended": "領収書をもらった"
+  },
+  {
+   "id": "u078",
+   "category": "typo",
+   "romaji": "oyuwowakashireochawoireru",
+   "correct_romaji": "oyuwowakashiteochawoireru",
+   "intended": "お湯を沸かしてお茶をいれる"
+  },
+  {
+   "id": "u079",
+   "category": "typo",
+   "romaji": "niwanojusamushiriwoshita",
+   "correct_romaji": "niwanokusamushiriwoshita",
+   "intended": "庭の草むしりをした"
+  },
+  {
+   "id": "u080",
+   "category": "typo",
+   "romaji": "kimatsushikennnobenkyouwohajineta",
+   "correct_romaji": "kimatsushikennnobenkyouwohajimeta",
+   "intended": "期末試験の勉強を始めた"
+  },
+  {
+   "id": "u081",
+   "category": "typo",
+   "romaji": "reizoukonogyuunyuugakkireteita",
+   "correct_romaji": "reizoukonogyuunyuugakireteita",
+   "intended": "冷蔵庫の牛乳が切れていた"
+  },
+  {
+   "id": "u082",
+   "category": "typo",
+   "romaji": "tamanegiwoittameru",
+   "correct_romaji": "tamanegiwoitameru",
+   "intended": "玉ねぎを炒める"
+  },
+  {
+   "id": "u083",
+   "category": "typo",
+   "romaji": "tanninnnosenseinissoudanshita",
+   "correct_romaji": "tanninnnosenseinisoudanshita",
+   "intended": "担任の先生に相談した"
+  },
+  {
+   "id": "u084",
+   "category": "typo",
+   "romaji": "harunninatteatatakakunatta",
+   "correct_romaji": "haruninatteatatakakunatta",
+   "intended": "春になって暖かくなった"
+  },
+  {
+   "id": "u085",
+   "category": "typo",
+   "romaji": "ottotoshuumatsunoyotteiwohanashita",
+   "correct_romaji": "ottotoshuumatsunoyoteiwohanashita",
+   "intended": "夫と週末の予定を話した"
+  },
+  {
+   "id": "u086",
+   "category": "typo",
+   "romaji": "tenchouniyasumiwotsuttaeta",
+   "correct_romaji": "tenchouniyasumiwotsutaeta",
+   "intended": "店長に休みを伝えた"
+  },
+  {
+   "id": "u087",
+   "category": "typo",
+   "romaji": "ryourinoajitsukkewokaetemita",
+   "correct_romaji": "ryourinoajitsukewokaetemita",
+   "intended": "料理の味付けを変えてみた"
+  },
+  {
+   "id": "u088",
+   "category": "typo",
+   "romaji": "denshanonakkadehonwoyondeita",
+   "correct_romaji": "denshanonakadehonwoyondeita",
+   "intended": "電車の中で本を読んでいた"
+  },
+  {
+   "id": "u089",
+   "category": "typo",
+   "romaji": "ameagarininijigaddeta",
+   "correct_romaji": "ameagarininijigadeta",
+   "intended": "雨上がりに虹が出た"
+  },
+  {
+   "id": "u090",
+   "category": "typo",
+   "romaji": "toshoiinnnoshigottowoshita",
+   "correct_romaji": "toshoiinnnoshigotowoshita",
+   "intended": "図書委員の仕事をした"
+  },
+  {
+   "id": "u091",
+   "category": "typo",
+   "romaji": "fuyumononofukuwoshimmatta",
+   "correct_romaji": "fuyumononofukuwoshimatta",
+   "intended": "冬物の服をしまった"
+  },
+  {
+   "id": "u092",
+   "category": "typo",
+   "romaji": "atarashiitecchouwokainiitta",
+   "correct_romaji": "atarashiitechouwokainiitta",
+   "intended": "新しい手帳を買いに行った"
+  },
+  {
+   "id": "u093",
+   "category": "typo",
+   "romaji": "kurumadesofunoiemaddeokutta",
+   "correct_romaji": "kurumadesofunoiemadeokutta",
+   "intended": "車で祖父の家まで送った"
+  },
+  {
+   "id": "u094",
+   "category": "typo",
+   "romaji": "okomewottoidenabeniireru",
+   "correct_romaji": "okomewotoidenabeniireru",
+   "intended": "お米を研いで鍋に入れる"
+  },
+  {
+   "id": "u095",
+   "category": "typo",
+   "romaji": "sansuunoshukudaiwotetsuddatta",
+   "correct_romaji": "sansuunoshukudaiwotetsudatta",
+   "intended": "算数の宿題を手伝った"
+  },
+  {
+   "id": "u096",
+   "category": "typo",
+   "romaji": "maiasarokujinimegassameru",
+   "correct_romaji": "maiasarokujinimegasameru",
+   "intended": "毎朝六時に目が覚める"
+  },
+  {
+   "id": "u097",
+   "category": "typo",
+   "romaji": "kaikeiwosummasetemisewodeta",
+   "correct_romaji": "kaikeiwosumasetemisewodeta",
+   "intended": "会計を済ませて店を出た"
+  },
+  {
+   "id": "u098",
+   "category": "typo",
+   "romaji": "soboniamimonowonarratta",
+   "correct_romaji": "soboniamimonowonaratta",
+   "intended": "祖母に編み物を習った"
+  },
+  {
+   "id": "u099",
+   "category": "typo",
+   "romaji": "natsumatsurideyukkatawokita",
+   "correct_romaji": "natsumatsurideyukatawokita",
+   "intended": "夏祭りで浴衣を着た"
+  },
+  {
+   "id": "u100",
+   "category": "typo",
+   "romaji": "bangohannnokondattewokangaeru",
+   "correct_romaji": "bangohannnokondatewokangaeru",
+   "intended": "晩ご飯の献立を考える"
+  },
+  {
+   "id": "u101",
+   "category": "control",
+   "romaji": "oosakanoobanidenwashita",
+   "correct_romaji": "oosakanoobanidenwashita",
+   "intended": "大阪の叔母に電話した"
+  },
+  {
+   "id": "u102",
+   "category": "control",
+   "romaji": "aomorideringowokatta",
+   "correct_romaji": "aomorideringowokatta",
+   "intended": "青森でりんごを買った"
+  },
+  {
+   "id": "u103",
+   "category": "control",
+   "romaji": "saitamanosofubowotazuneta",
+   "correct_romaji": "saitamanosofubowotazuneta",
+   "intended": "埼玉の祖父母を訪ねた"
+  },
+  {
+   "id": "u104",
+   "category": "control",
+   "romaji": "satousantouchiawasewoshita",
+   "correct_romaji": "satousantouchiawasewoshita",
+   "intended": "佐藤さんと打ち合わせをした"
+  },
+  {
+   "id": "u105",
+   "category": "control",
+   "romaji": "suzukisenseiniatta",
+   "correct_romaji": "suzukisenseiniatta",
+   "intended": "鈴木先生に会った"
+  },
+  {
+   "id": "u106",
+   "category": "control",
+   "romaji": "inouesannnoikennnisanseida",
+   "correct_romaji": "inouesannnoikennnisanseida",
+   "intended": "井上さんの意見に賛成だ"
+  },
+  {
+   "id": "u107",
+   "category": "control",
+   "romaji": "uenonobijutsukanheitta",
+   "correct_romaji": "uenonobijutsukanheitta",
+   "intended": "上野の美術館へ行った"
+  },
+  {
+   "id": "u108",
+   "category": "control",
+   "romaji": "kyoutodemacchawononda",
+   "correct_romaji": "kyoutodemacchawononda",
+   "intended": "京都で抹茶を飲んだ"
+  },
+  {
+   "id": "u109",
+   "category": "control",
+   "romaji": "hokkaidouhasamui",
+   "correct_romaji": "hokkaidouhasamui",
+   "intended": "北海道は寒い"
+  },
+  {
+   "id": "u110",
+   "category": "control",
+   "romaji": "okinawanoumihakireida",
+   "correct_romaji": "okinawanoumihakireida",
+   "intended": "沖縄の海はきれいだ"
+  },
+  {
+   "id": "u111",
+   "category": "control",
+   "romaji": "kouenwotoorinuketa",
+   "correct_romaji": "kouenwotoorinuketa",
+   "intended": "公園を通り抜けた"
+  },
+  {
+   "id": "u112",
+   "category": "control",
+   "romaji": "oodoorihakonzatsushiteiru",
+   "correct_romaji": "oodoorihakonzatsushiteiru",
+   "intended": "大通りは混雑している"
+  },
+  {
+   "id": "u113",
+   "category": "control",
+   "romaji": "koorimizuwononda",
+   "correct_romaji": "koorimizuwononda",
+   "intended": "氷水を飲んだ"
+  },
+  {
+   "id": "u114",
+   "category": "control",
+   "romaji": "tookunoyamagamieru",
+   "correct_romaji": "tookunoyamagamieru",
+   "intended": "遠くの山が見える"
+  },
+  {
+   "id": "u115",
+   "category": "control",
+   "romaji": "honoogayureteiru",
+   "correct_romaji": "honoogayureteiru",
+   "intended": "炎が揺れている"
+  },
+  {
+   "id": "u116",
+   "category": "control",
+   "romaji": "fuutouwoyuusoushita",
+   "correct_romaji": "fuutouwoyuusoushita",
+   "intended": "封筒を郵送した"
+  },
+  {
+   "id": "u117",
+   "category": "control",
+   "romaji": "happagaochita",
+   "correct_romaji": "happagaochita",
+   "intended": "葉っぱが落ちた"
+  },
+  {
+   "id": "u118",
+   "category": "control",
+   "romaji": "kittewoatsumeteiru",
+   "correct_romaji": "kittewoatsumeteiru",
+   "intended": "切手を集めている"
+  },
+  {
+   "id": "u119",
+   "category": "control",
+   "romaji": "zasshiwosansatsukatta",
+   "correct_romaji": "zasshiwosansatsukatta",
+   "intended": "雑誌を三冊買った"
+  },
+  {
+   "id": "u120",
+   "category": "control",
+   "romaji": "isshonikaerou",
+   "correct_romaji": "isshonikaerou",
+   "intended": "一緒に帰ろう"
+  },
+  {
+   "id": "u121",
+   "category": "control",
+   "romaji": "machiawaseniokureta",
+   "correct_romaji": "machiawaseniokureta",
+   "intended": "待ち合わせに遅れた"
+  },
+  {
+   "id": "u122",
+   "category": "control",
+   "romaji": "genninwoshiraberu",
+   "correct_romaji": "genninwoshiraberu",
+   "intended": "原因を調べる"
+  },
+  {
+   "id": "u123",
+   "category": "control",
+   "romaji": "kinnyoubinikonnintodokewodashita",
+   "correct_romaji": "kinnyoubinikonnintodokewodashita",
+   "intended": "金曜日に婚姻届を出した"
+  },
+  {
+   "id": "u124",
+   "category": "control",
+   "romaji": "tanniwootoshita",
+   "correct_romaji": "tanniwootoshita",
+   "intended": "単位を落とした"
+  },
+  {
+   "id": "u125",
+   "category": "control",
+   "romaji": "rennaishousetsuwoyonda",
+   "correct_romaji": "rennaishousetsuwoyonda",
+   "intended": "恋愛小説を読んだ"
+  },
+  {
+   "id": "u126",
+   "category": "control",
+   "romaji": "tenninnniannnaisareta",
+   "correct_romaji": "tenninnniannnaisareta",
+   "intended": "店員に案内された"
+  },
+  {
+   "id": "u127",
+   "category": "control",
+   "romaji": "kannikakitomedeokutta",
+   "correct_romaji": "kannikakitomedeokutta",
+   "intended": "簡易書留で送った"
+  },
+  {
+   "id": "u128",
+   "category": "control",
+   "romaji": "zenningasanseishita",
+   "correct_romaji": "zenningasanseishita",
+   "intended": "全員が賛成した"
+  },
+  {
+   "id": "u129",
+   "category": "control",
+   "romaji": "genkouwokakinaoshita",
+   "correct_romaji": "genkouwokakinaoshita",
+   "intended": "原稿を書き直した"
+  },
+  {
+   "id": "u130",
+   "category": "control",
+   "romaji": "okujoudebentouwotabeta",
+   "correct_romaji": "okujoudebentouwotabeta",
+   "intended": "屋上で弁当を食べた"
+  },
+  {
+   "id": "u131",
+   "category": "control",
+   "romaji": "ojisangakita",
+   "correct_romaji": "ojisangakita",
+   "intended": "叔父さんが来た"
+  },
+  {
+   "id": "u132",
+   "category": "control",
+   "romaji": "obasannnitegamiwokaita",
+   "correct_romaji": "obasannnitegamiwokaita",
+   "intended": "おばさんに手紙を書いた"
+  },
+  {
+   "id": "u133",
+   "category": "control",
+   "romaji": "shujinhashucchouchuudesu",
+   "correct_romaji": "shujinhashucchouchuudesu",
+   "intended": "主人は出張中です"
+  },
+  {
+   "id": "u134",
+   "category": "control",
+   "romaji": "byouintobiyouinnniyotta",
+   "correct_romaji": "byouintobiyouinnniyotta",
+   "intended": "病院と美容院に寄った"
+  },
+  {
+   "id": "u135",
+   "category": "control",
+   "romaji": "yukigatsumotteiru",
+   "correct_romaji": "yukigatsumotteiru",
+   "intended": "雪が積もっている"
+  },
+  {
+   "id": "u136",
+   "category": "control",
+   "romaji": "rippanaiegatatta",
+   "correct_romaji": "rippanaiegatatta",
+   "intended": "立派な家が建った"
+  },
+  {
+   "id": "u137",
+   "category": "control",
+   "romaji": "nikainomadokarafujisangamieta",
+   "correct_romaji": "nikainomadokarafujisangamieta",
+   "intended": "二階の窓から富士山が見えた"
+  },
+  {
+   "id": "u138",
+   "category": "control",
+   "romaji": "joousamagatewofutta",
+   "correct_romaji": "joousamagatewofutta",
+   "intended": "女王様が手を振った"
+  },
+  {
+   "id": "u139",
+   "category": "control",
+   "romaji": "kuukigakansoushiteiru",
+   "correct_romaji": "kuukigakansoushiteiru",
+   "intended": "空気が乾燥している"
+  },
+  {
+   "id": "u140",
+   "category": "control",
+   "romaji": "chuuousendeshinjukuhemukau",
+   "correct_romaji": "chuuousendeshinjukuhemukau",
+   "intended": "中央線で新宿へ向かう"
+  },
+  {
+   "id": "u141",
+   "category": "control",
+   "romaji": "konnyahamangetsuda",
+   "correct_romaji": "konnyahamangetsuda",
+   "intended": "今夜は満月だ"
+  },
+  {
+   "id": "u142",
+   "category": "control",
+   "romaji": "honnyadesankoushowosagashita",
+   "correct_romaji": "honnyadesankoushowosagashita",
+   "intended": "本屋で参考書を探した"
+  },
+  {
+   "id": "u143",
+   "category": "control",
+   "romaji": "sennensatsuworyougaeshita",
+   "correct_romaji": "sennensatsuworyougaeshita",
+   "intended": "千円札を両替した"
+  },
+  {
+   "id": "u144",
+   "category": "control",
+   "romaji": "sanponotochuudeamenifurareta",
+   "correct_romaji": "sanponotochuudeamenifurareta",
+   "intended": "散歩の途中で雨に降られた"
+  },
+  {
+   "id": "u145",
+   "category": "control",
+   "romaji": "touhokunoonsennnitomatta",
+   "correct_romaji": "touhokunoonsennnitomatta",
+   "intended": "東北の温泉に泊まった"
+  },
+  {
+   "id": "u146",
+   "category": "control",
+   "romaji": "unneikaiginogijirokuwokaku",
+   "correct_romaji": "unneikaiginogijirokuwokaku",
+   "intended": "運営会議の議事録を書く"
+  },
+  {
+   "id": "u147",
+   "category": "control",
+   "romaji": "shizuokanoochawoitadaita",
+   "correct_romaji": "shizuokanoochawoitadaita",
+   "intended": "静岡のお茶をいただいた"
+  },
+  {
+   "id": "u148",
+   "category": "control",
+   "romaji": "meitooigaasobinikita",
+   "correct_romaji": "meitooigaasobinikita",
+   "intended": "姪と甥が遊びに来た"
+  },
+  {
+   "id": "u149",
+   "category": "control",
+   "romaji": "takahashisanhaeigyoubuniiru",
+   "correct_romaji": "takahashisanhaeigyoubuniiru",
+   "intended": "高橋さんは営業部にいる"
+  },
+  {
+   "id": "u150",
+   "category": "control",
+   "romaji": "koushuudenwawosagashita",
+   "correct_romaji": "koushuudenwawosagashita",
+   "intended": "公衆電話を探した"
+  }
+ ]
+}
