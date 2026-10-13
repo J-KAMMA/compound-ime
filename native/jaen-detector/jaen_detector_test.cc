@@ -5,6 +5,7 @@
 #include "jaen_detector.h"
 #include "jaen_choices.h"
 #include "correction_log.h"
+#include "jaen_typo.h"
 
 #include <filesystem>
 #include <fstream>
@@ -32,7 +33,7 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
-    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}};
+    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -275,6 +276,17 @@ int main() {
     in.close();
     log.Clear();
     Expect(!std::filesystem::exists(file), "correction log clear");
+  }
+
+  {
+    // Readable slips, against a toy reading model of つづけて and おおきい.
+    static const jaen::KanaTrigram kToy[] = {
+        {"^^つ", 50}, {"^つづ", 50}, {"つづけ", 50}, {"づけて", 50}, {"けて$", 50},
+        {"^^お", 50}, {"^おお", 50}, {"おおき", 50}, {"おきい", 50}, {"きい$", 50}};
+    const jaen::KanaModel model(kToy);
+    Expect(jaen::FixReadableTypo("tsuduukete", Parse, model) == "tsudukete", "a doubled vowel is dropped (つづうけて)");
+    Expect(jaen::FixReadableTypo("tsudukete", Parse, model) == std::nullopt, "a good reading is left alone");
+    Expect(jaen::FixReadableTypo("ookii", Parse, model) == std::nullopt, "a long vowel typed on purpose stays (おおきい)");
   }
 
   std::cout << "SUMMARY\t" << failures << '\n';

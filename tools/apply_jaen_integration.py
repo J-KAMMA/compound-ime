@@ -2756,6 +2756,45 @@ edit("converter/english_lexicon.cc",
      "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
 
+# かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
+# 読めてしまう打ち間違いを、1キーを抜く・隣どうしを入れ替えると、かなの並びが
+# 目に見えて日本語らしくなる場合に直す（jaen::FixReadableTypo）。
+# MYIME_TYPO_MARGIN（既定 0.6、1かなあたりの対数確率の差）で強さを変え、off で止める。
+edit("converter/converter.cc", """        fixed_any = true;
+        if (typo_fixed) *typo_fixed = true;
+      }
+    }""", """        fixed_any = true;
+        if (typo_fixed) *typo_fixed = true;
+      } else if (const std::optional<double> margin = ReadableTypoMargin()) {
+        if (std::optional<std::string> fixed = jaen::FixReadableTypo(text, parse, TypoKanaModel(), *margin)) {
+          text = *std::move(fixed);
+          split = true;
+          fixed_any = true;
+          if (typo_fixed) *typo_fixed = true;
+        }
+      }
+    }""")
+edit("converter/converter.cc", "#include <optional>\n", """#include <cstdlib>
+#include <optional>
+""")
+edit("converter/converter.cc", "namespace mozc {\n", """namespace mozc {
+namespace {
+// MYIME_TYPO_MARGIN: how much more Japanese-like (per kana) a one-key fix of
+// readable romaji must read; "off" turns the fix off.
+std::optional<double> ReadableTypoMargin() {
+  static const std::optional<double> margin = []() -> std::optional<double> {
+    const char* value = std::getenv("MYIME_TYPO_MARGIN");
+    if (value == nullptr || *value == '\\0') return 0.6;
+    if (std::string_view(value) == "off") return std::nullopt;
+    char* end = nullptr;
+    const double parsed = std::strtod(value, &end);
+    return end != value && parsed > 0 ? std::optional<double>(parsed) : std::optional<double>(0.6);
+  }();
+  return margin;
+}
+}  // namespace
+""")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

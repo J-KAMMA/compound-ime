@@ -164,4 +164,55 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
   return best->second.second;
 }
 
+std::optional<std::string> FixReadableTypo(std::string_view raw, const RomajiParser& parse,
+                                           const KanaModel& model, double margin) {
+  if (raw.size() < 4 || raw.size() > kMaxRawLength ||
+      !std::ranges::all_of(raw, [](char c) { return c >= 'a' && c <= 'z'; })) {
+    return std::nullopt;
+  }
+  // Kana of fully read keys, or nullopt.
+  const auto reading = [&](std::string_view keys) -> std::optional<std::string> {
+    const std::vector<Chunk> chunks = parse(keys);
+    if (UnreadKeys(chunks) != 0) return std::nullopt;
+    std::string kana;
+    for (size_t i = 0; i < chunks.size(); ++i) {
+      kana += FinalN(chunks, i) ? std::string("ん") : chunks[i].conversion + chunks[i].pending;
+    }
+    return kana;
+  };
+  const auto average = [&](const std::string& kana) {
+    return model.Score(kana) / static_cast<double>(Characters(kana).size() + 1);
+  };
+  const std::optional<std::string> typed = reading(raw);
+  if (!typed) return std::nullopt;
+  const double base = average(*typed);
+
+  const std::string text(raw);
+  double best = base + margin;
+  std::optional<std::string> fixed;
+  const auto consider = [&](std::string candidate) {
+    const std::optional<std::string> kana = reading(candidate);
+    if (!kana || *kana == *typed || kana->empty()) return;
+    if (const double score = average(*kana); score > best) {
+      best = score;
+      fixed = std::move(candidate);
+    }
+  };
+  for (size_t i = 0; i < text.size(); ++i) {
+    // A doubled or stray key ("tsuduukete", "hayyaku").
+    if (i == 0 || text[i] != text[i - 1]) {
+      std::string s = text;
+      s.erase(i, 1);
+      consider(std::move(s));
+    }
+    // Two neighbors typed in the wrong order ("tsukua" for tsukau).
+    if (i + 1 < text.size() && text[i] != text[i + 1]) {
+      std::string s = text;
+      std::swap(s[i], s[i + 1]);
+      consider(std::move(s));
+    }
+  }
+  return fixed;
+}
+
 }  // namespace jaen

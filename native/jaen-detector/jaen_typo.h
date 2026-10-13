@@ -48,6 +48,14 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
                                    const KanaModel& model, double margin = 3.0,
                                    double floor = -4.5);
 
+// A slip in romaji that still reads as kana ("tsuduukete": つづうけて): the
+// typed keys with one key dropped or two neighbors swapped, when the reading
+// |model| scores beats the typed reading by at least |margin| per kana (end
+// mark included; averages, so a shorter reading is not favored for being
+// short). nullopt when no edit is that much better, or |raw| does not read.
+std::optional<std::string> FixReadableTypo(std::string_view raw, const RomajiParser& parse,
+                                           const KanaModel& model, double margin = 0.6);
+
 }  // namespace jaen
 
 #endif  // JAEN_TYPO_H_
