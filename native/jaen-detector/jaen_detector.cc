@@ -1,8 +1,6 @@
 #include "jaen_detector.h"
 
 #include <algorithm>
-#include <cstdio>
-#include <cstdlib>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -267,14 +265,6 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
-      }
-      if (std::getenv("UNREAD_DEBUG") && is_reading && word.size() >= kMinUnreadWordLength &&
-          kana_at[j] > kana_at[i]) {
-        std::fprintf(stderr, "UNREAD %.*s learned=%d place=%d edges=%d%d reading=%d cross=%d cost=%d\n",
-                     static_cast<int>(word.size()), word.data(), learned, place != nullptr,
-                     static_cast<int>(boundary[i]), static_cast<int>(boundary[j]),
-                     static_cast<int>((*is_reading)(kana_text(kana_at[i], kana_at[j]))),
-                     static_cast<int>(crosses_reading(kana_at[i], kana_at[j])), cost ? static_cast<int>(*cost) : 9999);
       }
       if (cost) english[i].emplace_back(j, *cost + edge_cost(i) + edge_cost(j));
     }
