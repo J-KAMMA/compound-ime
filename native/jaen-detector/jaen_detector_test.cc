@@ -34,7 +34,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -75,7 +75,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -115,6 +115,8 @@ int main() {
   Expect(english("slackkaramita") == "slack|", "a word may end before the same key (slack + kara)");
   Expect(english("linuxnokoma") == "linux|", "xn is ん, not a small kana: it may be cut");
   Expect(english("meetinggaarimasu") == "meeting|", "-ng before ga: んっ is not Japanese");
+  Expect(english("seatwokau") == "seat|", "a word before the particle wo, not \"two\" (sea|two)");
+  Expect(english("testshita") == "test|", "no word ends inside shi (tests|hita)");
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");

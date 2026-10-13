@@ -169,6 +169,14 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     blocked.resize(raw.size() + 1, small);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
+    // "two" read as とぉ (also dwo, kwo...) is a word ending in t, d, k...
+    // and the particle wo ("seat|wo", "git|wo"): the edge before "wo" counts
+    // as a chunk edge.
+    if (const std::string_view r = chunk.raw;
+        r.size() == 3 && IsAsciiAlpha(r[0]) && !IsVowel(r[0]) && Lower(r[0]) != 'w' && Lower(r[0]) != 'n' &&
+        Lower(r[1]) == 'w' && Lower(r[2]) == 'o') {
+      boundary[raw.size() - 2] = true;
+    }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];
       const size_t len = lead < 0x80 ? 1 : lead < 0xE0 ? 2 : lead < 0xF0 ? 3 : 4;
