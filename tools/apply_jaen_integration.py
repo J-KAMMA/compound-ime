@@ -2756,6 +2756,17 @@ edit("converter/english_lexicon.cc",
      "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
 
+# 強い印のときだけの英単語: 節: SCOWL のより珍しい語と固有名（london、ukulele、pilates）を
+# 組み込む（tools/build_english_lexicon.py の signal-words.txt）。打った形が普通の
+# ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
+signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n",
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
+
 # かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
 # 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
 # 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の

@@ -63,10 +63,16 @@ class Lexicon {
   void AddJoined(std::string_view word);
   bool IsJoined(std::string_view word) const;
 
+  // Rarer words and names (london, ukulele, pilates) taken only when what was
+  // typed is no plain Japanese romaji (lo: ぉ, a pending c), on chunk edges.
+  void AddSignalOnly(std::string_view word);
+  bool IsSignalOnly(std::string_view word) const;
+
  private:
   std::unordered_map<std::string, bool> words_;
   std::unordered_map<std::string, Place> places_;
   std::unordered_set<std::string> joined_;
+  std::unordered_set<std::string> signal_only_;
 };
 
 // Lowercase form of a valid lexicon word ([a-z'], starting with a letter, up

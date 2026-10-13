@@ -33,7 +33,8 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
-    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"}};
+    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
+    {"lo", "ぉ"}, {"he", "へ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -83,6 +84,9 @@ int main() {
   lexicon.Add("slack", true);
   lexicon.Add("nec", true);
   lexicon.Add("chatgpt", true);
+  for (const char* w : {"dog", "cat"}) lexicon.Add(w);
+  for (const char* w : {"london", "mac", "sumo", "gand"}) lexicon.AddSignalOnly(w);
+  lexicon.AddSignalOnly("kite");  // already a word: stays a plain word
   const auto split = [&](std::string_view raw) {
     return std::pair{jaen::SplitEnglish(Parse(raw), lexicon, Parse), std::string(raw)};
   };
@@ -111,6 +115,10 @@ int main() {
   Expect(english("slackkaramita") == "slack|", "a word may end before the same key (slack + kara)");
   Expect(english("linuxnokoma") == "linux|", "xn is ん, not a small kana: it may be cut");
   Expect(english("meetinggaarimasu") == "meeting|", "-ng before ga: んっ is not Japanese");
+  Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
+  Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
+  Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
+  Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
     const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ"};
