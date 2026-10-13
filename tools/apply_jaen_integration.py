@@ -2756,6 +2756,21 @@ edit("converter/english_lexicon.cc",
      "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
 
+# 強い印のときだけの英単語: 節: SCOWL のより珍しい語と固有名（london、ukulele、pilates）を
+# 組み込む（tools/build_english_lexicon.py の signal-words.txt）。打った形が普通の
+# ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
+signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="
+")
+edit("converter/english_lexicon.cc",
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);
+",
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);
+"
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);
+")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

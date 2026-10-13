@@ -53,6 +53,7 @@ jobs:
           python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow
           PY=$W/venv/bin/python
           $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
+          grep -xE "london|ukulele|pilates|bbq|mac|ping|paris|marathon|airline|tab|online" $W/lex/signal-words.txt | paste -sd' ' || true
           mkdir -p $W/ut
           curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
             https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2

@@ -94,6 +94,15 @@ bool Lexicon::IsJoined(std::string_view word) const {
   return lower && joined_.contains(*lower);
 }
 
+void Lexicon::AddSignalOnly(std::string_view word) {
+  if (auto lower = Normalize(word); lower && !words_.contains(*lower)) signal_only_.insert(*std::move(lower));
+}
+
+bool Lexicon::IsSignalOnly(std::string_view word) const {
+  const auto lower = Normalize(word);
+  return lower && signal_only_.contains(*lower);
+}
+
 bool Lexicon::IsCurated(std::string_view word) const {
   const auto lower = Normalize(word);
   const auto it = lower ? words_.find(*lower) : words_.end();
@@ -246,10 +255,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         }
       }
       const Lexicon::Place* place = lexicon.FindPlace(word);
-      if (learned == 0 && !place && !lexicon.Contains(word)) continue;
+      const bool signal_only = learned == 0 && !place && !lexicon.Contains(word) && lexicon.IsSignalOnly(word);
+      if (learned == 0 && !place && !lexicon.Contains(word) && !signal_only) continue;
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
-      if (ForeignCost(parse(word)) > 0) {
+      if (signal_only) {
+        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0) cost = kSpanCost - length;
+      } else if (ForeignCost(parse(word)) > 0) {
         cost = kSpanCost - length;
       } else if (word.size() >= kMinPlainWordLength &&
                  (lexicon.IsCurated(word) ||
