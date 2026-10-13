@@ -100,6 +100,8 @@ jobs:
           echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
           T=$W/repo/tests/conversion; mkdir -p $W/results
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/jaen270.txt $W/results/jaen270.tsv 4
+          python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/jaen200b.json > $W/jaen200b.txt
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/jaen200b.txt $W/results/jaen200b.tsv 4
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
           python3 $W/repo/tools/compare_results.py $T/expected-windows-139.tsv $W/results/inputs.tsv | head -60
 

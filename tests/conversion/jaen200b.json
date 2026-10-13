@@ -1,0 +1,1730 @@
+{
+ "description": "英単語まじりの入力 200 文と正解（jaen200b。別の作業役が実装を見ずに作成。jaen270 と別の文、なるべく別の英単語）",
+ "items": [
+  {
+   "id": "b001",
+   "category": "mixed",
+   "romaji": "raigetsunoconferencedehappyousuru",
+   "english": [
+    "conference"
+   ],
+   "intended": "来月のconferenceで発表する"
+  },
+  {
+   "id": "b002",
+   "category": "mixed",
+   "romaji": "atarashiimonitorwochuumonshita",
+   "english": [
+    "monitor"
+   ],
+   "intended": "新しいmonitorを注文した"
+  },
+  {
+   "id": "b003",
+   "category": "mixed",
+   "romaji": "maiasasmoothiewonondeiru",
+   "english": [
+    "smoothie"
+   ],
+   "intended": "毎朝smoothieを飲んでいる"
+  },
+  {
+   "id": "b004",
+   "category": "mixed",
+   "romaji": "shuumatsuhacampingniikuyoteidesu",
+   "english": [
+    "camping"
+   ],
+   "intended": "週末はcampingに行く予定です"
+  },
+  {
+   "id": "b005",
+   "category": "mixed",
+   "romaji": "konocoursehashoshinshamukedesu",
+   "english": [
+    "course"
+   ],
+   "intended": "このcourseは初心者向けです"
+  },
+  {
+   "id": "b006",
+   "category": "mixed",
+   "romaji": "kachounifeedbackwomoratta",
+   "english": [
+    "feedback"
+   ],
+   "intended": "課長にfeedbackをもらった"
+  },
+  {
+   "id": "b007",
+   "category": "mixed",
+   "romaji": "invoicenokingakuwokakuninshita",
+   "english": [
+    "invoice"
+   ],
+   "intended": "invoiceの金額を確認した"
+  },
+  {
+   "id": "b008",
+   "category": "mixed",
+   "romaji": "kinounowebinarhanagakatta",
+   "english": [
+    "webinar"
+   ],
+   "intended": "昨日のwebinarは長かった"
+  },
+  {
+   "id": "b009",
+   "category": "mixed",
+   "romaji": "ekimaeniatarashiicafegadekita",
+   "english": [
+    "cafe"
+   ],
+   "intended": "駅前に新しいcafeができた"
+  },
+  {
+   "id": "b010",
+   "category": "mixed",
+   "romaji": "kyouhayogawoyasumimasu",
+   "english": [
+    "yoga"
+   ],
+   "intended": "今日はyogaを休みます"
+  },
+  {
+   "id": "b011",
+   "category": "mixed",
+   "romaji": "heyanocurtainwokaeta",
+   "english": [
+    "curtain"
+   ],
+   "intended": "部屋のcurtainを替えた"
+  },
+  {
+   "id": "b012",
+   "category": "mixed",
+   "romaji": "kanojohapodcastwomainichikiiteiru",
+   "english": [
+    "podcast"
+   ],
+   "intended": "彼女はpodcastを毎日聞いている"
+  },
+  {
+   "id": "b013",
+   "category": "mixed",
+   "romaji": "sonosneakerhakarukutehakiyasui",
+   "english": [
+    "sneaker"
+   ],
+   "intended": "そのsneakerは軽くて履きやすい"
+  },
+  {
+   "id": "b014",
+   "category": "mixed",
+   "romaji": "shachounospeechgakandoutekidatta",
+   "english": [
+    "speech"
+   ],
+   "intended": "社長のspeechが感動的だった"
+  },
+  {
+   "id": "b015",
+   "category": "mixed",
+   "romaji": "raishuunointerviewnisonaeteiru",
+   "english": [
+    "interview"
+   ],
+   "intended": "来週のinterviewに備えている"
+  },
+  {
+   "id": "b016",
+   "category": "mixed",
+   "romaji": "kyoushitsudeprojectorwotsukatta",
+   "english": [
+    "projector"
+   ],
+   "intended": "教室でprojectorを使った"
+  },
+  {
+   "id": "b017",
+   "category": "mixed",
+   "romaji": "kesanoheadlinewomiteodoroita",
+   "english": [
+    "headline"
+   ],
+   "intended": "今朝のheadlineを見て驚いた"
+  },
+  {
+   "id": "b018",
+   "category": "mixed",
+   "romaji": "kaishanobonushaitsudeshouka",
+   "english": [
+    "bonus"
+   ],
+   "intended": "会社のbonusはいつでしょうか"
+  },
+  {
+   "id": "b019",
+   "category": "mixed",
+   "romaji": "tomodachitobowlingniitta",
+   "english": [
+    "bowling"
+   ],
+   "intended": "友達とbowlingに行った"
+  },
+  {
+   "id": "b020",
+   "category": "mixed",
+   "romaji": "shoppingnotsuideniginkouniyotta",
+   "english": [
+    "shopping"
+   ],
+   "intended": "shoppingのついでに銀行に寄った"
+  },
+  {
+   "id": "b021",
+   "category": "mixed",
+   "romaji": "tanjoubinisurprisewoshikaketa",
+   "english": [
+    "surprise"
+   ],
+   "intended": "誕生日にsurpriseを仕掛けた"
+  },
+  {
+   "id": "b022",
+   "category": "mixed",
+   "romaji": "kinoukaradietwohajimeta",
+   "english": [
+    "diet"
+   ],
+   "intended": "昨日からdietを始めた"
+  },
+  {
+   "id": "b023",
+   "category": "mixed",
+   "romaji": "oyatsunimuffinwoyaita",
+   "english": [
+    "muffin"
+   ],
+   "intended": "おやつにmuffinを焼いた"
+  },
+  {
+   "id": "b024",
+   "category": "mixed",
+   "romaji": "sonogakkounocampushahiroi",
+   "english": [
+    "campus"
+   ],
+   "intended": "その学校のcampusは広い"
+  },
+  {
+   "id": "b025",
+   "category": "mixed",
+   "romaji": "shiyakushodeformwomoratta",
+   "english": [
+    "form"
+   ],
+   "intended": "市役所でformをもらった"
+  },
+  {
+   "id": "b026",
+   "category": "mixed",
+   "romaji": "rirekishonosummarywokakinaoshita",
+   "english": [
+    "summary"
+   ],
+   "intended": "履歴書のsummaryを書き直した"
+  },
+  {
+   "id": "b027",
+   "category": "mixed",
+   "romaji": "kyounotraininggakitsukatta",
+   "english": [
+    "training"
+   ],
+   "intended": "今日のtrainingがきつかった"
+  },
+  {
+   "id": "b028",
+   "category": "mixed",
+   "romaji": "yuuenchideparadewomita",
+   "english": [
+    "parade"
+   ],
+   "intended": "遊園地でparadeを見た"
+  },
+  {
+   "id": "b029",
+   "category": "mixed",
+   "romaji": "kaigishitsunowhiteboardnikaita",
+   "english": [
+    "whiteboard"
+   ],
+   "intended": "会議室のwhiteboardに書いた"
+  },
+  {
+   "id": "b030",
+   "category": "mixed",
+   "romaji": "chichinoshumihagardeningda",
+   "english": [
+    "gardening"
+   ],
+   "intended": "父の趣味はgardeningだ"
+  },
+  {
+   "id": "b031",
+   "category": "mixed",
+   "romaji": "shinkansennnoseatwoyoyakushita",
+   "english": [
+    "seat"
+   ],
+   "intended": "新幹線のseatを予約した"
+  },
+  {
+   "id": "b032",
+   "category": "mixed",
+   "romaji": "kouhainomentorwotanomareta",
+   "english": [
+    "mentor"
+   ],
+   "intended": "後輩のmentorを頼まれた"
+  },
+  {
+   "id": "b033",
+   "category": "mixed",
+   "romaji": "ryokounoitinerarywotsukutta",
+   "english": [
+    "itinerary"
+   ],
+   "intended": "旅行のitineraryを作った"
+  },
+  {
+   "id": "b034",
+   "category": "mixed",
+   "romaji": "konoshampoohaiikaori",
+   "english": [
+    "shampoo"
+   ],
+   "intended": "このshampooはいい香り"
+  },
+  {
+   "id": "b035",
+   "category": "mixed",
+   "romaji": "kinjonogrocerydekaimonoshita",
+   "english": [
+    "grocery"
+   ],
+   "intended": "近所のgroceryで買い物した"
+  },
+  {
+   "id": "b036",
+   "category": "mixed",
+   "romaji": "shuumatsunihikingnidekaketa",
+   "english": [
+    "hiking"
+   ],
+   "intended": "週末にhikingに出かけた"
+  },
+  {
+   "id": "b037",
+   "category": "mixed",
+   "romaji": "bukatsunocaptainnierabareta",
+   "english": [
+    "captain"
+   ],
+   "intended": "部活のcaptainに選ばれた"
+  },
+  {
+   "id": "b038",
+   "category": "mixed",
+   "romaji": "kyounosessionhajuujikaradesu",
+   "english": [
+    "session"
+   ],
+   "intended": "今日のsessionは十時からです"
+  },
+  {
+   "id": "b039",
+   "category": "mixed",
+   "romaji": "kagakunoexperimentgashippaishita",
+   "english": [
+    "experiment"
+   ],
+   "intended": "化学のexperimentが失敗した"
+  },
+  {
+   "id": "b040",
+   "category": "mixed",
+   "romaji": "akachannnoblanketwokatta",
+   "english": [
+    "blanket"
+   ],
+   "intended": "赤ちゃんのblanketを買った"
+  },
+  {
+   "id": "b041",
+   "category": "mixed",
+   "romaji": "daigakunoscholarshipniouboshita",
+   "english": [
+    "scholarship"
+   ],
+   "intended": "大学のscholarshipに応募した"
+  },
+  {
+   "id": "b042",
+   "category": "mixed",
+   "romaji": "ashitanoweatherhadoudarou",
+   "english": [
+    "weather"
+   ],
+   "intended": "明日のweatherはどうだろう"
+  },
+  {
+   "id": "b043",
+   "category": "mixed",
+   "romaji": "kanojohanailwokireinishiteiru",
+   "english": [
+    "nail"
+   ],
+   "intended": "彼女はnailをきれいにしている"
+  },
+  {
+   "id": "b044",
+   "category": "mixed",
+   "romaji": "tsuukinchuunipuzzlewotoku",
+   "english": [
+    "puzzle"
+   ],
+   "intended": "通勤中にpuzzleを解く"
+  },
+  {
+   "id": "b045",
+   "category": "mixed",
+   "romaji": "volleyballnotaikainideta",
+   "english": [
+    "volleyball"
+   ],
+   "intended": "volleyballの大会に出た"
+  },
+  {
+   "id": "b046",
+   "category": "mixed",
+   "romaji": "mainichijournalwotsuketeiru",
+   "english": [
+    "journal"
+   ],
+   "intended": "毎日journalをつけている"
+  },
+  {
+   "id": "b047",
+   "category": "mixed",
+   "romaji": "omiyagenicandywokatta",
+   "english": [
+    "candy"
+   ],
+   "intended": "お土産にcandyを買った"
+  },
+  {
+   "id": "b048",
+   "category": "mixed",
+   "romaji": "atarashiideskgatodoita",
+   "english": [
+    "desk"
+   ],
+   "intended": "新しいdeskが届いた"
+  },
+  {
+   "id": "b049",
+   "category": "mixed",
+   "romaji": "hikkoshinoestimatewotanonda",
+   "english": [
+    "estimate"
+   ],
+   "intended": "引っ越しのestimateを頼んだ"
+  },
+  {
+   "id": "b050",
+   "category": "mixed",
+   "romaji": "shuushokukatsudoudenetworkinggataisetsu",
+   "english": [
+    "networking"
+   ],
+   "intended": "就職活動でnetworkingが大切"
+  },
+  {
+   "id": "b051",
+   "category": "mixed",
+   "romaji": "kinoukarafevergatsuzuiteiru",
+   "english": [
+    "fever"
+   ],
+   "intended": "昨日からfeverが続いている"
+  },
+  {
+   "id": "b052",
+   "category": "mixed",
+   "romaji": "kodomonohomeworkwotetsudatta",
+   "english": [
+    "homework"
+   ],
+   "intended": "子供のhomeworkを手伝った"
+  },
+  {
+   "id": "b053",
+   "category": "mixed",
+   "romaji": "konodressnihaakaikutsugaau",
+   "english": [
+    "dress"
+   ],
+   "intended": "このdressには赤い靴が合う"
+  },
+  {
+   "id": "b054",
+   "category": "mixed",
+   "romaji": "kinounoquizhazenmonseikaishita",
+   "english": [
+    "quiz"
+   ],
+   "intended": "昨日のquizは全問正解した"
+  },
+  {
+   "id": "b055",
+   "category": "mixed",
+   "romaji": "ashitanoflighthaasahayaidesu",
+   "english": [
+    "flight"
+   ],
+   "intended": "明日のflightは朝早いです"
+  },
+  {
+   "id": "b056",
+   "category": "mixed",
+   "romaji": "kuukoukarashuttleninotta",
+   "english": [
+    "shuttle"
+   ],
+   "intended": "空港からshuttleに乗った"
+  },
+  {
+   "id": "b057",
+   "category": "mixed",
+   "romaji": "petnoesawokaiwasureta",
+   "english": [
+    "pet"
+   ],
+   "intended": "petの餌を買い忘れた"
+  },
+  {
+   "id": "b058",
+   "category": "mixed",
+   "romaji": "konohonnnoauthorhayuumeidesu",
+   "english": [
+    "author"
+   ],
+   "intended": "この本のauthorは有名です"
+  },
+  {
+   "id": "b059",
+   "category": "mixed",
+   "romaji": "kinoukarasalegahajimatta",
+   "english": [
+    "sale"
+   ],
+   "intended": "昨日からsaleが始まった"
+  },
+  {
+   "id": "b060",
+   "category": "mixed",
+   "romaji": "sotsugyoushikinosuitwoerabu",
+   "english": [
+    "suit"
+   ],
+   "intended": "卒業式のsuitを選ぶ"
+  },
+  {
+   "id": "b061",
+   "category": "mixed-boundary",
+   "romaji": "ideagaukanda",
+   "english": [
+    "idea"
+   ],
+   "intended": "ideaが浮かんだ"
+  },
+  {
+   "id": "b062",
+   "category": "mixed-boundary",
+   "romaji": "konoareahachuushakinshidesu",
+   "english": [
+    "area"
+   ],
+   "intended": "このareaは駐車禁止です"
+  },
+  {
+   "id": "b063",
+   "category": "mixed-boundary",
+   "romaji": "medianitoriagerareta",
+   "english": [
+    "media"
+   ],
+   "intended": "mediaに取り上げられた"
+  },
+  {
+   "id": "b064",
+   "category": "mixed-boundary",
+   "romaji": "kitsuenzonehadokodesuka",
+   "english": [
+    "zone"
+   ],
+   "intended": "喫煙zoneはどこですか"
+  },
+  {
+   "id": "b065",
+   "category": "mixed-boundary",
+   "romaji": "herogatoujousuru",
+   "english": [
+    "hero"
+   ],
+   "intended": "heroが登場する"
+  },
+  {
+   "id": "b066",
+   "category": "mixed-boundary",
+   "romaji": "memowotorinagarakiku",
+   "english": [
+    "memo"
+   ],
+   "intended": "memoを取りながら聞く"
+  },
+  {
+   "id": "b067",
+   "category": "mixed-boundary",
+   "romaji": "zerokarayarinaosu",
+   "english": [
+    "zero"
+   ],
+   "intended": "zeroからやり直す"
+  },
+  {
+   "id": "b068",
+   "category": "mixed-boundary",
+   "romaji": "sonokyokunotunegasukidesu",
+   "english": [
+    "tune"
+   ],
+   "intended": "その曲のtuneが好きです"
+  },
+  {
+   "id": "b069",
+   "category": "mixed-boundary",
+   "romaji": "gamennnomodewokirikaeta",
+   "english": [
+    "mode"
+   ],
+   "intended": "画面のmodeを切り替えた"
+  },
+  {
+   "id": "b070",
+   "category": "mixed-boundary",
+   "romaji": "salsanokyoushitsunikayou",
+   "english": [
+    "salsa"
+   ],
+   "intended": "salsaの教室に通う"
+  },
+  {
+   "id": "b071",
+   "category": "mixed-boundary",
+   "romaji": "laptopwoieniwasureta",
+   "english": [
+    "laptop"
+   ],
+   "intended": "laptopを家に忘れた"
+  },
+  {
+   "id": "b072",
+   "category": "mixed-boundary",
+   "romaji": "lessonniokurenaiyouni",
+   "english": [
+    "lesson"
+   ],
+   "intended": "lessonに遅れないように"
+  },
+  {
+   "id": "b073",
+   "category": "mixed-boundary",
+   "romaji": "librarydehonwokarita",
+   "english": [
+    "library"
+   ],
+   "intended": "libraryで本を借りた"
+  },
+  {
+   "id": "b074",
+   "category": "mixed-boundary",
+   "romaji": "lockernikagiwokaketa",
+   "english": [
+    "locker"
+   ],
+   "intended": "lockerに鍵をかけた"
+  },
+  {
+   "id": "b075",
+   "category": "mixed-boundary",
+   "romaji": "lobbydemachiawaseshimashou",
+   "english": [
+    "lobby"
+   ],
+   "intended": "lobbyで待ち合わせしましょう"
+  },
+  {
+   "id": "b076",
+   "category": "mixed-boundary",
+   "romaji": "labelwohatteoku",
+   "english": [
+    "label"
+   ],
+   "intended": "labelを貼っておく"
+  },
+  {
+   "id": "b077",
+   "category": "mixed-boundary",
+   "romaji": "layoutwosukoshikaeta",
+   "english": [
+    "layout"
+   ],
+   "intended": "layoutを少し変えた"
+  },
+  {
+   "id": "b078",
+   "category": "mixed-boundary",
+   "romaji": "levelgaagatta",
+   "english": [
+    "level"
+   ],
+   "intended": "levelが上がった"
+  },
+  {
+   "id": "b079",
+   "category": "mixed-boundary",
+   "romaji": "licensenokoushinnniitta",
+   "english": [
+    "license"
+   ],
+   "intended": "licenseの更新に行った"
+  },
+  {
+   "id": "b080",
+   "category": "mixed-boundary",
+   "romaji": "lyricswooboeta",
+   "english": [
+    "lyrics"
+   ],
+   "intended": "lyricsを覚えた"
+  },
+  {
+   "id": "b081",
+   "category": "mixed-boundary",
+   "romaji": "lattewohitotsukudasai",
+   "english": [
+    "latte"
+   ],
+   "intended": "latteを一つください"
+  },
+  {
+   "id": "b082",
+   "category": "mixed-boundary",
+   "romaji": "laundrywotorikomu",
+   "english": [
+    "laundry"
+   ],
+   "intended": "laundryを取り込む"
+  },
+  {
+   "id": "b083",
+   "category": "mixed-boundary",
+   "romaji": "berlinniryuugakushita",
+   "english": [
+    "berlin"
+   ],
+   "intended": "berlinに留学した"
+  },
+  {
+   "id": "b084",
+   "category": "mixed-boundary",
+   "romaji": "seattlehaamegaooi",
+   "english": [
+    "seattle"
+   ],
+   "intended": "seattleは雨が多い"
+  },
+  {
+   "id": "b085",
+   "category": "mixed-boundary",
+   "romaji": "sydneynoyakeiwomita",
+   "english": [
+    "sydney"
+   ],
+   "intended": "sydneyの夜景を見た"
+  },
+  {
+   "id": "b086",
+   "category": "mixed-boundary",
+   "romaji": "bostonkarakaettekita",
+   "english": [
+    "boston"
+   ],
+   "intended": "bostonから帰ってきた"
+  },
+  {
+   "id": "b087",
+   "category": "mixed-boundary",
+   "romaji": "madridheryokoushita",
+   "english": [
+    "madrid"
+   ],
+   "intended": "madridへ旅行した"
+  },
+  {
+   "id": "b088",
+   "category": "mixed-boundary",
+   "romaji": "viennadeongakkaiwokiita",
+   "english": [
+    "vienna"
+   ],
+   "intended": "viennaで音楽会を聴いた"
+  },
+  {
+   "id": "b089",
+   "category": "mixed-boundary",
+   "romaji": "torontoniojigasundeiru",
+   "english": [
+    "toronto"
+   ],
+   "intended": "torontoに叔父が住んでいる"
+  },
+  {
+   "id": "b090",
+   "category": "mixed-boundary",
+   "romaji": "chicagonofuyuhasamui",
+   "english": [
+    "chicago"
+   ],
+   "intended": "chicagoの冬は寒い"
+  },
+  {
+   "id": "b091",
+   "category": "mixed-boundary",
+   "romaji": "milanderyouriwotanoshinda",
+   "english": [
+    "milan"
+   ],
+   "intended": "milanで料理を楽しんだ"
+  },
+  {
+   "id": "b092",
+   "category": "mixed-boundary",
+   "romaji": "hawaiinoumihakireidatta",
+   "english": [
+    "hawaii"
+   ],
+   "intended": "hawaiiの海はきれいだった"
+  },
+  {
+   "id": "b093",
+   "category": "mixed-boundary",
+   "romaji": "nikenokutsuwokatta",
+   "english": [
+    "nike"
+   ],
+   "intended": "nikeの靴を買った"
+  },
+  {
+   "id": "b094",
+   "category": "mixed-boundary",
+   "romaji": "ikeadetanawokatta",
+   "english": [
+    "ikea"
+   ],
+   "intended": "ikeaで棚を買った"
+  },
+  {
+   "id": "b095",
+   "category": "mixed-boundary",
+   "romaji": "legodeshirowotsukutta",
+   "english": [
+    "lego"
+   ],
+   "intended": "legoで城を作った"
+  },
+  {
+   "id": "b096",
+   "category": "mixed-boundary",
+   "romaji": "notionnigijirokuwomatometa",
+   "english": [
+    "notion"
+   ],
+   "intended": "notionに議事録をまとめた"
+  },
+  {
+   "id": "b097",
+   "category": "mixed-boundary",
+   "romaji": "figmadegamenwotsukuru",
+   "english": [
+    "figma"
+   ],
+   "intended": "figmaで画面を作る"
+  },
+  {
+   "id": "b098",
+   "category": "mixed-boundary",
+   "romaji": "teslaniichidonottemitai",
+   "english": [
+    "tesla"
+   ],
+   "intended": "teslaに一度乗ってみたい"
+  },
+  {
+   "id": "b099",
+   "category": "mixed-boundary",
+   "romaji": "airbnbdeyadowosagasu",
+   "english": [
+    "airbnb"
+   ],
+   "intended": "airbnbで宿を探す"
+  },
+  {
+   "id": "b100",
+   "category": "mixed-boundary",
+   "romaji": "paypaldeshiharatta",
+   "english": [
+    "paypal"
+   ],
+   "intended": "paypalで支払った"
+  },
+  {
+   "id": "b101",
+   "category": "mixed-boundary",
+   "romaji": "kindledeshousetsuwoyomu",
+   "english": [
+    "kindle"
+   ],
+   "intended": "kindleで小説を読む"
+  },
+  {
+   "id": "b102",
+   "category": "mixed-boundary",
+   "romaji": "canvadechirashiwotsukutta",
+   "english": [
+    "canva"
+   ],
+   "intended": "canvaでチラシを作った"
+  },
+  {
+   "id": "b103",
+   "category": "mixed-boundary",
+   "romaji": "costcodematomegaishita",
+   "english": [
+    "costco"
+   ],
+   "intended": "costcoでまとめ買いした"
+  },
+  {
+   "id": "b104",
+   "category": "mixed-boundary",
+   "romaji": "disneyniikunogatanoshimi",
+   "english": [
+    "disney"
+   ],
+   "intended": "disneyに行くのが楽しみ"
+  },
+  {
+   "id": "b105",
+   "category": "mixed-boundary",
+   "romaji": "picassonoewomita",
+   "english": [
+    "picasso"
+   ],
+   "intended": "picassoの絵を見た"
+  },
+  {
+   "id": "b106",
+   "category": "mixed-boundary",
+   "romaji": "mozartnokyokuwohiita",
+   "english": [
+    "mozart"
+   ],
+   "intended": "mozartの曲を弾いた"
+  },
+  {
+   "id": "b107",
+   "category": "mixed-boundary",
+   "romaji": "darwinnohonwoyonda",
+   "english": [
+    "darwin"
+   ],
+   "intended": "darwinの本を読んだ"
+  },
+  {
+   "id": "b108",
+   "category": "mixed-boundary",
+   "romaji": "emmatoeigawomita",
+   "english": [
+    "emma"
+   ],
+   "intended": "emmaと映画を見た"
+  },
+  {
+   "id": "b109",
+   "category": "mixed-boundary",
+   "romaji": "radiodenewswokiita",
+   "english": [
+    "radio",
+    "news"
+   ],
+   "intended": "radioでnewsを聞いた"
+  },
+  {
+   "id": "b110",
+   "category": "mixed-boundary",
+   "romaji": "kiwitomangowokatta",
+   "english": [
+    "kiwi",
+    "mango"
+   ],
+   "intended": "kiwiとmangoを買った"
+  },
+  {
+   "id": "b111",
+   "category": "mixed-hard",
+   "romaji": "sorehanoproblemdesu",
+   "english": [
+    "no",
+    "problem"
+   ],
+   "intended": "それはno problemです"
+  },
+  {
+   "id": "b112",
+   "category": "mixed-hard",
+   "romaji": "saigohahappyendingdatta",
+   "english": [
+    "happy",
+    "ending"
+   ],
+   "intended": "最後はhappy endingだった"
+  },
+  {
+   "id": "b113",
+   "category": "mixed-hard",
+   "romaji": "kanojohaitsumopositivethinkingda",
+   "english": [
+    "positive",
+    "thinking"
+   ],
+   "intended": "彼女はいつもpositive thinkingだ"
+  },
+  {
+   "id": "b114",
+   "category": "mixed-hard",
+   "romaji": "asapdetaiouonegaishimasu",
+   "english": [
+    "asap"
+   ],
+   "intended": "asapで対応お願いします"
+  },
+  {
+   "id": "b115",
+   "category": "mixed-hard",
+   "romaji": "uxwomottoyokushitai",
+   "english": [
+    "ux"
+   ],
+   "intended": "uxをもっと良くしたい"
+  },
+  {
+   "id": "b116",
+   "category": "mixed-hard",
+   "romaji": "osnoversionwoageta",
+   "english": [
+    "os",
+    "version"
+   ],
+   "intended": "osのversionを上げた"
+  },
+  {
+   "id": "b117",
+   "category": "mixed-hard",
+   "romaji": "apinokeywohakkoushita",
+   "english": [
+    "api",
+    "key"
+   ],
+   "intended": "apiのkeyを発行した"
+  },
+  {
+   "id": "b118",
+   "category": "mixed-hard",
+   "romaji": "vpnnisetsuzokushiteshigotosuru",
+   "english": [
+    "vpn"
+   ],
+   "intended": "vpnに接続して仕事する"
+  },
+  {
+   "id": "b119",
+   "category": "mixed-hard",
+   "romaji": "qanotantouninatta",
+   "english": [
+    "qa"
+   ],
+   "intended": "qaの担当になった"
+  },
+  {
+   "id": "b120",
+   "category": "mixed-hard",
+   "romaji": "prwodashitekudasai",
+   "english": [
+    "pr"
+   ],
+   "intended": "prを出してください"
+  },
+  {
+   "id": "b121",
+   "category": "mixed-hard",
+   "romaji": "faqnimatomemashita",
+   "english": [
+    "faq"
+   ],
+   "intended": "faqにまとめました"
+  },
+  {
+   "id": "b122",
+   "category": "mixed-hard",
+   "romaji": "ceonoaisatsugaatta",
+   "english": [
+    "ceo"
+   ],
+   "intended": "ceoの挨拶があった"
+  },
+  {
+   "id": "b123",
+   "category": "mixed-hard",
+   "romaji": "kpiwotasseishita",
+   "english": [
+    "kpi"
+   ],
+   "intended": "kpiを達成した"
+  },
+  {
+   "id": "b124",
+   "category": "mixed-hard",
+   "romaji": "snsnitoukoushita",
+   "english": [
+    "sns"
+   ],
+   "intended": "snsに投稿した"
+  },
+  {
+   "id": "b125",
+   "category": "mixed-hard",
+   "romaji": "homenogamennnimodoru",
+   "english": [
+    "home"
+   ],
+   "intended": "homeの画面に戻る"
+  },
+  {
+   "id": "b126",
+   "category": "mixed-hard",
+   "romaji": "notenitsukaikatawokaita",
+   "english": [
+    "note"
+   ],
+   "intended": "noteに使い方を書いた"
+  },
+  {
+   "id": "b127",
+   "category": "mixed-hard",
+   "romaji": "yamanohikegatanoshikatta",
+   "english": [
+    "hike"
+   ],
+   "intended": "山のhikeが楽しかった"
+  },
+  {
+   "id": "b128",
+   "category": "mixed-hard",
+   "romaji": "koenotonegaakarui",
+   "english": [
+    "tone"
+   ],
+   "intended": "声のtoneが明るい"
+  },
+  {
+   "id": "b129",
+   "category": "mixed-hard",
+   "romaji": "bikedetouringshita",
+   "english": [
+    "bike",
+    "touring"
+   ],
+   "intended": "bikeでtouringした"
+  },
+  {
+   "id": "b130",
+   "category": "mixed-hard",
+   "romaji": "dunenozokuhenwomita",
+   "english": [
+    "dune"
+   ],
+   "intended": "duneの続編を見た"
+  },
+  {
+   "id": "b131",
+   "category": "mixed-hard",
+   "romaji": "tunasandwichwotsukutta",
+   "english": [
+    "tuna",
+    "sandwich"
+   ],
+   "intended": "tuna sandwichを作った"
+  },
+  {
+   "id": "b132",
+   "category": "mixed-hard",
+   "romaji": "shashinnnoposewokangaeru",
+   "english": [
+    "pose"
+   ],
+   "intended": "写真のposeを考える"
+  },
+  {
+   "id": "b133",
+   "category": "mixed-hard",
+   "romaji": "micwomuteshitekudasai",
+   "english": [
+    "mic",
+    "mute"
+   ],
+   "intended": "micをmuteしてください"
+  },
+  {
+   "id": "b134",
+   "category": "mixed-hard",
+   "romaji": "kyouhacheatdaydesu",
+   "english": [
+    "cheat",
+    "day"
+   ],
+   "intended": "今日はcheat dayです"
+  },
+  {
+   "id": "b135",
+   "category": "mixed-hard",
+   "romaji": "kanojohamybestfrienddesu",
+   "english": [
+    "my",
+    "best",
+    "friend"
+   ],
+   "intended": "彼女はmy best friendです"
+  },
+  {
+   "id": "b136",
+   "category": "mixed-hard",
+   "romaji": "shikennnomaenigoodlucktoiwareta",
+   "english": [
+    "good",
+    "luck"
+   ],
+   "intended": "試験の前にgood luckと言われた"
+  },
+  {
+   "id": "b137",
+   "category": "mixed-hard",
+   "romaji": "lastorderhakujidesu",
+   "english": [
+    "last",
+    "order"
+   ],
+   "intended": "last orderは九時です"
+  },
+  {
+   "id": "b138",
+   "category": "mixed-hard",
+   "romaji": "checkouthajuujimadedesu",
+   "english": [
+    "check",
+    "out"
+   ],
+   "intended": "check outは十時までです"
+  },
+  {
+   "id": "b139",
+   "category": "mixed-hard",
+   "romaji": "tamanihafastfoodmotabetai",
+   "english": [
+    "fast",
+    "food"
+   ],
+   "intended": "たまにはfast foodも食べたい"
+  },
+  {
+   "id": "b140",
+   "category": "mixed-hard",
+   "romaji": "machinelearningnobenkyoukainisankashita",
+   "english": [
+    "machine",
+    "learning"
+   ],
+   "intended": "machine learningの勉強会に参加した"
+  },
+  {
+   "id": "b141",
+   "category": "mixed-hard",
+   "romaji": "sonowadaiwodeepdiveshiyou",
+   "english": [
+    "deep",
+    "dive"
+   ],
+   "intended": "その話題をdeep diveしよう"
+  },
+  {
+   "id": "b142",
+   "category": "mixed-hard",
+   "romaji": "winwinnokankeiwokizuku",
+   "english": [
+    "win",
+    "win"
+   ],
+   "intended": "win winの関係を築く"
+  },
+  {
+   "id": "b143",
+   "category": "mixed-hard",
+   "romaji": "basuhaontimenitsuita",
+   "english": [
+    "on",
+    "time"
+   ],
+   "intended": "バスはon timeに着いた"
+  },
+  {
+   "id": "b144",
+   "category": "mixed-hard",
+   "romaji": "kaigimaenosmalltalkganigatedesu",
+   "english": [
+    "small",
+    "talk"
+   ],
+   "intended": "会議前のsmall talkが苦手です"
+  },
+  {
+   "id": "b145",
+   "category": "mixed-hard",
+   "romaji": "hirunipowernapwotoru",
+   "english": [
+    "power",
+    "nap"
+   ],
+   "intended": "昼にpower napを取る"
+  },
+  {
+   "id": "b146",
+   "category": "mixed-hard",
+   "romaji": "konolifehackhabenridesu",
+   "english": [
+    "life",
+    "hack"
+   ],
+   "intended": "このlife hackは便利です"
+  },
+  {
+   "id": "b147",
+   "category": "mixed-hard",
+   "romaji": "planbwokangaeteoku",
+   "english": [
+    "plan",
+    "b"
+   ],
+   "intended": "plan bを考えておく"
+  },
+  {
+   "id": "b148",
+   "category": "mixed-hard",
+   "romaji": "vrdeuchuuwotaikenshita",
+   "english": [
+    "vr"
+   ],
+   "intended": "vrで宇宙を体験した"
+  },
+  {
+   "id": "b149",
+   "category": "mixed-hard",
+   "romaji": "itkigyounishuushokushita",
+   "english": [
+    "it"
+   ],
+   "intended": "it企業に就職した"
+  },
+  {
+   "id": "b150",
+   "category": "mixed-hard",
+   "romaji": "dmdeokuttekudasai",
+   "english": [
+    "dm"
+   ],
+   "intended": "dmで送ってください"
+  },
+  {
+   "id": "b151",
+   "category": "japanese-only",
+   "romaji": "tangowooboeru",
+   "english": [],
+   "intended": "単語を覚える"
+  },
+  {
+   "id": "b152",
+   "category": "japanese-only",
+   "romaji": "omenwokabutteodoru",
+   "english": [],
+   "intended": "お面をかぶって踊る"
+  },
+  {
+   "id": "b153",
+   "category": "japanese-only",
+   "romaji": "kouenmadekitekudasai",
+   "english": [],
+   "intended": "公園まで来てください"
+  },
+  {
+   "id": "b154",
+   "category": "japanese-only",
+   "romaji": "inunimatewooshieta",
+   "english": [],
+   "intended": "犬に待てを教えた"
+  },
+  {
+   "id": "b155",
+   "category": "japanese-only",
+   "romaji": "mizugamoreteiru",
+   "english": [],
+   "intended": "水が漏れている"
+  },
+  {
+   "id": "b156",
+   "category": "japanese-only",
+   "romaji": "soremoiikamo",
+   "english": [],
+   "intended": "それもいいかも"
+  },
+  {
+   "id": "b157",
+   "category": "japanese-only",
+   "romaji": "darenokasadesuka",
+   "english": [],
+   "intended": "誰の傘ですか"
+  },
+  {
+   "id": "b158",
+   "category": "japanese-only",
+   "romaji": "kanojohamewofuseta",
+   "english": [],
+   "intended": "彼女は目を伏せた"
+  },
+  {
+   "id": "b159",
+   "category": "japanese-only",
+   "romaji": "futonwohosetaraiinoni",
+   "english": [],
+   "intended": "布団を干せたらいいのに"
+  },
+  {
+   "id": "b160",
+   "category": "japanese-only",
+   "romaji": "kurumawotometekudasai",
+   "english": [],
+   "intended": "車を止めてください"
+  },
+  {
+   "id": "b161",
+   "category": "japanese-only",
+   "romaji": "makewomitomeru",
+   "english": [],
+   "intended": "負けを認める"
+  },
+  {
+   "id": "b162",
+   "category": "japanese-only",
+   "romaji": "takeyabuwoaruku",
+   "english": [],
+   "intended": "竹やぶを歩く"
+  },
+  {
+   "id": "b163",
+   "category": "japanese-only",
+   "romaji": "honewootta",
+   "english": [],
+   "intended": "骨を折った"
+  },
+  {
+   "id": "b164",
+   "category": "japanese-only",
+   "romaji": "gofunmattekudasai",
+   "english": [],
+   "intended": "五分待ってください"
+  },
+  {
+   "id": "b165",
+   "category": "japanese-only",
+   "romaji": "konbanhanabenishiyou",
+   "english": [],
+   "intended": "今晩は鍋にしよう"
+  },
+  {
+   "id": "b166",
+   "category": "japanese-only",
+   "romaji": "menwoyudeteiru",
+   "english": [],
+   "intended": "麺を茹でている"
+  },
+  {
+   "id": "b167",
+   "category": "japanese-only",
+   "romaji": "penwokashite",
+   "english": [],
+   "intended": "ペンを貸して"
+  },
+  {
+   "id": "b168",
+   "category": "japanese-only",
+   "romaji": "sonwoshitakigasuru",
+   "english": [],
+   "intended": "損をした気がする"
+  },
+  {
+   "id": "b169",
+   "category": "japanese-only",
+   "romaji": "hennnaotogasuru",
+   "english": [],
+   "intended": "変な音がする"
+  },
+  {
+   "id": "b170",
+   "category": "japanese-only",
+   "romaji": "tensuugaagatta",
+   "english": [],
+   "intended": "点数が上がった"
+  },
+  {
+   "id": "b171",
+   "category": "japanese-only",
+   "romaji": "melonwohanbunnnikitta",
+   "english": [],
+   "intended": "メロンを半分に切った"
+  },
+  {
+   "id": "b172",
+   "category": "japanese-only",
+   "romaji": "animenoseiyuuwoshiraberu",
+   "english": [],
+   "intended": "アニメの声優を調べる"
+  },
+  {
+   "id": "b173",
+   "category": "japanese-only",
+   "romaji": "emojiwotsukaisugi",
+   "english": [],
+   "intended": "絵文字を使いすぎ"
+  },
+  {
+   "id": "b174",
+   "category": "japanese-only",
+   "romaji": "karatenodoujounikayotteiru",
+   "english": [],
+   "intended": "空手の道場に通っている"
+  },
+  {
+   "id": "b175",
+   "category": "japanese-only",
+   "romaji": "bananatomomowokatta",
+   "english": [],
+   "intended": "バナナと桃を買った"
+  },
+  {
+   "id": "b176",
+   "category": "japanese-only",
+   "romaji": "tomatowosodateteiru",
+   "english": [],
+   "intended": "トマトを育てている"
+  },
+  {
+   "id": "b177",
+   "category": "japanese-only",
+   "romaji": "sofanouedeneteshimatta",
+   "english": [],
+   "intended": "ソファの上で寝てしまった"
+  },
+  {
+   "id": "b178",
+   "category": "japanese-only",
+   "romaji": "pandagasasawotabeteiru",
+   "english": [],
+   "intended": "パンダが笹を食べている"
+  },
+  {
+   "id": "b179",
+   "category": "japanese-only",
+   "romaji": "konbudedashiwotoru",
+   "english": [],
+   "intended": "昆布で出汁を取る"
+  },
+  {
+   "id": "b180",
+   "category": "japanese-only",
+   "romaji": "hashiwootoshita",
+   "english": [],
+   "intended": "箸を落とした"
+  },
+  {
+   "id": "b181",
+   "category": "japanese-only",
+   "romaji": "asameshiwonuita",
+   "english": [],
+   "intended": "朝飯を抜いた"
+  },
+  {
+   "id": "b182",
+   "category": "japanese-only",
+   "romaji": "namaewoyobareta",
+   "english": [],
+   "intended": "名前を呼ばれた"
+  },
+  {
+   "id": "b183",
+   "category": "japanese-only",
+   "romaji": "shiaigaenchousennninatta",
+   "english": [],
+   "intended": "試合が延長戦になった"
+  },
+  {
+   "id": "b184",
+   "category": "japanese-only",
+   "romaji": "kanemochininaritai",
+   "english": [],
+   "intended": "金持ちになりたい"
+  },
+  {
+   "id": "b185",
+   "category": "japanese-only",
+   "romaji": "kamenoesawoyaru",
+   "english": [],
+   "intended": "亀の餌をやる"
+  },
+  {
+   "id": "b186",
+   "category": "japanese-only",
+   "romaji": "himenoyakuwoenjita",
+   "english": [],
+   "intended": "姫の役を演じた"
+  },
+  {
+   "id": "b187",
+   "category": "japanese-only",
+   "romaji": "shourainotamenichokinsuru",
+   "english": [],
+   "intended": "将来のために貯金する"
+  },
+  {
+   "id": "b188",
+   "category": "japanese-only",
+   "romaji": "ategahazureta",
+   "english": [],
+   "intended": "当てが外れた"
+  },
+  {
+   "id": "b189",
+   "category": "japanese-only",
+   "romaji": "nimotsuwotananinoseta",
+   "english": [],
+   "intended": "荷物を棚に載せた"
+  },
+  {
+   "id": "b190",
+   "category": "japanese-only",
+   "romaji": "korewomitekudasai",
+   "english": [],
+   "intended": "これを見てください"
+  },
+  {
+   "id": "b191",
+   "category": "japanese-only",
+   "romaji": "komewotogu",
+   "english": [],
+   "intended": "米を研ぐ"
+  },
+  {
+   "id": "b192",
+   "category": "japanese-only",
+   "romaji": "mikanwomuku",
+   "english": [],
+   "intended": "みかんをむく"
+  },
+  {
+   "id": "b193",
+   "category": "japanese-only",
+   "romaji": "hanabitaikainiitta",
+   "english": [],
+   "intended": "花火大会に行った"
+  },
+  {
+   "id": "b194",
+   "category": "japanese-only",
+   "romaji": "senpainisoudanshita",
+   "english": [],
+   "intended": "先輩に相談した"
+  },
+  {
+   "id": "b195",
+   "category": "japanese-only",
+   "romaji": "tamagowowaru",
+   "english": [],
+   "intended": "卵を割る"
+  },
+  {
+   "id": "b196",
+   "category": "japanese-only",
+   "romaji": "tomodachitoumiheitta",
+   "english": [],
+   "intended": "友達と海へ行った"
+  },
+  {
+   "id": "b197",
+   "category": "japanese-only",
+   "romaji": "kaiganwoaruitekaetta",
+   "english": [],
+   "intended": "海岸を歩いて帰った"
+  },
+  {
+   "id": "b198",
+   "category": "japanese-only",
+   "romaji": "kanjinorenshuuwoshita",
+   "english": [],
+   "intended": "漢字の練習をした"
+  },
+  {
+   "id": "b199",
+   "category": "japanese-only",
+   "romaji": "mamanoobentougaoishii",
+   "english": [],
+   "intended": "ママのお弁当がおいしい"
+  },
+  {
+   "id": "b200",
+   "category": "japanese-only",
+   "romaji": "sakuragasaitarahanamishiyou",
+   "english": [],
+   "intended": "桜が咲いたら花見しよう"
+  }
+ ]
+}
