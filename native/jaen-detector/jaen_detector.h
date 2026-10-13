@@ -31,6 +31,10 @@ struct Piece {
   size_t begin = 0;
   size_t end = 0;
   bool english = false;
+  // Raw positions inside an English piece where two merged words meet and
+  // their concatenation is no lexicon word ("birthday|present"): shown with a
+  // space there.
+  std::vector<size_t> spaces;
   friend bool operator==(const Piece&, const Piece&) = default;
 };
 
@@ -54,9 +58,15 @@ class Lexicon {
   void AddPlace(std::string_view spelling, std::string_view surface, std::string_view standard);
   const Place* FindPlace(std::string_view spelling) const;
 
+  // Words made of two shorter words (download, backup): two such typed words
+  // are shown without a space between them.
+  void AddJoined(std::string_view word);
+  bool IsJoined(std::string_view word) const;
+
  private:
   std::unordered_map<std::string, bool> words_;
   std::unordered_map<std::string, Place> places_;
+  std::unordered_set<std::string> joined_;
 };
 
 // Lowercase form of a valid lexicon word ([a-z'], starting with a letter, up
@@ -92,12 +102,20 @@ bool IsForeignChunk(const Chunk& chunk);
 // "xn" for ん may be cut).
 // Adjacent English words are merged into one piece. |choices| (optional)
 // adds and removes words as described there.
+// |is_reading| (optional) tells whether kana is a reading in the Japanese
+// dictionary. A lexicon word of at least kMinUnreadWordLength letters on the
+// typed chunk edges whose kana is no Japanese reading (remote: れもて, safe:
+// さふぇ) is English too, unless a Japanese reading of 3+ kana crosses one of
+// its edges (the て of "kono|te|gami" belongs to 手紙).
 // Returns an empty vector when no English piece is chosen.
 inline constexpr size_t kMinPlainWordLength = 5;
+inline constexpr size_t kMinUnreadWordLength = 4;
+using ReadingCheck = std::function<bool(std::string_view kana)>;
 std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks,
                                 const Lexicon& lexicon,
                                 const RomajiParser& parse,
-                                const Choices* choices = nullptr);
+                                const Choices* choices = nullptr,
+                                const ReadingCheck* is_reading = nullptr);
 
 }  // namespace jaen
 

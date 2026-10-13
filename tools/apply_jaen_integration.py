@@ -2710,6 +2710,52 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
   // Context cues pick among homophones (tools/data/homophone-cues.tsv); a
   // first candidate from the user's history is never moved.""")
 
+# 英単語の読みと空白: 節: 読みが日本語の辞書にない英単語は英語のまま、続けて打った英単語の間に空白。
+#
+# 英単語の判定に、かなの読みが Mozc の辞書（利用者の辞書を含まない本体）に
+# あるかを渡す。remote（れもて）や safe（さふぇ）のように、読みが日本語にない
+# 語は英語として残す（native/jaen-detector の SplitEnglish）。続けて打った2語の
+# つなげた形が単語でないとき（birthdaypresent）は「birthday present」と表示する。
+C = "converter/converter.cc"
+edit(C, """  const std::shared_ptr<const jaen::Choices> choices = EnglishChoices().Get();
+  std::vector<jaen::Piece> pieces =
+      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get());""",
+     """  const std::shared_ptr<const jaen::Choices> choices = EnglishChoices().Get();
+  // Whether kana is a reading in Mozc's system dictionary.
+  const jaen::ReadingCheck is_reading = [this](std::string_view kana) {
+    return modules().GetDictionary().HasKey(kana);
+  };
+  std::vector<jaen::Piece> pieces =
+      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading);""")
+edit(C, """        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get());""",
+     """        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading);""")
+edit(C, """      segment->set_key(text);
+      segment->set_segment_type(Segment::FIXED_VALUE);
+      PutTypedValueFirst(text, segment);
+      typed.emplace_back(text, text);""", """      segment->set_key(text);
+      segment->set_segment_type(Segment::FIXED_VALUE);
+      // Two typed words that are no word together are shown with a space
+      // (piece.spaces is in descending order).
+      std::string shown = text;
+      for (const size_t at : piece.spaces) {
+        if (at > piece.begin && at - piece.begin < shown.size()) shown.insert(at - piece.begin, " ");
+      }
+      PutTypedValueFirst(shown, segment);
+      typed.emplace_back(text, shown);""")
+
+# 2語をつないだ英単語: 節: 2語をつないだ英単語の一覧（tools/data/english-joined.txt）を組み込む。
+#
+# 続けて打った英単語は、つないだ形がこの一覧（または英単語の一覧）にあれば
+# 1語のまま（download）、なければ空白を入れて表示する（weekly report）。
+joined = (REPO / "tools/data/english-joined.txt").read_text(encoding="ascii").split()
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + "inline constexpr const char* kJoinedWords[] = {\n"
+               + "".join(f'    "{w}",\n' for w in joined) + "};\n", encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n",
+     "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
