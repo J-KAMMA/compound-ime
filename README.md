@@ -26,12 +26,23 @@ Windows 用の日本語入力ソフトです。[Mozc](https://github.com/google/
 
 - Windows 11（64 ビット、x64）で動作を確かめています。
 - Linux（Ubuntu 24.04、x64、ibus）は試用版です。
+- Mac（Apple シリコン、macOS 13 以降）は試用版です。
 
 ## インストール
 
 ### Linux（ibus、試用版）
 
 配布ページの `compound-ime-<版>-linux-x64.tar.gz` を展開し、`sudo ./install.sh` を実行します。そのあと `ibus restart` をして、入力方式の設定で「コンパウンドIME」を追加します。外すときは `sudo ./uninstall.sh` です。Ubuntu 24.04 で、ibus 経由の変換までを確かめています（実際の画面での打ち心地は未確認です）。
+
+### Mac（試用版）
+
+配布ページの `CompoundIME-<版>-mac-arm64.pkg` を使います（Apple シリコンの Mac、macOS 13 以降）。
+
+1. 署名がないため、ダブルクリックでは開けません。ファイルを右クリック（または control キーを押しながらクリック）して「開く」を選び、確認の画面でもう一度「開く」を押します。
+2. インストール中に変換モデル（約74MB）を公式の配布元から取得します。
+3. 「システム設定」→「キーボード」→「入力ソース」の「編集」→「＋」→「日本語」から「コンパウンドIME」を追加します。
+
+外すときは「アプリケーション」→「CompoundIME」→「UninstallCompoundIME」を開きます。Mac では GitHub の Mac 上で組み立てと導入、変換の仕組みの起動までを確かめています（実際の画面での打ち心地は未確認です）。
 
 ### ウィンドウズ
 

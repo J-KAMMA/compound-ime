@@ -149,3 +149,15 @@ Ubuntu 24.04（x64）で確かめています。ウィンドウズ版と同じ�
 5. 配布物を作る: `bash tools/make_linux_bundle.sh <版> <work> <このリポジトリ>`。`<work>/dist/compound-ime-<版>-linux-x64.tar.gz` ができます。中の `install.sh` を sudo で実行すると `/usr/lib/compound-ime` などに入り、変換モデルを公式から取得します。公式の Mozc（`/usr/lib/mozc`、ibus の `mozc-jp`）とは名前も置き場所も別です。
 
 試験: `session_handler_main`（`//session:session_handler_main`）で手順 9 と同じ一括試験ができます。開発者の環境では 1,298 入力のうち 1,279 がウィンドウズ版と同じ結果で、残りは人工知能の計算のわずかな差による同点付近の入れ替わりでした。
+
+## 11. Mac 版（試用版）
+
+`.github/workflows/macos.yml` が GitHub の Mac（macos-15、Xcode 16.4、Swift 6.1）で、手順 2〜5 と同じ準備をしたうえで次を行います。手元の Mac でも同じ順に実行できます。
+
+1. Qt 6.9.1 を `build_tools/build_qt.py --release --confirm_license --macos_cpus=arm64` で組み立てる（ソースは手順 1 と同じ tarball）。
+2. 変換エンジン: `python3 tools/apply_linux_engine_port.py <work>/myime/src` のあと `swift build -c release`。llama.cpp は上流の azooKey が配る署名済みの xcframework（b4846）を Swift が自動で取得します。
+3. `tools/make_compound_icon.py` の絵から `data/images/mac/product_icon.icns` を作る（`sips` と `iconutil`）。
+4. `bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package_files` で作った zip を展開し、`CompoundIMEConverter.app` に `libazookey-engine.dylib`（`Contents/MacOS`）、`llama.framework`（`Contents/Frameworks`）、`*.bundle`（アプリの直下と `Contents/Resources`、絵文字辞書は除く）を入れ、`codesign --force --deep -s -` で簡易署名し直してから、`mac/build_package.py --oss` で `.pkg` にします。
+5. 導入時の処理（postflight）が、変換モデルを公式の配布元から `/Library/Application Support/CompoundIME/models` に取得し、SHA-256 を照合します。
+
+名前と置き場所は公式の Mozc と分けてあります（`/Library/Input Methods/CompoundIME.app`、識別子 `org.compoundime.inputmethod.Japanese`、学習データ `~/Library/Application Support/CompoundIME`）。試験の手順（`tools/batch_convert.sh`）では、1,298 文のうち 1,278 がウィンドウズ版と同じ結果でした。
