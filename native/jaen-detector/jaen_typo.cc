@@ -164,11 +164,11 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
   return best->second.second;
 }
 
-std::optional<std::string> FixReadableTypo(std::string_view raw, const RomajiParser& parse,
-                                           const KanaModel& model, double margin) {
+std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                        const TypoPriors& priors) {
   if (raw.size() < 4 || raw.size() > kMaxRawLength ||
       !std::ranges::all_of(raw, [](char c) { return c >= 'a' && c <= 'z'; })) {
-    return std::nullopt;
+    return {};
   }
   // Kana of fully read keys, or nullopt.
   const auto reading = [&](std::string_view keys) -> std::optional<std::string> {
@@ -180,39 +180,47 @@ std::optional<std::string> FixReadableTypo(std::string_view raw, const RomajiPar
     }
     return kana;
   };
-  const auto average = [&](const std::string& kana) {
-    return model.Score(kana) / static_cast<double>(Characters(kana).size() + 1);
-  };
   const std::optional<std::string> typed = reading(raw);
-  if (!typed) return std::nullopt;
-  const double base = average(*typed);
+  if (!typed || typed->empty()) return {};
 
+  // The cheapest kind per distinct reading.
+  std::map<std::string, TypoEdit> found;
   const std::string text(raw);
-  double best = base + margin;
-  std::optional<std::string> fixed;
-  const auto consider = [&](std::string candidate) {
-    const std::optional<std::string> kana = reading(candidate);
-    if (!kana || *kana == *typed || kana->empty()) return;
-    if (const double score = average(*kana); score > best) {
-      best = score;
-      fixed = std::move(candidate);
+  const auto add = [&](std::string keys, int prior) {
+    std::optional<std::string> kana = reading(keys);
+    if (!kana || kana->empty() || *kana == *typed) return;
+    const auto it = found.find(*kana);
+    if (it == found.end() || prior < it->second.prior) {
+      found[*kana] = {std::move(keys), *kana, prior};
     }
   };
-  for (size_t i = 0; i < text.size(); ++i) {
-    // A doubled or stray key ("tsuduukete", "hayyaku").
-    if (i == 0 || text[i] != text[i - 1]) {
+  // The first key is left alone: "ashita" is not "shita" mistyped.
+  for (size_t i = 1; i < text.size(); ++i) {
+    if (text[i] == text[i - 1]) {  // a key typed twice ("tsuduukete", "hayyaku")
       std::string s = text;
       s.erase(i, 1);
-      consider(std::move(s));
+      add(std::move(s), std::string_view("aiueo").find(text[i]) != std::string_view::npos ? priors.doubled_vowel
+                                                                   : priors.doubled_consonant);
     }
-    // Two neighbors typed in the wrong order ("tsukua" for tsukau).
-    if (i + 1 < text.size() && text[i] != text[i + 1]) {
+    if (i + 1 < text.size() && text[i] != text[i + 1]) {  // neighbors swapped ("kareu")
       std::string s = text;
       std::swap(s[i], s[i + 1]);
-      consider(std::move(s));
+      add(std::move(s), priors.swapped);
+    }
+    for (const char n : Neighbors(text[i])) {  // a key next to the right one ("kiagi")
+      std::string s = text;
+      s[i] = n;
+      add(std::move(s), priors.neighbor);
+    }
+    for (const char v : std::string_view("aiueo")) {  // a dropped vowel ("kyoha")
+      std::string s = text;
+      s.insert(i + 1, 1, v);
+      add(std::move(s), priors.dropped_vowel);
     }
   }
-  return fixed;
+  std::vector<TypoEdit> out;
+  for (auto& [kana, edit] : found) out.push_back(std::move(edit));
+  return out;
 }
 
 }  // namespace jaen

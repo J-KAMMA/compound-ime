@@ -48,13 +48,26 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
                                    const KanaModel& model, double margin = 3.0,
                                    double floor = -4.5);
 
-// A slip in romaji that still reads as kana ("tsuduukete": つづうけて): the
-// typed keys with one key dropped or two neighbors swapped, when the reading
-// |model| scores beats the typed reading by at least |margin| per kana (end
-// mark included; averages, so a shorter reading is not favored for being
-// short). nullopt when no edit is that much better, or |raw| does not read.
-std::optional<std::string> FixReadableTypo(std::string_view raw, const RomajiParser& parse,
-                                           const KanaModel& model, double margin = 0.6);
+// A slip in romaji that still reads as kana ("tsuduukete": つづうけて).
+// Extra cost (in the converter's cost units) charged for each kind of slip,
+// so a likelier slip needs a smaller gain to be taken.
+struct TypoPriors {
+  int doubled_vowel = 0;         // "tsuduukete" for tsudukete
+  int doubled_consonant = 2000;  // "hayyaku" for hayaku ("nikki" is a word)
+  int swapped = 1000;            // "kareu" for kaeru
+  int neighbor = 1500;           // "kiagi" for kaigi... a key next to the right one
+  int dropped_vowel = 2500;      // "kyoha" for kyouha
+};
+struct TypoEdit {
+  std::string keys;  // the typed keys with the edit
+  std::string kana;  // what they read as
+  int prior = 0;
+};
+// The typed keys |raw| with one edit each (never the first key), one per
+// distinct reading, with the cheapest kind of slip. The caller compares the
+// converter's cost of each reading plus its prior with the typed reading.
+std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                        const TypoPriors& priors = {});
 
 }  // namespace jaen
 

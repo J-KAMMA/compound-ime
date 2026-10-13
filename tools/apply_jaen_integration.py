@@ -2757,16 +2757,18 @@ edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
 
 # かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
-# 読めてしまう打ち間違いを、1キーを抜く・隣どうしを入れ替えると、かなの並びが
-# 目に見えて日本語らしくなる場合に直す（jaen::FixReadableTypo）。
-# MYIME_TYPO_MARGIN（既定 0.6、1かなあたりの対数確率の差）で強さを変え、off で止める。
+# 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
+# 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の
+# うち、Mozc の辞書の単語の費用と接続の費用で読んだ一番安い分け方（＋直しの種類ごと
+# の上乗せ）が、打ったままより MYIME_TYPO_MARGIN（既定 3000）以上安いものに直す。
+# 中身は native/jaen-detector/converter_readable_typo.inc。off で止める。
 edit("converter/converter.cc", """        fixed_any = true;
         if (typo_fixed) *typo_fixed = true;
       }
     }""", """        fixed_any = true;
         if (typo_fixed) *typo_fixed = true;
-      } else if (const std::optional<double> margin = ReadableTypoMargin()) {
-        if (std::optional<std::string> fixed = jaen::FixReadableTypo(text, parse, TypoKanaModel(), *margin)) {
+      } else if (const std::optional<int> margin = ReadableTypoMargin()) {
+        if (std::optional<std::string> fixed = FixReadableTypo(modules(), text, parse, *margin)) {
           text = *std::move(fixed);
           split = true;
           fixed_any = true;
@@ -2774,26 +2776,11 @@ edit("converter/converter.cc", """        fixed_any = true;
         }
       }
     }""")
-edit("converter/converter.cc", "#include <optional>\n", """#include <cstdlib>
-#include <optional>
-""")
-edit("converter/converter.cc", "namespace mozc {\n", """namespace mozc {
-namespace {
-// MYIME_TYPO_MARGIN: how much more Japanese-like (per kana) a one-key fix of
-// readable romaji must read; "off" turns the fix off.
-std::optional<double> ReadableTypoMargin() {
-  static const std::optional<double> margin = []() -> std::optional<double> {
-    const char* value = std::getenv("MYIME_TYPO_MARGIN");
-    if (value == nullptr || *value == '\\0') return 0.6;
-    if (std::string_view(value) == "off") return std::nullopt;
-    char* end = nullptr;
-    const double parsed = std::strtod(value, &end);
-    return end != value && parsed > 0 ? std::optional<double>(parsed) : std::optional<double>(0.6);
-  }();
-  return margin;
-}
-}  // namespace
-""")
+edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
+edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
+edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
+     "namespace mozc {\nnamespace converter {\n"
+     + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
 
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402

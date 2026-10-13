@@ -279,14 +279,19 @@ int main() {
   }
 
   {
-    // Readable slips, against a toy reading model of つづけて and おおきい.
-    static const jaen::KanaTrigram kToy[] = {
-        {"^^つ", 50}, {"^つづ", 50}, {"つづけ", 50}, {"づけて", 50}, {"けて$", 50},
-        {"^^お", 50}, {"^おお", 50}, {"おおき", 50}, {"おきい", 50}, {"きい$", 50}};
-    const jaen::KanaModel model(kToy);
-    Expect(jaen::FixReadableTypo("tsuduukete", Parse, model) == "tsudukete", "a doubled vowel is dropped (つづうけて)");
-    Expect(jaen::FixReadableTypo("tsudukete", Parse, model) == std::nullopt, "a good reading is left alone");
-    Expect(jaen::FixReadableTypo("ookii", Parse, model) == std::nullopt, "a long vowel typed on purpose stays (おおきい)");
+    // Readable slips: the edits offered, with what each kind costs.
+    const auto edit = [&](std::string_view raw, std::string_view keys) -> std::optional<int> {
+      for (const jaen::TypoEdit& e : jaen::ReadableTypoEdits(raw, Parse)) {
+        if (e.keys == keys) return e.prior;
+      }
+      return std::nullopt;
+    };
+    Expect(edit("tsuduukete", "tsudukete") == 0, "a doubled vowel may be dropped for free (つづうけて)");
+    Expect(edit("ashitadesu", "shitadesu") == std::nullopt, "the first key is never edited");
+    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
+    Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
+    Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
+           "only keys that read as kana are edited");
   }
 
   std::cout << "SUMMARY\t" << failures << '\n';

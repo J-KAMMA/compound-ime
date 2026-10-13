@@ -103,7 +103,7 @@ jobs:
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/jaen200b.json > $W/jaen200b.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/jaen200b.txt $W/results/jaen200b.tsv 4
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/typo150.json > $W/typo150.txt
-          for m in off 0.3 0.6 1.0; do
+          for m in off 2000 3000 4000; do
             MYIME_TYPO_MARGIN=$m bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/typo150.txt $W/results/typo150-$m.tsv 4
           done
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
