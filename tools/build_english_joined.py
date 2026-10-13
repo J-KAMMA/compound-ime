@@ -14,7 +14,9 @@ from pathlib import Path
 
 EXTRA = ["backend", "frontend", "login", "logout", "signin", "signup", "username", "website",
          "webpage", "smartwatch", "touchpad", "timestamp", "checkbox", "dropdown", "popup",
-         "codebase", "dataset", "database", "filename", "workflow", "keyword"]
+         "codebase", "dataset", "database", "filename", "workflow", "keyword",
+         "powerpoint", "github", "gitlab", "facebook", "youtube", "iphone", "playstation", "onedrive",
+         "dropbox", "wordpress", "javascript", "typescript"]
 
 
 def words(path):

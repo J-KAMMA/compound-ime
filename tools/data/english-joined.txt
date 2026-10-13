@@ -2361,6 +2361,7 @@ drillmasters
 drippier
 driveshaft
 driveshafts
+dropbox
 dropdown
 dropkick
 dropkicks
@@ -2552,6 +2553,7 @@ eyestrain
 eyeteeth
 eyetooth
 eyewash
+facebook
 facecloth
 facecloths
 facepalm
@@ -3118,6 +3120,8 @@ ghostwrote
 gigantically
 gingersnap
 gingersnaps
+github
+gitlab
 giveaway
 giveback
 givebacks
@@ -4185,6 +4189,7 @@ invalidity
 invalidly
 inviolate
 invulnerability
+iphone
 irksome
 ironclad
 ironstone
@@ -4210,6 +4215,7 @@ jailbreaks
 jailhouse
 jailhouses
 jammy
+javascript
 jawline
 jawlines
 jaybird
@@ -5507,6 +5513,7 @@ oilskin
 oilskins
 okapi
 onboard
+onedrive
 onetime
 onionskin
 online
@@ -6361,6 +6368,7 @@ playroom
 playrooms
 playschool
 playschools
+playstation
 playtime
 pleasingly
 plexus
@@ -6482,6 +6490,7 @@ potties
 poundage
 powerboat
 powerboats
+powerpoint
 pragmatically
 prat
 prate
@@ -9727,6 +9736,7 @@ typecast
 typecasting
 typecasts
 typefaces
+typescript
 typescripts
 typesetters
 typewrite
@@ -10349,6 +10359,7 @@ wordbook
 wordbooks
 wordless
 wordplay
+wordpress
 wordsmith
 wordsmiths
 workbasket
@@ -10416,6 +10427,7 @@ yellowhammer
 yellowhammers
 yetis
 youthfully
+youtube
 zestfully
 zippier
 zookeeper

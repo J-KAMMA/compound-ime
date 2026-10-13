@@ -192,6 +192,22 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     return false;
   };
+  // Kana that reads as Japanese grammar rather than a word: を inside
+  // (otowokesu: "woke"), a て-form ending (mattei: "matte"), or a reading
+  // that runs in from before and leaves only a particle (kawade: "wade").
+  const auto japanese_grammar = [&](size_t ka, size_t kb) {
+    for (size_t k = ka; k < kb; ++k) {
+      if (kana[k] == "を") return true;
+    }
+    if (kb - ka >= 2 && kana[kb - 1] == "て" && kana[kb - 2] == "っ") return true;
+    static constexpr std::string_view kParticles[] = {"で", "に", "を", "は", "が", "と", "も", "へ", "の"};
+    if (kb - ka >= 2 && std::ranges::find(kParticles, kana[kb - 1]) != std::end(kParticles)) {
+      for (size_t a = ka >= 6 ? ka - 6 : 0; a < ka; ++a) {
+        if (kb - 1 - a >= 2 && (*is_reading)(kana_text(a, kb - 1))) return true;
+      }
+    }
+    return false;
+  };
   const size_t n = raw.size();
   if (n == 0 || n > kMaxRawLength) return {};
   const auto edge_cost = [&](size_t i) { return boundary[i] ? 0 : kCutCost; };
@@ -248,7 +264,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       } else if (is_reading && learned == 0 && !place &&
                  word.size() >= kMinUnreadWordLength && boundary[i] && boundary[j] &&
                  kana_at[j] > kana_at[i] && !(*is_reading)(kana_text(kana_at[i], kana_at[j])) &&
-                 !crosses_reading(kana_at[i], kana_at[j])) {
+                 !crosses_reading(kana_at[i], kana_at[j]) &&
+                 !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
       }
       if (std::getenv("UNREAD_DEBUG") && is_reading && word.size() >= kMinUnreadWordLength &&
