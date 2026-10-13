@@ -2761,15 +2761,11 @@ edit("converter/english_lexicon.cc",
 # ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
 signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
 inc = src / "converter/english_lexicon_data.inc"
-inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="
-")
+inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
-     "    for (const char* word : kJoinedWords) words->AddJoined(word);
-",
-     "    for (const char* word : kJoinedWords) words->AddJoined(word);
-"
-     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);
-")
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n",
+     "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
 
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
