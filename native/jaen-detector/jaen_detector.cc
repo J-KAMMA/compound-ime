@@ -253,8 +253,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       }
       if (std::getenv("UNREAD_DEBUG") && is_reading && word.size() >= kMinUnreadWordLength &&
           kana_at[j] > kana_at[i]) {
-        std::fprintf(stderr, "UNREAD %.*s learned=%d place=%d edges=%d%d reading=%d cross=%d cost=%d
-",
+        std::fprintf(stderr, "UNREAD %.*s learned=%d place=%d edges=%d%d reading=%d cross=%d cost=%d\n",
                      static_cast<int>(word.size()), word.data(), learned, place != nullptr,
                      static_cast<int>(boundary[i]), static_cast<int>(boundary[j]),
                      static_cast<int>((*is_reading)(kana_text(kana_at[i], kana_at[j]))),
