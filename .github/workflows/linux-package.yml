@@ -1,0 +1,103 @@
+# Linux 版の配布物（ibus、tar.gz）を組み立てる。手動で動き、版の番号を受け取る。
+# 手順は BUILD.md の 10 と同じ。できた tar.gz は成果物として残る。
+name: Linux package
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 版の番号（例 3.34.6239.140）
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    env:
+      USE_BAZEL_VERSION: 9.0.2
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: 道具
+        run: |
+          set -eo pipefail
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq clang cmake ninja-build lld libibus-1.0-dev ibus qt6-base-dev libgtk-3-dev libcurl4-openssl-dev libncurses-dev libxml2-dev libz3-dev python3-venv > /dev/null
+          mkdir -p $HOME/tools && ln -sf $(command -v ld.lld) $HOME/tools/ld.lld
+          curl -fsSL -o $HOME/tools/bazelisk https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-linux-amd64
+          chmod +x $HOME/tools/bazelisk
+          curl -fsSL -o /tmp/swift.tar.gz https://download.swift.org/swift-6.3.3-release/ubuntu2404/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE-ubuntu24.04.tar.gz
+          mkdir -p $HOME/swift && tar -xzf /tmp/swift.tar.gz -C $HOME/swift --strip-components=1 && rm /tmp/swift.tar.gz
+          $HOME/swift/usr/bin/swift --version
+
+      - name: 上流のソースと土台の改修
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init --recursive
+          git -C myime/mozc apply --whitespace=nowarn $W/repo/patches/mozc-base.patch
+          git -C myime apply --whitespace=nowarn $W/repo/patches/myime-engine.patch
+          git init -q llama.cpp && cd llama.cpp && git remote add origin https://github.com/fkunn1326/llama.cpp.git
+          git fetch -q --depth 1 origin 10131b23ee0dbd9d03dfc618cec9fe3402919277 && git checkout -q FETCH_HEAD
+          git apply --ignore-whitespace $W/repo/patches/llama-utf8.patch
+
+      - name: 生成器と改造の適用
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
+          python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow
+          PY=$W/venv/bin/python
+          $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
+          mkdir -p $W/ut
+          curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
+            https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
+          echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | sha256sum -c
+          bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
+          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
+          cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
+          $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
+          $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+
+      - name: llama.cpp と変換エンジン
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; export PATH=$HOME/swift/usr/bin:$PATH
+          cmake -S $W/llama.cpp -B $W/llama.cpp/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON \
+            -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DLLAMA_CURL=OFF \
+            -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF > /dev/null
+          cmake --build $W/llama.cpp/build > /dev/null
+          cd $W/myime/src/swift-engine
+          cp $W/repo/tools/swift-Package.resolved Package.resolved
+          L=$W/llama.cpp/build/bin
+          swift build -c release -Xlinker -L$L -Xlinker -lllama -Xlinker -lggml -Xlinker -lggml-base \
+            -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath 2>&1 | tail -3
+
+      - name: Mozc の Linux 版
+        run: |
+          set -eo pipefail
+          T=$HOME/tools; cd $GITHUB_WORKSPACE/myime/mozc/src
+          $T/bazelisk build --config oss_linux -c opt --nocheck_visibility             --action_env=PATH=$T:/usr/bin:/bin --host_action_env=PATH=$T:/usr/bin:/bin             --linkopt=-B$T --host_linkopt=-B$T //unix:package > $GITHUB_WORKSPACE/bazel.log 2>&1             || { grep -B3 -A20 "ERROR\|error:" $GITHUB_WORKSPACE/bazel.log | head -80; exit 1; }
+
+      - name: 配布物
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; V="${{ inputs.version }}"
+          echo "$V" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$'
+          mkdir -p $W/work && ln -s $W/myime $W/work/myime && ln -s $W/llama.cpp $W/work/llama.cpp && ln -s $HOME/swift $W/work/swift
+          PATH=$W/venv/bin:$PATH bash $W/repo/tools/make_linux_bundle.sh "$V" $W/work $W/repo
+          mkdir -p $W/out && cp $W/work/dist/compound-ime-$V-linux-x64.tar.gz $W/out/
+          ls -la $W/out; sha256sum $W/out/*.tar.gz
+          tar -tzf $W/out/*.tar.gz | grep -cE "install.sh|libazookey|ibus_mozc|mozc_server"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: linux-package
+          path: out/
