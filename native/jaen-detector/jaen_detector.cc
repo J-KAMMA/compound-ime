@@ -1,6 +1,8 @@
 #include "jaen_detector.h"
 
 #include <algorithm>
+#include <cstdio>
+#include <cstdlib>
 #include <array>
 #include <cstdint>
 #include <limits>
@@ -137,10 +139,13 @@ bool InsideNormalSpelling(std::string_view raw, size_t begin, size_t end, const 
 }  // namespace
 
 std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon& lexicon,
-                                const RomajiParser& parse, const Choices* choices) {
+                                const RomajiParser& parse, const Choices* choices,
+                                const ReadingCheck* is_reading) {
   std::string raw;
   std::vector<bool> boundary(1, true);  // boundary[i]: i is an original chunk edge
   std::vector<bool> blocked(1, false);  // blocked[i]: i is inside an x?/l? small kana
+  std::vector<std::string> kana;        // the typed kana, one character each
+  std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   for (const Chunk& chunk : chunks) {
     const bool small = IsSmallKana(chunk);
     raw += chunk.raw;
@@ -148,7 +153,36 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     blocked.resize(raw.size() + 1, small);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
+    for (size_t at = 0; at < chunk.conversion.size();) {
+      const unsigned char lead = chunk.conversion[at];
+      const size_t len = lead < 0x80 ? 1 : lead < 0xE0 ? 2 : lead < 0xF0 ? 3 : 4;
+      kana.push_back(chunk.conversion.substr(at, len));
+      at += len;
+    }
+    kana_at.resize(raw.size() + 1, kana_at.back());
+    kana_at[raw.size()] = kana.size();
   }
+  const auto kana_text = [&](size_t a, size_t b) {
+    std::string out;
+    for (size_t k = a; k < b; ++k) out += kana[k];
+    return out;
+  };
+  // A Japanese reading of 3+ kana that starts before the edges [ka, kb) and
+  // ends inside, or starts inside and ends after.
+  const auto crosses_reading = [&](size_t ka, size_t kb) {
+    constexpr size_t kLongest = 8;
+    for (size_t a = ka >= kLongest ? ka - kLongest : 0; a < ka; ++a) {
+      for (size_t b = ka + 1; b < kb && b - a <= kLongest; ++b) {
+        if (b - a >= 3 && (*is_reading)(kana_text(a, b))) return true;
+      }
+    }
+    for (size_t a = ka + 1; a < kb; ++a) {
+      for (size_t b = kb + 1; b <= kana.size() && b - a <= kLongest; ++b) {
+        if (b - a >= 3 && (*is_reading)(kana_text(a, b))) return true;
+      }
+    }
+    return false;
+  };
   const size_t n = raw.size();
   if (n == 0 || n > kMaxRawLength) return {};
   const auto edge_cost = [&](size_t i) { return boundary[i] ? 0 : kCutCost; };
@@ -202,6 +236,20 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       } else if (place && boundary[i] && boundary[j] && BeforeParticleOrEnd(raw, j) &&
                  !InsideNormalSpelling(raw, i, j, *place)) {
         cost = -length;
+      } else if (is_reading && learned == 0 && !place &&
+                 word.size() >= kMinUnreadWordLength && boundary[i] && boundary[j] &&
+                 kana_at[j] > kana_at[i] && !(*is_reading)(kana_text(kana_at[i], kana_at[j])) &&
+                 !crosses_reading(kana_at[i], kana_at[j])) {
+        cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
+      }
+      if (std::getenv("UNREAD_DEBUG") && is_reading && word.size() >= kMinUnreadWordLength &&
+          kana_at[j] > kana_at[i]) {
+        std::fprintf(stderr, "UNREAD %.*s learned=%d place=%d edges=%d%d reading=%d cross=%d cost=%d
+",
+                     static_cast<int>(word.size()), word.data(), learned, place != nullptr,
+                     static_cast<int>(boundary[i]), static_cast<int>(boundary[j]),
+                     static_cast<int>((*is_reading)(kana_text(kana_at[i], kana_at[j]))),
+                     static_cast<int>(crosses_reading(kana_at[i], kana_at[j])), cost ? static_cast<int>(*cost) : 9999);
       }
       if (cost) english[i].emplace_back(j, *cost + edge_cost(i) + edge_cost(j));
     }
@@ -237,7 +285,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   for (size_t j = n; j > 0;) {
     const Back b = back[j][s];
     if (!pieces.empty() && b.english && pieces.back().english) {
-      pieces.back().begin = b.from;  // merge adjacent English words
+      // Merge adjacent English words; a space between two words whose
+      // concatenation is no word ("weekly report", not "down load").
+      const size_t first_end = pieces.back().spaces.empty() ? pieces.back().end : pieces.back().spaces.back();
+      const std::string_view joined = std::string_view(raw).substr(b.from, first_end - b.from);
+      if (!lexicon.Contains(joined)) pieces.back().spaces.push_back(j);
+      pieces.back().begin = b.from;
     } else {
       pieces.push_back({b.from, j, b.english});
     }

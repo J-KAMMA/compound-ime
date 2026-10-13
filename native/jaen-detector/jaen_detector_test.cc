@@ -10,6 +10,7 @@
 #include <fstream>
 #include <iostream>
 #include <map>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -72,7 +73,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -109,6 +110,31 @@ int main() {
   Expect(english("slackkaramita") == "slack|", "a word may end before the same key (slack + kara)");
   Expect(english("linuxnokoma") == "linux|", "xn is ん, not a small kana: it may be cut");
   Expect(english("meetinggaarimasu") == "meeting|", "-ng before ga: んっ is not Japanese");
+  {
+    // Readings in the Japanese dictionary (toy): only these count as Japanese.
+    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ"};
+    const jaen::ReadingCheck is_reading = [&](std::string_view kana) {
+      return readings.contains(std::string(kana));
+    };
+    const auto unread = [&](std::string_view raw) {
+      std::string out;
+      for (const Piece& p : jaen::SplitEnglish(Parse(raw), lexicon, Parse, nullptr, &is_reading)) {
+        if (p.english) out += std::string(raw.substr(p.begin, p.end - p.begin)) + "|";
+      }
+      return out;
+    };
+    Expect(unread("kaigiharemotedesu") == "remote|", "a word whose kana is no reading stays English");
+    Expect(unread("kitewoageta").empty(), "a word whose kana is a reading stays Japanese (kite: きて)");
+    Expect(unread("konotegamiwomita").empty(), "no word across a 3-kana reading (note in kono|te|gami)");
+    Expect(english("kaigiharemotedesu").empty(), "without the reading check nothing changes");
+    const auto spaced = jaen::SplitEnglish(Parse("weeklyreportwokaku"), lexicon, Parse);
+    Expect(spaced.size() == 2 && spaced[0].english && spaced[0].spaces == std::vector<size_t>{6},
+           "a space between two words that are no word together");
+    const auto joined = jaen::SplitEnglish(Parse("downloadshita"), lexicon, Parse);
+    Expect(!joined.empty() && joined[0].english && joined[0].spaces.size() == 1,
+           "down|load (no word 'download' in this lexicon) gets a space too");
+  }
+
   Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");
   Expect(english("tokyonimita") == "tokyo|", "Hepburn place name before a particle");
   Expect(english("kyouhatokyo") == "tokyo|", "Hepburn place name at the end");

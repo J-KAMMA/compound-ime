@@ -98,6 +98,20 @@ jobs:
           curl -fsSL -o $W/model.gguf \
             https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
           echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
+          printf 'SEND_KEY	ON
+SEND_KEYS	kaigiharemotedeokonaimasu
+SEND_KEY	Space
+SEND_KEY	Enter
+CLEAR_ALL
+SEND_KEYS	kokohasafedesu
+SEND_KEY	Space
+SEND_KEY	Enter
+CLEAR_ALL
+SEND_KEYS	githubnoissuewotateta
+SEND_KEY	Space
+SEND_KEY	Enter
+' > $W/dbg.tsv
+          UNREAD_DEBUG=1 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$W/model.gguf TEST_TMPDIR=$W/dbgp $E/session_handler_main --input $W/dbg.tsv --profile $W/dbgp --dictionary oss 2>&1 >/dev/null | grep UNREAD | sort -u | head -40 || true
           T=$W/repo/tests/conversion; mkdir -p $W/results
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/jaen270.txt $W/results/jaen270.tsv 4
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
