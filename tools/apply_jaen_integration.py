@@ -2767,6 +2767,32 @@ edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
      "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
 
+# かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
+# 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
+# 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の
+# うち、Mozc の辞書の単語の費用と接続の費用で読んだ一番安い分け方（＋直しの種類ごと
+# の上乗せ）が、打ったままより MYIME_TYPO_MARGIN（既定 3000）以上安いものに直す。
+# 中身は native/jaen-detector/converter_readable_typo.inc。off で止める。
+edit("converter/converter.cc", """        fixed_any = true;
+        if (typo_fixed) *typo_fixed = true;
+      }
+    }""", """        fixed_any = true;
+        if (typo_fixed) *typo_fixed = true;
+      } else if (const std::optional<int> margin = ReadableTypoMargin()) {
+        if (std::optional<std::string> fixed = FixReadableTypo(modules(), text, parse, *margin)) {
+          text = *std::move(fixed);
+          split = true;
+          fixed_any = true;
+          if (typo_fixed) *typo_fixed = true;
+        }
+      }
+    }""")
+edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
+edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
+edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
+     "namespace mozc {\nnamespace converter {\n"
+     + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)

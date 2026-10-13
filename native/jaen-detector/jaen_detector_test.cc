@@ -5,6 +5,7 @@
 #include "jaen_detector.h"
 #include "jaen_choices.h"
 #include "correction_log.h"
+#include "jaen_typo.h"
 
 #include <filesystem>
 #include <fstream>
@@ -32,7 +33,8 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
-    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"lo", "ぉ"}, {"he", "へ"}};
+    {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
+    {"lo", "ぉ"}, {"he", "へ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -282,6 +284,24 @@ int main() {
     in.close();
     log.Clear();
     Expect(!std::filesystem::exists(file), "correction log clear");
+  }
+
+  {
+    // Readable slips: the edits offered, with what each kind costs.
+    const auto edit = [&](std::string_view raw, std::string_view keys) -> std::optional<int> {
+      for (const jaen::TypoEdit& e : jaen::ReadableTypoEdits(raw, Parse)) {
+        if (e.keys == keys) return e.prior;
+      }
+      return std::nullopt;
+    };
+    Expect(edit("tsuduukete", "tsudukete") == 0, "a doubled vowel may be dropped for free (つづうけて)");
+    Expect(edit("ashitadesu", "shitadesu") == std::nullopt, "the first key is never edited");
+    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
+    Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
+    Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou and uo are not swapped (chuo for ちゅうおう)");
+    Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
+    Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
+           "only keys that read as kana are edited");
   }
 
   std::cout << "SUMMARY\t" << failures << '\n';

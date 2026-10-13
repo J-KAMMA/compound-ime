@@ -164,4 +164,71 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
   return best->second.second;
 }
 
+std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                        const TypoPriors& priors) {
+  if (raw.size() < 4 || raw.size() > kMaxRawLength ||
+      !std::ranges::all_of(raw, [](char c) { return c >= 'a' && c <= 'z'; })) {
+    return {};
+  }
+  // Kana of fully read keys, or nullopt.
+  const auto reading = [&](std::string_view keys) -> std::optional<std::string> {
+    const std::vector<Chunk> chunks = parse(keys);
+    if (UnreadKeys(chunks) != 0) return std::nullopt;
+    std::string kana;
+    for (size_t i = 0; i < chunks.size(); ++i) {
+      kana += FinalN(chunks, i) ? std::string("ん") : chunks[i].conversion + chunks[i].pending;
+    }
+    return kana;
+  };
+  const std::optional<std::string> typed = reading(raw);
+  if (!typed || typed->empty()) return {};
+  // Small vowels (ふぁ, うぃ) are a foreign word typed as spelled ("fashion",
+  // "wifi"), not a slip in Japanese.
+  for (const std::string_view small : {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゎ", "ゔ"}) {
+    if (typed->find(small) != std::string::npos) return {};
+  }
+
+  // The cheapest kind per distinct reading.
+  std::map<std::string, TypoEdit> found;
+  const std::string text(raw);
+  const auto add = [&](std::string keys, int prior) {
+    std::optional<std::string> kana = reading(keys);
+    if (!kana || kana->empty() || *kana == *typed) return;
+    const auto it = found.find(*kana);
+    if (it == found.end() || prior < it->second.prior) {
+      found[*kana] = {std::move(keys), *kana, prior};
+    }
+  };
+  // The first key is left alone: "ashita" is not "shita" mistyped.
+  for (size_t i = 1; i < text.size(); ++i) {
+    if (text[i] == text[i - 1]) {  // a key typed twice ("tsuduukete", "hayyaku")
+      std::string s = text;
+      s.erase(i, 1);
+      add(std::move(s), std::string_view("aiueo").find(text[i]) != std::string_view::npos ? priors.doubled_vowel
+                                                                   : priors.doubled_consonant);
+    }
+    // Neighbors swapped ("kareu"); not "uo"/"ou", where a long vowel was left
+    // out the passport way ("chuosen" is 中央線, not 朝鮮 mistyped).
+    if (i + 1 < text.size() && text[i] != text[i + 1] && text.compare(i, 2, "uo") != 0 &&
+        text.compare(i, 2, "ou") != 0) {
+      std::string s = text;
+      std::swap(s[i], s[i + 1]);
+      add(std::move(s), priors.swapped);
+    }
+    for (const char n : Neighbors(text[i])) {  // a key next to the right one ("kiagi")
+      std::string s = text;
+      s[i] = n;
+      add(std::move(s), priors.neighbor);
+    }
+    for (const char v : std::string_view("aiueo")) {  // a dropped vowel ("kyoha")
+      std::string s = text;
+      s.insert(i + 1, 1, v);
+      add(std::move(s), priors.dropped_vowel);
+    }
+  }
+  std::vector<TypoEdit> out;
+  for (auto& [kana, edit] : found) out.push_back(std::move(edit));
+  return out;
+}
+
 }  // namespace jaen
