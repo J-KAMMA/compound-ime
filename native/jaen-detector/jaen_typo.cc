@@ -206,6 +206,19 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       found[*kana] = {std::move(keys), *kana, prior};
     }
   };
+  // A long vowel left out, also after the first key ("okii" for ookii).
+  for (size_t i = 0; i < text.size(); ++i) {
+    const char c = text[i];
+    if (std::string_view("aiueo").find(c) == std::string_view::npos) continue;
+    std::string longer{c};
+    if (c == 'o' || c == 'u') longer = c == 'u' ? "u" : "ou";
+    if (c == 'e') longer = "ei";
+    for (const char v : longer) {
+      std::string s = text;
+      s.insert(i + 1, 1, v);
+      add(std::move(s), priors.long_vowel);
+    }
+  }
   // The first key is left alone: "ashita" is not "shita" mistyped.
   for (size_t i = 1; i < text.size(); ++i) {
     if (text[i] == text[i - 1]) {  // a key typed twice ("tsuduukete", "hayyaku")

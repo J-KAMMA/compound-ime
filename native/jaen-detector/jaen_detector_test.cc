@@ -328,6 +328,8 @@ int main() {
     Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
     Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
     Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou and uo are not swapped (chuo for ちゅうおう)");
+    Expect(edit("kyohaame", "kyouhaame") == jaen::TypoPriors{}.long_vowel, "a long vowel left out is offered first (kyoha)");
+    Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "also after the first key (okii for ookii)");
     Expect(edit("kazukidesu", "kaxukidesu") == std::nullopt, "no fix brings in an x or l small kana (z next to x)");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),

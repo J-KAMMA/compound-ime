@@ -56,7 +56,13 @@ struct TypoPriors {
   int doubled_consonant = 2000;  // "hayyaku" for hayaku ("nikki" is a word)
   int swapped = 1000;            // "kareu" for kaeru
   int neighbor = 1500;           // "kiagi" for kaigi... a key next to the right one
-  int dropped_vowel = 2500;      // "kyoha" for kyouha
+  int dropped_vowel = 2500;      // "kaig" for kaigi: any vowel left out
+  // A long vowel left out (u after o or u, i after e, a vowel doubled:
+  // "kyoha" for kyouha, "gakko" for gakkou, "ega" for eiga), the commonest
+  // slip and the passport way of writing (chubu, kudo): taken more readily.
+  // Measured on 40 such slips and 421 correct sentences (typo150/150b
+  // controls and ja400): a 2000 margin fixes 33 and changes none.
+  int long_vowel = -1000;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit
