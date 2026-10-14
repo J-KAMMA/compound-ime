@@ -1701,6 +1701,14 @@ subprocess.run([sys.executable, str(REPO / "tools/build_romaji_alias_dictionary.
                 "--loanwords", str(REPO / "tools/data/loanwords.tsv"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary11.txt.tmp").unlink()
 
+# カタカナ語の元の英単語（dictionary12.txt）: コーヒー の次の候補に coffee。読みはカタカナ語と
+# 同じで、英語のつづりをローマ字で打った読み（idea: いであ）にも付ける。
+# tools/data/katakana-english.tsv は .github/workflows/katakana-data.yml で作る。
+subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_dictionary.py"), "--mozc", str(src),
+                "--pairs", str(REPO / "tools/data/katakana-english.tsv"),
+                "--out", str(src / "data/dictionary_oss/dictionary12.txt.tmp"), "--install"], check=True)
+(src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
