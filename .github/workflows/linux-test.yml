@@ -49,7 +49,9 @@ jobs:
       # 組み立ての途中の結果を次の試験で使い回す（変えた所だけ組み立て直す）
       - uses: actions/cache@v4
         with:
-          path: ~/bazel-disk
+          path: |
+            ~/bazel-disk
+            ~/bazel-repo
           key: linux-bazel-${{ github.run_id }}
           restore-keys: linux-bazel-
       - uses: actions/cache@v4
@@ -95,7 +97,7 @@ jobs:
         run: |
           set -eo pipefail
           T=$HOME/tools; cd $GITHUB_WORKSPACE/myime/mozc/src
-          $T/bazelisk build --config oss_linux -c opt --nocheck_visibility --disk_cache=$HOME/bazel-disk \
+          $T/bazelisk build --config oss_linux -c opt --nocheck_visibility --disk_cache=$HOME/bazel-disk --repository_cache=$HOME/bazel-repo \
             --action_env=PATH=$T:/usr/bin:/bin --host_action_env=PATH=$T:/usr/bin:/bin \
             --linkopt=-B$T --host_linkopt=-B$T //session:session_handler_main > $GITHUB_WORKSPACE/bazel.log 2>&1 \
             || { grep -B3 -A20 "ERROR\|error:" $GITHUB_WORKSPACE/bazel.log | head -80; exit 1; }
