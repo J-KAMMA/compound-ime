@@ -59,7 +59,7 @@ jobs:
           echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | sha256sum -c
           bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
           # （実験用）追加の辞書: neologd（Apache-2.0）、place-names（パブリックドメイン）、personal-names（Apache-2.0）
-          EXTRA_SOURCES="${EXTRA_SOURCES:-neologd}"
+          EXTRA_SOURCES="${EXTRA_SOURCES:-neologd place-names personal-names}"
           for r in $EXTRA_SOURCES; do
             case $r in
               neologd) c=d8307abf02b830b185c9320822cffa0d0787c54e ;;
