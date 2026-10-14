@@ -102,6 +102,9 @@ jobs:
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/jaen270.txt $W/results/jaen270.tsv 4
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/jaen200b.json > $W/jaen200b.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/jaen200b.txt $W/results/jaen200b.tsv 4
+          # （実験用）英単語を文脈として人工知能に渡すのを止めた場合
+          MYIME_ENGLISH_CONTEXT=0 bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/jaen270.txt $W/results/jaen270-noctx.tsv 4
+          MYIME_ENGLISH_CONTEXT=0 bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/jaen200b.txt $W/results/jaen200b-noctx.tsv 4
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/typo150.json > $W/typo150.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/typo150.txt $W/results/typo150.tsv 4
           # 打ち間違いの直しを見ずに作った別の150文: 直しなし（off）と既定の両方
