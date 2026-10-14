@@ -67,6 +67,10 @@ struct TypoPriors {
   // passport way leaves ou's u out before an o ("chuosen" is 中央線, and
   // ちょうせん reads 5066 cheaper); the 8 such slips read 6858 or more cheaper.
   int swapped_uo = 3000;
+  // One key too many anywhere ("arukite" for aruite, "afutta" for futta).
+  // The clean sentences (ja400, inputs) read at most about 5000 cheaper with a
+  // key taken out; most such slips 6000 or more.
+  int extra_key = 2500;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit
