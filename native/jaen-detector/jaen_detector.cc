@@ -312,12 +312,16 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
       }
-      // A word ending in the first letter of sh, ch or ts ("sets|hita": the s
-      // of shi) likely took it from the kana after it: "set|shita" wins.
-      if (cost && j < n) {
+      // A word ending in the first letter of sh, ch or tsu, when the word
+      // without it is a word too ("sets|hita": the s of shi), likely took it
+      // from the kana after it: "set|shita" wins; "campus|ha" stays.
+      if (cost && j < n && word.size() > 3 && lexicon.Contains(word.substr(0, word.size() - 1))) {
         const char last = Lower(raw[j - 1]);
         const char after = Lower(raw[j]);
-        if (((last == 's' || last == 'c') && after == 'h') || (last == 't' && after == 's')) *cost += kStealCost;
+        if (((last == 's' || last == 'c') && after == 'h') ||
+            (last == 't' && after == 's' && j + 1 < n && Lower(raw[j + 1]) == 'u')) {
+          *cost += kStealCost;
+        }
       }
       if (cost) english[i].emplace_back(j, *cost + edge_cost(i) + edge_cost(j));
     }
