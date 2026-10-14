@@ -100,6 +100,14 @@ int main() {
   Check("じゅうむいか", "16日");
   Check("にじゅうなのか", "27日");
   Check("じゅうようか", "18日");
+  // Codes read digit by digit.
+  Check("でんわばんごうはぜろきゅうぜろからはじまる", "090");
+  Check("ないせんばんごうはにいちさんです", "213");
+  Check("ぜろさんのしがいきょくばん", "");  // two digits only: no code
+  Check("ぜろからやりなおす", "");
+  Check("ばんごうはにばんです", "");  // one digit and a unit stays a word
+  Check("おにいさんです", "");
+  Check("さんじゅうにんです", "30人");
   Check("いつか", "");
   Check("むいか", "");
   Check("なのか", "");

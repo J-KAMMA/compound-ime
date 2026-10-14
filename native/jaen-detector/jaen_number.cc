@@ -224,11 +224,11 @@ std::optional<std::pair<size_t, int>> DayAt(const Text& t, size_t pos, bool afte
 
 std::optional<Match> MatchAt(const Text& t, size_t i);
 
-// What may follow a span: the end, 、, a particle, ごぜん/ごご, or another span.
+// What may follow a span: the end, 、, a particle or です, ごぜん/ごご, or another span.
 bool BoundaryOk(const Text& t, size_t end) {
   if (end >= t.size() || t[end] == U'、') return true;
   constexpr Piece kParticles[] = {U"は", U"が", U"を", U"に", U"で",   U"と",   U"の",
-                                  U"も", U"へ", U"や", U"から", U"まで", U"より", U"って"};
+                                  U"も", U"へ", U"や", U"から", U"まで", U"より", U"って", U"です"};
   for (Piece p : kParticles) {
     if (At(t, end, p)) return true;
   }
@@ -270,8 +270,37 @@ void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
   }
 }
 
+// Digits read one by one as a code, kept as written (090, 213): right after
+// ばんごう (and は/が/を/の/も), two or more; elsewhere three or more starting
+// with ぜろ (an area or mobile code). にい and ごお are 2 and 5 drawn out.
+void OfferDigitString(const Text& t, size_t i, std::optional<Match>& best) {
+  static constexpr std::pair<Piece, char> kCode[] = {
+      {U"ぜろ", '0'}, {U"れい", '0'}, {U"いち", '1'}, {U"にい", '2'}, {U"に", '2'}, {U"さん", '3'},
+      {U"よん", '4'}, {U"ごお", '5'}, {U"ご", '5'}, {U"ろく", '6'}, {U"なな", '7'}, {U"はち", '8'},
+      {U"きゅう", '9'}};
+  bool after_bangou = false;
+  for (Piece p : {Piece(U"ばんごう"), Piece(U"ばんごうは"), Piece(U"ばんごうが"), Piece(U"ばんごうを"),
+                  Piece(U"ばんごうの"), Piece(U"ばんごうも")}) {
+    after_bangou = after_bangou || (i >= p.size() && At(t, i - p.size(), p));
+  }
+  const bool zero_first = At(t, i, U"ぜろ");
+  if (!after_bangou && !zero_first) return;
+  // Every way to read a run of code digits from |pos|.
+  std::vector<std::pair<size_t, std::string>> runs;
+  const auto walk = [&](auto&& self, size_t pos, std::string digits) -> void {
+    if (digits.size() >= (after_bangou ? 2u : 3u)) runs.emplace_back(pos, digits);
+    if (digits.size() >= 15) return;
+    for (const auto& [reading, digit] : kCode) {
+      if (At(t, pos, reading)) self(self, pos + reading.size(), digits + digit);
+    }
+  };
+  walk(walk, i, "");
+  for (const auto& [end, digits] : runs) Offer(t, best, end, digits);
+}
+
 std::optional<Match> MatchAt(const Text& t, size_t i) {
   std::optional<Match> best;
+  OfferDigitString(t, i, best);
   OfferClock(t, i, best);
   if (auto day = DayAt(t, i, false)) Offer(t, best, day->first, Join(day->second, "日"));
   OfferNumbers(t, i, best);
