@@ -112,6 +112,12 @@ jobs:
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
           python3 $W/repo/tools/score_categories.py $W/results/ja400.tsv $T/ja400.json | head -12
+          # カタカナ語の次の候補に英単語が出るか（変換したときの候補の先頭4つ）
+          for r in konpyu-ta- ko-hi- kafe cafe idea yoga mi-teinngu sukeju-ru ribinngu; do
+            printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\n' "$r" > $W/cand.tsv
+            MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$W/model.gguf TEST_TMPDIR=$W/cp $E/session_handler_main --input $W/cand.tsv --profile $W/cp --dictionary oss < /dev/null 2>/dev/null \
+              | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=4{exit} END{print out}' | sed "s|^|$r: |" || true
+          done
           # 利用者が見つけた失敗（毎回確かめる）
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/reported.json > $W/reported.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/reported.txt $W/results/reported.tsv 1
