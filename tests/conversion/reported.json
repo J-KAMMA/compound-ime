@@ -28,6 +28,26 @@
     "avax"
    ],
    "note": "2026-10-14 報告: あvax になった（avax が一覧になく vax が英単語に）"
+  },
+  {
+   "id": "r004",
+   "category": "reported",
+   "romaji": "sns",
+   "intended": "SNS",
+   "alternatives": [
+    "sns"
+   ],
+   "note": "2026-10-15 報告: ｓんｓ になった（sns が一覧になく n だけ ん に）"
+  },
+  {
+   "id": "r005",
+   "category": "reported",
+   "romaji": "snsnitoukousuru",
+   "intended": "SNSに投稿する",
+   "alternatives": [
+    "snsに投稿する"
+   ],
+   "note": "2026-10-15 報告の関連（sns の後に助詞）"
   }
  ]
 }
