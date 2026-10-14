@@ -111,6 +111,12 @@ jobs:
           # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
+          # 速さの目安: 最初の100文を1つの処理で変換した時間（GitHub の計算機、画像処理用の計算機なし）
+          head -100 $W/ja400.txt > $W/speed.txt
+          t0=$(date +%s.%N)
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/speed.txt $W/speed.tsv 1
+          t1=$(date +%s.%N)
+          python3 -c "import sys; t=float(sys.argv[2])-float(sys.argv[1]); print(f'速さ: 100文 {t:.1f} 秒、1文あたり {t*10:.0f} ミリ秒（起動を含む）')" $t0 $t1 | tee $W/results/speed.txt
           python3 $W/repo/tools/score_categories.py $W/results/ja400.tsv $T/ja400.json | head -12
           # 候補の先頭4つ: カタカナ語の次の英単語、日付・時刻（きょう、いま）、絵文字（ねこ）、話し言葉
           for r in konpyu-ta- ko-hi- kafe cafe idea yoga mi-thinngu sukeju-ru ribinngu kyou ima ashita neko hare ikokka; do
