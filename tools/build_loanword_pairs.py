@@ -100,6 +100,11 @@ def distance(source, kata):
     return d[n][m]
 
 
+def variant(katakana):
+    """One key for the spellings of a katakana word: long marks and small vowels dropped."""
+    return katakana.translate(str.maketrans("ァィゥェォ", "アイウエオ", "ー・"))
+
+
 def skeleton(text):
     text = text.replace("ng", "n").translate(str.maketrans("CJSzdgbpf", "tssstkbbh"))
     out = [c for c in text if c not in "aeiouyhwIU"]
@@ -156,7 +161,11 @@ def main():
         ranked = sorted((score + args.cost_weight * katakana_cost[word], score, word)
                         for word, score in best.items())
         top = ranked[0]
-        if top[1] <= args.threshold and all(s[0] - top[0] >= args.margin for s in ranked[1:]):
+        # Spellings of one katakana word (コンピュータ / コンピューター, アイデア / アイディア)
+        # are no rivals.
+        same = variant(top[2])
+        if top[1] <= args.threshold and all(s[0] - top[0] >= args.margin for s in ranked[1:]
+                                            if variant(s[2]) != same):
             pairs.append((english, top[2], top[1]))
     with args.out.open("w", encoding="utf-8", newline="\n") as out:
         out.write("# english<TAB>katakana<TAB>distance per sound (build_loanword_pairs.py)\n")
