@@ -169,13 +169,23 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     blocked.resize(raw.size() + 1, small);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
-    // "two" read as とぉ (also dwo, kwo...) is a word ending in t, d, k...
-    // and the particle wo ("seat|wo", "git|wo"): the edge before "wo" counts
-    // as a chunk edge.
-    if (const std::string_view r = chunk.raw;
-        r.size() == 3 && IsAsciiAlpha(r[0]) && !IsVowel(r[0]) && Lower(r[0]) != 'w' && Lower(r[0]) != 'n' &&
-        Lower(r[1]) == 'w' && Lower(r[2]) == 'o') {
-      boundary[raw.size() - 2] = true;
+    // Chunks the romaji table formed across a word's last letter count their
+    // inner edges as chunk edges too:
+    const std::string_view r = chunk.raw;
+    const size_t start = raw.size() - r.size();
+    const auto consonant = [](char c) { return IsAsciiAlpha(c) && !IsVowel(c); };
+    if (chunk.conversion.empty()) {
+      // keys still waiting for more ("ts" of "set|shita", "xw" of "ux|wo",
+      // "lw" of "mail|wo"): no kana is cut there.
+      for (size_t k = 1; k < r.size(); ++k) boundary[start + k] = true;
+    } else if (r.size() == 3 && consonant(r[0]) && Lower(r[0]) != 'w' && Lower(r[0]) != 'n' &&
+               Lower(r[1]) == 'w' && Lower(r[2]) == 'o') {
+      boundary[start + 1] = true;  // "two" read as とぉ: "seat|wo", "git|wo"
+    } else if (r.size() == 3 && consonant(r[0]) && Lower(r[0]) != 's' && Lower(r[0]) != 'c' &&
+               Lower(r[1]) == 'h' && IsVowel(r[2])) {
+      boundary[start + 1] = true;  // "dhe" read as でぇ: "madrid|he"
+    } else if (r.size() == 2 && Lower(r[0]) == 'n' && Lower(r[1]) == 'n') {
+      boundary[start + 1] = true;  // "nn" read as ん: "berlin|ni", "darwin|no"
     }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];

@@ -118,6 +118,7 @@ int main() {
   Expect(english("seatwokau") == "seat|", "a word before the particle wo, not \"two\" (sea|two)");
   Expect(english("testshita") == "test|", "no word ends inside shi (tests|hita)");
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
+  Expect(english("londonniikimasu") == "london|", "a word may end inside nn read as ん (london|ni)");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
