@@ -244,9 +244,15 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     return out;
   };
   // A Japanese reading of 3+ kana that starts before the edges [ka, kb) and
-  // ends inside, or starts inside and ends after.
+  // ends inside, or starts inside and ends after, or holds them and runs past
+  // one (ばせい over "base" in baseiwo, よごれ over "gore", にがて over "gate").
   const auto crosses_reading = [&](size_t ka, size_t kb) {
     constexpr size_t kLongest = 8;
+    for (size_t a = ka >= kLongest ? ka - kLongest : 0; a <= ka; ++a) {
+      for (size_t b = std::max(kb, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
+        if ((a < ka || b > kb) && (*is_reading)(kana_text(a, b))) return true;
+      }
+    }
     for (size_t a = ka >= kLongest ? ka - kLongest : 0; a < ka; ++a) {
       for (size_t b = ka + 1; b < kb && b - a <= kLongest; ++b) {
         if (b - a >= 3 && (*is_reading)(kana_text(a, b))) return true;

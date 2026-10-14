@@ -34,7 +34,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -75,7 +75,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore", "base"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -144,7 +144,7 @@ int main() {
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
-    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと"};
+    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい"};
     const jaen::ReadingCheck is_reading = [&](std::string_view kana) {
       return readings.contains(std::string(kana));
     };
@@ -162,6 +162,8 @@ int main() {
     Expect(unread("kokodematteite").empty(), "a て-form stays Japanese (matte: まって)");
     Expect(unread("kawadeoyogu").empty(), "a reading plus a particle stays Japanese (wade in kawa|de)");
     Expect(unread("otowokesu").empty(), "を inside stays Japanese (woke in oto|wo|kesu)");
+    Expect(unread("baseiwoabiru").empty(), "a reading holding the word and running past it stays Japanese (base in ばせい)");
+    Expect(unread("basenishite") == "base|", "with no such reading the word is English (base|ni)");
     Expect(english("atoulorettoga") == "lore|", "without the reading check a small kana is a sign (lore)");
     Expect(unread("atoulorettoga").empty(), "a small kana typed for a Japanese word is no sign (ulo of うぉれっと)");
     Expect(unread("londonheikimasu") == "london|", "a small kana in no reading is still a sign (london)");

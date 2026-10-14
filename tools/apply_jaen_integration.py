@@ -3265,10 +3265,10 @@ EOP
 
 /usr/bin/true""")
 
-# 英単語の判定で日本語の読みと見なす語を絞る: 辞書にあっても、カタカナだけの珍しい語（サフェ、
-# ボンス、ニケ）や、英語のつづりの読みに足した別名（れもて→リモート）は日本語の読みと
-# 見なさない。safe、bonus、nike、remote は英語のまま残る。メモ、カフェ、ウォレットのようによく使う
-# カタカナ語と、漢字やひらがなの語（褒め、なめ）はこれまでどおり日本語。
+# 英単語の判定で日本語の読みと見なす語を絞る: 英語のつづりの読みに足した別名（れもて→リモート、
+# ぱうせ→ポーズ）と英語の値の項目は、日本語の読みと見なさない。remote、pause、agenda は
+# 英語のまま残る。漢字やひらがなの語と、かなそのままのカタカナ（メモ、キテ）はこれまでどおり
+# 日本語（Mozc の辞書には 来て のような活用形がなく、きて はカタカナの項目で読みと分かる）。
 # 中身は native/jaen-detector/converter_reading_check.inc。
 edit("converter/converter.cc", "    return modules().GetDictionary().HasKey(kana);",
      "    return ReadsAsJapanese(modules(), kana);")

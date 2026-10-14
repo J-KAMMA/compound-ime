@@ -21,20 +21,18 @@ std::string KatakanaOf(absl::string_view kana) {
 }
 
 // Whether |kana| reads as Japanese for the English check: a dictionary word
-// that is not katakana (褒め, なめ, 0), or the katakana of the kana itself as a
-// common word (メモ, カフェ, ウォレット). Rare katakana of the kana itself (サフェ, ボンス,
-// ニケ) and other katakana (リモート for れもて, a spelled English reading)
-// do not count: remote, safe, bonus and nike stay English.
+// that is not katakana (褒め, なめ, 0), or the katakana of the kana itself
+// (メモ, ウォレット, キテ: Mozc keeps no inflected forms such as 来て, so the
+// katakana entry is what tells きて is read). Only other katakana (リモート for
+// れもて, ポーズ for ぱうせ: readings added for English spellings) and English
+// values (watch for うぉっち) do not count: remote and pause stay English.
 bool ReadsAsJapanese(const engine::Modules& modules, absl::string_view kana) {
-  constexpr int kCommonKatakanaCost = 6000;  // ウォレット 5392, ティッシュ 5003; ニケ 6048, サフェ 7832
   const std::string katakana = KatakanaOf(kana);
   bool japanese = false;
   dictionary::InlineCallback callback;
   callback.OnToken([&](absl::string_view, absl::string_view, const dictionary::Token& token) {
-    // English values (watch for うぉっち) are the added English candidates, no Japanese.
     const Util::ScriptType script = Util::GetScriptType(token.value);
-    if ((script != Util::KATAKANA && script != Util::ALPHABET) ||
-        (token.value == katakana && token.cost < kCommonKatakanaCost)) {
+    if ((script != Util::KATAKANA && script != Util::ALPHABET) || token.value == katakana) {
       japanese = true;
       return dictionary::DictionaryInterface::Callback::TRAVERSE_DONE;
     }

@@ -174,7 +174,7 @@ def main():
             seen.add(raw)
             alts = "|".join(item.get("alternatives", []))
             lines.append(f"{item['id']}\t{style}\t{raw}\t{item['intended']}\t{alts}")
-    Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8")
+    Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(lines)} lines, {skipped} sentences with English skipped")
 
 
