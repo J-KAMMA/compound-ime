@@ -5,6 +5,7 @@
 #   a1, a2: 1,298文（inputs）の前半と後半
 #   b: 日本語だけの400文、予測変換、速さ、候補の並び、利用者が見つけた失敗
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
+#   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -68,6 +69,13 @@ c)
   MYIME_TYPO_MARGIN=off $BATCH $W/typo150b.txt $OUT/typo150b-off.tsv 4
   $BATCH $W/typo150b.txt $OUT/typo150b.tsv 4
   ;;
+d1|d2)
+  # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
+  cut -f3 $T/variants.tsv > $W/variants.txt
+  half=$(( ($(wc -l < $W/variants.txt) + 1) / 2 ))
+  if [ "$GROUP" = d1 ]; then head -n $half $W/variants.txt > $W/v.txt; else tail -n +$((half + 1)) $W/variants.txt > $W/v.txt; fi
+  $BATCH $W/v.txt $OUT/variants-${GROUP#d}.tsv 4
+  ;;
 *)
-  echo "組は a1、a2、b、c のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2 のどれか" >&2; exit 2 ;;
 esac
