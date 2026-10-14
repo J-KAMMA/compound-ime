@@ -188,6 +188,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   std::vector<bool> no_start(1, false);  // no English word starts at i
   std::vector<bool> no_end(1, false);    // no English word ends at i
   std::vector<bool> unread;              // unread[k]: raw key k was left unread (no kana)
+  std::vector<bool> small_start(1, false);  // small_start[i]: an x?/l? small kana starts at i
   std::vector<std::string> kana;        // the typed kana, one character each
   std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   for (const Chunk& chunk : chunks) {
@@ -198,6 +199,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     no_start.resize(raw.size() + 1, false);
     no_end.resize(raw.size() + 1, false);
     unread.resize(raw.size(), chunk.conversion.empty());
+    small_start.resize(raw.size() + 1, false);
+    small_start[raw.size() - chunk.raw.size()] = small;
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
     // Chunks the romaji table formed across a word's last letter count their
@@ -272,6 +275,18 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     return false;
   };
+  // A small kana k that joins the kana before it in a Japanese reading of 3+
+  // kana (うぉ of うぉれっと typed "ulo"): the l or x was typed for that kana.
+  const auto small_in_reading = [&](size_t k) {
+    if (!is_reading || k == 0) return false;
+    constexpr size_t kLongest = 8;
+    for (size_t a = k >= kLongest ? k - kLongest : 0; a < k; ++a) {
+      for (size_t b = std::max(k + 1, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
+        if ((*is_reading)(kana_text(a, b))) return true;
+      }
+    }
+    return false;
+  };
   const size_t n = raw.size();
   if (n == 0 || n > kMaxRawLength) return {};
   const auto edge_cost = [&](size_t i) { return boundary[i] ? 0 : kCutCost; };
@@ -339,6 +354,16 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       const Lexicon::Place* place = lexicon.FindPlace(word);
       const bool signal_only = learned == 0 && !place && !lexicon.Contains(word) && lexicon.IsSignalOnly(word);
       if (learned == 0 && !place && !lexicon.Contains(word) && !signal_only) continue;
+      // Its only sign is a small kana typed for a Japanese word ("lore" in
+      // ato|ulo|retto, あとうぉれっと): no word.
+      if (learned == 0) {
+        const int64_t sign = ForeignCost(parse(word));
+        bool typed_for_japanese = false;
+        for (size_t p = i; p < j && !typed_for_japanese; ++p) {
+          typed_for_japanese = small_start[p] && small_in_reading(kana_at[p]);
+        }
+        if (sign > 0 && sign < kForeignCost && typed_for_japanese) continue;
+      }
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
       if (signal_only) {

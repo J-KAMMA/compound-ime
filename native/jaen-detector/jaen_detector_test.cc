@@ -75,7 +75,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -144,7 +144,7 @@ int main() {
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
-    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ"};
+    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと"};
     const jaen::ReadingCheck is_reading = [&](std::string_view kana) {
       return readings.contains(std::string(kana));
     };
@@ -162,6 +162,9 @@ int main() {
     Expect(unread("kokodematteite").empty(), "a て-form stays Japanese (matte: まって)");
     Expect(unread("kawadeoyogu").empty(), "a reading plus a particle stays Japanese (wade in kawa|de)");
     Expect(unread("otowokesu").empty(), "を inside stays Japanese (woke in oto|wo|kesu)");
+    Expect(english("atoulorettoga") == "lore|", "without the reading check a small kana is a sign (lore)");
+    Expect(unread("atoulorettoga").empty(), "a small kana typed for a Japanese word is no sign (ulo of うぉれっと)");
+    Expect(unread("londonheikimasu") == "london|", "a small kana in no reading is still a sign (london)");
     const auto spaced = jaen::SplitEnglish(Parse("weeklyreportwokaku"), lexicon, Parse);
     Expect(spaced.size() == 2 && spaced[0].english && spaced[0].spaces == std::vector<size_t>{6},
            "a space between two words that are no word together");

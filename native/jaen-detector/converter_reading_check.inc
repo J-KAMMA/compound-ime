@@ -22,16 +22,18 @@ std::string KatakanaOf(absl::string_view kana) {
 
 // Whether |kana| reads as Japanese for the English check: a dictionary word
 // that is not katakana (褒め, なめ, 0), or the katakana of the kana itself as a
-// common word (メモ, カフェ). Rare katakana of the kana itself (サフェ, ボンス,
-// イデア) and other katakana (リモート for れもて, a spelled English reading)
-// do not count: remote, safe, bonus and idea stay English.
+// common word (メモ, カフェ, ウォレット). Rare katakana of the kana itself (サフェ, ボンス,
+// ニケ) and other katakana (リモート for れもて, a spelled English reading)
+// do not count: remote, safe, bonus and nike stay English.
 bool ReadsAsJapanese(const engine::Modules& modules, absl::string_view kana) {
-  constexpr int kCommonKatakanaCost = 5000;
+  constexpr int kCommonKatakanaCost = 6000;  // ウォレット 5392, ティッシュ 5003; ニケ 6048, サフェ 7832
   const std::string katakana = KatakanaOf(kana);
   bool japanese = false;
   dictionary::InlineCallback callback;
   callback.OnToken([&](absl::string_view, absl::string_view, const dictionary::Token& token) {
-    if (Util::GetScriptType(token.value) != Util::KATAKANA ||
+    // English values (watch for うぉっち) are the added English candidates, no Japanese.
+    const Util::ScriptType script = Util::GetScriptType(token.value);
+    if ((script != Util::KATAKANA && script != Util::ALPHABET) ||
         (token.value == katakana && token.cost < kCommonKatakanaCost)) {
       japanese = true;
       return dictionary::DictionaryInterface::Callback::TRAVERSE_DONE;

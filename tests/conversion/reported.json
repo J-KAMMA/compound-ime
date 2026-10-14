@@ -48,6 +48,24 @@
     "snsに投稿する"
    ],
    "note": "2026-10-15 報告の関連（sns の後に助詞）"
+  },
+  {
+   "id": "r006",
+   "category": "reported",
+   "romaji": "atoulorettoga",
+   "intended": "あとウォレットが",
+   "alternatives": [
+    "後ウォレットが"
+   ],
+   "note": "2026-10-15 報告: 阿藤loreっと になった（ulo の小さい ぉ を英単語 lore の始まりと取り違え）"
+  },
+  {
+   "id": "r007",
+   "category": "reported",
+   "romaji": "fulairuwohiraku",
+   "intended": "ファイルを開く",
+   "alternatives": [],
+   "note": "2026-10-15 報告の関連（l で打った小さい ぁ）"
   }
  ]
 }
