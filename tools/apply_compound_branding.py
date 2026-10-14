@@ -299,7 +299,8 @@ edit(U, '      "/Library/Input Methods/Mozc.app",', '      "/Library/Input Metho
 edit(U, '      "/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Converter.plist",',
      '      "/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Converter.plist",')
 edit(U, '      "/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Renderer.plist", "/Applications/Mozc",',
-     '      "/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist", "/Applications/CompoundIME",')
+     '      "/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist",\n'
+     '      "/Library/LaunchAgents/org.compoundime.update-check.plist", "/Applications/CompoundIME",')
 
 # 起動用の設定（LaunchAgents）: 名前と中身
 L = src / "mac/installer/LaunchAgents"

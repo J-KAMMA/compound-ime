@@ -5,6 +5,11 @@ on:
   push:
     branches: [mac]
   workflow_dispatch:
+    inputs:
+      version:
+        description: 版の番号（例 3.34.6239.141）
+        required: false
+        default: 3.34.6239.0
 
 permissions:
   contents: read
@@ -178,7 +183,7 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
           cd $S
-          bazelisk build --config oss_macos -c opt --nocheck_visibility //mac:package_files > $W/bazel.log 2>&1 || { grep -v "install_name_tool: warning" $W/bazel.log | grep -B3 -A25 "ERROR\|error:\|Traceback" | head -120; exit 1; }
+          bazelisk build --config oss_macos -c opt --nocheck_visibility --action_env=MOZC_VERSION=${{ inputs.version || '3.34.6239.0' }} //mac:package_files > $W/bazel.log 2>&1 || { grep -v "install_name_tool: warning" $W/bazel.log | grep -B3 -A25 "ERROR\|error:\|Traceback" | head -120; exit 1; }
           rm -rf $W/pkg && mkdir $W/pkg && cd $W/pkg && unzip -q $S/bazel-bin/mac/package_files.zip
           find . -maxdepth 6 -name "*.app" | head -20
           CONV=$(find . -path "*CompoundIME.app/Contents/Resources/CompoundIMEConverter.app" -maxdepth 8 | head -1)
@@ -193,6 +198,9 @@ jobs:
           install_name_tool -add_rpath @loader_path/../Frameworks "$CONV/Contents/MacOS/libazookey-engine.dylib" 2>/dev/null || true
           cp $W/repo/docs/credits_en.html "$(dirname "$CONV")/credits_en.html"
           APP=$(dirname "$(dirname "$(dirname "$CONV")")")
+          # 新しい版のお知らせの台本（インストール時に LaunchAgent から呼ばれる）
+          cp $W/repo/tools/update-check/update_check_mac.sh "$APP/Contents/Resources/update_check.sh"
+          chmod +x "$APP/Contents/Resources/update_check.sh"
           codesign --force --deep -s - "$APP"
           codesign --verify --deep "$APP" && echo "署名（簡易）を確認"
           zip -qry $W/package_files_compound.zip installer

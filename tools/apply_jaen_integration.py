@@ -3222,4 +3222,25 @@ fi
 
 /usr/bin/true""")
 
+# マック版の新しい版のお知らせ: ログイン時に台本（CompoundIME.app の Resources/update_check.sh）を動かす
+# LaunchAgent を置く。止め方は tools/update-check/README.md。
+edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 新しい版のお知らせ（1日1回まで GitHub の公開ページに問い合わせる）
+A="/Library/LaunchAgents/org.compoundime.update-check.plist"
+/bin/cat > "$A" <<'EOP'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>org.compoundime.update-check</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/bash</string><string>/Library/Input Methods/CompoundIME.app/Contents/Resources/update_check.sh</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>86400</integer>
+</dict>
+</plist>
+EOP
+/bin/chmod 644 "$A"
+
+/usr/bin/true""")
+
 print("applied")
