@@ -9,7 +9,6 @@ usb	USB
 ai	AI
 it	IT
 dx	DX
-gx	GX
 kpi	KPI
 kgi	KGI
 okr	OKR
@@ -39,7 +38,6 @@ nhk	NHK
 jr	JR
 ntt	NTT
 kddi	KDDI
-jt	JT
 jtb	JTB
 jal	JAL
 jaxa	JAXA
@@ -93,9 +91,6 @@ wms	WMS
 tms	TMS
 pos	POS
 ec	EC
-cx	CX
-ex	EX
-bx	BX
 bpo	BPO
 bpr	BPR
 rpa	RPA
@@ -104,8 +99,6 @@ nlp	NLP
 llm	LLM
 gpt	GPT
 ml	ML
-dl	DL
-cv	CV
 mcp	MCP
 cnn	CNN
 rnn	RNN
@@ -185,7 +178,6 @@ rbac	RBAC
 abac	ABAC
 acl	ACL
 pki	PKI
-ca	CA
 cve	CVE
 cvss	CVSS
 owasp	OWASP
@@ -198,15 +190,12 @@ swg	SWG
 ngfw	NGFW
 iot	IoT
 iiot	IIoT
-ot	OT
 ict	ICT
 cad	CAD
 cae	CAE
 bim	BIM
-cg	CG
 vr	VR
 ar	AR
-mr	MR
 xr	XR
 vtuber	VTuber
 nfc	NFC
@@ -225,7 +214,6 @@ wifi	Wi-Fi
 bluetooth	Bluetooth
 ble	BLE
 gnss	GNSS
-ic	IC
 lsi	LSI
 cmos	CMOS
 ccd	CCD
@@ -237,8 +225,6 @@ ems	EMS
 odm	ODM
 oem	OEM
 obm	OBM
-pb	PB
-nb	NB
 sku	SKU
 upc	UPC
 cpa	CPA
@@ -257,11 +243,9 @@ nrr	NRR
 grr	GRR
 nps	NPS
 csat	CSAT
-pv	PV
 seo	SEO
 sem	SEM
 lpo	LPO
-lp	LP
 cta	CTA
 ugc	UGC
 kol	KOL
@@ -276,7 +260,6 @@ aisas	AISAS
 mvp	MVP
 poc	PoC
 pmf	PMF
-pm	PM
 pdm	PdM
 pjm	PjM
 pmo	PMO
@@ -292,14 +275,11 @@ secops	SecOps
 devsecops	DevSecOps
 gitops	GitOps
 aiops	AIOps
-ci	CI
-cd	CD
 cicd	CI/CD
 tdd	TDD
 bdd	BDD
 ddd	DDD
 oop	OOP
-fp	FP
 mvc	MVC
 mvvm	MVVM
 mpa	MPA
@@ -338,7 +318,6 @@ dmp	DMP
 dsp	DSP
 ssp	SSP
 adn	ADN
-vm	VM
 vdi	VDI
 oss	OSS
 gpl	GPL
@@ -355,8 +334,6 @@ mtbf	MTBF
 rto	RTO
 rpo	RPO
 bcp	BCP
-dr	DR
-lb	LB
 alb	ALB
 nlb	NLB
 elb	ELB
@@ -422,7 +399,6 @@ dll	DLL
 uuid	UUID
 guid	GUID
 id	ID
-pw	PW
 sms	SMS
 mms	MMS
 rcs	RCS
@@ -436,24 +412,18 @@ ftth	FTTH
 adsl	ADSL
 dsl	DSL
 catv	CATV
-bs	BS
 hd	HD
 fhd	FHD
 uhd	UHD
 sd	SD
 microsd	microSD
-cf	CF
 dvd	DVD
-bd	BD
 cdrom	CD-ROM
 dvdr	DVD-R
-md	MD
 vhs	VHS
-ld	LD
 mac	Mac
 nas	NAS
 kvm	KVM
-tn	TN
 miniled	MiniLED
 microled	microLED
 qled	QLED
@@ -467,9 +437,7 @@ ipo	IPO
 tob	TOB
 mbo	MBO
 lbo	LBO
-vc	VC
 cvc	CVC
-ir	IR
 pbr	PBR
 roic	ROIC
 ebitda	EBITDA
@@ -481,7 +449,6 @@ irr	IRR
 wacc	WACC
 capm	CAPM
 fcf	FCF
-pl	PL
 gdp	GDP
 gnp	GNP
 gni	GNI
@@ -535,8 +502,6 @@ jgto	JGTO
 nbl	NBL
 ntv	NTV
 tbs	TBS
-tx	TX
-mx	MX
 bstbs	BS-TBS
 wowow	WOWOW
 jcom	J:COM
@@ -557,7 +522,6 @@ mtv	MTV
 afp	AFP
 nyt	NYT
 wsj	WSJ
-ft	FT
 wwd	WWD
 knt	KNT
 lcc	LCC
@@ -565,7 +529,6 @@ fsc	FSC
 jcb	JCB
 amex	AMEX
 amc	AMC
-uq	UQ
 iij	IIJ
 iijmio	IIJmio
 ocn	OCN
@@ -573,27 +536,20 @@ biglobe	BIGLOBE
 sonet	So-net
 nuro	NURO
 ibm	IBM
-hp	HP
 hpe	HPE
 dell	DELL
 amd	AMD
 tsmc	TSMC
 asml	ASML
-sk	SK
-lg	LG
 byd	BYD
 catl	CATL
 bmw	BMW
-vw	VW
-gm	GM
 basf	BASF
-bp	BP
 hsbc	HSBC
 ubs	UBS
 bnp	BNP
 kpmg	KPMG
 pwc	PwC
-ey	EY
 bcg	BCG
 ykk	YKK
 lixil	LIXIL
@@ -619,23 +575,12 @@ sugoca	SUGOCA
 nimoca	nimoca
 kitaca	Kitaca
 smfg	SMFG
-fg	FG
-kk	KK
 llc	LLC
 llp	LLP
-gk	GK
 npo	NPO
 ngo	NGO
-ob	OB
-og	OG
 ojt	OJT
 offjt	Off-JT
-ky	KY
-jk	JK
-jc	JC
-jd	JD
-dk	DK
-dc	DC
 js	JS
 toeic	TOEIC
 toefl	TOEFL
@@ -674,42 +619,20 @@ ccnp	CCNP
 lpic	LPIC
 linuc	LinuC
 awssaa	AWS SAA
-ap	AP
 toeiclr	TOEIC L&R
 diy	DIY
 dtm	DTM
 daw	DAW
 vst	VST
-mv	MV
-mc	MC
 dj	DJ
 bgm	BGM
-op	OP
-ed	ED
 cm	CM
 tvcm	TVCM
 oad	OAD
 ost	OST
-vj	VJ
 av	AV
-ab	A/B
-bl	BL
-gl	GL
-tl	TL
-nl	NL
-cp	CP
-ng	NG
 ok	OK
-ss	SS
-ur	UR
-sr	SR
-lr	LR
-mp	MP
-sp	SP
-tp	TP
 exp	EXP
-xp	XP
-lv	LV
 atk	ATK
 def	DEF
 int	INT
@@ -718,7 +641,6 @@ luk	LUK
 dps	DPS
 dot	DoT
 aoe	AoE
-cc	CC
 pvp	PvP
 pve	PvE
 pvpve	PvPvE
@@ -744,18 +666,13 @@ stg	STG
 rta	RTA
 tas	TAS
 npc	NPC
-pk	PK
 dlc	DLC
 mtx	MTX
 esports	esports
 vrchat	VRChat
 vrc	VRC
-rt	RT
-rp	RP
-ff	FF
 fb	FB
 ig	IG
-yt	YT
 igtv	IGTV
 asmr	ASMR
 bot	BOT
@@ -788,12 +705,6 @@ idk	IDK
 irl	IRL
 afk	AFK
 brb	BRB
-gg	GG
-gj	GJ
-hf	HF
-wp	WP
-nt	NT
-ks	KS
 bff	BFF
 dink	DINK
 dinks	DINKS
@@ -826,22 +737,16 @@ nmn	NMN
 bcaa	BCAA
 hmb	HMB
 ages	AGEs
-uv	UV
 uvb	UVB
 spf	SPF
-bb	BB
-dd	DD
 ipl	IPL
-rf	RF
 icl	ICL
 lasik	LASIK
 mri	MRI
-ct	CT
 ecg	ECG
 icu	ICU
 ccu	CCU
 nicu	NICU
-er	ER
 aed	AED
 cpr	CPR
 bls	BLS
@@ -857,7 +762,6 @@ ibs	IBS
 ibd	IBD
 gerd	GERD
 ckd	CKD
-dv	DV
 pms	PMS
 pmdd	PMDD
 ivf	IVF
@@ -865,7 +769,6 @@ icsi	ICSI
 amh	AMH
 nipt	NIPT
 hcg	HCG
-lh	LH
 fsh	FSH
 tsh	TSH
 ast	AST
@@ -875,19 +778,15 @@ crp	CRP
 egfr	eGFR
 nexco	NEXCO
 jct	JCT
-hv	HV
 hev	HEV
 phv	PHV
 phev	PHEV
 fcv	FCV
 fcev	FCEV
 bev	BEV
-mt	MT
 cvt	CVT
 dct	DCT
 awd	AWD
-fr	FR
-rr	RR
 suv	SUV
 mpv	MPV
 abs	ABS
@@ -906,8 +805,6 @@ ncap	NCAP
 wltc	WLTC
 lrt	LRT
 brt	BRT
-sl	SL
-ef	EF
 dmu	DMU
 mrt	MRT
 bts	BTS
@@ -915,17 +812,13 @@ mtr	MTR
 ktx	KTX
 tgv	TGV
 lgv	LGV
-vp	VP
 svp	SVP
 evp	EVP
 mgr	MGR
 bizdev	BizDev
 sdr	SDR
 bdr	BDR
-fs	FS
 csm	CSM
-qc	QC
-rd	R&D
 rfp	RFP
 rfi	RFI
 rfq	RFQ
@@ -936,10 +829,8 @@ aml	AML
 cft	CFT
 kyb	KYB
 ddq	DDQ
-jv	JV
 spc	SPC
 spv	SPV
-gp	GP
 lps	LPS
 reit	REIT
 jreit	J-REIT
@@ -951,7 +842,6 @@ espp	ESPP
 nisa	NISA
 ideco	iDeCo
 gpif	GPIF
-fx	FX
 cfd	CFD
 topix	TOPIX
 nasdaq	NASDAQ
@@ -1156,7 +1046,6 @@ rolldown	Rolldown
 snowpack	Snowpack
 browserify	Browserify
 lerna	Lerna
-nx	Nx
 turborepo	Turborepo
 changesets	Changesets
 eslint	ESLint
@@ -1642,7 +1531,7 @@ visualstudiocode	Visual Studio Code
 visualstudio	Visual Studio
 vscodium	VSCodium
 sublimetext	Sublime Text
-notepad	Notepad++
+notepad	Notepad
 terapad	TeraPad
 sakuraeditor	Sakura Editor
 intellij	IntelliJ
@@ -1658,8 +1547,6 @@ jetbrains	JetBrains
 androidstudio	Android Studio
 netbeans	NetBeans
 codeblocks	Code::Blocks
-devc	Dev-C++
-qt	Qt
 qtcreator	Qt Creator
 gtk	GTK
 wxwidgets	wxWidgets
@@ -1825,7 +1712,6 @@ riscv	RISC-V
 mips	MIPS
 powerpc	PowerPC
 sparc	SPARC
-kde	KDE
 kdeplasma	KDE Plasma
 xfce	Xfce
 lxde	LXDE
@@ -1881,12 +1767,9 @@ sed	sed
 awk	awk
 grep	grep
 ripgrep	ripgrep
-fd	fd
 fzf	fzf
 exa	exa
 zoxide	zoxide
-jq	jq
-yq	yq
 htop	htop
 btop	btop
 ncdu	ncdu
@@ -1897,7 +1780,6 @@ gitlfs	Git LFS
 gitflow	git-flow
 githubflow	GitHub Flow
 githubcli	GitHub CLI
-gh	gh
 sourcetree	Sourcetree
 gitkraken	GitKraken
 githubdesktop	GitHub Desktop
@@ -2449,7 +2331,6 @@ marvell	Marvell
 kioxia	Kioxia
 sandisk	SanDisk
 westerndigital	Western Digital
-wd	WD
 seagate	Seagate
 samsung	Samsung
 skhynix	SK hynix
@@ -2737,7 +2618,7 @@ lastfm	Last.fm
 netflix	Netflix
 amazonprime	Amazon Prime
 primevideo	Prime Video
-disney	Disney+
+disney	Disney
 disneyplus	Disney Plus
 appletv	Apple TV
 abematv	AbemaTV
@@ -2746,7 +2627,7 @@ lemino	Lemino
 crunchyroll	Crunchyroll
 funimation	Funimation
 hidive	HIDIVE
-paramount	Paramount+
+paramount	Paramount
 hbomax	HBO Max
 rakutentv	Rakuten TV
 jsports	J SPORTS
@@ -2813,7 +2694,7 @@ appleaccount	Apple Account
 applepay	Apple Pay
 applecard	Apple Card
 applearcade	Apple Arcade
-applefitness	Apple Fitness+
+applefitness	Apple Fitness
 appleone	Apple One
 applebooks	Apple Books
 applemaps	Apple Maps
@@ -2944,12 +2825,11 @@ microsoftstream	Microsoft Stream
 snippingtool	Snipping Tool
 powertoys	PowerToys
 sysinternals	Sysinternals
-visualc	Visual C++
 powerquery	Power Query
 powerpivot	Power Pivot
 excelvba	Excel VBA
 copilotpro	Copilot Pro
-copilotpc	Copilot+ PC
+copilotpc	Copilot PC
 minecraft	Minecraft
 amazon	Amazon
 primeday	Prime Day
@@ -3084,7 +2964,6 @@ douyin	Douyin
 bilibili	Bilibili
 xiaohongshu	Xiaohongshu
 kuaishou	Kuaishou
-qq	QQ
 baidu	Baidu
 taobao	Taobao
 tmall	Tmall
@@ -3236,7 +3115,6 @@ kinemaster	KineMaster
 powerdirector	PowerDirector
 filmora	Filmora
 wondershare	Wondershare
-vn	VN
 vrew	Vrew
 premiererush	Premiere Rush
 lumafusion	LumaFusion
@@ -3411,7 +3289,6 @@ linkbuds	LinkBuds
 nintendoswitch	Nintendo Switch
 joycon	Joy-Con
 amiibo	amiibo
-ds	DS
 wii	Wii
 wiiu	Wii U
 gamecube	GameCube
@@ -3740,7 +3617,6 @@ inj	INJ
 arbitrum	Arbitrum
 arb	ARB
 zksync	zkSync
-zk	ZK
 starknet	Starknet
 strk	STRK
 linea	Linea
@@ -3801,8 +3677,6 @@ bitget	Bitget
 bgb	BGB
 okb	OKB
 kcs	KCS
-ht	HT
-gt	GT
 ftt	FTT
 toncoin	Toncoin
 notcoin	Notcoin
@@ -3919,7 +3793,6 @@ amm	AMM
 tvl	TVL
 apy	APY
 apr	APR
-il	IL
 mev	MEV
 pow	PoW
 dpos	DPoS
@@ -3947,7 +3820,6 @@ jcba	JCBA
 ico	ICO
 ieo	IEO
 sto	STO
-st	ST
 saft	SAFT
 sats	sats
 gwei	Gwei
@@ -3957,12 +3829,10 @@ ath	ATH
 dyor	DYOR
 wagmi	WAGMI
 ngmi	NGMI
-gn	GN
 lfg	LFG
 rugpull	rug pull
 vitalik	Vitalik
 vitalikbuterin	Vitalik Buterin
-cz	CZ
 sbf	SBF
 metaverse	Metaverse
 dapps	DApps
@@ -4051,7 +3921,6 @@ msciworld	MSCI World
 mscikokusai	MSCI Kokusai
 ftseallworld	FTSE All-World
 crsp	CRSP
-vt	VT
 vti	VTI
 vym	VYM
 qqq	QQQ
@@ -4107,7 +3976,6 @@ interactivebrokers	Interactive Brokers
 ibkr	IBKR
 saxo	Saxo
 exness	Exness
-xm	XM
 xmtrading	XMTrading
 fxgt	FXGT
 titanfx	TitanFX
@@ -4140,7 +4008,6 @@ mom	MoM
 ytd	YTD
 ttm	TTM
 ltm	LTM
-fy	FY
 otc	OTC
 adr	ADR
 gdr	GDR
@@ -4159,7 +4026,6 @@ pce	PCE
 ism	ISM
 nfp	NFP
 adp	ADP
-cb	CB
 umich	UMich
 sofr	SOFR
 libor	LIBOR
@@ -4177,7 +4043,6 @@ tbill	T-Bill
 tnote	T-Note
 tbond	T-Bond
 ycc	YCC
-qe	QE
 zirp	ZIRP
 nirp	NIRP
 mmt	MMT
@@ -4188,7 +4053,6 @@ batx	BATX
 tmt	TMT
 garp	GARP
 sri	SRI
-sx	SX
 tcfd	TCFD
 tnfd	TNFD
 issb	ISSB
@@ -4216,7 +4080,6 @@ americanexpress	American Express
 dinersclub	Diners Club
 unionpay	UnionPay
 revolutcard	Revolut Card
-uc	UC
 orico	Orico
 jcbw	JCB W
 kyash	Kyash
@@ -4255,7 +4118,6 @@ uniqlo	UNIQLO
 muji	MUJI
 ikea	IKEA
 zara	ZARA
-hm	H&M
 oldnavy	Old Navy
 bananarepublic	Banana Republic
 bershka	Bershka
@@ -4369,7 +4231,6 @@ givenchy	Givenchy
 valentino	Valentino
 versace	Versace
 dolcegabbana	Dolce&Gabbana
-dg	D&G
 armani	Armani
 giorgioarmani	Giorgio Armani
 emporioarmani	Emporio Armani
@@ -4463,7 +4324,6 @@ suitsquare	SUIT SQUARE
 brooksbrothers	Brooks Brothers
 jcrew	J.Crew
 abercrombie	Abercrombie
-af	A&F
 hollister	Hollister
 americaneagle	American Eagle
 eddiebauer	Eddie Bauer
@@ -4518,7 +4378,6 @@ protrek	PRO TREK
 orientstar	Orient Star
 credor	Credor
 danielwellington	Daniel Wellington
-dw	DW
 skagen	Skagen
 garmin	Garmin
 coros	COROS
@@ -4563,10 +4422,6 @@ revoltech	Revoltech
 bandaispirits	BANDAI SPIRITS
 bandainamco	Bandai Namco
 gunpla	Gunpla
-hg	HG
-mg	MG
-rg	RG
-pg	PG
 tamashiinations	Tamashii Nations
 shfiguarts	S.H.Figuarts
 figuarts	Figuarts
@@ -4618,7 +4473,6 @@ starwars	Star Wars
 lucasfilm	Lucasfilm
 usj	USJ
 warnerbros	Warner Bros.
-wb	WB
 sonypictures	Sony Pictures
 studioghibli	Studio Ghibli
 ghibli	Ghibli
@@ -4690,9 +4544,7 @@ lotte	Lotte
 cupnoodle	Cup Noodle
 mizkan	Mizkan
 kewpie	Kewpie
-qp	QP
 housefoods	House Foods
-sb	S&B
 suntory	Suntory
 heineken	Heineken
 budweiser	Budweiser
@@ -4861,7 +4713,6 @@ cetaphil	Cetaphil
 cerave	CeraVe
 neutrogena	Neutrogena
 olay	Olay
-hs	H&S
 herbalessences	Herbal Essences
 ululis	ululis
 yolu	YOLU
@@ -4884,7 +4735,6 @@ ulta	Ulta
 innisfree	Innisfree
 laneige	Laneige
 sulwhasoo	Sulwhasoo
-drjart	Dr.Jart+
 cosrx	COSRX
 torriden	Torriden
 roundlab	Round Lab
@@ -4907,7 +4757,6 @@ stylenanda	Stylenanda
 lexus	Lexus
 mazda	Mazda
 acura	Acura
-gr	GR
 gazooracing	GAZOO Racing
 trd	TRD
 modellista	Modellista
@@ -4951,7 +4800,6 @@ spacia	Spacia
 wagonr	Wagon R
 copen	Copen
 delica	Delica
-ek	eK
 lancerevolution	Lancer Evolution
 mercedesbenz	Mercedes-Benz
 mercedes	Mercedes
@@ -5107,7 +4955,6 @@ technics	Technics
 accuphase	Accuphase
 luxman	Luxman
 mcintosh	McIntosh
-bw	B&W
 harmankardon	Harman Kardon
 gibson	Gibson
 ibanez	Ibanez
@@ -5164,7 +5011,6 @@ larcenciel	L'Arc~en~Ciel
 xjapan	X JAPAN
 glay	GLAY
 lunasea	LUNA SEA
-bz	B'z
 mrchildren	Mr.Children
 smap	SMAP
 heysayjump	Hey! Say! JUMP
@@ -5174,7 +5020,6 @@ travisjapan	Travis Japan
 timelesz	timelesz
 befirst	BE:FIRST
 niziu	NiziU
-xg	XG
 blackpink	BLACKPINK
 newjeans	NewJeans
 lesserafim	LE SSERAFIM
@@ -5215,7 +5060,6 @@ cpop	C-POP
 tpop	T-POP
 jrock	J-ROCK
 edm	EDM
-rb	R&B
 hiphop	Hip-Hop
 lofi	Lo-fi
 vaporwave	Vaporwave
@@ -5224,10 +5068,8 @@ vsinger	Vsinger
 ffxiv	FFXIV
 ffvii	FFVII
 finalfantasy	Final Fantasy
-dq	DQ
 dqx	DQX
 dragonquest	Dragon Quest
-mh	MH
 mhw	MHW
 mhwilds	MHWilds
 mhrise	MHRise
@@ -5256,7 +5098,6 @@ kirby	Kirby
 metroid	Metroid
 pikmin	Pikmin
 kingdomhearts	Kingdom Hearts
-kh	KH
 nier	NieR
 nierautomata	NieR:Automata
 smt	SMT
@@ -5337,7 +5178,6 @@ masterduel	Master Duel
 duellinks	Duel Links
 lorcana	Lorcana
 battlespirits	Battle Spirits
-zx	Z/X
 wixoss	WIXOSS
 shadowverseevolve	Shadowverse Evolve
 gwent	Gwent
@@ -5358,7 +5198,6 @@ pubg	PUBG
 pubgmobile	PUBG MOBILE
 cod	CoD
 codwarzone	CoD:Warzone
-bf	BF
 titanfall	Titanfall
 tarkov	Tarkov
 palworld	Palworld
@@ -5415,11 +5254,9 @@ blazblue	BlazBlue
 undernight	Under Night
 kof	KOF
 mortalkombat	Mortal Kombat
-mk	MK
 meltyblood	Melty Blood
 dnfduel	DNF Duel
 virtuafighter	Virtua Fighter
-vf	VF
 crcup	CRCUP
 vct	VCT
 vcj	VCJ
@@ -5450,7 +5287,6 @@ xboxshowcase	Xbox Showcase
 steamsale	Steam Sale
 zetadivision	ZETA DIVISION
 crazyraccoon	Crazy Raccoon
-cr	CR
 detonation	DetonatioN
 detonationfocusme	DetonatioN FocusMe
 fennel	FENNEL
@@ -5481,7 +5317,6 @@ tes	TES
 weibogaming	Weibo Gaming
 teamsecret	Team Secret
 evilgeniuses	Evil Geniuses
-eg	EG
 mouz	MOUZ
 astralis	Astralis
 ence	ENCE
@@ -5650,7 +5485,6 @@ superrugby	Super Rugby
 nrl	NRL
 afl	AFL
 ucl	UCL
-cl	CL
 uel	UEL
 europaleague	Europa League
 ecl	ECL
@@ -5669,14 +5503,6 @@ goldcup	Gold Cup
 cwc	CWC
 ballondor	Ballon d'Or
 var	VAR
-fk	FK
-ck	CK
-df	DF
-mf	MF
-fw	FW
-wg	WG
-sh	SH
-xa	xA
 realmadrid	Real Madrid
 barca	Barça
 atleticomadrid	Atlético Madrid
@@ -5733,7 +5559,6 @@ alcs	ALCS
 nlcs	NLCS
 alds	ALDS
 nlds	NLDS
-al	AL
 cyyoung	Cy Young
 silverslugger	Silver Slugger
 goldglove	Gold Glove
@@ -5741,12 +5566,8 @@ ops	OPS
 babip	BABIP
 fip	FIP
 xfip	xFIP
-qs	QS
 rbi	RBI
 obp	OBP
-dh	DH
-lf	LF
-ut	UT
 statcast	Statcast
 ladodgers	LA Dodgers
 dodgers	Dodgers
@@ -5788,10 +5609,6 @@ sunrockersshibuya	Sunrockers Shibuya
 levangahokkaido	Levanga Hokkaido
 superbowl	Super Bowl
 nfldraft	NFL Draft
-qb	QB
-wr	WR
-ol	OL
-td	TD
 stanleycup	Stanley Cup
 nhldraft	NHL Draft
 pgatour	PGA Tour
@@ -5854,7 +5671,6 @@ mguh	MGU-H
 kers	KERS
 vsc	VSC
 dsq	DSQ
-pp	PP
 krush	Krush
 onechampionship	ONE Championship
 bellator	Bellator
