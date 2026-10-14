@@ -2915,6 +2915,19 @@ edit("converter/converter.cc", """    segment->set_key(kana);
   }
   return typed;""")
 
+# 候補の出どころの印（AZ、AZ1、U、B など）: 節: Mozc の確認用の印で、開発用の作り方
+# （ウィンドウズ版の fastbuild）では常に候補の欄に出ていた。設定の「詳しい記録」
+# （verbose_level）が1以上のときだけ出す。
+edit("prediction/dictionary_predictor.cc", """bool IsDebug(const ConversionRequest& request) {
+#ifndef NDEBUG
+  return true;
+#else   // NDEBUG
+  return request.config().verbose_level() >= 1;
+#endif  // NDEBUG
+}""", """bool IsDebug(const ConversionRequest& request) {
+  return request.config().verbose_level() >= 1;
+}""")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
