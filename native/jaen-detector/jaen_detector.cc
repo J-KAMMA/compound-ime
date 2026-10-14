@@ -304,7 +304,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       // jpycdake): an unknown abbreviation or name, kept as typed.
       if (word.size() >= 4 && boundary[i] && boundary[j] &&
           std::all_of(unread.begin() + i, unread.begin() + j, [](bool u) { return u; })) {
-        english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()));
+        english[i].emplace_back(j, kSpanCost - kLengthBonus * static_cast<int64_t>(word.size()));  // as a word with a foreign sign: a listed word wins (chatgpt)
         continue;
       }
       const Lexicon::Place* place = lexicon.FindPlace(word);

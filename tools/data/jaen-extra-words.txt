@@ -19,6 +19,7 @@ cli
 cloudflare
 commit
 config
+crypto
 css
 csv
 debug
