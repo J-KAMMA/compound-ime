@@ -368,7 +368,10 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         for (size_t p = i; p < j && !typed_for_japanese; ++p) {
           typed_for_japanese = small_start[p] && small_in_reading(kana_at[p]);
         }
-        if (sign > 0 && sign < kForeignCost && typed_for_japanese) continue;
+        // A word starting at such a small kana ("lair" in fu|la|iru, ふぁいる)
+        // takes it from its kana whatever else it has (the r left waiting).
+        const bool starts_there = small_start[i] && small_in_reading(kana_at[i]);
+        if (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese)) continue;
       }
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;

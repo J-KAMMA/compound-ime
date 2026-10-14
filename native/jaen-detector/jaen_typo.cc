@@ -191,7 +191,14 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
   // The cheapest kind per distinct reading.
   std::map<std::string, TypoEdit> found;
   const std::string text(raw);
+  // x and l type small kana on purpose; no fix brings one in ("nizyuu" is not
+  // "nixyuu", にゅう).
+  const auto small_keys = [](std::string_view keys) {
+    return std::ranges::count_if(keys, [](char c) { return c == 'x' || c == 'l'; });
+  };
+  const auto typed_small_keys = small_keys(raw);
   const auto add = [&](std::string keys, int prior) {
+    if (small_keys(keys) > typed_small_keys) return;
     std::optional<std::string> kana = reading(keys);
     if (!kana || kana->empty() || *kana == *typed) return;
     const auto it = found.find(*kana);

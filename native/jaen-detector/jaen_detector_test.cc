@@ -34,7 +34,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -75,7 +75,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore", "base"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore", "base", "lair"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -144,7 +144,7 @@ int main() {
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
-    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい"};
+    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい", "ふぁいる"};
     const jaen::ReadingCheck is_reading = [&](std::string_view kana) {
       return readings.contains(std::string(kana));
     };
@@ -164,6 +164,7 @@ int main() {
     Expect(unread("otowokesu").empty(), "を inside stays Japanese (woke in oto|wo|kesu)");
     Expect(unread("baseiwoabiru").empty(), "a reading holding the word and running past it stays Japanese (base in ばせい)");
     Expect(unread("basenishite") == "base|", "with no such reading the word is English (base|ni)");
+    Expect(unread("fulairuwomiru").empty(), "a word starting at such a small kana is no word even with a waiting key (lair in ふぁいる)");
     Expect(english("atoulorettoga") == "lore|", "without the reading check a small kana is a sign (lore)");
     Expect(unread("atoulorettoga").empty(), "a small kana typed for a Japanese word is no sign (ulo of うぉれっと)");
     Expect(unread("londonheikimasu") == "london|", "a small kana in no reading is still a sign (london)");
@@ -327,6 +328,7 @@ int main() {
     Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
     Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
     Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou and uo are not swapped (chuo for ちゅうおう)");
+    Expect(edit("kazukidesu", "kaxukidesu") == std::nullopt, "no fix brings in an x or l small kana (z next to x)");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");
