@@ -5,17 +5,15 @@
 
 For each pair (katakana<TAB>english) whose katakana is a word in Mozc's dictionary, the English
 word gets the katakana word's reading, part of speech and cost plus --penalty, so it comes right
-after the katakana word: コーヒー, then coffee. When the English spelling typed as romaji reads
-differently ("idea" is read いであ, アイデア is あいであ), that reading gets the English word too,
-with the same cost, so typing the spelling also offers it after the katakana word.
+after the katakana word: コーヒー, then coffee. Only the katakana word's reading is used: the
+reading of the English spelling typed as romaji is often a Japanese word ("site" reads して),
+and words typed in English spelling are kept as English by the English-word detector.
 """
 import argparse
 import re
 import sys
 from pathlib import Path
 
-sys.path.insert(0, str(Path(__file__).parent))
-from build_romaji_alias_dictionary import Romaji  # noqa: E402
 
 KATAKANA = re.compile(r"[ァ-ヺー]+")
 HIRAGANA = re.compile(r"[ぁ-ゖー]+")
@@ -31,7 +29,6 @@ def main():
     args = parser.parse_args()
 
     data = args.mozc / "data/dictionary_oss"
-    romaji = Romaji(args.mozc / "data/preedit/romanji-hiragana.tsv")
     katakana_entries = {}  # katakana -> (reading, lid, rid, cost), the cheapest
     existing = set()
     for path in sorted(data.glob("dictionary*.txt")):
@@ -65,9 +62,6 @@ def main():
             continue
         reading, lid, rid, cost = katakana_entries[katakana]
         add(reading, english, lid, rid, cost + args.penalty)
-        spelled = romaji.read(english.replace(" ", "").replace("'", ""))
-        if spelled != reading:
-            add(spelled, english, lid, rid, cost + args.penalty)
 
     with args.out.open("w", encoding="utf-8", newline="\n") as out:
         for (reading, english), (lid, rid, cost) in sorted(entries.items()):
