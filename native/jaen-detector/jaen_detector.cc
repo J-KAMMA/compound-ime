@@ -163,6 +163,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   std::vector<bool> blocked(1, false);  // blocked[i]: i is inside an x?/l? small kana
   std::vector<bool> no_start(1, false);  // no English word starts at i
   std::vector<bool> no_end(1, false);    // no English word ends at i
+  std::vector<bool> unread;              // unread[k]: raw key k was left unread (no kana)
   std::vector<std::string> kana;        // the typed kana, one character each
   std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   for (const Chunk& chunk : chunks) {
@@ -172,6 +173,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     blocked.resize(raw.size() + 1, small);
     no_start.resize(raw.size() + 1, false);
     no_end.resize(raw.size() + 1, false);
+    unread.resize(raw.size(), chunk.conversion.empty());
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
     // Chunks the romaji table formed across a word's last letter count their
@@ -297,6 +299,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         if (it != choices->english.end() && it->second >= kEnglishChoiceCount) {
           learned = it->second;
         }
+      }
+      // Four or more keys in a row the table could not read ("jpyc" of
+      // jpycdake): an unknown abbreviation or name, kept as typed.
+      if (word.size() >= 4 && boundary[i] && boundary[j] &&
+          std::all_of(unread.begin() + i, unread.begin() + j, [](bool u) { return u; })) {
+        english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()));
+        continue;
       }
       const Lexicon::Place* place = lexicon.FindPlace(word);
       const bool signal_only = learned == 0 && !place && !lexicon.Contains(word) && lexicon.IsSignalOnly(word);

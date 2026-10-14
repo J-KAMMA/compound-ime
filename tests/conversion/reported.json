@@ -8,6 +8,26 @@
    "intended": "待ち時間って",
    "alternatives": [],
    "note": "2026-10-14 報告: 街自家NTT絵 になった（nn の2つ目の n から ntt を英単語と判定）"
+  },
+  {
+   "id": "r002",
+   "category": "reported",
+   "romaji": "jpycdaketeniirereba",
+   "intended": "JPYCだけ手に入れれば",
+   "alternatives": [
+    "jpycだけ手に入れれば"
+   ],
+   "note": "2026-10-14 報告: jpyCD開け手に入れれば になった（jpyc が一覧になく cd が英単語に）"
+  },
+  {
+   "id": "r003",
+   "category": "reported",
+   "romaji": "avax",
+   "intended": "AVAX",
+   "alternatives": [
+    "avax"
+   ],
+   "note": "2026-10-14 報告: あvax になった（avax が一覧になく vax が英単語に）"
   }
  ]
 }

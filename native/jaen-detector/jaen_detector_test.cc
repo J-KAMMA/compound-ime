@@ -123,6 +123,9 @@ int main() {
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
   Expect(english("londonniikimasu") == "london|", "a word may end inside nn read as ん (london|ni)");
   Expect(english("matijikanntte").empty(), "no word starts at the second n of nn or ends inside って (ntt in matijikan|nntte)");
+  lexicon.Add("cd", true);
+  Expect(english("jpycdake") == "jpyc|", "four unread keys are an unknown word kept as typed (jpyc|dake, not cd)");
+  Expect(english("tokyp").empty(), "three unread keys stay for the typo fix");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
