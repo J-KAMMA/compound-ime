@@ -63,6 +63,10 @@ struct TypoPriors {
   // Measured on 40 such slips and 421 correct sentences (typo150/150b
   // controls and ja400): a 2000 margin fixes 33 and changes none.
   int long_vowel = -1000;
+  // "uo" typed for ou ("shiryuo", "bentuo"). Costlier than other swaps: the
+  // passport way leaves ou's u out before an o ("chuosen" is 中央線, and
+  // ちょうせん reads 5066 cheaper); the 8 such slips read 6858 or more cheaper.
+  int swapped_uo = 3000;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit

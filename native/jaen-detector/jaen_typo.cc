@@ -227,14 +227,13 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       add(std::move(s), std::string_view("aiueo").find(text[i]) != std::string_view::npos ? priors.doubled_vowel
                                                                    : priors.doubled_consonant);
     }
-    // Neighbors swapped ("kareu"); not "uo"/"ou", where a long vowel was left
-    // out the passport way ("chuosen" is 中央線, not 朝鮮 mistyped).
-    // The ' of n' is no key to swap.
+    // Neighbors swapped ("kareu"); "uo" to ou costs more (see swapped_uo), and
+    // ou is never made uo. The ' of n' is no key to swap.
     if (i + 1 < text.size() && text[i] != text[i + 1] && text[i] != '\'' && text[i + 1] != '\'' &&
-        text.compare(i, 2, "uo") != 0 && text.compare(i, 2, "ou") != 0) {
+        text.compare(i, 2, "ou") != 0) {
       std::string s = text;
       std::swap(s[i], s[i + 1]);
-      add(std::move(s), priors.swapped);
+      add(std::move(s), text.compare(i, 2, "uo") == 0 ? priors.swapped_uo : priors.swapped);
     }
     for (const char n : Neighbors(text[i])) {  // a key next to the right one ("kiagi")
       std::string s = text;
