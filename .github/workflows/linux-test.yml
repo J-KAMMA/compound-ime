@@ -112,6 +112,10 @@ jobs:
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
           python3 $W/repo/tools/score_categories.py $W/results/ja400.tsv $T/ja400.json | head -12
+          # 利用者が見つけた失敗（毎回確かめる）
+          python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/reported.json > $W/reported.txt
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/reported.txt $W/results/reported.tsv 1
+          python3 $W/repo/tools/score_categories.py $W/results/reported.tsv $T/reported.json
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
           python3 $W/repo/tools/compare_results.py $T/expected-windows-139.tsv $W/results/inputs.tsv | head -60
 

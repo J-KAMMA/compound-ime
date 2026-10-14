@@ -1,0 +1,13 @@
+{
+ "description": "利用者が実際に打って見つけた失敗。毎回の試験で確かめ、二度と起きないようにする。",
+ "items": [
+  {
+   "id": "r001",
+   "category": "reported",
+   "romaji": "matijikanntte",
+   "intended": "待ち時間って",
+   "alternatives": [],
+   "note": "2026-10-14 報告: 街自家NTT絵 になった（nn の2つ目の n から ntt を英単語と判定）"
+  }
+ ]
+}

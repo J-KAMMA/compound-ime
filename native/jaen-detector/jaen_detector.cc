@@ -161,6 +161,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   std::string raw;
   std::vector<bool> boundary(1, true);  // boundary[i]: i is an original chunk edge
   std::vector<bool> blocked(1, false);  // blocked[i]: i is inside an x?/l? small kana
+  std::vector<bool> no_start(1, false);  // no English word starts at i
+  std::vector<bool> no_end(1, false);    // no English word ends at i
   std::vector<std::string> kana;        // the typed kana, one character each
   std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   for (const Chunk& chunk : chunks) {
@@ -168,6 +170,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     raw += chunk.raw;
     boundary.resize(raw.size() + 1, false);
     blocked.resize(raw.size() + 1, small);
+    no_start.resize(raw.size() + 1, false);
+    no_end.resize(raw.size() + 1, false);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
     // Chunks the romaji table formed across a word's last letter count their
@@ -187,6 +191,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       boundary[start + 1] = true;  // "dhe" read as でぇ: "madrid|he"
     } else if (r.size() == 2 && Lower(r[0]) == 'n' && Lower(r[1]) == 'n') {
       boundary[start + 1] = true;  // "nn" read as ん: "berlin|ni", "darwin|no"
+      no_start[start + 1] = true;  // but no word starts at its second n ("matijikan|ntt|e")
+    }
+    // A doubled key read as っ ("tte" って): a word may end after the first
+    // key ("meeting|ga" in gga) but not before the vowel ("ntt|e").
+    if (!chunk.conversion.empty() && chunk.conversion.starts_with("っ") && !small && r.size() >= 3) {
+      for (size_t k = 2; k < r.size(); ++k) no_end[start + k] = true;
     }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];
@@ -270,9 +280,9 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   // English candidates by start position: (end, cost).
   std::vector<std::vector<std::pair<size_t, int64_t>>> english(n);
   for (size_t i = 0; i < n; ++i) {
-    if (blocked[i]) continue;
+    if (blocked[i] || no_start[i]) continue;
     for (size_t j = i + 1; j <= std::min(n, i + kMaxWordLength); ++j) {
-      if (blocked[j]) continue;  // never split っ typed as xtu, ぅ as xu, ...
+      if (blocked[j] || no_end[j]) continue;  // never split っ typed as xtu, ぅ as xu, ...
       if (inside_japanese(i, j)) continue;
       // c or t before "ch" is the っ of っち ("nec" in necchuu, "pet" in
       // petchi): no English word ends there. Other doubled keys stay possible
