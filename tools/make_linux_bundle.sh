@@ -37,6 +37,20 @@ done
 rm -rf $L/AzooKeyKanaKanjiConverter_KanaKanjiConverterModuleWithDefaultDictionary.resources/EmojiDictionary
 cp "$REPO/docs/credits_en.html" $OUT/credits_en.html
 cp "$REPO/LICENSE" $OUT/LICENSE
+# 新しい版のお知らせ: 版の番号、台本、ログイン時の自動起動（止め方は tools/update-check/README.md）
+echo "$V" > $L/version.txt
+cp "$REPO/tools/update-check/update_check.sh" $L/update_check.sh
+chmod +x $L/update_check.sh
+mkdir -p $OUT/files/etc/xdg/autostart
+cat > $OUT/files/etc/xdg/autostart/compound-ime-update-check.desktop <<'EOD'
+[Desktop Entry]
+Type=Application
+Name=CompoundIME update check
+Name[ja]=コンパウンドIME 新しい版のお知らせ
+Exec=/usr/lib/compound-ime/update_check.sh
+NoDisplay=true
+X-GNOME-Autostart-enabled=true
+EOD
 
 cat > $OUT/install.sh <<'EOS'
 #!/bin/bash
@@ -69,7 +83,7 @@ set -e
 [ "$(id -u)" = 0 ] || { echo "sudo ./uninstall.sh で実行してください"; exit 1; }
 rm -rf /usr/lib/compound-ime /usr/lib/ibus-compound-ime /usr/share/ibus-compound-ime \
        /usr/share/icons/compound-ime /usr/share/compound-ime /usr/share/doc/compound-ime
-rm -f /usr/share/ibus/component/compound-ime.xml
+rm -f /usr/share/ibus/component/compound-ime.xml /etc/xdg/autostart/compound-ime-update-check.desktop
 echo "外しました。ibus を再起動してください: ibus restart"
 EOS
 chmod +x $OUT/install.sh $OUT/uninstall.sh
