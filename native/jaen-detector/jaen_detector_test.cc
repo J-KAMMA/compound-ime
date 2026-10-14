@@ -75,7 +75,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -117,7 +117,10 @@ int main() {
   Expect(english("meetinggaarimasu") == "meeting|", "-ng before ga: んっ is not Japanese");
   Expect(english("seatwokau") == "seat|", "a word before the particle wo, not \"two\" (sea|two)");
   Expect(english("testshita") == "test|", "no word ends inside shi (tests|hita)");
+  Expect(english("setshita") == "set|", "set|shita, not sets|hita");
+  Expect(english("campushahiroi") == "campus|", "campus|ha stays: campu is no word");
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
+  Expect(english("londonniikimasu") == "london|", "a word may end inside nn read as ん (london|ni)");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");

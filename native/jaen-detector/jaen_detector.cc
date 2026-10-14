@@ -17,6 +17,7 @@ constexpr int64_t kWeakForeignCost = 150;  // per rare-but-Japanese chunk (one w
 constexpr int64_t kSpanCost = 100;      // minus kLengthBonus per letter
 constexpr int64_t kLengthBonus = 3;     // longer words win ("sheet|wo" over "shee|two")
 constexpr int64_t kCutCost = 5;         // English edge inside an original chunk
+constexpr int64_t kStealCost = 50;      // a word ending in the s of shi, the c of chi, the t of tsu
 
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
@@ -169,13 +170,23 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     blocked.resize(raw.size() + 1, small);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
-    // "two" read as とぉ (also dwo, kwo...) is a word ending in t, d, k...
-    // and the particle wo ("seat|wo", "git|wo"): the edge before "wo" counts
-    // as a chunk edge.
-    if (const std::string_view r = chunk.raw;
-        r.size() == 3 && IsAsciiAlpha(r[0]) && !IsVowel(r[0]) && Lower(r[0]) != 'w' && Lower(r[0]) != 'n' &&
-        Lower(r[1]) == 'w' && Lower(r[2]) == 'o') {
-      boundary[raw.size() - 2] = true;
+    // Chunks the romaji table formed across a word's last letter count their
+    // inner edges as chunk edges too:
+    const std::string_view r = chunk.raw;
+    const size_t start = raw.size() - r.size();
+    const auto consonant = [](char c) { return IsAsciiAlpha(c) && !IsVowel(c); };
+    if (chunk.conversion.empty()) {
+      // keys still waiting for more ("ts" of "set|shita", "xw" of "ux|wo",
+      // "lw" of "mail|wo"): no kana is cut there.
+      for (size_t k = 1; k < r.size(); ++k) boundary[start + k] = true;
+    } else if (r.size() == 3 && consonant(r[0]) && Lower(r[0]) != 'w' && Lower(r[0]) != 'n' &&
+               Lower(r[1]) == 'w' && Lower(r[2]) == 'o') {
+      boundary[start + 1] = true;  // "two" read as とぉ: "seat|wo", "git|wo"
+    } else if (r.size() == 3 && consonant(r[0]) && Lower(r[0]) != 's' && Lower(r[0]) != 'c' &&
+               Lower(r[1]) == 'h' && IsVowel(r[2])) {
+      boundary[start + 1] = true;  // "dhe" read as でぇ: "madrid|he"
+    } else if (r.size() == 2 && Lower(r[0]) == 'n' && Lower(r[1]) == 'n') {
+      boundary[start + 1] = true;  // "nn" read as ん: "berlin|ni", "darwin|no"
     }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];
@@ -248,6 +259,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   const auto word_across = [&](size_t e) {
     for (size_t a = e >= kMaxWordLength ? e - kMaxWordLength : 0; a < e; ++a) {
       for (size_t b = std::max(e + 1, a + 3); b <= std::min(n, a + kMaxWordLength); ++b) {
+        // Only the second n of "nn" past the edge ("inn" over "berlin|ni").
+        if (b == e + 1 && Lower(raw[e - 1]) == 'n' && Lower(raw[e]) == 'n') continue;
         if (lexicon.Contains(std::string_view(raw).substr(a, b - a))) return true;
       }
     }
@@ -298,6 +311,17 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
+      }
+      // A word ending in the first letter of sh, ch or tsu, when the word
+      // without it is a word too ("sets|hita": the s of shi), likely took it
+      // from the kana after it: "set|shita" wins; "campus|ha" stays.
+      if (cost && j < n && word.size() > 3 && lexicon.Contains(word.substr(0, word.size() - 1))) {
+        const char last = Lower(raw[j - 1]);
+        const char after = Lower(raw[j]);
+        if (((last == 's' || last == 'c') && after == 'h') ||
+            (last == 't' && after == 's' && j + 1 < n && Lower(raw[j + 1]) == 'u')) {
+          *cost += kStealCost;
+        }
       }
       if (cost) english[i].emplace_back(j, *cost + edge_cost(i) + edge_cost(j));
     }
