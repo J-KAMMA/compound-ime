@@ -117,6 +117,13 @@ jobs:
           path: bin/
           retention-days: 1
 
+      # 英単語の一覧（build_english_lexicon.py の出力）: ウィンドウズ版を手元で組み立てるときに使う
+      - uses: actions/upload-artifact@v4
+        with:
+          name: english-lexicon
+          path: lex/
+          retention-days: 14
+
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
   test:
     needs: build
