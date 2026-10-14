@@ -21,6 +21,7 @@ Output: id<TAB>style<TAB>romaji<TAB>intended<TAB>alternatives (| separated).
 """
 import argparse
 import json
+import re
 from pathlib import Path
 
 SMALL = set("ぁぃぅぇぉゃゅょゎ")
@@ -143,6 +144,11 @@ def write(kana, style, rev):
     return "".join(out)
 
 
+def norm(raw):
+    """Romaji with ん written one way (nn, n', n before a consonant: n)."""
+    return re.sub(r"nn|n'", "n", raw)
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--table", required=True)
@@ -163,8 +169,12 @@ def main():
     lines, skipped = [], 0
     for item in items:
         kana = to_kana(item["romaji"], table)
-        if any(c.isascii() and c.isalpha() for c in kana):
-            skipped += 1  # English typed as is: no kana to write again
+        # English typed as is (kana left with letters, or l/x/q/v/c keys of
+        # words such as lemon or vitamin) has no kana to write again; a line
+        # whose base writing is not what was typed (youtube: youtsube) neither.
+        if (any(c.isascii() and c.isalpha() for c in kana) or re.search(r"[lxqv]|c(?!h)", item["romaji"])
+                or norm(write(kana, "base", rev) or "") != norm(item["romaji"])):
+            skipped += 1
             continue
         seen = set()
         for style in STYLES:
@@ -175,7 +185,7 @@ def main():
             alts = "|".join(item.get("alternatives", []))
             lines.append(f"{item['id']}\t{style}\t{raw}\t{item['intended']}\t{alts}")
     Path(args.out).write_text("\n".join(lines) + "\n", encoding="utf-8", newline="\n")
-    print(f"{len(lines)} lines, {skipped} sentences with English skipped")
+    print(f"{len(lines)} lines, {skipped} sentences skipped (English or another base writing)")
 
 
 if __name__ == "__main__":

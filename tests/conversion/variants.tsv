@@ -648,13 +648,6 @@ j173	base	goninnnihitorigasannseishita	5人に1人が賛成した	五人に一�
 j173	kunrei	goninnnihitorigasannseisita	5人に1人が賛成した	五人に一人が賛成した
 j173	n_x	gonixnnihitorigasaxnseishita	5人に1人が賛成した	五人に一人が賛成した
 j173	n_apos	gonin'nihitorigasan'seishita	5人に1人が賛成した	五人に一人が賛成した
-j174	base	kokonokakannnoshutchou	9日間の出張	九日間の出張
-j174	kunrei	kokonokakannnosyuttyou	9日間の出張	九日間の出張
-j174	small_l	kokonokakannnoshilyutchilyou	9日間の出張	九日間の出張
-j174	small_x	kokonokakannnoshixyutchixyou	9日間の出張	九日間の出張
-j174	tsu_l	kokonokakannnoshultuchou	9日間の出張	九日間の出張
-j174	n_x	kokonokakaxnnoshutchou	9日間の出張	九日間の出張
-j174	n_apos	kokonokakan'noshutchou	9日間の出張	九日間の出張
 j175	base	nisennnijuurokunennnokeikaku	2026年の計画	二〇二六年の計画
 j175	kunrei	nisennnizyuurokunennnokeikaku	2026年の計画	二〇二六年の計画
 j175	small_l	nisennnijilyuurokunennnokeikaku	2026年の計画	二〇二六年の計画
@@ -1010,13 +1003,6 @@ j260	base	me-runohennshinnwomatsu	メールの返信を待つ
 j260	kunrei	me-runohennsinnwomatu	メールの返信を待つ	
 j260	n_x	me-runohexnshixnwomatsu	メールの返信を待つ	
 j260	n_apos	me-runohen'shin'womatsu	メールの返信を待つ	
-j261	base	soremetchaiijann	それめっちゃいいじゃん	
-j261	kunrei	soremettyaiizyann	それめっちゃいいじゃん	
-j261	small_l	soremetchilyaiijilyann	それめっちゃいいじゃん	
-j261	small_x	soremetchixyaiijixyann	それめっちゃいいじゃん	
-j261	tsu_l	soremeltuchaiijann	それめっちゃいいじゃん	
-j261	n_x	soremetchaiijaxn	それめっちゃいいじゃん	
-j261	n_apos	soremetchaiijan'	それめっちゃいいじゃん	
 j262	base	konoke-kiyabaioishii	このケーキやばいおいしい	このケーキやばい美味しい|このケーキヤバいおいしい|このケーキヤバい美味しい
 j262	kunrei	konoke-kiyabaioisii	このケーキやばいおいしい	このケーキやばい美味しい|このケーキヤバいおいしい|このケーキヤバい美味しい
 j263	base	nannkatsukaretappoi	なんか疲れたっぽい	
@@ -1109,16 +1095,6 @@ j292	base	kyoumootsukare-	今日もお疲れー	今日もおつかれー
 j292	kunrei	kyoumootukare-	今日もお疲れー	今日もおつかれー
 j292	small_l	kilyoumootsukare-	今日もお疲れー	今日もおつかれー
 j292	small_x	kixyoumootsukare-	今日もお疲れー	今日もおつかれー
-j293	base	isshonigannbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	kunrei	issyonigannbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	small_l	isshilyonigannbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	small_x	isshixyonigannbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	tsu_l	iltushonigannbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	n_x	isshonigaxnbaroltu	一緒に頑張ろっ	一緒にがんばろっ
-j293	n_apos	isshonigan'baroltu	一緒に頑張ろっ	一緒にがんばろっ
-j294	base	sotchiittemoii	そっち行ってもいい	
-j294	kunrei	sottiittemoii	そっち行ってもいい	
-j294	tsu_l	soltuchiiltutemoii	そっち行ってもいい	
 j295	base	nanndeyanenn	なんでやねん	
 j295	n_x	naxndeyanexn	なんでやねん	
 j295	n_apos	nan'deyanen'	なんでやねん	
@@ -1680,12 +1656,6 @@ inputs61	small_l	ashitanokaigishirilyouwojilyunnbisuru
 inputs61	small_x	ashitanokaigishirixyouwojixyunnbisuru		
 inputs61	n_x	ashitanokaigishiryouwojuxnbisuru		
 inputs61	n_apos	ashitanokaigishiryouwojun'bisuru		
-inputs64	base	ashitanomeechinngwotsuika		
-inputs64	kunrei	asitanomeetinngwotuika		
-inputs64	small_l	ashitanomeechinngulotsuika		
-inputs64	small_x	ashitanomeechinnguxotsuika		
-inputs64	n_x	ashitanomeechixngwotsuika		
-inputs64	n_apos	ashitanomeechin'gwotsuika		
 inputs65	base	ashitanotennkihakumorida		
 inputs65	kunrei	asitanotennkihakumorida		
 inputs65	n_x	ashitanotexnkihakumorida		
@@ -1782,19 +1752,6 @@ inputs109	small_l	bilyouinnnoishi
 inputs109	small_x	bixyouinnnoishi		
 inputs109	n_x	byouixnnoishi		
 inputs109	n_apos	byouin'noishi		
-inputs111	base	kameranorennzuwokau		
-inputs111	n_x	kameranorexnzuwokau		
-inputs111	n_apos	kameranoren'zuwokau		
-inputs112	base	kamerawomottekita		
-inputs112	tsu_l	kamerawomoltutekita		
-inputs113	base	kamerawoyouishite		
-inputs113	kunrei	kamerawoyouisite		
-inputs115	base	kannvadepo-suta-wotsukuru		
-inputs115	kunrei	kannvadepo-suta-wotukuru		
-inputs115	small_l	kannvuladepo-suta-wotsukuru		
-inputs115	small_x	kannvuxadepo-suta-wotsukuru		
-inputs115	n_x	kaxnvadepo-suta-wotsukuru		
-inputs115	n_apos	kan'vadepo-suta-wotsukuru		
 inputs119	base	cheeseke-kiwoyaku		
 inputs119	small_l	chileeseke-kiwoyaku		
 inputs119	small_x	chixeeseke-kiwoyaku		
@@ -1806,10 +1763,6 @@ inputs121	n_x	chiraxnnobukeyashikiwomita
 inputs121	n_apos	chiran'nobukeyashikiwomita		
 inputs122	base	chizuwominagaraaruku		
 inputs122	kunrei	tizuwominagaraaruku		
-inputs123	base	chokoxatewotabesugita		
-inputs123	kunrei	tyokoxatewotabesugita		
-inputs123	small_l	chilyokolatewotabesugita		
-inputs123	small_x	chixyokoxatewotabesugita		
 inputs124	base	chofudekaimonowosuru		
 inputs124	kunrei	tyohudekaimonowosuru		
 inputs124	small_l	chilyofudekaimonowosuru		
@@ -1843,15 +1796,6 @@ inputs134	small_l	chilyuosennhadaitaikonnderu
 inputs134	small_x	chixyuosennhadaitaikonnderu		
 inputs134	n_x	chuosexnhadaitaikoxnderu		
 inputs134	n_apos	chuosen'hadaitaikon'deru		
-inputs135	base	shinopipexinewonaoshita		
-inputs135	kunrei	sinopipexinewonaosita		
-inputs135	small_l	shinopipelinewonaoshita		
-inputs138	base	koffeewonomitai		
-inputs138	small_l	koffuleewonomitai		
-inputs138	small_x	koffuxeewonomitai		
-inputs138	tsu_l	koltufeewonomitai		
-inputs142	base	kookiewoyuukounishite		
-inputs142	kunrei	kookiewoyuukounisite		
 inputs146	base	daigakunojukennbennkyouwosuru		
 inputs146	kunrei	daigakunozyukennbennkyouwosuru		
 inputs146	small_l	daigakunojilyukennbennkilyouwosuru		
@@ -2094,9 +2038,6 @@ inputs242	small_x	gotoshinnpeihaishixyadatta
 inputs242	tsu_l	gotoshinnpeihaishadaltuta		
 inputs242	n_x	gotoshixnpeihaishadatta		
 inputs242	n_apos	gotoshin'peihaishadatta		
-inputs243	base	gusshinobaggugahoshii		
-inputs243	kunrei	gussinobaggugahosii		
-inputs243	tsu_l	gultushinobaltugugahoshii		
 inputs245	base	gyakubaridekabuwokatta		
 inputs245	small_l	gilyakubaridekabuwokatta		
 inputs245	small_x	gixyakubaridekabuwokatta		
@@ -2319,8 +2260,6 @@ inputs323	base	ichibannmaenosekigaii
 inputs323	kunrei	itibannmaenosekigaii		
 inputs323	n_x	ichibaxnmaenosekigaii		
 inputs323	n_apos	ichiban'maenosekigaii		
-inputs324	base	idekowohajimeru		
-inputs324	kunrei	idekowohazimeru		
 inputs325	base	idou		
 inputs327	base	iemonnwokattekite		
 inputs327	tsu_l	iemonnwokaltutekite		
@@ -2956,11 +2895,6 @@ inputs543	small_x	konomichihakoujichixyuunanodehitotsusakinokadowomagarimasu
 inputs544	base	konomichiwomassuguiku		
 inputs544	kunrei	konomitiwomassuguiku		
 inputs544	tsu_l	konomichiwomaltusuguiku		
-inputs545	base	konomisenokoffeehaoishii		
-inputs545	kunrei	konomisenokoffeehaoisii		
-inputs545	small_l	konomisenokoffuleehaoishii		
-inputs545	small_x	konomisenokoffuxeehaoishii		
-inputs545	tsu_l	konomisenokoltufeehaoishii		
 inputs546	base	konomisenopasutahaoishii		
 inputs546	kunrei	konomisenopasutahaoisii		
 inputs547	base	konomonndaihamuzukashii		
@@ -3107,13 +3041,6 @@ inputs592	tsu_l	kutsushitawoaraltuteoite
 inputs593	base	kutsuwonuidekaraheyanihaittekudasai		
 inputs593	kunrei	kutuwonuidekaraheyanihaittekudasai		
 inputs593	tsu_l	kutsuwonuidekaraheyanihailtutekudasai		
-inputs594	base	kutchanndeyukiasobiwosuru		
-inputs594	kunrei	kuttyanndeyukiasobiwosuru		
-inputs594	small_l	kutchilyanndeyukiasobiwosuru		
-inputs594	small_x	kutchixyanndeyukiasobiwosuru		
-inputs594	tsu_l	kultuchanndeyukiasobiwosuru		
-inputs594	n_x	kutchaxndeyukiasobiwosuru		
-inputs594	n_apos	kutchan'deyukiasobiwosuru		
 inputs595	base	kuukaigakouyasannwohiraita		
 inputs595	n_x	kuukaigakouyasaxnwohiraita		
 inputs595	n_apos	kuukaigakouyasan'wohiraita		
@@ -3177,12 +3104,6 @@ inputs611	base	kyouhakitanokazegatsuyoi
 inputs611	kunrei	kyouhakitanokazegatuyoi		
 inputs611	small_l	kilyouhakitanokazegatsuyoi		
 inputs611	small_x	kixyouhakitanokazegatsuyoi		
-inputs612	base	kyouhaonnlinedejugyougaaru		
-inputs612	kunrei	kyouhaonnlinedezyugyougaaru		
-inputs612	small_l	kilyouhaonnlinedejilyugilyougaaru		
-inputs612	small_x	kixyouhaonnlinedejixyugixyougaaru		
-inputs612	n_x	kyouhaoxnlinedejugyougaaru		
-inputs612	n_apos	kyouhaon'linedejugyougaaru		
 inputs614	base	kyouhatennkigaiidesune		
 inputs614	small_l	kilyouhatennkigaiidesune		
 inputs614	small_x	kixyouhatennkigaiidesune		
@@ -3231,33 +3152,6 @@ inputs626	base	kyuuniamegafuridashita
 inputs626	kunrei	kyuuniamegahuridasita		
 inputs626	small_l	kilyuuniamegafuridashita		
 inputs626	small_x	kixyuuniamegafuridashita		
-inputs627	base	lemonnwokakeru		
-inputs627	n_x	lemoxnwokakeru		
-inputs627	n_apos	lemon'wokakeru		
-inputs628	base	linederennrakushimasu		
-inputs628	kunrei	linederennrakusimasu		
-inputs628	n_x	linederexnrakushimasu		
-inputs628	n_apos	linederen'rakushimasu		
-inputs629	base	linenogu-rupunihairu		
-inputs630	base	linnkwoharimasu		
-inputs630	small_l	linnkuloharimasu		
-inputs630	small_x	linnkuxoharimasu		
-inputs630	n_x	lixnkwoharimasu		
-inputs630	n_apos	lin'kwoharimasu		
-inputs631	base	linunnokomanndowooboeru		
-inputs631	n_x	linuxnokomaxndowooboeru		
-inputs631	n_apos	linun'okoman'dowooboeru		
-inputs633	base	loannwokumu		
-inputs633	n_x	loaxnwokumu		
-inputs633	n_apos	loan'wokumu		
-inputs634	base	loginnishippaishita		
-inputs634	kunrei	loginnisippaisita		
-inputs634	tsu_l	loginnishiltupaishita		
-inputs634	n_x	logixnishippaishita		
-inputs634	n_apos	login'ishippaishita		
-inputs635	base	lonndonnheikimasu		
-inputs635	n_x	loxndoxnheikimasu		
-inputs635	n_apos	lon'don'heikimasu		
 inputs637	base	mabushii		
 inputs637	kunrei	mabusii		
 inputs640	base	machigaeteitaraoshieteitadakemasennka		
@@ -3345,12 +3239,6 @@ inputs667	base	matsutouyayuminokonnsa-toniiku
 inputs667	kunrei	matutouyayuminokonnsa-toniiku		
 inputs667	n_x	matsutouyayuminokoxnsa-toniiku		
 inputs667	n_apos	matsutouyayuminokon'sa-toniiku		
-inputs668	base	meechinngwoennchoushimasu		
-inputs668	kunrei	meetinngwoenntyousimasu		
-inputs668	small_l	meechinnguloennchilyoushimasu		
-inputs668	small_x	meechinnguxoennchixyoushimasu		
-inputs668	n_x	meechixngwoexnchoushimasu		
-inputs668	n_apos	meechin'gwoen'choushimasu		
 inputs669	base	meitannteikonannwomaishuumiru		
 inputs669	kunrei	meitannteikonannwomaisyuumiru		
 inputs669	small_l	meitannteikonannwomaishilyuumiru		
@@ -3437,11 +3325,6 @@ inputs695	kunrei	mousugutukimasu
 inputs696	base	mousukoshiyukkurihanashite		
 inputs696	kunrei	mousukosiyukkurihanasite		
 inputs696	tsu_l	mousukoshiyultukurihanashite		
-inputs697	base	movienochikettowokatta		
-inputs697	kunrei	movienotikettowokatta		
-inputs697	small_l	movulienochikettowokatta		
-inputs697	small_x	movuxienochikettowokatta		
-inputs697	tsu_l	movienochikeltutowokaltuta		
 inputs698	base	mozukofunngunnwokenngakushita		
 inputs698	kunrei	mozukohunngunnwokenngakusita		
 inputs698	n_x	mozukofuxnguxnwokexngakushita		
@@ -3621,10 +3504,6 @@ inputs752	small_x	notebookuxohiraku
 inputs753	base	notebookwowasureta		
 inputs753	small_l	notebookulowasureta		
 inputs753	small_x	notebookuxowasureta		
-inputs754	base	nochionnono-towoseirisuru		
-inputs754	kunrei	notionnono-towoseirisuru		
-inputs754	n_x	nochioxnono-towoseirisuru		
-inputs754	n_apos	nochion'ono-towoseirisuru		
 inputs755	base	noukousesshokushaninatta		
 inputs755	kunrei	noukousessyokusyaninatta		
 inputs755	small_l	noukousesshilyokushilyaninatta		
@@ -3793,10 +3672,6 @@ inputs809	n_apos	on'gakuwokiiteyasumu
 inputs810	base	onnkounaseikaku		
 inputs810	n_x	oxnkounaseikaku		
 inputs810	n_apos	on'kounaseikaku		
-inputs811	base	onnlinedeshiharau		
-inputs811	kunrei	onnlinedesiharau		
-inputs811	n_x	oxnlinedeshiharau		
-inputs811	n_apos	on'linedeshiharau		
 inputs812	base	onomichidera-mennwotabeta		
 inputs812	kunrei	onomitidera-mennwotabeta		
 inputs812	n_x	onomichidera-mexnwotabeta		
@@ -3940,23 +3815,12 @@ inputs859	small_x	pa-texi-nojixyunnbigaowatta
 inputs859	tsu_l	pa-thi-nojunnbigaowaltuta		
 inputs859	n_x	pa-thi-nojuxnbigaowatta		
 inputs859	n_apos	pa-thi-nojun'bigaowatta		
-inputs860	base	pa-chi-niikitai		
-inputs860	kunrei	pa-ti-niikitai		
 inputs861	base	panndanoakachannwomita		
 inputs861	kunrei	panndanoakatyannwomita		
 inputs861	small_l	panndanoakachilyannwomita		
 inputs861	small_x	panndanoakachixyannwomita		
 inputs861	n_x	paxndanoakachaxnwomita		
 inputs861	n_apos	pan'danoakachan'womita		
-inputs862	base	papahaoffisedehataraiteiru		
-inputs862	small_l	papahaoffulisedehataraiteiru		
-inputs862	small_x	papahaoffuxisedehataraiteiru		
-inputs862	tsu_l	papahaoltufisedehataraiteiru		
-inputs863	base	parisheshutchousuru		
-inputs863	kunrei	parishesyuttyousuru		
-inputs863	small_l	parishileshilyutchilyousuru		
-inputs863	small_x	parishixeshixyutchixyousuru		
-inputs863	tsu_l	parisheshultuchousuru		
 inputs865	base	pasokonngakoshoushita		
 inputs865	kunrei	pasokonngakosyousita		
 inputs865	small_l	pasokonngakoshilyoushita		
@@ -3986,13 +3850,6 @@ inputs880	n_x	pixnwoiretekudasai
 inputs880	n_apos	pin'woiretekudasai		
 inputs881	base	pizzawotabetai		
 inputs881	tsu_l	piltuzawotabetai		
-inputs882	base	pizzayasaxadwochuumonnshita		
-inputs882	kunrei	pizzayasaxadwotyuumonnsita		
-inputs882	small_l	pizzayasaladolochilyuumonnshita		
-inputs882	small_x	pizzayasaxadoxochixyuumonnshita		
-inputs882	tsu_l	piltuzayasaxadwochuumonnshita		
-inputs882	n_x	pizzayasaxadwochuumoxnshita		
-inputs882	n_apos	pizzayasaxadwochuumon'shita		
 inputs884	base	poketto		
 inputs884	tsu_l	pokeltuto		
 inputs895	base	rainennkekkonnsuru		
@@ -4015,16 +3872,9 @@ inputs898	base	rakutenndepoinntogatamatta
 inputs898	tsu_l	rakutenndepoinntogatamaltuta		
 inputs898	n_x	rakutexndepoixntogatamatta		
 inputs898	n_apos	rakuten'depoin'togatamatta		
-inputs900	base	reshipewominagaratsukutta		
-inputs900	kunrei	resipewominagaratukutta		
-inputs900	tsu_l	reshipewominagaratsukultuta		
 inputs901	base	reizoukoniireteoku		
 inputs902	base	reizoukowosoujishimasu		
 inputs902	kunrei	reizoukowosouzisimasu		
-inputs903	base	rexeasegaraishuuninobita		
-inputs903	kunrei	rexeasegaraisyuuninobita		
-inputs903	small_l	releasegaraishilyuuninobita		
-inputs903	small_x	rexeasegaraishixyuuninobita		
 inputs904	base	rennrakusaki		
 inputs904	n_x	rexnrakusaki		
 inputs904	n_apos	ren'rakusaki		
@@ -4128,10 +3978,6 @@ inputs937	base	sakuragasaita
 inputs938	base	sakuragasakukisetsuninatta		
 inputs938	kunrei	sakuragasakukisetuninatta		
 inputs938	tsu_l	sakuragasakukisetsuninaltuta		
-inputs939	base	saxedefukuwokatta		
-inputs939	kunrei	saxedehukuwokatta		
-inputs939	small_l	saledefukuwokatta		
-inputs939	tsu_l	saxedefukuwokaltuta		
 inputs940	base	samegaoyoideiru		
 inputs941	base	samenaiuchinichawannniyosoimashita		
 inputs941	kunrei	samenaiutinityawannniyosoimasita		
@@ -4142,8 +3988,6 @@ inputs941	n_apos	samenaiuchinichawan'niyosoimashita
 inputs942	base	samerumaenigohannwotabeyou		
 inputs942	n_x	samerumaenigohaxnwotabeyou		
 inputs942	n_apos	samerumaenigohan'wotabeyou		
-inputs943	base	sameshizedeonegaishimasu		
-inputs943	kunrei	samesizedeonegaisimasu		
 inputs944	base	samewomita		
 inputs945	base	sanadayukimuragaoosakadetatakatta		
 inputs945	tsu_l	sanadayukimuragaoosakadetatakaltuta		
@@ -4701,13 +4545,6 @@ inputs1131	n_x	tashikametekaradenaitohexnkoudekimasexn
 inputs1131	n_apos	tashikametekaradenaitohen'koudekimasen'		
 inputs1133	base	tatamisugirutoshiwaninariyasui		
 inputs1133	kunrei	tatamisugirutosiwaninariyasui		
-inputs1134	base	taxidekuukoumadeitta		
-inputs1134	small_l	talidekuukoumadeitta		
-inputs1134	tsu_l	taxidekuukoumadeiltuta		
-inputs1135	base	tannitsuiteshiraberu		
-inputs1135	kunrei	tannituitesiraberu		
-inputs1135	n_x	taxnitsuiteshiraberu		
-inputs1135	n_apos	tan'itsuiteshiraberu		
 inputs1139	base	tebukurowohametekarasoujiwohajimemasu		
 inputs1139	kunrei	tebukurowohametekarasouziwohazimemasu		
 inputs1140	base	tedukaosamunomanngawoatsumeru		
@@ -4901,10 +4738,6 @@ inputs1211	kunrei	uiwokairyousita
 inputs1211	small_l	uiwokairilyoushita		
 inputs1211	small_x	uiwokairixyoushita		
 inputs1213	base	uketori		
-inputs1214	base	ukwelewonaraihajimeta		
-inputs1214	kunrei	ukwelewonaraihazimeta		
-inputs1214	small_l	ukulelewonaraihajimeta		
-inputs1214	small_x	ukuxelewonaraihajimeta		
 inputs1217	base	unntennwoyameru		
 inputs1217	n_x	uxntexnwoyameru		
 inputs1217	n_apos	un'ten'woyameru		
@@ -4922,33 +4755,7 @@ inputs1221	n_x	utagawahiroshigenohaxngawokazaru
 inputs1221	n_apos	utagawahiroshigenohan'gawokazaru		
 inputs1222	base	utsusu		
 inputs1222	kunrei	utusu		
-inputs1223	base	webudeyoyakushita		
-inputs1223	kunrei	webudeyoyakusita		
-inputs1223	small_l	ulebudeyoyakushita		
-inputs1223	small_x	uxebudeyoyakushita		
 inputs1224	base	uzumasanoeigamuraniiku		
-inputs1225	base	videonikomenntoshita		
-inputs1225	kunrei	videonikomenntosita		
-inputs1225	small_l	vulideonikomenntoshita		
-inputs1225	small_x	vuxideonikomenntoshita		
-inputs1225	n_x	videonikomexntoshita		
-inputs1225	n_apos	videonikomen'toshita		
-inputs1226	base	videowoeranndekudasai		
-inputs1226	small_l	vulideowoeranndekudasai		
-inputs1226	small_x	vuxideowoeranndekudasai		
-inputs1226	n_x	videowoeraxndekudasai		
-inputs1226	n_apos	videowoeran'dekudasai		
-inputs1227	base	visanoshinnseiwosuru		
-inputs1227	kunrei	visanosinnseiwosuru		
-inputs1227	small_l	vulisanoshinnseiwosuru		
-inputs1227	small_x	vuxisanoshinnseiwosuru		
-inputs1227	n_x	visanoshixnseiwosuru		
-inputs1227	n_apos	visanoshin'seiwosuru		
-inputs1228	base	vitaminnwotoru		
-inputs1228	small_l	vulitaminnwotoru		
-inputs1228	small_x	vuxitaminnwotoru		
-inputs1228	n_x	vitamixnwotoru		
-inputs1228	n_apos	vitamin'wotoru		
 inputs1229	base	wakaranakerebaennryonakukiitekudasai		
 inputs1229	small_l	wakaranakerebaennrilyonakukiitekudasai		
 inputs1229	small_x	wakaranakerebaennrixyonakukiitekudasai		
@@ -5065,12 +4872,6 @@ inputs1270	small_l	youmeishilyuwosukoshidakenomu
 inputs1270	small_x	youmeishixyuwosukoshidakenomu		
 inputs1271	base	youshi		
 inputs1271	kunrei	yousi		
-inputs1272	base	youtsubededougawomita		
-inputs1272	kunrei	youtubededougawomita		
-inputs1273	base	youtsubedemita		
-inputs1273	kunrei	youtubedemita		
-inputs1274	base	youtsubedenekonodougawomita		
-inputs1274	kunrei	youtubedenekonodougawomita		
 inputs1275	base	yoyakunojikannnimaniau		
 inputs1275	kunrei	yoyakunozikannnimaniau		
 inputs1275	n_x	yoyakunojikaxnnimaniau		

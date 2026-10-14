@@ -5,7 +5,9 @@
 variants.tsv: tools/romaji_variants.py output. results.tsv: input<TAB>segments<TAB>committed.
 For each style: how many lines give another result than the base style of the
 same sentence (should be 0), and how many give the answer (when there is one).
-The lines that differ from base are listed.
+The lines that differ from base are listed. A sentence whose base result has
+English letters (chofu, hokkaido: place names typed the English way) is left
+out: another way of typing it is no longer the same English spelling.
 """
 import sys
 from collections import defaultdict
@@ -19,13 +21,14 @@ def main():
         if len(p) >= 3:
             got[p[0]] = p[2]
     base = {v[0]: got.get(v[2]) for v in variants if v[1] == "base"}
+    english = {sid for sid, out in base.items() if out and any(c.isascii() and c.isalpha() for c in out)}
     total, differ, correct, answered = defaultdict(int), defaultdict(int), defaultdict(int), defaultdict(int)
     listed = []
     for v in variants:
         sid, style, raw, intended = v[0], v[1], v[2], v[3]
         alts = v[4].split("|") if len(v) > 4 and v[4] else []
         out = got.get(raw)
-        if out is None:
+        if out is None or sid in english:
             continue
         total[style] += 1
         if intended:
@@ -35,6 +38,7 @@ def main():
             differ[style] += 1
             listed.append(f"  {sid} {style}: {raw} → {out}（base: {base[sid]}）")
     all_differ = sum(differ.values())
+    print(f"（base の結果に英字がある {len(english)} 文は数えない）")
     print(f"打ち方の揺れ: base と違う結果 {all_differ}/{sum(total[s] for s in total if s != 'base')}")
     for style in sorted(total, key=lambda s: (s != "base", s)):
         ans = f"、正解 {correct[style]}/{answered[style]}" if answered[style] else ""
