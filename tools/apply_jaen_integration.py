@@ -2670,7 +2670,7 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
       if (segments->conversion_segment(begin).segment_type() != Segment::FREE) { ++begin; continue; }
       size_t end = begin;
       while (end < count && segments->conversion_segment(end).segment_type() == Segment::FREE) ++end;
-      if (end - begin >= 2 && std::chrono::steady_clock::now() < deadline) {
+      if (end - begin >= 1 && std::chrono::steady_clock::now() < deadline) {
         Segments run(*segments);
         const size_t history = run.history_segments_size();
         if (end < count) run.erase_segments(history + end, count - end);
@@ -2792,6 +2792,19 @@ edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
+
+# 英単語の前後の1文節の日本語: 節: 「きのうから|sale|が始まった」の「きのうから」のような
+# 1文節の部分は、文全体の処理（2文節以上が前提）に入らず、Mozc の順位（機能から）のままだった。
+# 英単語で区切られた部分の処理のときだけ、1文節でも人工知能に見せる。
+edit("engine/engine.cc", "#include <cstdint>\n",
+     "#include <cstdint>\n\n// Fewest segments the whole-phrase query takes (1 only for runs between English words).\n"
+     "static thread_local size_t g_whole_phrase_min_segments = 2;\n")
+edit("engine/engine.cc", "    if (segments->resized() || count < 2 || count > 128 || original.size() != count) return;",
+     "    if (segments->resized() || count < g_whole_phrase_min_segments || count > 128 || original.size() != count) return;")
+edit("engine/engine.cc", "        PreferWholePhrase(options, mozc, azoo, prefetch, deadline, pos, &run, run_left, run_right, original);",
+     "        g_whole_phrase_min_segments = 1;\n"
+     "        PreferWholePhrase(options, mozc, azoo, prefetch, deadline, pos, &run, run_left, run_right, original);\n"
+     "        g_whole_phrase_min_segments = 2;")
 
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
