@@ -2692,6 +2692,13 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
         bool same = run.conversion_segments_size() == end - begin;
         for (size_t i = begin; same && i < end; ++i)
           same = run.conversion_segment(i - begin).key() == segments->conversion_segment(i).key();
+        if (std::getenv("RUN_DEBUG")) {  // (exp/context only)
+          std::string before, after;
+          for (size_t i = begin; i < end; ++i) before += segments->conversion_segment(i).key() + "=" + values[i] + "|";
+          for (const auto& s : run.conversion_segments()) after += s.key() + "=" + (s.candidates_size() ? s.candidate(0).value : "") + "|";
+          std::fprintf(stderr, "RUN left=[%s] right=[%s] before=%s after=%s same=%d\n", run_left.c_str(), run_right.c_str(),
+                       before.c_str(), after.c_str(), same ? 1 : 0);
+        }
         for (size_t i = begin; same && i < end; ++i) {
           const auto& chosen = run.conversion_segment(i - begin).candidate(0);
           auto* segment = segments->mutable_conversion_segment(i);
@@ -2760,6 +2767,9 @@ edit("converter/english_lexicon.cc",
      "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n",
      "    for (const auto& place : kHepburnPlaces) words->AddPlace(place[0], place[1], place[2]);\n"
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n")
+
+# （実験用）人工知能の選択の記録に要る取り込み
+edit("engine/engine.cc", "#include <cstdint>\n", "#include <cstdint>\n#include <cstdio>\n")
 
 # 強い印のときだけの英単語: 節: SCOWL のより珍しい語と固有名（london、ukulele、pilates）を
 # 組み込む（tools/build_english_lexicon.py の signal-words.txt）。打った形が普通の
