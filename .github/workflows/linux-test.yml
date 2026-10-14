@@ -58,7 +58,20 @@ jobs:
             https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
           echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | sha256sum -c
           bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
-          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          # （実験用）追加の辞書: neologd（Apache-2.0）、place-names（パブリックドメイン）、personal-names（Apache-2.0）
+          EXTRA_SOURCES="${EXTRA_SOURCES:-neologd}"
+          for r in $EXTRA_SOURCES; do
+            case $r in
+              neologd) c=d8307abf02b830b185c9320822cffa0d0787c54e ;;
+              place-names) c=98cf8e9d7731695a52e5bc72ed633933c71d1913 ;;
+              personal-names) c=b557dd4c1548cc7c2164d5f8b14170c40cbb6f81 ;;
+            esac
+            curl -fsSL -o $W/ut/mozcdic-ut-$r.txt.bz2 https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-$r/$c/mozcdic-ut-$r.txt.bz2
+            sha256sum $W/ut/mozcdic-ut-$r.txt.bz2
+            bunzip2 -k $W/ut/mozcdic-ut-$r.txt.bz2
+          done
+          SOURCES=$(echo sudachidict $EXTRA_SOURCES | tr ' ' ',')
+          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources $SOURCES --out $W/dictionary10.txt --install
           cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex

@@ -31,6 +31,7 @@ POS = {  # lines of data/dictionary_oss/id.def, resolved to ids below
     "personal-names": "名詞,固有名詞,人名,一般,*,*,*",
     "place-names": "名詞,固有名詞,地域,一般,*,*,*",
     "jawiki": "名詞,固有名詞,一般,*,*,*,*",
+    "neologd": "名詞,固有名詞,一般,*,*,*,*",
     "sudachidict": "名詞,一般,*,*,*,*,*",
 }
 READING = re.compile(r"[ぁ-ゖー]+")
