@@ -2782,6 +2782,17 @@ edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
      "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
 
+# 英語の決まった言い回し: 節: tools/data/english-phrases.txt（see you、made in japan など）を組み込む。
+# 続けて打った言い回しは、かなの切れ目の上なら1つの英語の文節にし、空白を入れて表示する。
+phrases = [line.strip() for line in (REPO / "tools/data/english-phrases.txt").read_text(encoding="utf-8").splitlines()
+           if line.strip() and not line.startswith("#")]
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + array("kPhrases", phrases), encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n",
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n"
+     "    for (const char* phrase : kPhrases) words->AddPhrase(phrase);\n")
+
 # かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
 # 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
 # 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の

@@ -63,6 +63,13 @@ class Lexicon {
   void AddJoined(std::string_view word);
   bool IsJoined(std::string_view word) const;
 
+  // Set phrases of two or more words ("see you", "made in japan"): typed
+  // together on chunk edges they are one English piece, shown with spaces.
+  void AddPhrase(std::string_view phrase);
+  // Where the spaces go in |typed| (offsets after each word but the last), or
+  // nullptr when it is no phrase.
+  const std::vector<size_t>* FindPhrase(std::string_view typed) const;
+
   // Rarer words and names (london, ukulele, pilates) taken only when what was
   // typed is no plain Japanese romaji (lo: ぉ, a pending c), on chunk edges.
   void AddSignalOnly(std::string_view word);
@@ -73,6 +80,7 @@ class Lexicon {
   std::unordered_map<std::string, Place> places_;
   std::unordered_set<std::string> joined_;
   std::unordered_set<std::string> signal_only_;
+  std::unordered_map<std::string, std::vector<size_t>> phrases_;
 };
 
 // Lowercase form of a valid lexicon word ([a-z'], starting with a letter, up
