@@ -2424,6 +2424,14 @@ b = b[:deps] + '        "//renderer:renderer_style_handler",\n' + b[deps:]
 # first (tools/data/brand-casing.tsv), the word as typed second.
 pairs = [line.split("\t") for line in (REPO / "tools/data/brand-casing.tsv").read_text(encoding="utf-8").splitlines()
          if line and not line.startswith("#")]
+# 略語・IT・サービス名の一覧（tools/data/jaen-modern-words.tsv）の表示の形も足す（brand-casing を優先）
+_cased = {p[0] for p in pairs}
+for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines():
+    if line and not line.startswith("#") and "\t" in line:
+        typed, shown = line.split("\t")[:2]
+        if typed not in _cased and shown != typed and '"' not in shown and "\\" not in shown:
+            pairs.append([typed, shown])
+            _cased.add(typed)
 assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"
@@ -2775,6 +2783,9 @@ edit("converter/english_lexicon.cc",
 # 組み込む（tools/build_english_lexicon.py の signal-words.txt）。打った形が普通の
 # ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
 signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
+# 略語・IT・サービス名（tools/data/jaen-modern-words.tsv、約6,000語）も、強い印のときだけ使う語に足す
+signal += [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
+           if line and not line.startswith("#") and "\t" in line]
 inc = src / "converter/english_lexicon_data.inc"
 inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
