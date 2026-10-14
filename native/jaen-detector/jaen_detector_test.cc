@@ -135,6 +135,10 @@ int main() {
   Expect(english("madeinjapandesu") == "madeinjapan|", "a set phrase of three words");
   Expect(english("loginnishippai").size() > 0 && split("loginnishippai").first[0].spaces.empty(),
          "a phrase that is also one word stays one word (login)");
+  lexicon.Add("cd", true);
+  Expect(english("jpycdake") == "jpyc|", "four unread keys are an unknown word kept as typed (jpyc|dake, not cd)");
+  Expect(english("tokyp").empty(), "three unread keys stay for the typo fix");
+  Expect(english("chatgptnikiku") == "chatgpt|", "a listed word wins over four unread keys inside it (chatgpt, not tgpt)");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");

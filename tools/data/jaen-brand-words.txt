@@ -50,6 +50,7 @@ asyncio
 atcoder
 atlassian
 atlus
+avax
 avi
 avif
 azw
@@ -80,11 +81,13 @@ bloodborne
 bluesky
 bluetooth
 bmp
+bnb
 bookoff
 bootstrap
 brave
 bridgestone
 broadcom
+btc
 bubble
 bybit
 bytedance
@@ -251,6 +254,7 @@ esbuild
 eslint
 esp
 esxi
+eth
 ethereum
 etsy
 evernote
@@ -402,6 +406,7 @@ jobcan
 jotform
 jpeg
 jpg
+jpyc
 jquery
 jsfiddle
 julia
@@ -839,6 +844,8 @@ unix
 unreal
 uplay
 usbc
+usdc
+usdt
 utf
 uuid
 vagrant
@@ -916,6 +923,7 @@ xiaomi
 xlsx
 xml
 xperia
+xrp
 xserver
 xss
 yahooauctions
