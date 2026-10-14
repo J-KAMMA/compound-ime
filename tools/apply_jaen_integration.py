@@ -2824,6 +2824,90 @@ edit("converter/converter.cc", "  RewriteAndSuppressCandidates(request, segments
      "  RewriteAndSuppressCandidates(request, segments);\n  TrimCandidates(request, segments);\n"
      "  HalfWidthDigitsInText(segments);\n")
 
+# 数の読みは数字: 節: 「にじゅうよっか」「しちがつはつか」「にせんにじゅうろくねん」のような
+# 数の読み＋単位（native/jaen-detector/jaen_number の FindNumbers）を、日本語の部分の中で
+# 確定済みの文節（24日、7月20日、2026年）にする。前後の日本語はこれまでどおり変換される。
+# 1けたの数＋単位（にほん、くじ）は取らない。MYIME_NUMBERS=0 で止める。
+for name in ("jaen_number.h", "jaen_number.cc"):
+    write(f"converter/{name}", (REPO / "native/jaen-detector" / name).read_text(encoding="utf-8")
+          .replace('#include "jaen_number.h"', '#include "converter/jaen_number.h"'))
+edit("converter/BUILD.bazel", """        "jaen_typo.cc",
+    ],""", """        "jaen_typo.cc",
+        "jaen_number.cc",
+    ],""")
+edit("converter/BUILD.bazel", """        "jaen_typo.h",
+    ],""", """        "jaen_typo.h",
+        "jaen_number.h",
+    ],""")
+edit("converter/converter.cc", '#include "converter/jaen_typo.h"\n',
+     '#include "converter/jaen_typo.h"\n#include "converter/jaen_number.h"\n')
+edit("converter/converter.cc", "  if (!split) return {};\n", """  // Number readings in Japanese pieces ("にじゅうよっか") become fixed
+  // segments of digits ("24日"); MYIME_NUMBERS=0 turns this off.
+  static const bool numbers_enabled = [] {
+    const char* value = std::getenv("MYIME_NUMBERS");
+    return value == nullptr || std::string_view(value) != "0";
+  }();
+  const auto kana_of = [&](const std::string& keys) {
+    std::string kana;  // as the composer's conversion query: a final n is ん
+    for (const jaen::Chunk& chunk : parse(keys)) {
+      kana += chunk.conversion.empty() && (chunk.pending == "n" || chunk.pending == "N")
+                  ? "ん"
+                  : chunk.conversion + chunk.pending;
+    }
+    return kana;
+  };
+  bool has_numbers = false;
+  for (size_t p = 0; numbers_enabled && !has_numbers && p < pieces.size(); ++p) {
+    has_numbers = !pieces[p].english && !jaen::FindNumbers(kana_of(texts[p])).empty();
+  }
+  if (!split && !has_numbers) return {};
+""")
+edit("converter/converter.cc", """    segment->set_key(kana);
+    segment->set_segment_type(Segment::FREE);
+  }
+  return typed;""", """    const std::vector<jaen::NumberSpan> numbers =
+        has_numbers ? jaen::FindNumbers(kana) : std::vector<jaen::NumberSpan>();
+    if (numbers.empty()) {
+      segment->set_key(kana);
+      segment->set_segment_type(Segment::FREE);
+      continue;
+    }
+    std::vector<size_t> at;  // byte offset of each kana, and the end
+    for (size_t i = 0; i < kana.size();) {
+      at.push_back(i);
+      const auto b = static_cast<unsigned char>(kana[i]);
+      i += b < 0x80 ? 1 : b < 0xE0 ? 2 : b < 0xF0 ? 3 : 4;
+    }
+    at.push_back(kana.size());
+    Segment* next = segment;
+    const auto take = [&]() {
+      Segment* s = next ? next : segments->add_segment();
+      next = nullptr;
+      return s;
+    };
+    size_t pos = 0;
+    for (const jaen::NumberSpan& number : numbers) {
+      if (number.begin > pos) {
+        Segment* s = take();
+        s->set_key(kana.substr(at[pos], at[number.begin] - at[pos]));
+        s->set_segment_type(Segment::FREE);
+      }
+      Segment* s = take();
+      s->set_key(kana.substr(at[number.begin], at[number.end] - at[number.begin]));
+      s->set_segment_type(Segment::FIXED_VALUE);
+      PutTypedValueFirst(number.value, s);
+      // Put first again after the rewriters, like an English word.
+      typed.emplace_back(std::string(s->key()), number.value);
+      pos = number.end;
+    }
+    if (pos + 1 < at.size()) {
+      Segment* s = take();
+      s->set_key(kana.substr(at[pos]));
+      s->set_segment_type(Segment::FREE);
+    }
+  }
+  return typed;""")
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
