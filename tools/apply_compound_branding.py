@@ -167,6 +167,17 @@ edit(W, '<Feature Id="MozcInstall" Title="Mozc"', f'<Feature Id="MozcInstall" Ti
 edit(W, '<Directory Id="MozcDir" Name="Mozc">', f'<Directory Id="MozcDir" Name="{ASCII}">')
 edit(W, 'Name="MozcCacheService"', f'Name="{ASCII}CacheService"', 2)
 edit(W, 'Name="Mozc Prelauncher"', f'Name="{ASCII} Prelauncher"')
+# 新しい版のお知らせ（tools/update-check/update_check.ps1）: 入れる先に置き、ログイン時に動かす。
+# 台本は MSI を作るときに azookey の部品と同じ場所に置く。止め方は HKCU\Software\CompoundIME の UpdateCheck=0。
+edit(W, '      <ComponentRef Id="MozcTool" />\n', '      <ComponentRef Id="MozcTool" />\n      <ComponentRef Id="UpdateCheck" />\n')
+edit(W, """          <File Id="mozc_tool.exe" Name="mozc_tool.exe" DiskId="1" Checksum="yes" Source="$(var.MozcToolPath)" Vital="yes" />
+        </Component>""", """          <File Id="mozc_tool.exe" Name="mozc_tool.exe" DiskId="1" Checksum="yes" Source="$(var.MozcToolPath)" Vital="yes" />
+        </Component>
+        <Component Id="UpdateCheck">
+          <File Id="update_check.ps1" Name="update_check.ps1" DiskId="1" Source="$(var.AzooKeyDllDir)/update_check.ps1" KeyPath="yes" />
+          <RegistryValue Root="HKLM" Key="Software\\Microsoft\\Windows\\CurrentVersion\\Run" Name="CompoundIMEUpdateCheck" Type="string"
+                         Value="powershell.exe -NoProfile -NonInteractive -WindowStyle Hidden -ExecutionPolicy Bypass -File &quot;[MozcDir]update_check.ps1&quot;" />
+        </Component>""")
 
 # Settings tool: product name in every window title, About dialog.
 edit("gui/base/util.cc", '''  const QString name = QObject::tr("Mozc");
