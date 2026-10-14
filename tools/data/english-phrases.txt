@@ -1,0 +1,455 @@
+# 日本語の文の中にローマ字で続けて打たれる英語の決まった言い回し（2語以上・英小文字・単語間は空白1つ・1行1つ）。続けて打った綴りが自然な日本語のローマ字に読める短い言い回しはなるべく除いた。
+thank you
+thank you very much
+thanks a lot
+you are welcome
+no problem
+no thank you
+excuse me
+see you
+see you later
+see you soon
+see you again
+see you tomorrow
+good morning
+good afternoon
+good evening
+good night
+good luck
+good job
+good bye
+good game
+happy birthday
+happy new year
+merry christmas
+happy halloween
+happy hour
+happy ending
+nice to meet you
+how are you
+long time no see
+have a nice day
+have a good day
+welcome back
+welcome home
+oh my god
+my pleasure
+never mind
+why not
+all right
+just kidding
+let it be
+let it go
+lets go
+best wishes
+best regards
+kind regards
+well done
+cheer up
+bon appetit
+bon voyage
+get well soon
+sweet dreams
+i love you
+i miss you
+one more time
+one more chance
+last chance
+trick or treat
+love and peace
+peace and love
+no comment
+no smoking
+keep out
+do not disturb
+under construction
+coming soon
+now loading
+now on sale
+sold out
+out of stock
+best friend
+dreams come true
+love story
+true love
+first love
+love letter
+fan club
+fan art
+just do it
+never give up
+keep calm and carry on
+time is money
+no pain no gain
+better late than never
+last but not least
+so far so good
+home sweet home
+safety first
+dead or alive
+game over
+game changer
+as soon as possible
+by the way
+for your information
+best practice
+win win
+take over
+case by case
+step by step
+day by day
+one by one
+little by little
+face to face
+back to back
+peer to peer
+end to end
+first come first served
+on time
+just in time
+up to date
+out of date
+state of the art
+cutting edge
+team building
+kick off
+deep dive
+action plan
+follow up
+catch up
+check in
+check out
+wrap up
+set up
+sign up
+sign in
+sign out
+log in
+log out
+opt in
+opt out
+roll out
+start up
+round table
+work life balance
+work from home
+remote work
+business model
+business plan
+market share
+market research
+customer experience
+user experience
+user interface
+user friendly
+cash flow
+due diligence
+supply chain
+best effort
+top down
+bottom up
+trial and error
+give and take
+pros and cons
+ups and downs
+all in one
+all or nothing
+one on one
+made in japan
+only one
+number one
+low cost
+high quality
+high end
+low end
+small talk
+fair trade
+social distancing
+new normal
+know how
+on the job training
+off the job training
+chief executive officer
+venture capital
+sunk cost
+fake news
+social media
+social network
+press release
+breaking news
+time out
+long term
+short term
+part time
+full time
+on demand
+in stock
+best seller
+last minute
+digital transformation
+digital marketing
+sharing economy
+carbon neutral
+net zero
+renewable energy
+electric vehicle
+autonomous driving
+sustainable development goals
+climate change
+eco friendly
+pull request
+merge request
+code review
+open source
+machine learning
+deep learning
+artificial intelligence
+natural language processing
+neural network
+large language model
+generative ai
+prompt engineering
+fine tuning
+reinforcement learning
+computer vision
+speech recognition
+image recognition
+face recognition
+big data
+data science
+cloud computing
+cloud native
+internet of things
+augmented reality
+virtual reality
+single sign on
+two factor authentication
+multi factor authentication
+rest api
+search engine
+front end
+back end
+full stack
+unit test
+test driven development
+hot fix
+dark mode
+drag and drop
+copy and paste
+plug and play
+double click
+right click
+operating system
+source code
+version control
+stack overflow
+memory leak
+virtual machine
+touch screen
+smart watch
+cyber security
+zero trust
+end user
+early access
+hello world
+proof of concept
+software as a service
+scrum master
+product manager
+project manager
+edge case
+technical debt
+clean code
+ip address
+email address
+direct message
+online meeting
+dark web
+open world
+battle royale
+first person shooter
+role playing game
+free to play
+pay to win
+speed run
+level up
+power up
+voice chat
+live stream
+live streaming
+influencer marketing
+conversion rate
+call to action
+user generated content
+word of mouth
+strike out
+pinch hitter
+double play
+no hitter
+perfect game
+hit and run
+free kick
+penalty kick
+corner kick
+hat trick
+own goal
+yellow card
+red card
+extra time
+half time
+world cup
+slam dunk
+free throw
+fast break
+triple double
+buzzer beater
+match point
+break point
+nice shot
+nice try
+fair play
+knock out
+personal best
+world record
+gold medal
+silver medal
+bronze medal
+half marathon
+cool down
+warm up
+personal trainer
+push up
+high five
+most valuable player
+all star
+dream team
+sudden death
+figure skating
+table tennis
+touch down
+grand prix
+rock climbing
+mountain bike
+ice hockey
+fast food
+junk food
+street food
+fish and chips
+hot dog
+french fries
+potato chips
+ice cream
+whipped cream
+cream cheese
+apple pie
+fried chicken
+roast beef
+beef stew
+caesar salad
+potato salad
+french toast
+peanut butter
+maple syrup
+olive oil
+soy sauce
+hot sauce
+black pepper
+white wine
+red wine
+craft beer
+draft beer
+ginger ale
+iced tea
+iced coffee
+black coffee
+milk tea
+green tea
+hot chocolate
+cafe latte
+cafe au lait
+all you can eat
+all you can drink
+take out
+afternoon tea
+food court
+food truck
+plant based
+gluten free
+sugar free
+fat free
+main dish
+side dish
+limited edition
+limited time
+round trip
+one way
+boarding pass
+lost and found
+duty free
+tax free
+jet lag
+theme park
+amusement park
+world heritage
+city tour
+road trip
+guest house
+bed and breakfast
+room service
+front desk
+all inclusive
+tour guide
+business class
+first class
+economy class
+bucket list
+once in a lifetime
+must see
+must have
+world tour
+live tour
+music video
+behind the scenes
+making of
+special edition
+red carpet
+best actor
+theme song
+rock band
+heavy metal
+hip hop
+rhythm and blues
+background music
+special effects
+science fiction
+reality show
+talk show
+live action
+slow motion
+short film
+spin off
+main character
+voice actor
+comic book
+light novel
+fast fashion
+high fashion
+second hand
+dress code
+smart casual
+business casual
+polo shirt
+tank top
+high heels
+running shoes
+eye shadow
+nail art
+hair salon
+anti aging
+skin care
+hair care
+self care
+mental health
+well being
+rock and roll
+black and white
