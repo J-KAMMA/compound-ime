@@ -305,6 +305,10 @@ edit(A, '    @"/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Renderer.plis
      '    @"/Library/LaunchAgents/org.compoundime.inputmethod.Japanese.Renderer.plist", nil};')
 edit(A, 'static NSString *const kSourceID = @"org.mozc.inputmethod.Japanese";',
      'static NSString *const kSourceID = @"org.compoundime.inputmethod.Japanese";')
+# マックのインストーラーの版の決まり（Google の配布では末尾が .101 か .1）はコンパウンドIMEの版
+# （3.34.6239.141 など）に合わないので、確かめない。
+edit("build_tools/tweak_macinstaller_script.py", "  if options.version_file and not is_valid:",
+     "  if False and options.version_file and not is_valid:  # CompoundIME has its own version numbers")
 U = "mac/Uninstaller/Uninstaller.mm"
 edit(U, '      "/Library/Input Methods/Mozc.app",', '      "/Library/Input Methods/CompoundIME.app",')
 edit(U, '      "/Library/LaunchAgents/org.mozc.inputmethod.Japanese.Converter.plist",',
