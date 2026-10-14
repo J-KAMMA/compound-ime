@@ -38,8 +38,8 @@ jobs:
           python3 $W/repo/tools/build_loanword_pairs.py --mozc $W/myime/mozc/src --cmudict $W/cmudict.dict \
             --lexicon $W/lex35/english-lexicon.txt --out $W/out/pairs-all.tsv --all-words
           python3 $W/repo/tools/build_katakana_english.py --pairs $W/out/pairs-all.tsv \
-            --level $W/lex10 --level $W/lex20 --level $W/lex35 --checked $W/repo/tools/data/loanwords.tsv \
-            --out $W/out/katakana-english.tsv
+            --level $W/lex10 --level $W/lex20 --level $W/lex35 --checked $W/repo/tools/data/katakana-english-common.tsv \
+            --checked $W/repo/tools/data/loanwords.tsv --mozc $W/myime/mozc/src --out $W/out/katakana-english.tsv
           shuf -n 60 --random-source=<(yes) $W/out/katakana-english.tsv | paste -sd' '
 
       - uses: actions/upload-artifact@v4

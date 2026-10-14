@@ -15,11 +15,22 @@ at most --threshold, no past forms (-ed) unless the katakana ends in ド or ト,
 unless it ends in ス or ズ, and -ing words only for katakana ending in ング (and back).
 """
 import argparse
+import re
 from pathlib import Path
+
+KATAKANA = re.compile(r"[ァ-ヺー]+")
+
+
+def hiragana(katakana):
+    return "".join(chr(ord(c) - 0x60) if "ァ" <= c <= "ヶ" else c for c in katakana)
 
 
 def plausible(english, katakana):
-    if english.endswith("ed") and not katakana.endswith(("ド", "ト")):
+    if english.endswith("ed"):
+        return False  # past forms are rarely loanwords (snowballed for スノーボード)
+    # A small ッ comes from a doubled or hard consonant in the spelling (セッション: session).
+    if "ッ" in katakana and not any(a == b and a not in "aeiou" for a, b in zip(english, english[1:])) \
+            and not any(s in english for s in ("ck", "tch", "x", "dg", "pt", "ct", "tt")):
         return False
     if english.endswith("s") and not english.endswith("ss") and not katakana.endswith(("ス", "ズ")):
         return False
@@ -30,7 +41,9 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--pairs", type=Path, required=True)
     parser.add_argument("--level", type=Path, action="append", required=True)
-    parser.add_argument("--checked", type=Path)
+    parser.add_argument("--checked", type=Path, action="append", default=[])
+    parser.add_argument("--mozc", type=Path, help="Mozc src: katakana words whose reading is also a "
+                        "hiragana or kanji word (ピッタリ: ぴったり) are Japanese, not loanwords")
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--threshold", type=float, default=0.06)
     parser.add_argument("--margin", type=float, default=0.03)
@@ -42,12 +55,22 @@ def main():
             level.setdefault(word, rank)
 
     result = {}
-    if args.checked:
-        for line in args.checked.read_text(encoding="utf-8").splitlines():
+    for checked in args.checked:
+        for line in checked.read_text(encoding="utf-8").splitlines():
             if line.startswith("#") or "\t" not in line:
                 continue
-            english, katakana = line.split("\t")[:2]
-            result.setdefault(katakana, []).append(english)
+            a, b = line.split("\t")[:2]
+            katakana, english = (a, b) if KATAKANA.fullmatch(a) else (b, a)
+            if english not in result.get(katakana, []):
+                result.setdefault(katakana, []).append(english)
+
+    japanese = set()  # readings of hiragana or kanji words
+    if args.mozc:
+        for path in sorted((args.mozc / "data/dictionary_oss").glob("dictionary0*.txt")):
+            for line in path.read_text(encoding="utf-8").splitlines():
+                f = line.split("\t")
+                if len(f) >= 5 and not KATAKANA.fullmatch(f[4]) and not f[4].isascii():
+                    japanese.add(f[0])
 
     by_katakana = {}
     for line in args.pairs.read_text(encoding="utf-8").splitlines():
@@ -56,7 +79,7 @@ def main():
         english, katakana, distance = line.split("\t")[:3]
         distance = float(distance)
         if (distance > args.threshold or len(katakana) < 4 or len(english) < 4 or english not in level
-                or not plausible(english, katakana)):
+                or not plausible(english, katakana) or hiragana(katakana) in japanese):
             continue
         by_katakana.setdefault(katakana, []).append((level[english], distance, english))
 
