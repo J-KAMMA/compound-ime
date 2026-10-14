@@ -1,0 +1,47 @@
+# カタカナ語と英単語の組（tools/data/katakana-english.tsv）を作る。手動で動く。
+# Mozc の辞書のカタカナ語と、英単語の発音（CMU Pronouncing Dictionary、BSD）を照らし合わせ、
+# 英単語の使われやすさ（SCOWL の段階）で選ぶ。できた一覧は成果物として残る。
+name: Katakana data
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: 材料
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init mozc
+          git -C myime/mozc apply --whitespace=nowarn $W/repo/patches/mozc-base.patch
+          curl -fsSL -o $W/cmudict.dict \
+            https://raw.githubusercontent.com/cmusphinx/cmudict/0f8072f814306c5ee4fbf992ed853601b12c01f9/cmudict.dict
+          echo "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22  $W/cmudict.dict" | sha256sum -c
+          for l in 10 20 35; do python3 $W/repo/tools/build_english_lexicon.py --out $W/lex$l --level $l; done
+
+      - name: 組を作る
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; mkdir -p $W/out
+          python3 $W/repo/tools/build_loanword_pairs.py --mozc $W/myime/mozc/src --cmudict $W/cmudict.dict \
+            --lexicon $W/lex35/english-lexicon.txt --out $W/out/pairs-all.tsv --all-words
+          python3 $W/repo/tools/build_katakana_english.py --pairs $W/out/pairs-all.tsv \
+            --level $W/lex10 --level $W/lex20 --level $W/lex35 --out $W/out/katakana-english.tsv
+          shuf -n 60 --random-source=<(yes) $W/out/katakana-english.tsv | paste -sd' '
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: katakana-data
+          path: out/
