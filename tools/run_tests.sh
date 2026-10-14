@@ -10,6 +10,9 @@ GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
 BATCH="bash $REPO/tools/batch_convert.sh $E/session_handler_main $E $MODEL"
 W=$(mktemp -d); mkdir -p "$OUT"
+# 変換エンジンの部品（libggml-cpu.so など）は一式の中から探す。組み立てた計算機の
+# llama.cpp の組み立て先は、ここにはない。
+export LD_LIBRARY_PATH="$E${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 romaji() { python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" "$1"; }
 run_one() {  # one input through the server; prints the output protocol text
   MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$MODEL TEST_TMPDIR=$W/p \
