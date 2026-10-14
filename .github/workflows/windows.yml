@@ -31,6 +31,8 @@ jobs:
       W: C:/w
       VERSION: ${{ inputs.version || '3.34.6239.142' }}
     steps:
+      # 改行コードの自動変換を止めてから取り出す（パッチと台本は LF）
+      - run: git config --global core.autocrlf false
       - uses: actions/checkout@v4
         with:
           path: repo
