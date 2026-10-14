@@ -6,7 +6,7 @@ name: Windows
 on:
   # 手動実行の入口は主枝に入ってから使える。それまでの試験はこの枝への push で動かす
   push:
-    branches: [exp/windows-ci]
+    branches: [exp/windows-ci2]
   workflow_dispatch:
     inputs:
       version:
