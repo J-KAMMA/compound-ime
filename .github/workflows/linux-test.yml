@@ -46,6 +46,19 @@ jobs:
           git fetch -q --depth 1 origin 10131b23ee0dbd9d03dfc618cec9fe3402919277 && git checkout -q FETCH_HEAD
           git apply --ignore-whitespace $W/repo/patches/llama-utf8.patch
 
+      # 組み立ての途中の結果を次の試験で使い回す（変えた所だけ組み立て直す）
+      - uses: actions/cache@v4
+        with:
+          path: ~/bazel-disk
+          key: linux-bazel-${{ github.run_id }}
+          restore-keys: linux-bazel-
+      - uses: actions/cache@v4
+        with:
+          path: |
+            llama.cpp/build
+            myime/src/swift-engine/.build
+          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/swift-Package.resolved') }}
+
       - name: 生成器と改造の適用
         run: |
           set -eo pipefail
@@ -82,7 +95,7 @@ jobs:
         run: |
           set -eo pipefail
           T=$HOME/tools; cd $GITHUB_WORKSPACE/myime/mozc/src
-          $T/bazelisk build --config oss_linux -c opt --nocheck_visibility \
+          $T/bazelisk build --config oss_linux -c opt --nocheck_visibility --disk_cache=$HOME/bazel-disk \
             --action_env=PATH=$T:/usr/bin:/bin --host_action_env=PATH=$T:/usr/bin:/bin \
             --linkopt=-B$T --host_linkopt=-B$T //session:session_handler_main > $GITHUB_WORKSPACE/bazel.log 2>&1 \
             || { grep -B3 -A20 "ERROR\|error:" $GITHUB_WORKSPACE/bazel.log | head -80; exit 1; }
@@ -111,6 +124,17 @@ jobs:
           # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
+          # 予測変換: 最初の100文を最後まで打ち、変換キーを押す前の候補の上位3つに正解が出るか
+          python3 -c "import json,sys; [print(i['romaji']+'\t'+'\t'.join([i['intended']]+i.get('alternatives',[]))) for i in json.load(open(sys.argv[1]))['items'][:100]]" $T/ja400.json > $W/pred-items.tsv
+          hit=0; total=0
+          while IFS=$'\t' read -r r answers; do
+            printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSHOW_OUTPUT\n' "$r" > $W/pred.tsv
+            top=$(MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$W/model.gguf TEST_TMPDIR=$W/pp $E/session_handler_main --input $W/pred.tsv --profile $W/pp --dictionary oss < /dev/null 2>/dev/null \
+              | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; n++} n>=3{exit}')
+            total=$((total+1))
+            if printf '%s\n' "$top" | grep -qxF -f <(printf '%s\n' $answers); then hit=$((hit+1)); fi
+          done < $W/pred-items.tsv
+          echo "予測変換: 上位3つに正解 $hit/$total" | tee $W/results/prediction.txt
           # 速さの目安: 最初の100文を1つの処理で変換した時間（GitHub の計算機、画像処理用の計算機なし）
           head -100 $W/ja400.txt > $W/speed.txt
           t0=$(date +%s.%N)
