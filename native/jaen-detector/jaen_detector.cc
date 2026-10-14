@@ -17,6 +17,7 @@ constexpr int64_t kWeakForeignCost = 150;  // per rare-but-Japanese chunk (one w
 constexpr int64_t kSpanCost = 100;      // minus kLengthBonus per letter
 constexpr int64_t kLengthBonus = 3;     // longer words win ("sheet|wo" over "shee|two")
 constexpr int64_t kCutCost = 5;         // English edge inside an original chunk
+constexpr int64_t kStealCost = 50;      // a word ending in the s of shi, the c of chi, the t of tsu
 
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
@@ -258,6 +259,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   const auto word_across = [&](size_t e) {
     for (size_t a = e >= kMaxWordLength ? e - kMaxWordLength : 0; a < e; ++a) {
       for (size_t b = std::max(e + 1, a + 3); b <= std::min(n, a + kMaxWordLength); ++b) {
+        // Only the second n of "nn" past the edge ("inn" over "berlin|ni").
+        if (b == e + 1 && Lower(raw[e - 1]) == 'n' && Lower(raw[e]) == 'n') continue;
         if (lexicon.Contains(std::string_view(raw).substr(a, b - a))) return true;
       }
     }
@@ -308,6 +311,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
+      }
+      // A word ending in the first letter of sh, ch or ts ("sets|hita": the s
+      // of shi) likely took it from the kana after it: "set|shita" wins.
+      if (cost && j < n) {
+        const char last = Lower(raw[j - 1]);
+        const char after = Lower(raw[j]);
+        if (((last == 's' || last == 'c') && after == 'h') || (last == 't' && after == 's')) *cost += kStealCost;
       }
       if (cost) english[i].emplace_back(j, *cost + edge_cost(i) + edge_cost(j));
     }

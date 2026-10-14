@@ -29,6 +29,7 @@ dvd
 excel
 facebook
 figma
+frontend
 git
 github
 gitlab
@@ -41,12 +42,14 @@ instagram
 iphone
 javascript
 json
+lego
 linux
 log
 login
 logout
 macos
 merge
+message
 microsoft
 mozc
 notion
@@ -59,12 +62,13 @@ powershell
 pr
 pull
 push
-message
 python
+qa
 repo
 rust
 server
 slack
+sns
 sql
 tiktok
 twitter
@@ -73,6 +77,8 @@ ubuntu
 ui
 url
 usb
+ux
+vr
 vscode
 wifi
 windows
