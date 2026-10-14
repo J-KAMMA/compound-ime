@@ -235,12 +235,6 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       std::swap(s[i], s[i + 1]);
       add(std::move(s), text.compare(i, 2, "uo") == 0 ? priors.swapped_uo : priors.swapped);
     }
-    // One key too many ("arukite"); not the x/l of a small kana, nor ' or -.
-    if (std::string_view("xl'-").find(text[i]) == std::string_view::npos) {
-      std::string s = text;
-      s.erase(i, 1);
-      add(std::move(s), priors.extra_key);
-    }
     for (const char n : Neighbors(text[i])) {  // a key next to the right one ("kiagi")
       std::string s = text;
       s[i] = n;
