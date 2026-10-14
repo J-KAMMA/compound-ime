@@ -246,9 +246,11 @@ jobs:
           echo "bazel-bin: $BIN"
           BO=$(dirname "$(dirname "$BIN")")
           C=$W/parts; rm -rf $C; mkdir -p $C
-          for n in mozc_server.exe mozc_tool.exe mozc_renderer.exe mozc_broker.exe mozc_cache_service.exe mozc_tip32.dll mozc_tip64.dll mozc_installer_helper.dll session_handler_main.exe mozc_version.txt; do
+          # 出力名=組み立ての対象が作るファイル名（インストーラーの定義が読むもの）
+          for pair in mozc_server.exe=mozc_server_win.exe mozc_tool.exe=mozc_tool_win.exe mozc_renderer.exe=win32_renderer_main.exe mozc_broker.exe=mozc_broker_main.exe mozc_cache_service.exe=mozc_cache_service.exe mozc_tip32.dll=mozc_tip32.dll mozc_tip64.dll=mozc_tip64.dll mozc_installer_helper.dll=custom_action.dll session_handler_main.exe=session_handler_main.exe mozc_version.txt=mozc_version.txt; do
+            n=${pair%%=*}; src=${pair#*=}
             # 構成ごとに出力先が違う（x64 への切り替えなど）ので bazel-out 全体から探す
-            f=$(find "$BO" -name "$n" -path '*/bin/*' -not -path '*/_objs/*' -not -path '*.runfiles/*' -not -path '*-exec*' | head -1)
+            f=$(find "$BO" -name "$src" -path '*/bin/*' -not -path '*/_objs/*' -not -path '*.runfiles/*' -not -path '*-exec*' | head -1)
             echo "$n <- $f"
             if [ -z "$f" ]; then echo "見つからない: $n"; find "$BO" \( -name '*.exe' -o -name '*.dll' \) -path '*/bin/*' -not -path '*/_objs/*' -not -path '*.runfiles/*' | head -60; exit 1; fi
             cp "$f" $C/$n
