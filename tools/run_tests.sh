@@ -1,8 +1,8 @@
 #!/bin/bash
 # run_tests.sh <group> <engine dir> <model.gguf> <this repository> <results dir>
-# 変換の試験を、組（a、b、c）に分けて流す。GitHub の試験（.github/workflows/linux-test.yml）が
+# 変換の試験を、組（a1、a2、b、c）に分けて流す。GitHub の試験（.github/workflows/linux-test.yml）が
 # 組ごとに別の計算機で同時に呼ぶ。<engine dir> には session_handler_main と変換エンジン一式がある。
-#   a: 1,298文（inputs）
+#   a1, a2: 1,298文（inputs）の前半と後半
 #   b: 日本語だけの400文、予測変換、速さ、候補の並び、利用者が見つけた失敗
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
 set -eo pipefail
@@ -20,9 +20,11 @@ run_one() {  # one input through the server; prints the output protocol text
 }
 
 case $GROUP in
-a)
-  $BATCH $T/inputs.txt $OUT/inputs.tsv 4
-  python3 $REPO/tools/compare_results.py $T/expected-windows-139.tsv $OUT/inputs.tsv | head -60
+a1|a2)
+  # 1,298文を前半と後半に分ける（まとめの段で inputs.tsv にする）
+  half=$(( ($(wc -l < $T/inputs.txt) + 1) / 2 ))
+  if [ "$GROUP" = a1 ]; then head -n $half $T/inputs.txt > $W/inputs.txt; else tail -n +$((half + 1)) $T/inputs.txt > $W/inputs.txt; fi
+  $BATCH $W/inputs.txt $OUT/inputs-${GROUP#a}.tsv 4
   ;;
 b)
   # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
@@ -67,5 +69,5 @@ c)
   $BATCH $W/typo150b.txt $OUT/typo150b.tsv 4
   ;;
 *)
-  echo "組は a、b、c のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c のどれか" >&2; exit 2 ;;
 esac

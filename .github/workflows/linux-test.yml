@@ -125,7 +125,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a, b, c]
+        group: [a1, a2, b, c]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -161,6 +161,12 @@ jobs:
           pattern: results-*
           path: results
           merge-multiple: true
+      - name: 1,298文の前半と後半をつなぐ
+        run: |
+          if [ -f results/inputs-1.tsv ] && [ -f results/inputs-2.tsv ]; then
+            cat results/inputs-1.tsv results/inputs-2.tsv > results/inputs.tsv && rm results/inputs-1.tsv results/inputs-2.tsv
+          fi
+          ls results
       - uses: actions/upload-artifact@v4
         with:
           name: linux-results
