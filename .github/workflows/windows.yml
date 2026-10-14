@@ -163,8 +163,14 @@ jobs:
           powershell -NoProfile -ExecutionPolicy Bypass -File $W/myime/scripts/ci/copy-swift-runtime.ps1 -OutputDir "C:\\w\\engine-out"
           ls $W/engine-out
 
+      - name: 保存できるものの確認（エンジン）
+        id: have
+        if: always()
+        run: |
+          [ -f $W/engine-out/azookey-engine.dll ] && echo "engine=yes" >> "$GITHUB_OUTPUT" || echo "engine=no" >> "$GITHUB_OUTPUT"
+
       - name: 変換エンジンの控えを保存
-        if: always() && steps.engine-cache.outputs.cache-hit != 'true' && hashFiles('C:/w/engine-out/azookey-engine.dll') != ''
+        if: always() && steps.engine-cache.outputs.cache-hit != 'true' && steps.have.outputs.engine == 'yes'
         uses: actions/cache/save@v4
         with:
           path: C:/w/engine-out
@@ -186,8 +192,14 @@ jobs:
           ls third_party/qt
           rm -rf third_party/qt_src third_party_cache
 
+      - name: 保存できるものの確認（Qt）
+        id: haveqt
+        if: always()
+        run: |
+          [ -f $W/myime/mozc/src/third_party/qt/bin/Qt6Core.dll ] && echo "qt=yes" >> "$GITHUB_OUTPUT" || echo "qt=no" >> "$GITHUB_OUTPUT"
+
       - name: Qt の控えを保存
-        if: always() && steps.qt-cache.outputs.cache-hit != 'true' && hashFiles('C:/w/myime/mozc/src/third_party/qt/bin/Qt6Core.dll') != ''
+        if: always() && steps.qt-cache.outputs.cache-hit != 'true' && steps.haveqt.outputs.qt == 'yes'
         uses: actions/cache/save@v4
         with:
           path: C:/w/myime/mozc/src/third_party/qt
