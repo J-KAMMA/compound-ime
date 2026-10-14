@@ -1709,6 +1709,13 @@ subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_diction
                 "--out", str(src / "data/dictionary_oss/dictionary12.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
+# 話し言葉・ネットの書き方（dictionary13.txt）: 行こっか、まあいっか、すいたー など
+# （tools/data/colloquial.tsv）。Mozc に同じ読みの語があれば、その語より少し後ろにする。
+subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py"), "--mozc", str(src),
+                "--words", str(REPO / "tools/data/colloquial.tsv"),
+                "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
+(src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
