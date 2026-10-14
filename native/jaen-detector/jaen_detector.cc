@@ -17,6 +17,7 @@ constexpr int64_t kWeakForeignCost = 150;  // per rare-but-Japanese chunk (one w
 constexpr int64_t kSpanCost = 100;      // minus kLengthBonus per letter
 constexpr int64_t kLengthBonus = 3;     // longer words win ("sheet|wo" over "shee|two")
 constexpr int64_t kCutCost = 5;         // English edge inside an original chunk
+constexpr int64_t kPhraseBonus = 20;    // a set phrase wins over its words read apart
 constexpr int64_t kStealCost = 50;      // a word ending in the s of shi, the c of chi, the t of tsu
 
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
@@ -102,6 +103,29 @@ void Lexicon::AddSignalOnly(std::string_view word) {
 bool Lexicon::IsSignalOnly(std::string_view word) const {
   const auto lower = Normalize(word);
   return lower && signal_only_.contains(*lower);
+}
+
+void Lexicon::AddPhrase(std::string_view phrase) {
+  std::string joined;
+  std::vector<size_t> spaces;
+  for (size_t start = 0; start <= phrase.size();) {
+    size_t end = phrase.find(' ', start);
+    if (end == std::string_view::npos) end = phrase.size();
+    const auto word = Normalize(phrase.substr(start, end - start));
+    if (!word) return;
+    if (!joined.empty()) spaces.push_back(joined.size());
+    joined += *word;
+    start = end + 1;
+  }
+  if (!spaces.empty() && joined.size() <= kMaxWordLength) phrases_[joined] = std::move(spaces);
+}
+
+const std::vector<size_t>* Lexicon::FindPhrase(std::string_view typed) const {
+  const auto lower = Normalize(typed);
+  // One word as written together ("login", "frontend", "takeout") is no phrase.
+  if (!lower || words_.contains(*lower) || joined_.contains(*lower)) return nullptr;
+  const auto it = phrases_.find(*lower);
+  return it == phrases_.end() ? nullptr : &it->second;
 }
 
 bool Lexicon::IsCurated(std::string_view word) const {
@@ -300,6 +324,11 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           learned = it->second;
         }
       }
+      // A set phrase on chunk edges ("seeyou", "madeinjapan") is one piece.
+      if (boundary[i] && boundary[j] && lexicon.FindPhrase(word)) {
+        english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()) - kPhraseBonus);
+        continue;
+      }
       // Four or more keys in a row the table could not read ("jpyc" of
       // jpycdake): an unknown abbreviation or name, kept as typed.
       if (word.size() >= 4 && boundary[i] && boundary[j] &&
@@ -386,6 +415,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       pieces.back().begin = b.from;
     } else {
       pieces.push_back({b.from, j, b.english});
+    }
+    // The spaces inside a set phrase ("see you"), in descending order.
+    if (b.english) {
+      if (const std::vector<size_t>* inside = lexicon.FindPhrase(std::string_view(raw).substr(b.from, j - b.from))) {
+        for (size_t k = inside->size(); k-- > 0;) pieces.back().spaces.push_back(b.from + (*inside)[k]);
+      }
     }
     j = b.from;
     s = b.state;

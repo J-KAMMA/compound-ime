@@ -1709,6 +1709,13 @@ subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_diction
                 "--out", str(src / "data/dictionary_oss/dictionary12.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
+# 話し言葉・ネットの書き方（dictionary13.txt）: 行こっか、まあいっか、すいたー など
+# （tools/data/colloquial.tsv）。Mozc に同じ読みの語があれば、その語より少し後ろにする。
+subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py"), "--mozc", str(src),
+                "--words", str(REPO / "tools/data/colloquial.tsv"),
+                "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
+(src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
@@ -2775,6 +2782,17 @@ edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
      "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
 
+# 英語の決まった言い回し: 節: tools/data/english-phrases.txt（see you、made in japan など）を組み込む。
+# 続けて打った言い回しは、かなの切れ目の上なら1つの英語の文節にし、空白を入れて表示する。
+phrases = [line.strip() for line in (REPO / "tools/data/english-phrases.txt").read_text(encoding="utf-8").splitlines()
+           if line.strip() and not line.startswith("#")]
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + array("kPhrases", phrases), encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n",
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n"
+     "    for (const char* phrase : kPhrases) words->AddPhrase(phrase);\n")
+
 # かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
 # 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
 # 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の
@@ -2907,6 +2925,19 @@ edit("converter/converter.cc", """    segment->set_key(kana);
     }
   }
   return typed;""")
+
+# 候補の出どころの印（AZ、AZ1、U、B など）: 節: Mozc の確認用の印で、開発用の作り方
+# （ウィンドウズ版の fastbuild）では常に候補の欄に出ていた。設定の「詳しい記録」
+# （verbose_level）が1以上のときだけ出す。
+edit("prediction/dictionary_predictor.cc", """bool IsDebug(const ConversionRequest& request) {
+#ifndef NDEBUG
+  return true;
+#else   // NDEBUG
+  return request.config().verbose_level() >= 1;
+#endif  // NDEBUG
+}""", """bool IsDebug(const ConversionRequest& request) {
+  return request.config().verbose_level() >= 1;
+}""")
 
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
@@ -3199,6 +3230,27 @@ if ! echo "$SUM  $MODEL" | /usr/bin/shasum -a 256 -c -s 2>/dev/null; then
     && echo "$SUM  $MODEL.part" | /usr/bin/shasum -a 256 -c -s && /bin/mv "$MODEL.part" "$MODEL"
   /bin/rm -f "$MODEL.part"
 fi
+
+/usr/bin/true""")
+
+# マック版の新しい版のお知らせ: ログイン時に台本（CompoundIME.app の Resources/update_check.sh）を動かす
+# LaunchAgent を置く。止め方は tools/update-check/README.md。
+edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 新しい版のお知らせ（1日1回まで GitHub の公開ページに問い合わせる）
+A="/Library/LaunchAgents/org.compoundime.update-check.plist"
+/bin/cat > "$A" <<'EOP'
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>org.compoundime.update-check</string>
+  <key>ProgramArguments</key>
+  <array><string>/bin/bash</string><string>/Library/Input Methods/CompoundIME.app/Contents/Resources/update_check.sh</string></array>
+  <key>RunAtLoad</key><true/>
+  <key>StartInterval</key><integer>86400</integer>
+</dict>
+</plist>
+EOP
+/bin/chmod 644 "$A"
 
 /usr/bin/true""")
 
