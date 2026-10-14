@@ -242,7 +242,7 @@ jobs:
         run: |
           set -eo pipefail
           cd $W/myime/mozc/src
-          BIN=$(bazelisk --output_user_root=C:/b info bazel-bin --config=oss_windows -c opt 2>/dev/null | tail -1 | tr -d "")
+          BIN=$(bazelisk --output_user_root=C:/b info bazel-bin --config=oss_windows -c opt 2>/dev/null | tail -1 | tr -d "[:cntrl:]")
           echo "bazel-bin: $BIN"
           C=$W/parts; rm -rf $C; mkdir -p $C
           for n in mozc_server.exe mozc_tool.exe mozc_renderer.exe mozc_broker.exe mozc_cache_service.exe mozc_tip32.dll mozc_tip64.dll mozc_installer_helper.dll session_handler_main.exe mozc_version.txt; do
