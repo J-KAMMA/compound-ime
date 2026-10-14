@@ -2666,11 +2666,16 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
       has_fixed |= segment.segment_type() == Segment::FIXED_VALUE;
     }
     if (!has_fixed) return;
+    // MYIME_RUN_MIN_SEGMENTS (default 2): the shortest run queried.
+    static const size_t kMinRunSegments = [] {
+      const char* value = std::getenv("MYIME_RUN_MIN_SEGMENTS");
+      return value && *value >= '1' && *value <= '9' ? static_cast<size_t>(*value - '0') : size_t{2};
+    }();
     for (size_t begin = 0; begin < count;) {
       if (segments->conversion_segment(begin).segment_type() != Segment::FREE) { ++begin; continue; }
       size_t end = begin;
       while (end < count && segments->conversion_segment(end).segment_type() == Segment::FREE) ++end;
-      if (end - begin >= 2 && std::chrono::steady_clock::now() < deadline) {
+      if (end - begin >= kMinRunSegments && std::chrono::steady_clock::now() < deadline) {
         Segments run(*segments);
         const size_t history = run.history_segments_size();
         if (end < count) run.erase_segments(history + end, count - end);
