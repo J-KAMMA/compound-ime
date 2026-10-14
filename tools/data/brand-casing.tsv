@@ -20,6 +20,7 @@ asics	ASICS
 astro	Astro
 atcoder	AtCoder
 atlus	ATLUS
+avax	AVAX
 avi	AVI
 aws	AWS
 azure	Azure
@@ -35,8 +36,10 @@ bloodborne	Bloodborne
 bluesky	Bluesky
 bluetooth	Bluetooth
 bmp	BMP
+bnb	BNB
 bridgestone	BRIDGESTONE
 broadcom	Broadcom
+btc	BTC
 cakephp	CakePHP
 casio	CASIO
 cassandra	Cassandra
@@ -112,6 +115,7 @@ epub	ePub
 erlang	Erlang
 erp	ERP
 esp	ESP
+eth	ETH
 etsy	Etsy
 evernote	Evernote
 excel	Excel
@@ -188,6 +192,7 @@ javascript	JavaScript
 jbl	JBL
 jimdo	Jimdo
 jpeg	JPEG
+jpyc	JPYC
 jquery	jQuery
 json	JSON
 julia	Julia
@@ -334,6 +339,7 @@ smtp	SMTP
 snapchat	Snapchat
 snmp	SNMP
 snowflake	Snowflake
+sns	SNS
 softbank	SoftBank
 solr	Solr
 soundcloud	SoundCloud
@@ -381,6 +387,8 @@ unix	UNIX
 unreal	Unreal
 url	URL
 usb	USB
+usdc	USDC
+usdt	USDT
 vagrant	Vagrant
 vba	VBA
 vbscript	VBScript
@@ -417,6 +425,7 @@ xeon	Xeon
 xiaomi	Xiaomi
 xml	XML
 xperia	Xperia
+xrp	XRP
 xss	XSS
 yaml	YAML
 yandex	Yandex
