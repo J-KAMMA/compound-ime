@@ -4,6 +4,9 @@
 name: Windows
 
 on:
+  # 手動実行の入口は主枝に入ってから使える。それまでの試験はこの枝への push で動かす
+  push:
+    branches: [exp/windows-ci]
   workflow_dispatch:
     inputs:
       version:
@@ -26,7 +29,7 @@ jobs:
       BAZEL_SH: C:\Program Files\Git\usr\bin\bash.exe
       # 作業場（長い道筋は Windows で失敗しやすいので短くする）
       W: C:/w
-      VERSION: ${{ inputs.version }}
+      VERSION: ${{ inputs.version || '3.34.6239.142' }}
     steps:
       - uses: actions/checkout@v4
         with:
