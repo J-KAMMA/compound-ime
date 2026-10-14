@@ -34,7 +34,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -330,6 +330,7 @@ int main() {
     Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou and uo are not swapped (chuo for ちゅうおう)");
     Expect(edit("kyohaame", "kyouhaame") == jaen::TypoPriors{}.long_vowel, "a long vowel left out is offered first (kyoha)");
     Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "also after the first key (okii for ookii)");
+    Expect(edit("kyohan'demo", "kyouhan'demo") == jaen::TypoPriors{}.long_vowel, "keys with n' for ん are edited too");
     Expect(edit("kazukidesu", "kaxukidesu") == std::nullopt, "no fix brings in an x or l small kana (z next to x)");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),

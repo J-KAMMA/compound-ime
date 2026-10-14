@@ -167,7 +167,7 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
 std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
                                         const TypoPriors& priors) {
   if (raw.size() < 4 || raw.size() > kMaxRawLength ||
-      !std::ranges::all_of(raw, [](char c) { return c >= 'a' && c <= 'z'; })) {
+      !std::ranges::all_of(raw, [](char c) { return (c >= 'a' && c <= 'z') || c == '\''; })) {
     return {};
   }
   // Kana of fully read keys, or nullopt.
@@ -229,8 +229,9 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
     }
     // Neighbors swapped ("kareu"); not "uo"/"ou", where a long vowel was left
     // out the passport way ("chuosen" is 中央線, not 朝鮮 mistyped).
-    if (i + 1 < text.size() && text[i] != text[i + 1] && text.compare(i, 2, "uo") != 0 &&
-        text.compare(i, 2, "ou") != 0) {
+    // The ' of n' is no key to swap.
+    if (i + 1 < text.size() && text[i] != text[i + 1] && text[i] != '\'' && text[i + 1] != '\'' &&
+        text.compare(i, 2, "uo") != 0 && text.compare(i, 2, "ou") != 0) {
       std::string s = text;
       std::swap(s[i], s[i + 1]);
       add(std::move(s), priors.swapped);
