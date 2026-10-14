@@ -87,6 +87,8 @@ int main() {
   lexicon.Add("ntt", true);
   lexicon.AddPhrase("see you");
   lexicon.AddPhrase("made in japan");
+  lexicon.AddPhrase("log in");
+  lexicon.Add("login");
   for (const char* w : {"dog", "cat"}) lexicon.Add(w);
   for (const char* w : {"london", "mac", "sumo", "gand"}) lexicon.AddSignalOnly(w);
   lexicon.AddSignalOnly("kite");  // already a word: stays a plain word
@@ -131,6 +133,8 @@ int main() {
            "a set phrase is one piece with its space (see you)");
   }
   Expect(english("madeinjapandesu") == "madeinjapan|", "a set phrase of three words");
+  Expect(english("loginnishippai").size() > 0 && split("loginnishippai").first[0].spaces.empty(),
+         "a phrase that is also one word stays one word (login)");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");

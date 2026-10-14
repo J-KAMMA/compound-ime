@@ -122,7 +122,9 @@ void Lexicon::AddPhrase(std::string_view phrase) {
 
 const std::vector<size_t>* Lexicon::FindPhrase(std::string_view typed) const {
   const auto lower = Normalize(typed);
-  const auto it = lower ? phrases_.find(*lower) : phrases_.end();
+  // One word as written together ("login", "frontend", "takeout") is no phrase.
+  if (!lower || words_.contains(*lower) || joined_.contains(*lower)) return nullptr;
+  const auto it = phrases_.find(*lower);
   return it == phrases_.end() ? nullptr : &it->second;
 }
 
