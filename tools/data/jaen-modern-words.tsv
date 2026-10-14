@@ -1,0 +1,5960 @@
+# 日本語の文の中にローマ字入力のまま打たれる英字の語（一般的な英単語の辞書に載らない略語・製品名・サービス名・ブランド名など）。形式: 打つ形（英小文字のみ）<TAB>表示する形。一般的な英単語や、そのまま自然な日本語のローマ字になる語は除いた。2026-10-15 作成（試験データは見ていない）
+sns	SNS
+pdf	PDF
+api	API
+url	URL
+os	OS
+pc	PC
+usb	USB
+ai	AI
+it	IT
+dx	DX
+gx	GX
+kpi	KPI
+kgi	KGI
+okr	OKR
+roi	ROI
+ceo	CEO
+cto	CTO
+cfo	CFO
+cio	CIO
+cmo	CMO
+chro	CHRO
+ciso	CISO
+cpo	CPO
+cro	CRO
+cdo	CDO
+hr	HR
+pr	PR
+qa	QA
+ux	UX
+ui	UI
+uiux	UI/UX
+faq	FAQ
+dm	DM
+etc	ETC
+atm	ATM
+gps	GPS
+nhk	NHK
+jr	JR
+ntt	NTT
+kddi	KDDI
+jt	JT
+jtb	JTB
+jal	JAL
+jaxa	JAXA
+jica	JICA
+jetro	JETRO
+jasrac	JASRAC
+jis	JIS
+jas	JAS
+jaf	JAF
+jra	JRA
+jfa	JFA
+jba	JBA
+npb	NPB
+jpx	JPX
+tse	TSE
+nec	NEC
+tdk	TDK
+agc	AGC
+ntn	NTN
+nok	NOK
+smbc	SMBC
+mufg	MUFG
+ufj	UFJ
+sbi	SBI
+gmo	GMO
+btob	BtoB
+btoc	BtoC
+ctoc	CtoC
+dtoc	DtoC
+saas	SaaS
+paas	PaaS
+iaas	IaaS
+daas	DaaS
+baas	BaaS
+faas	FaaS
+maas	MaaS
+haas	HaaS
+caas	CaaS
+xaas	XaaS
+ipaas	iPaaS
+crm	CRM
+sfa	SFA
+erp	ERP
+scm	SCM
+cms	CMS
+lms	LMS
+hrm	HRM
+hcm	HCM
+plm	PLM
+wms	WMS
+tms	TMS
+pos	POS
+ec	EC
+cx	CX
+ex	EX
+bx	BX
+bpo	BPO
+bpr	BPR
+rpa	RPA
+ocr	OCR
+nlp	NLP
+llm	LLM
+gpt	GPT
+ml	ML
+dl	DL
+cv	CV
+mcp	MCP
+cnn	CNN
+rnn	RNN
+lstm	LSTM
+vae	VAE
+rlhf	RLHF
+sft	SFT
+dpo	DPO
+ppo	PPO
+lora	LoRA
+qlora	QLoRA
+tpu	TPU
+gpu	GPU
+cpu	CPU
+npu	NPU
+apu	APU
+dpu	DPU
+soc	SoC
+ssd	SSD
+hdd	HDD
+nvme	NVMe
+ram	RAM
+rom	ROM
+dram	DRAM
+sram	SRAM
+vram	VRAM
+ddr	DDR
+ecc	ECC
+bios	BIOS
+uefi	UEFI
+tpm	TPM
+lan	LAN
+vpn	VPN
+vps	VPS
+dns	DNS
+dhcp	DHCP
+nat	NAT
+tcp	TCP
+udp	UDP
+ip	IP
+http	HTTP
+https	HTTPS
+ftp	FTP
+sftp	SFTP
+ftps	FTPS
+ssh	SSH
+ssl	SSL
+tls	TLS
+smtp	SMTP
+imap	IMAP
+ldap	LDAP
+saml	SAML
+oauth	OAuth
+oidc	OIDC
+sso	SSO
+mfa	MFA
+otp	OTP
+totp	TOTP
+jwt	JWT
+cors	CORS
+csrf	CSRF
+xss	XSS
+csp	CSP
+waf	WAF
+ids	IDS
+ips	IPS
+siem	SIEM
+edr	EDR
+xdr	XDR
+mdr	MDR
+ndr	NDR
+utm	UTM
+dlp	DLP
+iam	IAM
+pam	PAM
+rbac	RBAC
+abac	ABAC
+acl	ACL
+pki	PKI
+ca	CA
+cve	CVE
+cvss	CVSS
+owasp	OWASP
+ddos	DDoS
+dos	DoS
+bec	BEC
+ztna	ZTNA
+casb	CASB
+swg	SWG
+ngfw	NGFW
+iot	IoT
+iiot	IIoT
+ot	OT
+ict	ICT
+cad	CAD
+cae	CAE
+bim	BIM
+cg	CG
+vr	VR
+ar	AR
+mr	MR
+xr	XR
+vtuber	VTuber
+nfc	NFC
+rfid	RFID
+qr	QR
+led	LED
+lcd	LCD
+oled	OLED
+hdr	HDR
+hdmi	HDMI
+dvi	DVI
+vga	VGA
+usbc	USB-C
+lte	LTE
+wifi	Wi-Fi
+bluetooth	Bluetooth
+ble	BLE
+gnss	GNSS
+ic	IC
+lsi	LSI
+cmos	CMOS
+ccd	CCD
+mems	MEMS
+fpga	FPGA
+asic	ASIC
+pcb	PCB
+ems	EMS
+odm	ODM
+oem	OEM
+obm	OBM
+pb	PB
+nb	NB
+sku	SKU
+upc	UPC
+cpa	CPA
+cpc	CPC
+cpm	CPM
+ctr	CTR
+cvr	CVR
+cpi	CPI
+ltv	LTV
+cac	CAC
+arpu	ARPU
+arppu	ARPPU
+mrr	MRR
+arr	ARR
+nrr	NRR
+grr	GRR
+nps	NPS
+csat	CSAT
+pv	PV
+seo	SEO
+sem	SEM
+lpo	LPO
+lp	LP
+cta	CTA
+ugc	UGC
+kol	KOL
+pdca	PDCA
+swot	SWOT
+ksf	KSF
+kfs	KFS
+usp	USP
+stp	STP
+aidma	AIDMA
+aisas	AISAS
+mvp	MVP
+poc	PoC
+pmf	PMF
+pm	PM
+pdm	PdM
+pjm	PjM
+pmo	PMO
+vpoe	VPoE
+vpop	VPoP
+sre	SRE
+devops	DevOps
+mlops	MLOps
+llmops	LLMOps
+dataops	DataOps
+finops	FinOps
+secops	SecOps
+devsecops	DevSecOps
+gitops	GitOps
+aiops	AIOps
+ci	CI
+cd	CD
+cicd	CI/CD
+tdd	TDD
+bdd	BDD
+ddd	DDD
+oop	OOP
+fp	FP
+mvc	MVC
+mvvm	MVVM
+mpa	MPA
+ssr	SSR
+ssg	SSG
+isr	ISR
+csr	CSR
+pwa	PWA
+sdk	SDK
+cli	CLI
+gui	GUI
+cui	CUI
+restful	RESTful
+rpc	RPC
+grpc	gRPC
+graphql	GraphQL
+orm	ORM
+db	DB
+dbms	DBMS
+rdb	RDB
+rdbms	RDBMS
+nosql	NoSQL
+sql	SQL
+ddl	DDL
+dml	DML
+dcl	DCL
+etl	ETL
+elt	ELT
+dwh	DWH
+olap	OLAP
+oltp	OLTP
+kvs	KVS
+cdn	CDN
+cdp	CDP
+dmp	DMP
+dsp	DSP
+ssp	SSP
+adn	ADN
+vm	VM
+vdi	VDI
+oss	OSS
+gpl	GPL
+lgpl	LGPL
+agpl	AGPL
+mit	MIT
+bsd	BSD
+eula	EULA
+sla	SLA
+slo	SLO
+sli	SLI
+mttr	MTTR
+mtbf	MTBF
+rto	RTO
+rpo	RPO
+bcp	BCP
+dr	DR
+lb	LB
+alb	ALB
+nlb	NLB
+elb	ELB
+rds	RDS
+eks	EKS
+ecs	ECS
+ecr	ECR
+vpc	VPC
+cdk	CDK
+sam	SAM
+sqs	SQS
+ses	SES
+kms	KMS
+gce	GCE
+gke	GKE
+gcs	GCS
+aks	AKS
+acr	ACR
+vnet	VNet
+ascii	ASCII
+json	JSON
+xml	XML
+yaml	YAML
+toml	TOML
+csv	CSV
+tsv	TSV
+html	HTML
+css	CSS
+scss	SCSS
+sass	SASS
+jsx	JSX
+tsx	TSX
+svg	SVG
+png	PNG
+jpeg	JPEG
+jpg	JPG
+gif	GIF
+webp	WebP
+avif	AVIF
+heic	HEIC
+bmp	BMP
+aac	AAC
+flac	FLAC
+wav	WAV
+mov	MOV
+mkv	MKV
+wmv	WMV
+midi	MIDI
+psd	PSD
+eps	EPS
+dxf	DXF
+stl	STL
+obj	OBJ
+fbx	FBX
+rar	RAR
+lzh	LZH
+dmg	DMG
+apk	APK
+ipa	IPA
+exe	EXE
+msi	MSI
+dll	DLL
+uuid	UUID
+guid	GUID
+id	ID
+pw	PW
+sms	SMS
+mms	MMS
+rcs	RCS
+mnp	MNP
+sim	SIM
+esim	eSIM
+mvno	MVNO
+mno	MNO
+isp	ISP
+ftth	FTTH
+adsl	ADSL
+dsl	DSL
+catv	CATV
+bs	BS
+hd	HD
+fhd	FHD
+uhd	UHD
+sd	SD
+microsd	microSD
+cf	CF
+dvd	DVD
+bd	BD
+cdrom	CD-ROM
+dvdr	DVD-R
+md	MD
+vhs	VHS
+ld	LD
+mac	Mac
+nas	NAS
+kvm	KVM
+tn	TN
+miniled	MiniLED
+microled	microLED
+qled	QLED
+amoled	AMOLED
+eink	E-ink
+nft	NFT
+dao	DAO
+sdgs	SDGs
+esg	ESG
+ipo	IPO
+tob	TOB
+mbo	MBO
+lbo	LBO
+vc	VC
+cvc	CVC
+ir	IR
+pbr	PBR
+roic	ROIC
+ebitda	EBITDA
+ebit	EBIT
+ev	EV
+dcf	DCF
+npv	NPV
+irr	IRR
+wacc	WACC
+capm	CAPM
+fcf	FCF
+pl	PL
+gdp	GDP
+gnp	GNP
+gni	GNI
+ppi	PPI
+pmi	PMI
+fomc	FOMC
+frb	FRB
+ecb	ECB
+boj	BOJ
+imf	IMF
+wto	WTO
+oecd	OECD
+opec	OPEC
+apec	APEC
+asean	ASEAN
+fta	FTA
+tpp	TPP
+rcep	RCEP
+brics	BRICS
+nato	NATO
+unesco	UNESCO
+unicef	UNICEF
+ilo	ILO
+iaea	IAEA
+ioc	IOC
+fifa	FIFA
+uefa	UEFA
+nba	NBA
+nfl	NFL
+mlb	MLB
+nhl	NHL
+mls	MLS
+ncaa	NCAA
+pga	PGA
+lpga	LPGA
+atp	ATP
+wta	WTA
+wrc	WRC
+motogp	MotoGP
+ufc	UFC
+wwe	WWE
+njpw	NJPW
+wbc	WBC
+wba	WBA
+wbo	WBO
+ibf	IBF
+jbc	JBC
+jpba	JPBA
+jlpga	JLPGA
+jgto	JGTO
+nbl	NBL
+ntv	NTV
+tbs	TBS
+tx	TX
+mx	MX
+bstbs	BS-TBS
+wowow	WOWOW
+jcom	J:COM
+abema	ABEMA
+tver	TVer
+unext	U-NEXT
+dazn	DAZN
+fod	FOD
+hulu	Hulu
+dtv	dTV
+bbc	BBC
+abc	ABC
+cbs	CBS
+nbc	NBC
+hbo	HBO
+espn	ESPN
+mtv	MTV
+afp	AFP
+nyt	NYT
+wsj	WSJ
+ft	FT
+wwd	WWD
+knt	KNT
+lcc	LCC
+fsc	FSC
+jcb	JCB
+amex	AMEX
+amc	AMC
+uq	UQ
+iij	IIJ
+iijmio	IIJmio
+ocn	OCN
+biglobe	BIGLOBE
+sonet	So-net
+nuro	NURO
+ibm	IBM
+hp	HP
+hpe	HPE
+dell	DELL
+amd	AMD
+tsmc	TSMC
+asml	ASML
+sk	SK
+lg	LG
+byd	BYD
+catl	CATL
+bmw	BMW
+vw	VW
+gm	GM
+basf	BASF
+bp	BP
+hsbc	HSBC
+ubs	UBS
+bnp	BNP
+kpmg	KPMG
+pwc	PwC
+ey	EY
+bcg	BCG
+ykk	YKK
+lixil	LIXIL
+dcm	DCM
+zozo	ZOZO
+zozotown	ZOZOTOWN
+dmm	DMM
+dmmcom	DMM.com
+sega	SEGA
+snk	SNK
+hal	HAL
+nhn	NHN
+paypay	PayPay
+aupay	au PAY
+quicpay	QUICPay
+nanaco	nanaco
+suica	Suica
+pasmo	PASMO
+icoca	ICOCA
+toica	TOICA
+manaca	manaca
+sugoca	SUGOCA
+nimoca	nimoca
+kitaca	Kitaca
+smfg	SMFG
+fg	FG
+kk	KK
+llc	LLC
+llp	LLP
+gk	GK
+npo	NPO
+ngo	NGO
+ob	OB
+og	OG
+ojt	OJT
+offjt	Off-JT
+ky	KY
+jk	JK
+jc	JC
+jd	JD
+dk	DK
+dc	DC
+js	JS
+toeic	TOEIC
+toefl	TOEFL
+ielts	IELTS
+gtec	GTEC
+teap	TEAP
+cefr	CEFR
+alt	ALT
+esl	ESL
+efl	EFL
+pta	PTA
+mba	MBA
+phd	PhD
+uscpa	USCPA
+cfp	CFP
+cfa	CFA
+cma	CMA
+ifrs	IFRS
+gaap	GAAP
+jgaap	J-GAAP
+usgaap	US-GAAP
+sox	SOX
+jsox	J-SOX
+csirt	CSIRT
+psirt	PSIRT
+isms	ISMS
+gdpr	GDPR
+ccpa	CCPA
+pcidss	PCI DSS
+hipaa	HIPAA
+itil	ITIL
+pmbok	PMBOK
+pmp	PMP
+ccna	CCNA
+ccnp	CCNP
+lpic	LPIC
+linuc	LinuC
+awssaa	AWS SAA
+ap	AP
+toeiclr	TOEIC L&R
+diy	DIY
+dtm	DTM
+daw	DAW
+vst	VST
+mv	MV
+mc	MC
+dj	DJ
+bgm	BGM
+op	OP
+ed	ED
+cm	CM
+tvcm	TVCM
+oad	OAD
+ost	OST
+vj	VJ
+av	AV
+ab	A/B
+bl	BL
+gl	GL
+tl	TL
+nl	NL
+cp	CP
+ng	NG
+ok	OK
+ss	SS
+ur	UR
+sr	SR
+lr	LR
+mp	MP
+sp	SP
+tp	TP
+exp	EXP
+xp	XP
+lv	LV
+atk	ATK
+def	DEF
+int	INT
+dex	DEX
+luk	LUK
+dps	DPS
+dot	DoT
+aoe	AoE
+cc	CC
+pvp	PvP
+pve	PvE
+pvpve	PvPvE
+mmo	MMO
+mmorpg	MMORPG
+rpg	RPG
+srpg	SRPG
+arpg	ARPG
+jrpg	JRPG
+fps	FPS
+tps	TPS
+rts	RTS
+moba	MOBA
+tcg	TCG
+ccg	CCG
+dcg	DCG
+ocg	OCG
+trpg	TRPG
+adv	ADV
+avg	AVG
+slg	SLG
+stg	STG
+rta	RTA
+tas	TAS
+npc	NPC
+pk	PK
+dlc	DLC
+mtx	MTX
+esports	esports
+vrchat	VRChat
+vrc	VRC
+rt	RT
+rp	RP
+ff	FF
+fb	FB
+ig	IG
+yt	YT
+igtv	IGTV
+asmr	ASMR
+bot	BOT
+lmao	LMAO
+omg	OMG
+btw	BTW
+fyi	FYI
+asap	ASAP
+tbd	TBD
+tba	TBA
+tbc	TBC
+wip	WIP
+eod	EOD
+eow	EOW
+pto	PTO
+wfh	WFH
+imho	IMHO
+afaik	AFAIK
+tldr	TL;DR
+iirc	IIRC
+til	TIL
+fomo	FOMO
+yolo	YOLO
+pov	POV
+nsfw	NSFW
+sfw	SFW
+ps	PS
+tbh	TBH
+idk	IDK
+irl	IRL
+afk	AFK
+brb	BRB
+gg	GG
+gj	GJ
+hf	HF
+wp	WP
+nt	NT
+ks	KS
+bff	BFF
+dink	DINK
+dinks	DINKS
+lgbt	LGBT
+lgbtq	LGBTQ
+metoo	MeToo
+blm	BLM
+pfas	PFAS
+dna	DNA
+rna	RNA
+mrna	mRNA
+pcr	PCR
+sars	SARS
+mers	MERS
+hiv	HIV
+hpv	HPV
+adhd	ADHD
+asd	ASD
+hsp	HSP
+ptsd	PTSD
+ocd	OCD
+bmi	BMI
+bmr	BMR
+pfc	PFC
+mct	MCT
+dha	DHA
+cbd	CBD
+thc	THC
+nmn	NMN
+bcaa	BCAA
+hmb	HMB
+ages	AGEs
+uv	UV
+uvb	UVB
+spf	SPF
+bb	BB
+dd	DD
+ipl	IPL
+rf	RF
+icl	ICL
+lasik	LASIK
+mri	MRI
+ct	CT
+ecg	ECG
+icu	ICU
+ccu	CCU
+nicu	NICU
+er	ER
+aed	AED
+cpr	CPR
+bls	BLS
+acls	ACLS
+dmat	DMAT
+dpat	DPAT
+qol	QOL
+adl	ADL
+iadl	IADL
+als	ALS
+copd	COPD
+ibs	IBS
+ibd	IBD
+gerd	GERD
+ckd	CKD
+dv	DV
+pms	PMS
+pmdd	PMDD
+ivf	IVF
+icsi	ICSI
+amh	AMH
+nipt	NIPT
+hcg	HCG
+lh	LH
+fsh	FSH
+tsh	TSH
+ast	AST
+ldl	LDL
+hdl	HDL
+crp	CRP
+egfr	eGFR
+nexco	NEXCO
+jct	JCT
+hv	HV
+hev	HEV
+phv	PHV
+phev	PHEV
+fcv	FCV
+fcev	FCEV
+bev	BEV
+mt	MT
+cvt	CVT
+dct	DCT
+awd	AWD
+fr	FR
+rr	RR
+suv	SUV
+mpv	MPV
+abs	ABS
+esc	ESC
+acc	ACC
+lka	LKA
+lkas	LKAS
+adas	ADAS
+aeb	AEB
+hud	HUD
+obd	OBD
+ecu	ECU
+isofix	ISOFIX
+jncap	JNCAP
+ncap	NCAP
+wltc	WLTC
+lrt	LRT
+brt	BRT
+sl	SL
+ef	EF
+dmu	DMU
+mrt	MRT
+bts	BTS
+mtr	MTR
+ktx	KTX
+tgv	TGV
+lgv	LGV
+vp	VP
+svp	SVP
+evp	EVP
+mgr	MGR
+bizdev	BizDev
+sdr	SDR
+bdr	BDR
+fs	FS
+csm	CSM
+qc	QC
+rd	R&D
+rfp	RFP
+rfi	RFI
+rfq	RFQ
+nda	NDA
+loi	LOI
+kyc	KYC
+aml	AML
+cft	CFT
+kyb	KYB
+ddq	DDQ
+jv	JV
+spc	SPC
+spv	SPV
+gp	GP
+lps	LPS
+reit	REIT
+jreit	J-REIT
+etf	ETF
+etn	ETN
+esop	ESOP
+rsu	RSU
+espp	ESPP
+nisa	NISA
+ideco	iDeCo
+gpif	GPIF
+fx	FX
+cfd	CFD
+topix	TOPIX
+nasdaq	NASDAQ
+nyse	NYSE
+lse	LSE
+hkex	HKEX
+sgx	SGX
+kospi	KOSPI
+dax	DAX
+ftse	FTSE
+msci	MSCI
+vix	VIX
+vwap	VWAP
+twap	TWAP
+pts	PTS
+sor	SOR
+mrf	MRF
+mmf	MMF
+bic	BIC
+ach	ACH
+rtgs	RTGS
+cbdc	CBDC
+bnpl	BNPL
+github	GitHub
+gitlab	GitLab
+bitbucket	Bitbucket
+gitea	Gitea
+gogs	Gogs
+forgejo	Forgejo
+codeberg	Codeberg
+sourceforge	SourceForge
+docker	Docker
+dockercompose	Docker Compose
+dockerhub	DockerHub
+podman	Podman
+buildah	Buildah
+containerd	containerd
+crio	CRI-O
+runc	runc
+kubernetes	Kubernetes
+kubectl	kubectl
+kubeadm	kubeadm
+kubelet	kubelet
+minikube	minikube
+openshift	OpenShift
+kustomize	Kustomize
+istio	Istio
+linkerd	Linkerd
+terraform	Terraform
+terragrunt	Terragrunt
+pulumi	Pulumi
+ansible	Ansible
+saltstack	SaltStack
+cloudformation	CloudFormation
+crossplane	Crossplane
+argocd	ArgoCD
+fluxcd	FluxCD
+tekton	Tekton
+jenkins	Jenkins
+circleci	CircleCI
+travisci	TravisCI
+githubactions	GitHub Actions
+gitlabci	GitLab CI
+buildkite	Buildkite
+teamcity	TeamCity
+appveyor	AppVeyor
+bitrise	Bitrise
+codemagic	Codemagic
+fastlane	fastlane
+dependabot	Dependabot
+sonarqube	SonarQube
+sonarcloud	SonarCloud
+codecov	Codecov
+coveralls	Coveralls
+snyk	Snyk
+trivy	Trivy
+grype	Grype
+syft	Syft
+falco	Falco
+grafana	Grafana
+mimir	Mimir
+alertmanager	Alertmanager
+datadog	Datadog
+newrelic	NewRelic
+dynatrace	Dynatrace
+appdynamics	AppDynamics
+splunk	Splunk
+sumologic	Sumo Logic
+elasticsearch	Elasticsearch
+kibana	Kibana
+logstash	Logstash
+fluentd	Fluentd
+fluentbit	Fluent Bit
+filebeat	Filebeat
+metricbeat	Metricbeat
+opensearch	OpenSearch
+opentelemetry	OpenTelemetry
+zipkin	Zipkin
+bugsnag	Bugsnag
+rollbar	Rollbar
+lightstep	Lightstep
+pagerduty	PagerDuty
+opsgenie	Opsgenie
+statuspage	Statuspage
+uptimerobot	UptimeRobot
+zabbix	Zabbix
+nagios	Nagios
+icinga	Icinga
+netdata	Netdata
+telegraf	Telegraf
+influxdb	InfluxDB
+victoriametrics	VictoriaMetrics
+timescaledb	TimescaleDB
+questdb	QuestDB
+clickhouse	ClickHouse
+trino	Trino
+hadoop	Hadoop
+hdfs	HDFS
+mapreduce	MapReduce
+pyspark	PySpark
+flink	Flink
+kafka	Kafka
+rabbitmq	RabbitMQ
+activemq	ActiveMQ
+zeromq	ZeroMQ
+nats	NATS
+mosquitto	Mosquitto
+mqtt	MQTT
+amqp	AMQP
+redpanda	Redpanda
+airflow	Airflow
+dagster	Dagster
+dbt	dbt
+fivetran	Fivetran
+airbyte	Airbyte
+talend	Talend
+informatica	Informatica
+bigquery	BigQuery
+databricks	Databricks
+emr	EMR
+dataflow	Dataflow
+dataproc	Dataproc
+lookerstudio	Looker Studio
+powerbi	PowerBI
+metabase	Metabase
+redash	Redash
+sisense	Sisense
+qlik	Qlik
+qlikview	QlikView
+thoughtspot	ThoughtSpot
+jsonl	JSONL
+ndjson	NDJSON
+xslt	XSLT
+xpath	XPath
+xhtml	XHTML
+postcss	PostCSS
+tailwind	Tailwind
+tailwindcss	TailwindCSS
+bulma	Bulma
+materialui	Material UI
+chakraui	Chakra UI
+mantine	Mantine
+antdesign	Ant Design
+antd	antd
+shadcn	shadcn
+shadcnui	shadcn/ui
+radix	Radix
+radixui	Radix UI
+headlessui	Headless UI
+daisyui	daisyUI
+unocss	UnoCSS
+windicss	WindiCSS
+vuetify	Vuetify
+elementplus	Element Plus
+primevue	PrimeVue
+primereact	PrimeReact
+semanticui	Semantic UI
+styledcomponents	styled-components
+cssmodules	CSS Modules
+vanillaextract	vanilla-extract
+pandacss	Panda CSS
+stylex	StyleX
+javascript	JavaScript
+typescript	TypeScript
+ecmascript	ECMAScript
+nodejs	Node.js
+npm	npm
+npx	npx
+pnpm	pnpm
+corepack	Corepack
+nvm	nvm
+fnm	fnm
+voltajs	Volta.js
+webpack	webpack
+vite	Vite
+esbuild	esbuild
+swc	SWC
+babel	Babel
+turbopack	Turbopack
+rspack	Rspack
+rolldown	Rolldown
+snowpack	Snowpack
+browserify	Browserify
+lerna	Lerna
+nx	Nx
+turborepo	Turborepo
+changesets	Changesets
+eslint	ESLint
+tslint	TSLint
+jshint	JSHint
+jslint	JSLint
+biome	Biome
+oxlint	Oxlint
+stylelint	Stylelint
+lintstaged	lint-staged
+commitlint	commitlint
+vitest	Vitest
+puppeteer	Puppeteer
+webdriver	WebDriver
+webdriverio	WebdriverIO
+testcafe	TestCafe
+nightwatch	Nightwatch
+testinglibrary	Testing Library
+msw	MSW
+supertest	Supertest
+jmeter	JMeter
+reactjs	ReactJS
+reactnative	React Native
+nextjs	Next.js
+nuxt	Nuxt
+nuxtjs	Nuxt.js
+vue	Vue
+vuejs	Vue.js
+vuex	Vuex
+pinia	Pinia
+angularjs	AngularJS
+svelte	Svelte
+sveltekit	SvelteKit
+solidjs	SolidJS
+preact	Preact
+qwik	Qwik
+astro	Astro
+jekyll	Jekyll
+hexo	Hexo
+docusaurus	Docusaurus
+vitepress	VitePress
+vuepress	VuePress
+mkdocs	MkDocs
+docsify	Docsify
+gitbook	GitBook
+nextra	Nextra
+emberjs	Ember.js
+backbonejs	Backbone.js
+jquery	jQuery
+lodash	Lodash
+ramda	Ramda
+rxjs	RxJS
+immer	Immer
+immutablejs	Immutable.js
+redux	Redux
+reduxtoolkit	Redux Toolkit
+mobx	MobX
+zustand	Zustand
+valtio	Valtio
+xstate	XState
+tanstack	TanStack
+tanstackquery	TanStack Query
+reactquery	React Query
+swr	SWR
+apollo	Apollo
+apolloclient	Apollo Client
+urql	urql
+trpc	tRPC
+axios	Axios
+zod	Zod
+yup	Yup
+valibot	Valibot
+formik	Formik
+dayjs	Day.js
+momentjs	Moment.js
+datefns	date-fns
+luxon	Luxon
+chartjs	Chart.js
+echarts	ECharts
+highcharts	Highcharts
+recharts	Recharts
+plotly	Plotly
+threejs	Three.js
+babylonjs	Babylon.js
+pixijs	PixiJS
+gsap	GSAP
+framermotion	Framer Motion
+lottie	Lottie
+animejs	Anime.js
+mapbox	Mapbox
+openlayers	OpenLayers
+socketio	Socket.IO
+expressjs	Express.js
+fastify	Fastify
+nestjs	NestJS
+adonisjs	AdonisJS
+elysia	Elysia
+sailsjs	Sails.js
+strapi	Strapi
+directus	Directus
+keystonejs	KeystoneJS
+contentful	Contentful
+microcms	microCMS
+prismic	Prismic
+storyblok	Storyblok
+hygraph	Hygraph
+graphcms	GraphCMS
+datocms	DatoCMS
+netlifycms	Netlify CMS
+decapcms	Decap CMS
+prisma	Prisma
+typeorm	TypeORM
+sequelize	Sequelize
+drizzleorm	Drizzle ORM
+knex	Knex
+knexjs	Knex.js
+mikroorm	MikroORM
+objectionjs	Objection.js
+kysely	Kysely
+nwjs	NW.js
+phonegap	PhoneGap
+nativescript	NativeScript
+flutterflow	FlutterFlow
+xamarin	Xamarin
+netmaui	.NET MAUI
+kotlinmultiplatform	Kotlin Multiplatform
+composemultiplatform	Compose Multiplatform
+jetpackcompose	Jetpack Compose
+swiftui	SwiftUI
+uikit	UIKit
+appkit	AppKit
+coredata	CoreData
+coreml	Core ML
+arkit	ARKit
+realitykit	RealityKit
+scenekit	SceneKit
+spritekit	SpriteKit
+vulkan	Vulkan
+opengl	OpenGL
+opengles	OpenGL ES
+webgl	WebGL
+webgpu	WebGPU
+directx	DirectX
+opencl	OpenCL
+cuda	CUDA
+cudnn	cuDNN
+tensorrt	TensorRT
+rocm	ROCm
+oneapi	oneAPI
+python	Python
+cpython	CPython
+pypy	PyPy
+cython	Cython
+jython	Jython
+micropython	MicroPython
+circuitpython	CircuitPython
+pip	pip
+pipx	pipx
+pipenv	pipenv
+conda	Conda
+miniconda	Miniconda
+micromamba	Micromamba
+pyenv	pyenv
+virtualenv	virtualenv
+venv	venv
+tox	tox
+nox	nox
+pytest	pytest
+unittest	unittest
+isort	isort
+pylint	Pylint
+mypy	mypy
+pyright	Pyright
+pylance	Pylance
+pydantic	Pydantic
+fastapi	FastAPI
+django	Django
+starlette	Starlette
+uvicorn	Uvicorn
+gunicorn	Gunicorn
+sqlalchemy	SQLAlchemy
+peewee	Peewee
+tortoiseorm	Tortoise ORM
+streamlit	Streamlit
+gradio	Gradio
+seaborn	Seaborn
+matplotlib	Matplotlib
+numpy	NumPy
+scipy	SciPy
+dask	Dask
+jax	JAX
+optax	Optax
+pytorch	PyTorch
+torchvision	TorchVision
+torchaudio	torchaudio
+pytorchlightning	PyTorch Lightning
+tensorflow	TensorFlow
+keras	Keras
+tflite	TFLite
+tensorflowlite	TensorFlow Lite
+onnx	ONNX
+onnxruntime	ONNX Runtime
+openvino	OpenVINO
+scikitlearn	scikit-learn
+sklearn	sklearn
+xgboost	XGBoost
+lightgbm	LightGBM
+catboost	CatBoost
+optuna	Optuna
+hyperopt	Hyperopt
+mlflow	MLflow
+wandb	wandb
+kubeflow	Kubeflow
+sagemaker	SageMaker
+vertexai	Vertex AI
+huggingface	Hugging Face
+diffusers	Diffusers
+peft	PEFT
+trl	TRL
+deepspeed	DeepSpeed
+fsdp	FSDP
+vllm	vLLM
+sglang	SGLang
+tgi	TGI
+llamacpp	llama.cpp
+gguf	GGUF
+ggml	GGML
+ollama	Ollama
+lmstudio	LM Studio
+localai	LocalAI
+exllama	ExLlama
+autogptq	AutoGPTQ
+gptq	GPTQ
+awq	AWQ
+bitsandbytes	bitsandbytes
+langchain	LangChain
+langgraph	LangGraph
+langsmith	LangSmith
+llamaindex	LlamaIndex
+dspy	DSPy
+autogen	AutoGen
+crewai	CrewAI
+semantickernel	Semantic Kernel
+litellm	LiteLLM
+openrouter	OpenRouter
+weaviate	Weaviate
+qdrant	Qdrant
+milvus	Milvus
+chromadb	ChromaDB
+faiss	FAISS
+hnsw	HNSW
+pgvector	pgvector
+lancedb	LanceDB
+vespa	Vespa
+spacy	spaCy
+nltk	NLTK
+gensim	Gensim
+mecab	MeCab
+sudachipy	SudachiPy
+kytea	KyTea
+fasttext	fastText
+glove	GloVe
+bert	BERT
+roberta	RoBERTa
+albert	ALBERT
+distilbert	DistilBERT
+deberta	DeBERTa
+electra	ELECTRA
+xlnet	XLNet
+bart	BART
+mixtral	Mixtral
+qwen	Qwen
+deepseek	DeepSeek
+stablelm	StableLM
+stablediffusion	Stable Diffusion
+sdxl	SDXL
+controlnet	ControlNet
+comfyui	ComfyUI
+invokeai	InvokeAI
+fooocus	Fooocus
+dreambooth	DreamBooth
+opencv	OpenCV
+pil	PIL
+scikitimage	scikit-image
+imagemagick	ImageMagick
+ffmpeg	FFmpeg
+gstreamer	GStreamer
+detectron	Detectron
+mediapipe	MediaPipe
+openpose	OpenPose
+paddleocr	PaddleOCR
+easyocr	EasyOCR
+beautifulsoup	BeautifulSoup
+scrapy	Scrapy
+httpx	httpx
+aiohttp	aiohttp
+asyncio	asyncio
+sanic	Sanic
+cherrypy	CherryPy
+tkinter	Tkinter
+pyqt	PyQt
+pyside	PySide
+kivy	Kivy
+wxpython	wxPython
+pyinstaller	PyInstaller
+nuitka	Nuitka
+jupyter	Jupyter
+jupyterlab	JupyterLab
+jupyternotebook	Jupyter Notebook
+ipython	IPython
+colab	Colab
+googlecolab	Google Colab
+kaggle	Kaggle
+anacondanavigator	Anaconda Navigator
+spyder	Spyder
+pycharm	PyCharm
+thonny	Thonny
+golang	Golang
+rustup	rustup
+rustc	rustc
+clippy	Clippy
+cratesio	crates.io
+actix	Actix
+actixweb	Actix Web
+axum	Axum
+serde	Serde
+seaorm	SeaORM
+leptos	Leptos
+dioxus	Dioxus
+bevy	Bevy
+wasm	Wasm
+webassembly	WebAssembly
+wasmtime	wasmtime
+wasmer	Wasmer
+emscripten	Emscripten
+beego	Beego
+gorm	GORM
+logrus	Logrus
+kotlin	Kotlin
+ktor	Ktor
+springboot	Spring Boot
+springframework	Spring Framework
+quarkus	Quarkus
+micronaut	Micronaut
+helidon	Helidon
+vertx	Vert.x
+dropwizard	Dropwizard
+playframework	Play Framework
+scala	Scala
+sbt	sbt
+maven	Maven
+gradle	Gradle
+java	Java
+jvm	JVM
+jdk	JDK
+jre	JRE
+openjdk	OpenJDK
+graalvm	GraalVM
+corretto	Corretto
+temurin	Temurin
+adoptium	Adoptium
+junit	JUnit
+testng	TestNG
+mockito	Mockito
+mybatis	MyBatis
+jpa	JPA
+jdbc	JDBC
+jakartaee	Jakarta EE
+javaee	Java EE
+servlet	Servlet
+jsp	JSP
+thymeleaf	Thymeleaf
+wildfly	WildFly
+jboss	JBoss
+glassfish	GlassFish
+weblogic	WebLogic
+websphere	WebSphere
+clojure	Clojure
+leiningen	Leiningen
+clojurescript	ClojureScript
+erlang	Erlang
+haskell	Haskell
+ghc	GHC
+ocaml	OCaml
+purescript	PureScript
+rescript	ReScript
+reasonml	ReasonML
+agda	Agda
+coq	Coq
+prolog	Prolog
+commonlisp	Common Lisp
+emacslisp	Emacs Lisp
+fortran	Fortran
+cobol	COBOL
+nim	Nim
+zig	Zig
+matlab	MATLAB
+simulink	Simulink
+mathematica	Mathematica
+sagemath	SageMath
+sas	SAS
+spss	SPSS
+stata	Stata
+rstudio	RStudio
+tidyverse	tidyverse
+dplyr	dplyr
+perl	Perl
+cpan	CPAN
+php	PHP
+laravel	Laravel
+symfony	Symfony
+cakephp	CakePHP
+codeigniter	CodeIgniter
+yii	Yii
+zend	Zend
+laminas	Laminas
+phalcon	Phalcon
+phpunit	PHPUnit
+wordpress	WordPress
+drupal	Drupal
+joomla	Joomla
+magento	Magento
+eccube	EC-CUBE
+movabletype	Movable Type
+concretecms	Concrete CMS
+ablogcms	a-blog cms
+basercms	baserCMS
+inertiajs	Inertia.js
+alpinejs	Alpine.js
+htmx	htmx
+ror	RoR
+rubygems	RubyGems
+bundler	Bundler
+rbenv	rbenv
+rvm	RVM
+rspec	RSpec
+minitest	Minitest
+sidekiq	Sidekiq
+erb	ERB
+haml	Haml
+rubocop	Rubocop
+swiftpm	SwiftPM
+cocoapods	CocoaPods
+xcode	Xcode
+objectivec	Objective-C
+objc	ObjC
+csharp	CSharp
+vbnet	VB.NET
+visualbasic	Visual Basic
+vba	VBA
+vbscript	VBScript
+dotnet	dotNET
+netcore	.NET Core
+aspnet	ASP.NET
+aspnetcore	ASP.NET Core
+blazor	Blazor
+entityframework	Entity Framework
+efcore	EF Core
+linq	LINQ
+nuget	NuGet
+wpf	WPF
+winforms	WinForms
+windowsforms	Windows Forms
+uwp	UWP
+winui	WinUI
+winrt	WinRT
+mfc	MFC
+atl	ATL
+com	COM
+activex	ActiveX
+powershell	PowerShell
+pwsh	pwsh
+zsh	Zsh
+tmux	tmux
+gnuscreen	GNU Screen
+vim	Vim
+neovim	Neovim
+emacs	Emacs
+spacemacs	Spacemacs
+doomemacs	Doom Emacs
+vscode	VSCode
+visualstudiocode	Visual Studio Code
+visualstudio	Visual Studio
+vscodium	VSCodium
+sublimetext	Sublime Text
+notepad	Notepad++
+terapad	TeraPad
+sakuraeditor	Sakura Editor
+intellij	IntelliJ
+intellijidea	IntelliJ IDEA
+webstorm	WebStorm
+phpstorm	PhpStorm
+rubymine	RubyMine
+goland	GoLand
+clion	CLion
+datagrip	DataGrip
+dataspell	DataSpell
+jetbrains	JetBrains
+androidstudio	Android Studio
+netbeans	NetBeans
+codeblocks	Code::Blocks
+devc	Dev-C++
+qt	Qt
+qtcreator	Qt Creator
+gtk	GTK
+wxwidgets	wxWidgets
+imgui	ImGui
+dearimgui	Dear ImGui
+sdl	SDL
+sfml	SFML
+raylib	Raylib
+cmake	CMake
+bazel	Bazel
+scons	SCons
+autotools	Autotools
+autoconf	autoconf
+automake	automake
+pkgconfig	pkg-config
+vcpkg	vcpkg
+gcc	GCC
+llvm	LLVM
+msvc	MSVC
+mingw	MinGW
+cygwin	Cygwin
+wsl	WSL
+gdb	GDB
+lldb	LLDB
+valgrind	Valgrind
+strace	strace
+ltrace	ltrace
+perf	perf
+ebpf	eBPF
+bpf	BPF
+bpftrace	bpftrace
+dtrace	DTrace
+systemtap	SystemTap
+wireshark	Wireshark
+tcpdump	tcpdump
+nmap	nmap
+netcat	netcat
+socat	socat
+wget	wget
+httpie	HTTPie
+hoppscotch	Hoppscotch
+openapi	OpenAPI
+redoc	Redoc
+raml	RAML
+asyncapi	AsyncAPI
+protobuf	Protobuf
+protocolbuffers	Protocol Buffers
+avro	Avro
+apachearrow	Apache Arrow
+messagepack	MessagePack
+cbor	CBOR
+bson	BSON
+linux	Linux
+gnu	GNU
+gnulinux	GNU/Linux
+ubuntu	Ubuntu
+debian	Debian
+fedora	Fedora
+centos	CentOS
+rhel	RHEL
+redhat	Red Hat
+rockylinux	Rocky Linux
+almalinux	AlmaLinux
+oraclelinux	Oracle Linux
+opensuse	openSUSE
+suse	SUSE
+sles	SLES
+archlinux	Arch Linux
+manjaro	Manjaro
+endeavouros	EndeavourOS
+gentoo	Gentoo
+slackware	Slackware
+alpinelinux	Alpine Linux
+kalilinux	Kali Linux
+parrotos	Parrot OS
+linuxmint	Linux Mint
+elementaryos	elementary OS
+popos	Pop!_OS
+zorinos	Zorin OS
+mxlinux	MX Linux
+raspbian	Raspbian
+nixos	NixOS
+guix	Guix
+voidlinux	Void Linux
+clearlinux	Clear Linux
+amazonlinux	Amazon Linux
+coreos	CoreOS
+flatcar	Flatcar
+talos	Talos
+truenas	TrueNAS
+freenas	FreeNAS
+openmediavault	OpenMediaVault
+proxmox	Proxmox
+esxi	ESXi
+vsphere	vSphere
+vcenter	vCenter
+vmware	VMware
+vmwareworkstation	VMware Workstation
+virtualbox	VirtualBox
+hyperv	Hyper-V
+qemu	QEMU
+xen	Xen
+lxc	LXC
+lxd	LXD
+freebsd	FreeBSD
+openbsd	OpenBSD
+netbsd	NetBSD
+dragonflybsd	DragonFly BSD
+illumos	illumos
+openindiana	OpenIndiana
+aix	AIX
+hpux	HP-UX
+zos	z/OS
+unix	Unix
+posix	POSIX
+macos	macOS
+osx	OS X
+ios	iOS
+ipados	iPadOS
+watchos	watchOS
+tvos	tvOS
+visionos	visionOS
+android	Android
+aosp	AOSP
+lineageos	LineageOS
+grapheneos	GrapheneOS
+calyxos	CalyxOS
+wearos	Wear OS
+androidtv	Android TV
+googletv	Google TV
+fireos	Fire OS
+webos	webOS
+harmonyos	HarmonyOS
+openharmony	OpenHarmony
+kaios	KaiOS
+sailfishos	Sailfish OS
+chromeos	ChromeOS
+chromiumos	ChromiumOS
+chromebook	Chromebook
+windows	Windows
+windowsserver	Windows Server
+windowsxp	Windows XP
+msdos	MS-DOS
+reactos	ReactOS
+haikuos	Haiku OS
+beos	BeOS
+minix	Minix
+freertos	FreeRTOS
+rtos	RTOS
+tron	TRON
+itron	ITRON
+tkernel	T-Kernel
+vxworks	VxWorks
+qnx	QNX
+mbed	Mbed
+arduino	Arduino
+raspberrypi	Raspberry Pi
+microbit	micro:bit
+jetsonnano	Jetson Nano
+avr	AVR
+pic	PIC
+riscv	RISC-V
+mips	MIPS
+powerpc	PowerPC
+sparc	SPARC
+kde	KDE
+kdeplasma	KDE Plasma
+xfce	Xfce
+lxde	LXDE
+lxqt	LXQt
+hyprland	Hyprland
+bspwm	bspwm
+dwm	dwm
+openbox	Openbox
+wayland	Wayland
+xorg	Xorg
+systemd	systemd
+sysvinit	SysVinit
+openrc	OpenRC
+runit	runit
+refind	rEFInd
+syslinux	Syslinux
+aptget	apt-get
+dpkg	dpkg
+yum	yum
+dnf	dnf
+rpm	rpm
+zypper	zypper
+homebrew	Homebrew
+macports	MacPorts
+chocolatey	Chocolatey
+winget	winget
+flatpak	Flatpak
+appimage	AppImage
+snapd	snapd
+cron	cron
+crontab	crontab
+rsync	rsync
+scp	scp
+sshd	sshd
+openssh	OpenSSH
+putty	PuTTY
+teraterm	Tera Term
+rlogin	RLogin
+mobaxterm	MobaXterm
+winscp	WinSCP
+filezilla	FileZilla
+ffftp	FFFTP
+cyberduck	Cyberduck
+iterm	iTerm
+alacritty	Alacritty
+wezterm	WezTerm
+ghostty	Ghostty
+windowsterminal	Windows Terminal
+conhost	conhost
+cmdexe	cmd.exe
+gnumake	GNU Make
+sed	sed
+awk	awk
+grep	grep
+ripgrep	ripgrep
+fd	fd
+fzf	fzf
+exa	exa
+zoxide	zoxide
+jq	jq
+yq	yq
+htop	htop
+btop	btop
+ncdu	ncdu
+neofetch	neofetch
+fastfetch	fastfetch
+git	Git
+gitlfs	Git LFS
+gitflow	git-flow
+githubflow	GitHub Flow
+githubcli	GitHub CLI
+gh	gh
+sourcetree	Sourcetree
+gitkraken	GitKraken
+githubdesktop	GitHub Desktop
+tortoisegit	TortoiseGit
+tortoisesvn	TortoiseSVN
+svn	SVN
+subversion	Subversion
+mercurial	Mercurial
+cvs	CVS
+plasticscm	Plastic SCM
+gerrit	Gerrit
+phabricator	Phabricator
+copilot	Copilot
+githubcopilot	GitHub Copilot
+copilotchat	Copilot Chat
+codeium	Codeium
+tabnine	Tabnine
+codewhisperer	CodeWhisperer
+amazonq	Amazon Q
+qdeveloper	Q Developer
+sourcegraph	Sourcegraph
+aider	Aider
+cline	Cline
+roocode	Roo Code
+replit	Replit
+replitagent	Replit Agent
+boltnew	Bolt.new
+stackblitz	StackBlitz
+codesandbox	CodeSandbox
+codepen	CodePen
+jsfiddle	JSFiddle
+jsbin	JSBin
+gitpod	Gitpod
+codespaces	Codespaces
+githubcodespaces	GitHub Codespaces
+devpod	DevPod
+devcontainers	Dev Containers
+devcontainer	devcontainer
+aws	AWS
+awslambda	AWS Lambda
+cloudfront	CloudFront
+dynamodb	DynamoDB
+elasticache	ElastiCache
+memorydb	MemoryDB
+opensearchservice	OpenSearch Service
+cognito	Cognito
+appsync	AppSync
+apigateway	API Gateway
+fargate	Fargate
+lightsail	Lightsail
+elasticbeanstalk	Elastic Beanstalk
+cloudwatch	CloudWatch
+cloudtrail	CloudTrail
+guardduty	GuardDuty
+securityhub	Security Hub
+secretsmanager	SecretsManager
+parameterstore	Parameter Store
+systemsmanager	Systems Manager
+ssm	SSM
+stepfunctions	Step Functions
+eventbridge	EventBridge
+msk	MSK
+amazonbedrock	Amazon Bedrock
+rekognition	Rekognition
+textract	Textract
+amazonconnect	Amazon Connect
+workspaces	WorkSpaces
+directconnect	Direct Connect
+transitgateway	Transit Gateway
+codecommit	CodeCommit
+codebuild	CodeBuild
+codedeploy	CodeDeploy
+codepipeline	CodePipeline
+codecatalyst	CodeCatalyst
+copilotcli	Copilot CLI
+samcli	SAM CLI
+awscdk	AWS CDK
+controltower	Control Tower
+gcp	GCP
+googlecloud	Google Cloud
+computeengine	Compute Engine
+appengine	App Engine
+cloudrun	Cloud Run
+cloudfunctions	Cloud Functions
+cloudsql	Cloud SQL
+cloudspanner	Cloud Spanner
+firestore	Firestore
+firebase	Firebase
+firebaseauth	Firebase Auth
+bigtable	Bigtable
+pubsub	Pub/Sub
+cloudbuild	Cloud Build
+artifactregistry	Artifact Registry
+cloudarmor	Cloud Armor
+cloudcdn	Cloud CDN
+clouddns	Cloud DNS
+anthos	Anthos
+apigee	Apigee
+geminiapi	Gemini API
+automl	AutoML
+dialogflow	Dialogflow
+azure	Azure
+microsoftazure	Microsoft Azure
+azuredevops	Azure DevOps
+azurefunctions	Azure Functions
+azuread	Azure AD
+entraid	Entra ID
+microsoftentra	Microsoft Entra
+cosmosdb	Cosmos DB
+azureopenai	Azure OpenAI
+azuresql	Azure SQL
+blobstorage	Blob Storage
+appservice	App Service
+logicapps	Logic Apps
+powerautomate	Power Automate
+powerapps	Power Apps
+powerplatform	Power Platform
+dataverse	Dataverse
+copilotstudio	Copilot Studio
+armtemplate	ARM template
+oci	OCI
+oraclecloud	Oracle Cloud
+ibmcloud	IBM Cloud
+alibabacloud	Alibaba Cloud
+aliyun	Aliyun
+tencentcloud	Tencent Cloud
+huaweicloud	Huawei Cloud
+conoha	ConoHa
+conohavps	ConoHa VPS
+xserver	Xserver
+lolipop	Lolipop
+colorfulbox	ColorfulBox
+mixhost	mixhost
+ablenet	ABLENET
+idcf	IDCF
+nifcloud	NIFCLOUD
+heroku	Heroku
+flyio	Fly.io
+vercel	Vercel
+netlify	Netlify
+cloudflare	Cloudflare
+cloudflareworkers	Cloudflare Workers
+cloudflarepages	Cloudflare Pages
+durableobjects	Durable Objects
+denodeploy	Deno Deploy
+supabase	Supabase
+appwrite	Appwrite
+pocketbase	PocketBase
+nhost	Nhost
+planetscale	PlanetScale
+turso	Turso
+cockroachdb	CockroachDB
+yugabytedb	YugabyteDB
+tidb	TiDB
+vitess	Vitess
+faunadb	FaunaDB
+xata	Xata
+upstash	Upstash
+hasura	Hasura
+postgres	Postgres
+postgresql	PostgreSQL
+psql	psql
+pgadmin	pgAdmin
+mysql	MySQL
+mariadb	MariaDB
+percona	Percona
+sqlite	SQLite
+duckdb	DuckDB
+oracledb	Oracle DB
+oracledatabase	Oracle Database
+sqlserver	SQL Server
+mssql	MSSQL
+tsql	T-SQL
+plsql	PL/SQL
+plpgsql	PL/pgSQL
+sybase	Sybase
+informix	Informix
+teradata	Teradata
+netezza	Netezza
+vertica	Vertica
+greenplum	Greenplum
+saphana	SAP HANA
+firebird	Firebird
+hsqldb	HSQLDB
+msaccess	MS Access
+filemaker	FileMaker
+kintone	kintone
+redis	Redis
+valkey	Valkey
+keydb	KeyDB
+memcached	Memcached
+mongodb	MongoDB
+mongodbatlas	MongoDB Atlas
+couchdb	CouchDB
+couchbase	Couchbase
+pouchdb	PouchDB
+rethinkdb	RethinkDB
+scylladb	ScyllaDB
+hbase	HBase
+arangodb	ArangoDB
+orientdb	OrientDB
+janusgraph	JanusGraph
+dgraph	Dgraph
+surrealdb	SurrealDB
+edgedb	EdgeDB
+etcd	etcd
+zookeeper	ZooKeeper
+rocksdb	RocksDB
+leveldb	LevelDB
+lmdb	LMDB
+berkeleydb	BerkeleyDB
+objectbox	ObjectBox
+indexeddb	IndexedDB
+localstorage	localStorage
+sessionstorage	sessionStorage
+dbeaver	DBeaver
+tableplus	TablePlus
+sequelpro	Sequel Pro
+sequelace	Sequel Ace
+heidisql	HeidiSQL
+phpmyadmin	phpMyAdmin
+adminer	Adminer
+mysqlworkbench	MySQL Workbench
+ssms	SSMS
+navicat	Navicat
+mongodbcompass	MongoDB Compass
+redisinsight	RedisInsight
+nginx	Nginx
+apache	Apache
+httpd	httpd
+traefik	Traefik
+haproxy	HAProxy
+lighttpd	Lighttpd
+iis	IIS
+openresty	OpenResty
+kong	Kong
+tyk	Tyk
+krakend	KrakenD
+envoyproxy	Envoy Proxy
+cloudflaretunnel	Cloudflare Tunnel
+ngrok	ngrok
+localtunnel	localtunnel
+tailscale	Tailscale
+zerotier	ZeroTier
+wireguard	WireGuard
+openvpn	OpenVPN
+softether	SoftEther
+ipsec	IPsec
+pptp	PPTP
+openssl	OpenSSL
+libressl	LibreSSL
+boringssl	BoringSSL
+letsencrypt	Let's Encrypt
+certbot	certbot
+digicert	DigiCert
+sectigo	Sectigo
+globalsign	GlobalSign
+keycloak	Keycloak
+okta	Okta
+onelogin	OneLogin
+pingidentity	Ping Identity
+nextauth	NextAuth
+nextauthjs	NextAuth.js
+authjs	Auth.js
+supertokens	Supertokens
+fusionauth	FusionAuth
+ory	Ory
+kratos	Kratos
+authelia	Authelia
+authentik	Authentik
+freeipa	FreeIPA
+activedirectory	Active Directory
+openldap	OpenLDAP
+kerberos	Kerberos
+yubikey	YubiKey
+webauthn	WebAuthn
+ctap	CTAP
+bitwarden	Bitwarden
+lastpass	LastPass
+keepass	KeePass
+keepassxc	KeePassXC
+dashlane	Dashlane
+nordpass	NordPass
+protonpass	Proton Pass
+vaultwarden	Vaultwarden
+hashicorp	HashiCorp
+hashicorpvault	HashiCorp Vault
+infisical	Infisical
+gnupg	GnuPG
+gpg	GPG
+pgp	PGP
+openpgp	OpenPGP
+veracrypt	VeraCrypt
+bitlocker	BitLocker
+filevault	FileVault
+luks	LUKS
+tor	Tor
+torbrowser	Tor Browser
+qubesos	Qubes OS
+metasploit	Metasploit
+burpsuite	Burp Suite
+owaspzap	OWASP ZAP
+nessus	Nessus
+openvas	OpenVAS
+nikto	Nikto
+sqlmap	sqlmap
+hashcat	Hashcat
+aircrackng	Aircrack-ng
+ghidra	Ghidra
+idapro	IDA Pro
+ollydbg	OllyDbg
+binaryninja	Binary Ninja
+cyberchef	CyberChef
+virustotal	VirusTotal
+censys	Censys
+crowdstrike	CrowdStrike
+sentinelone	SentinelOne
+cybereason	Cybereason
+trendmicro	Trend Micro
+eset	ESET
+kaspersky	Kaspersky
+norton	Norton
+mcafee	McAfee
+avast	Avast
+bitdefender	Bitdefender
+malwarebytes	Malwarebytes
+sophos	Sophos
+symantec	Symantec
+broadcom	Broadcom
+paloalto	Palo Alto
+fortinet	Fortinet
+fortigate	FortiGate
+zscaler	Zscaler
+netskope	Netskope
+oktaworkforce	Okta Workforce
+cisco	Cisco
+ciscoios	Cisco IOS
+junos	Junos
+arista	Arista
+ubiquiti	Ubiquiti
+unifi	UniFi
+mikrotik	MikroTik
+routeros	RouterOS
+pfsense	pfSense
+opnsense	OPNsense
+openwrt	OpenWrt
+ddwrt	DD-WRT
+yamahartx	YAMAHA RTX
+netgear	NETGEAR
+tplink	TP-Link
+elecom	ELECOM
+iodata	IODATA
+necaterm	NEC Aterm
+aterm	Aterm
+asus	ASUS
+synology	Synology
+qnap	QNAP
+terramaster	TerraMaster
+asustor	Asustor
+netgearreadynas	NETGEAR ReadyNAS
+slack	Slack
+notion	Notion
+discord	Discord
+figma	Figma
+figjam	FigJam
+adobexd	Adobe XD
+invision	InVision
+zeplin	Zeplin
+penpot	Penpot
+axure	Axure
+axurerp	Axure RP
+balsamiq	Balsamiq
+lucidchart	Lucidchart
+drawio	draw.io
+diagramsnet	diagrams.net
+cacoo	Cacoo
+plantuml	PlantUML
+graphviz	Graphviz
+excalidraw	Excalidraw
+tldraw	tldraw
+jira	Jira
+confluence	Confluence
+trello	Trello
+redmine	Redmine
+trac	Trac
+bugzilla	Bugzilla
+clickup	ClickUp
+mondaycom	monday.com
+wrike	Wrike
+basecamp	Basecamp
+smartsheet	Smartsheet
+airtable	Airtable
+nocodb	NocoDB
+baserow	Baserow
+logseq	Logseq
+roamresearch	Roam Research
+scrapbox	Scrapbox
+cosense	Cosense
+evernote	Evernote
+onenote	OneNote
+anytype	Anytype
+affine	AFFiNE
+appflowy	AppFlowy
+heptabase	Heptabase
+workflowy	Workflowy
+dynalist	Dynalist
+typora	Typora
+marktext	MarkText
+zettlr	Zettlr
+iawriter	iA Writer
+overleaf	Overleaf
+latex	LaTeX
+tex	TeX
+platex	pLaTeX
+uplatex	upLaTeX
+lualatex	LuaLaTeX
+xelatex	XeLaTeX
+bibtex	BibTeX
+pandoc	Pandoc
+commonmark	CommonMark
+gfm	GFM
+asciidoc	AsciiDoc
+restructuredtext	reStructuredText
+orgmode	Org-mode
+esaio	esa.io
+qiita	Qiita
+qiitateam	Qiita Team
+docbase	DocBase
+kibela	Kibela
+crowi	Crowi
+growi	GROWI
+wikijs	Wiki.js
+bookstack	BookStack
+dokuwiki	Dokuwiki
+mediawiki	MediaWiki
+pukiwiki	PukiWiki
+redminewiki	Redmine Wiki
+stackoverflow	Stack Overflow
+stackexchange	Stack Exchange
+teratail	teratail
+hackernews	Hacker News
+devto	Dev.to
+devcommunity	DEV Community
+hashnode	Hashnode
+substack	Substack
+ghostio	Ghost.io
+openai	OpenAI
+chatgpt	ChatGPT
+chatgptplus	ChatGPT Plus
+chatgptpro	ChatGPT Pro
+chatgptteam	ChatGPT Team
+chatgptenterprise	ChatGPT Enterprise
+gpts	GPTs
+gptstore	GPT Store
+dalle	DALL-E
+openaiapi	OpenAI API
+anthropic	Anthropic
+claude	Claude
+claudecode	Claude Code
+claudeai	Claude.ai
+gemini	Gemini
+geminipro	Gemini Pro
+geminiultra	Gemini Ultra
+geminiflash	Gemini Flash
+geminiadvanced	Gemini Advanced
+notebooklm	NotebookLM
+aistudio	AI Studio
+deepmind	DeepMind
+alphago	AlphaGo
+alphafold	AlphaFold
+alphazero	AlphaZero
+microsoftcopilot	Microsoft Copilot
+bingchat	Bing Chat
+bingai	Bing AI
+perplexityai	Perplexity AI
+grok	Grok
+xai	xAI
+metaai	Meta AI
+mistralai	Mistral AI
+lechat	Le Chat
+cohere	Cohere
+commandr	Command R
+jurassic	Jurassic
+characterai	Character.AI
+youcom	You.com
+phind	Phind
+genspark	Genspark
+felo	Felo
+midjourney	Midjourney
+nijijourney	Niji Journey
+novelai	NovelAI
+stabilityai	Stability AI
+dreamstudio	DreamStudio
+leonardoai	Leonardo AI
+runwayml	Runway ML
+pikalabs	Pika Labs
+luma	Luma
+lumaai	Luma AI
+dreammachine	Dream Machine
+kling	Kling
+hailuo	Hailuo
+hedra	Hedra
+heygen	HeyGen
+synthesia	Synthesia
+elevenlabs	ElevenLabs
+sunoai	Suno AI
+soundraw	Soundraw
+murf	Murf
+voicevox	VOICEVOX
+voicepeak	VOICEPEAK
+coefont	CoeFont
+rvc	RVC
+sovitssvc	so-vits-svc
+vits	VITS
+synthesizerv	Synthesizer V
+vocaloid	VOCALOID
+cevio	CeVIO
+cevioai	CeVIO AI
+aivoice	A.I.VOICE
+aivisspeech	AivisSpeech
+aivis	Aivis
+coeiroink	COEIROINK
+nvidia	NVIDIA
+geforce	GeForce
+rtx	RTX
+gtx	GTX
+quadro	Quadro
+adalovelace	Ada Lovelace
+dgx	DGX
+omniverse	Omniverse
+dlss	DLSS
+gsync	G-SYNC
+freesync	FreeSync
+radeon	Radeon
+ryzen	Ryzen
+threadripper	Threadripper
+epyc	EPYC
+intel	Intel
+coreultra	Core Ultra
+xeon	Xeon
+celeron	Celeron
+pentium	Pentium
+exynos	Exynos
+dimensity	Dimensity
+mediatek	MediaTek
+applesilicon	Apple Silicon
+qualcomm	Qualcomm
+marvell	Marvell
+kioxia	Kioxia
+sandisk	SanDisk
+westerndigital	Western Digital
+wd	WD
+seagate	Seagate
+samsung	Samsung
+skhynix	SK hynix
+lexar	Lexar
+kingston	Kingston
+gskill	G.Skill
+asrock	ASRock
+gigabyte	GIGABYTE
+zotac	ZOTAC
+palit	Palit
+powercolor	PowerColor
+xfx	XFX
+evga	EVGA
+nzxt	NZXT
+fractaldesign	Fractal Design
+lianli	Lian Li
+coolermaster	Cooler Master
+bequiet	be quiet!
+noctua	Noctua
+thermaltake	Thermaltake
+deepcool	DeepCool
+antec	Antec
+silverstone	SilverStone
+seasonic	Seasonic
+razer	Razer
+logicool	Logicool
+logitech	Logitech
+hyperx	HyperX
+steelseries	SteelSeries
+roccat	Roccat
+elgato	Elgato
+streamdeck	Stream Deck
+avermedia	AVerMedia
+blackmagicdesign	Blackmagic Design
+atem	ATEM
+davinciresolve	DaVinci Resolve
+finalcut	Final Cut
+imovie	iMovie
+premierepro	Premiere Pro
+aftereffects	After Effects
+photoshop	Photoshop
+indesign	InDesign
+lightroom	Lightroom
+lightroomclassic	Lightroom Classic
+acrobatreader	Acrobat Reader
+adobeexpress	Adobe Express
+adobefirefly	Adobe Firefly
+adobefresco	Adobe Fresco
+dreamweaver	Dreamweaver
+characteranimator	Character Animator
+mediaencoder	Media Encoder
+substancepainter	Substance Painter
+creativecloud	Creative Cloud
+adobecc	Adobe CC
+adobefonts	Adobe Fonts
+adobestock	Adobe Stock
+behance	Behance
+dribbble	Dribbble
+pinterest	Pinterest
+unsplash	Unsplash
+pexels	Pexels
+pixabay	Pixabay
+shutterstock	Shutterstock
+gettyimages	Getty Images
+istock	iStock
+pixta	PIXTA
+adobesign	Adobe Sign
+docusign	DocuSign
+cloudsign	CloudSign
+freee	freee
+moneyforward	Money Forward
+smarthr	SmartHR
+jobcan	Jobcan
+hrmos	HRMOS
+chatwork	Chatwork
+lineworks	LINE WORKS
+microsoftteams	Microsoft Teams
+zoom	Zoom
+webex	Webex
+ciscowebex	Cisco Webex
+googlemeet	Google Meet
+jitsi	Jitsi
+jitsimeet	Jitsi Meet
+bluejeans	BlueJeans
+gotomeeting	GoToMeeting
+skype	Skype
+lync	Lync
+mattermost	Mattermost
+rocketchat	Rocket.Chat
+zulip	Zulip
+gitter	Gitter
+irc	IRC
+typetalk	Typetalk
+yammer	Yammer
+vivaengage	Viva Engage
+sharepoint	SharePoint
+onedrive	OneDrive
+dropbox	Dropbox
+googledrive	Google Drive
+icloud	iCloud
+iclouddrive	iCloud Drive
+pcloud	pCloud
+synccom	Sync.com
+nextcloud	Nextcloud
+owncloud	ownCloud
+seafile	Seafile
+syncthing	Syncthing
+resilio	Resilio
+resiliosync	Resilio Sync
+gigafile	GigaFile
+firestorage	firestorage
+wetransfer	WeTransfer
+sendanywhere	SendAnywhere
+sharex	ShareX
+snagit	Snagit
+greenshot	Greenshot
+lightshot	Lightshot
+gyazo	Gyazo
+cleanshot	CleanShot
+cleanshotx	CleanShot X
+obs	OBS
+obsstudio	OBS Studio
+streamlabs	Streamlabs
+xsplit	XSplit
+vmix	vMix
+bandicam	Bandicam
+camtasia	Camtasia
+screenflow	ScreenFlow
+fraps	Fraps
+shadowplay	ShadowPlay
+nvidiabroadcast	NVIDIA Broadcast
+krisp	Krisp
+voicemeeter	Voicemeeter
+vbaudio	VB-Audio
+vbcable	VB-Cable
+cubase	Cubase
+studioone	Studio One
+ableton	Ableton
+abletonlive	Ableton Live
+flstudio	FL Studio
+logicpro	Logic Pro
+garageband	GarageBand
+protools	Pro Tools
+bitwig	Bitwig
+musescore	MuseScore
+dorico	Dorico
+kontakt	Kontakt
+nativeinstruments	Native Instruments
+izotope	iZotope
+melodyne	Melodyne
+autotune	Auto-Tune
+houdini	Houdini
+zbrush	ZBrush
+lightwave	LightWave
+magicavoxel	MagicaVoxel
+sketchup	SketchUp
+autocad	AutoCAD
+revit	Revit
+archicad	ArchiCAD
+vectorworks	Vectorworks
+solidworks	SolidWorks
+catia	CATIA
+creo	Creo
+freecad	FreeCAD
+openscad	OpenSCAD
+kicad	KiCad
+altium	Altium
+ltspice	LTspice
+unrealengine	Unreal Engine
+godot	Godot
+gamemaker	GameMaker
+rpgmaker	RPG Maker
+tyranoscript	TyranoScript
+renpy	Ren'Py
+cocos	Cocos
+cocoscreator	Cocos Creator
+defold	Defold
+gdevelop	GDevelop
+robloxstudio	Roblox Studio
+cryengine	CryEngine
+sourceengine	Source Engine
+havok	Havok
+physx	PhysX
+vroid	VRoid
+vroidstudio	VRoid Studio
+vrm	VRM
+vseeface	VSeeFace
+clipstudio	Clip Studio
+ibispaint	ibisPaint
+medibang	MediBang
+painttoolsai	PaintTool SAI
+krita	Krita
+inkscape	Inkscape
+affinitydesigner	Affinity Designer
+affinityphoto	Affinity Photo
+affinitypublisher	Affinity Publisher
+pixelmator	Pixelmator
+pixelmatorpro	Pixelmator Pro
+paintnet	Paint.NET
+aseprite	Aseprite
+photopea	Photopea
+canva	Canva
+vectornator	Vectornator
+coreldraw	CorelDRAW
+corelpainter	Corel Painter
+substancedesigner	Substance Designer
+marvelousdesigner	Marvelous Designer
+mixamo	Mixamo
+metahuman	MetaHuman
+quixel	Quixel
+megascans	Megascans
+sketchfab	Sketchfab
+turbosquid	TurboSquid
+pixiv	pixiv
+pixivfanbox	pixivFANBOX
+fanbox	FANBOX
+fantia	Fantia
+cien	Ci-en
+skeb	Skeb
+skima	SKIMA
+coconala	coconala
+crowdworks	CrowdWorks
+upwork	Upwork
+fiverr	Fiverr
+toptal	Toptal
+youtube	YouTube
+youtubemusic	YouTube Music
+youtubepremium	YouTube Premium
+youtubeshorts	YouTube Shorts
+youtubekids	YouTube Kids
+youtubetv	YouTube TV
+youtuber	YouTuber
+tiktok	TikTok
+tiktoklite	TikTok Lite
+tiktoker	TikToker
+instagram	Instagram
+insta	Insta
+instagrammer	Instagrammer
+facebook	Facebook
+whatsapp	WhatsApp
+twitter	Twitter
+tweetdeck	Tweetdeck
+bluesky	Bluesky
+mastodon	Mastodon
+misskey	Misskey
+pawoo	Pawoo
+fediverse	Fediverse
+nostr	Nostr
+damus	Damus
+tumblr	Tumblr
+reddit	Reddit
+snapchat	Snapchat
+linkedin	LinkedIn
+wantedly	Wantedly
+bereal	BeReal
+niconico	Niconico
+showroom	SHOWROOM
+pococha	Pococha
+mirrativ	Mirrativ
+iriam	IRIAM
+twitcasting	TwitCasting
+openrec	OPENREC
+openrectv	OPENREC.tv
+mildom	Mildom
+linelive	LINE LIVE
+bigolive	Bigo Live
+standfm	stand.fm
+voicy	Voicy
+applepodcasts	Apple Podcasts
+spotify	Spotify
+spotifypremium	Spotify Premium
+applemusic	Apple Music
+amazonmusic	Amazon Music
+linemusic	LINE MUSIC
+kkbox	KKBOX
+deezer	Deezer
+soundcloud	SoundCloud
+bandcamp	Bandcamp
+audiomack	Audiomack
+ototoy	OTOTOY
+recochoku	recochoku
+shazam	Shazam
+musixmatch	Musixmatch
+lastfm	Last.fm
+netflix	Netflix
+amazonprime	Amazon Prime
+primevideo	Prime Video
+disney	Disney+
+disneyplus	Disney Plus
+appletv	Apple TV
+abematv	AbemaTV
+paravi	Paravi
+lemino	Lemino
+crunchyroll	Crunchyroll
+funimation	Funimation
+hidive	HIDIVE
+paramount	Paramount+
+hbomax	HBO Max
+rakutentv	Rakuten TV
+jsports	J SPORTS
+spotvnow	SPOTV NOW
+dmmtv	DMM TV
+netflixjapan	Netflix Japan
+audiobookjp	audiobook.jp
+kindle	Kindle
+kindleunlimited	Kindle Unlimited
+kindlepaperwhite	Kindle Paperwhite
+kindleoasis	Kindle Oasis
+kindlescribe	Kindle Scribe
+booklive	BookLive
+ebookjapan	ebookjapan
+piccoma	piccoma
+webtoon	Webtoon
+comico	comico
+alphapolis	AlphaPolis
+wattpad	Wattpad
+fanfictionnet	FanFiction.net
+goodreads	Goodreads
+iphone	iPhone
+iphonepro	iPhone Pro
+iphonese	iPhone SE
+iphonemini	iPhone mini
+iphoneair	iPhone Air
+ipad	iPad
+ipadpro	iPad Pro
+ipadair	iPad Air
+ipadmini	iPad mini
+ipod	iPod
+ipodtouch	iPod touch
+ipodnano	iPod nano
+ipodshuffle	iPod shuffle
+ipodclassic	iPod classic
+imac	iMac
+imacpro	iMac Pro
+macbook	MacBook
+macbookair	MacBook Air
+macbookpro	MacBook Pro
+macmini	Mac mini
+macpro	Mac Pro
+macstudio	Mac Studio
+studiodisplay	Studio Display
+applewatch	Apple Watch
+airpods	AirPods
+airpodspro	AirPods Pro
+airpodsmax	AirPods Max
+airtag	AirTag
+airplay	AirPlay
+airdrop	AirDrop
+airmac	AirMac
+homepod	HomePod
+homepodmini	HomePod mini
+applepencil	Apple Pencil
+magickeyboard	Magic Keyboard
+magicmouse	Magic Mouse
+magictrackpad	Magic Trackpad
+magsafe	MagSafe
+facetime	FaceTime
+imessage	iMessage
+appleid	Apple ID
+appleaccount	Apple Account
+applepay	Apple Pay
+applecard	Apple Card
+applearcade	Apple Arcade
+applefitness	Apple Fitness+
+appleone	Apple One
+applebooks	Apple Books
+applemaps	Apple Maps
+visionpro	Vision Pro
+itunes	iTunes
+iwork	iWork
+ilife	iLife
+appstore	App Store
+testflight	TestFlight
+xcodecloud	Xcode Cloud
+faceid	Face ID
+touchid	Touch ID
+liquidretina	Liquid Retina
+promotion	ProMotion
+dynamicisland	Dynamic Island
+appleintelligence	Apple Intelligence
+imageplayground	Image Playground
+carplay	CarPlay
+healthkit	HealthKit
+homekit	HomeKit
+sirikit	SiriKit
+gamecenter	Game Center
+findmy	Find My
+universalcontrol	Universal Control
+stagemanager	Stage Manager
+rosetta	Rosetta
+corei	Core i
+applestore	Apple Store
+geniusbar	Genius Bar
+applecare	AppleCare
+google	Google
+gmail	Gmail
+googlemaps	Google Maps
+googleearth	Google Earth
+googlephotos	Google Photos
+googledocs	Google Docs
+googlesheets	Google Sheets
+googleslides	Google Slides
+googleforms	Google Forms
+googlecalendar	Google Calendar
+googlekeep	Google Keep
+googletasks	Google Tasks
+googlechat	Google Chat
+googleworkspace	Google Workspace
+gsuite	G Suite
+googleone	Google One
+googleplay	Google Play
+googlepay	Google Pay
+googlewallet	Google Wallet
+googlelens	Google Lens
+googletranslate	Google Translate
+googleassistant	Google Assistant
+googlehome	Google Home
+googlenest	Google Nest
+nesthub	Nest Hub
+nestmini	Nest Mini
+chromecast	Chromecast
+googlepixel	Google Pixel
+pixelwatch	Pixel Watch
+pixelbuds	Pixel Buds
+fitbit	Fitbit
+googleanalytics	Google Analytics
+searchconsole	Search Console
+gtm	GTM
+googleads	Google Ads
+googleadsense	Google AdSense
+adsense	AdSense
+admob	AdMob
+googletrends	Google Trends
+googlealerts	Google Alerts
+googlescholar	Google Scholar
+googlebooks	Google Books
+googlenews	Google News
+googlefonts	Google Fonts
+googlesites	Google Sites
+googleclassroom	Google Classroom
+googlecolaboratory	Google Colaboratory
+androidauto	Android Auto
+chrome	Chrome
+googlechrome	Google Chrome
+picasa	Picasa
+googleglass	Google Glass
+geminilive	Gemini Live
+recaptcha	reCAPTCHA
+jamboard	Jamboard
+youtubestudio	YouTube Studio
+googleadwords	Google AdWords
+microsoft	Microsoft
+msoffice	MS Office
+excel	Excel
+powerpoint	PowerPoint
+visio	Visio
+microsoftproject	Microsoft Project
+exchangeonline	Exchange Online
+intune	Intune
+microsoftdefender	Microsoft Defender
+windowsdefender	Windows Defender
+bing	Bing
+microsoftbing	Microsoft Bing
+microsoftedge	Microsoft Edge
+internetexplorer	Internet Explorer
+cortana	Cortana
+xbox	Xbox
+xboxone	Xbox One
+gamepass	Game Pass
+surfacepro	Surface Pro
+surfacelaptop	Surface Laptop
+surfacego	Surface Go
+surfacebook	Surface Book
+surfacestudio	Surface Studio
+surfaceduo	Surface Duo
+hololens	HoloLens
+kinect	Kinect
+linkedinlearning	LinkedIn Learning
+microsoftstore	Microsoft Store
+msn	MSN
+hotmail	Hotmail
+outlookcom	Outlook.com
+windowslive	Windows Live
+windowshello	Windows Hello
+windowsupdate	Windows Update
+windowsinsider	Windows Insider
+clipchamp	Clipchamp
+microsoftloop	Microsoft Loop
+microsoftplanner	Microsoft Planner
+microsoftforms	Microsoft Forms
+microsoftstream	Microsoft Stream
+snippingtool	Snipping Tool
+powertoys	PowerToys
+sysinternals	Sysinternals
+visualc	Visual C++
+powerquery	Power Query
+powerpivot	Power Pivot
+excelvba	Excel VBA
+copilotpro	Copilot Pro
+copilotpc	Copilot+ PC
+minecraft	Minecraft
+amazon	Amazon
+primeday	Prime Day
+amazonfresh	Amazon Fresh
+amazonpay	Amazon Pay
+amazonbusiness	Amazon Business
+amazonphotos	Amazon Photos
+amazonecho	Amazon Echo
+echodot	Echo Dot
+echoshow	Echo Show
+echostudio	Echo Studio
+alexa	Alexa
+firetv	Fire TV
+firestick	Fire Stick
+firehd	Fire HD
+kindlefire	Kindle Fire
+imdb	IMDb
+zappos	Zappos
+wholefoods	Whole Foods
+wondery	Wondery
+amazonluna	Amazon Luna
+amazonkids	Amazon Kids
+amazonbasics	AmazonBasics
+amazonlockers	Amazon Lockers
+primegaming	Prime Gaming
+primereading	Prime Reading
+primemusic	Prime Music
+metaquest	Meta Quest
+questpro	Quest Pro
+oculus	Oculus
+oculusquest	Oculus Quest
+oculusrift	Oculus Rift
+horizonworlds	Horizon Worlds
+metahorizon	Meta Horizon
+raybanmeta	Ray-Ban Meta
+instagramreels	Instagram Reels
+facebookmessenger	Facebook Messenger
+whatsappbusiness	WhatsApp Business
+facebookmarketplace	Facebook Marketplace
+facebookpay	Facebook Pay
+metapay	Meta Pay
+metaverified	Meta Verified
+samsunggalaxy	Samsung Galaxy
+galaxys	Galaxy S
+galaxytab	Galaxy Tab
+galaxywatch	Galaxy Watch
+galaxybuds	Galaxy Buds
+galaxynote	Galaxy Note
+galaxya	Galaxy A
+xperia	Xperia
+aquos	AQUOS
+aquossense	AQUOS sense
+aquoswish	AQUOS wish
+aquosr	AQUOS R
+xiaomi	Xiaomi
+redmi	Redmi
+huawei	Huawei
+oneplus	OnePlus
+nothingphone	Nothing Phone
+motorola	motorola
+motog	moto g
+razr	razr
+zenfone	ZenFone
+rogphone	ROG Phone
+balmudaphone	BALMUDA Phone
+rakutenhand	Rakuten Hand
+benq	BenQ
+viewsonic	ViewSonic
+alienware	Alienware
+elitebook	EliteBook
+probook	ProBook
+lenovo	Lenovo
+thinkpad	ThinkPad
+thinkcentre	ThinkCentre
+ideapad	IdeaPad
+zenbook	ZenBook
+vivobook	VivoBook
+rog	ROG
+tufgaming	TUF Gaming
+acer	Acer
+razerblade	Razer Blade
+dynabook	dynabook
+letsnote	Let's note
+lavie	LAVIE
+fmv	FMV
+lifebook	LIFEBOOK
+mousecomputer	Mouse Computer
+gtune	G-Tune
+daiv	DAIV
+iiyamapc	iiyama PC
+galleria	GALLERIA
+excomputer	eX.computer
+sycom	Sycom
+steamdeck	Steam Deck
+rogally	ROG Ally
+legiongo	Legion Go
+gpd	GPD
+gpdwin	GPD WIN
+ayaneo	AYANEO
+onexplayer	ONEXPLAYER
+linepay	LINE Pay
+linemessenger	LINE Messenger
+linenews	LINE NEWS
+lineout	LINE Out
+linevoom	LINE VOOM
+voom	VOOM
+linedevelopers	LINE Developers
+yahoo	Yahoo!
+yahoojapan	Yahoo! JAPAN
+zozosuit	ZOZOSUIT
+askul	ASKUL
+lohaco	LOHACO
+edy	Edy
+rakutenlink	Rakuten Link
+viber	Viber
+rakutenviber	Rakuten Viber
+mercari	mercari
+merpay	Merpay
+mercarishops	Mercari Shops
+jmty	Jmty
+creema	Creema
+shopify	Shopify
+shopifypayments	Shopify Payments
+paypal	PayPal
+paidy	Paidy
+alipay	Alipay
+wechatpay	WeChat Pay
+wechat	WeChat
+weixin	Weixin
+weibo	Weibo
+douyin	Douyin
+bilibili	Bilibili
+xiaohongshu	Xiaohongshu
+kuaishou	Kuaishou
+qq	QQ
+baidu	Baidu
+taobao	Taobao
+tmall	Tmall
+jdcom	JD.com
+shein	SHEIN
+aliexpress	AliExpress
+alibaba	Alibaba
+lazada	Lazada
+shopee	Shopee
+tokopedia	Tokopedia
+gojek	Gojek
+uber	Uber
+ubereats	Uber Eats
+lyft	Lyft
+didifood	DiDi Food
+sride	S.RIDE
+wolt	Wolt
+foodpanda	foodpanda
+doordash	DoorDash
+instacart	Instacart
+grubhub	Grubhub
+deliveroo	Deliveroo
+justeat	Just Eat
+airbnb	Airbnb
+bookingcom	Booking.com
+expedia	Expedia
+hotelscom	Hotels.com
+tripcom	Trip.com
+ctrip	Ctrip
+trivago	Trivago
+tripadvisor	TripAdvisor
+skyscanner	Skyscanner
+googleflights	Google Flights
+klook	Klook
+kkday	KKday
+vrbo	Vrbo
+couchsurfing	Couchsurfing
+relux	Relux
+stayjapan	STAYJAPAN
+peatix	Peatix
+connpass	connpass
+techplay	TECH PLAY
+eventbrite	Eventbrite
+calendly	Calendly
+timerex	TimeRex
+spir	Spir
+youcanbookme	YouCanBook.me
+uberjapan	Uber Japan
+tabelog	Tabelog
+hotpepper	HOT PEPPER
+retty	Retty
+opentable	OpenTable
+tablecheck	TableCheck
+airregi	AirREGI
+smaregi	SmaRegi
+cookpad	Cookpad
+delishkitchen	DELISH KITCHEN
+cookpadmart	cookpadmart
+oisix	Oisix
+cokeon	Coke ON
+vpoint	V POINT
+aukabucom	au Kabucom
+docomo	docomo
+linemo	LINEMO
+uqmobile	UQ mobile
+ymobile	Y!mobile
+libmo	LIBMO
+jcommobile	J:COM MOBILE
+eximo	eximo
+bbiq	BBIQ
+wimax	WiMAX
+pocketwifi	Pocket WiFi
+starlink	Starlink
+spotifywrapped	Spotify Wrapped
+uberone	Uber One
+netflixparty	Netflix Party
+teleparty	Teleparty
+discordnitro	Discord Nitro
+twitchprime	Twitch Prime
+patreon	Patreon
+kofi	Ko-fi
+onlyfans	OnlyFans
+fanicon	Fanicon
+readyfor	READYFOR
+greenfunding	GREEN FUNDING
+kickstarter	Kickstarter
+indiegogo	Indiegogo
+gofundme	GoFundMe
+polca	polca
+motiongallery	Motion Gallery
+udemy	Udemy
+coursera	Coursera
+edx	edX
+khanacademy	Khan Academy
+duolingo	Duolingo
+babbel	Babbel
+rosettastone	Rosetta Stone
+memrise	Memrise
+quizlet	Quizlet
+kahoot	Kahoot!
+studyplus	Studyplus
+studysapuri	StudySapuri
+schoo	Schoo
+progate	Progate
+dotinstall	dotinstall
+atcoder	AtCoder
+leetcode	LeetCode
+hackerrank	HackerRank
+codeforces	Codeforces
+topcoder	TopCoder
+signate	SIGNATE
+projecteuler	Project Euler
+codingame	CodinGame
+exercism	Exercism
+freecodecamp	freeCodeCamp
+codecademy	Codecademy
+scrimba	Scrimba
+frontendmentor	Frontend Mentor
+tryhackme	TryHackMe
+hackthebox	HackTheBox
+picoctf	picoCTF
+ctf	CTF
+isucon	ISUCON
+runteq	RUNTEQ
+techcamp	TECH CAMP
+dmmwebcamp	DMM WEBCAMP
+techacademy	TechAcademy
+codecamp	CodeCamp
+aidemy	Aidemy
+chegg	Chegg
+grammarly	Grammarly
+deepl	DeepL
+deeplwrite	DeepL Write
+voicetra	VoiceTra
+pocketalk	POCKETALK
+languagetool	LanguageTool
+wordtune	Wordtune
+quillbot	QuillBot
+otterai	Otter.ai
+tldv	tl;dv
+rimovoice	Rimo Voice
+clovanote	CLOVA Note
+krispai	Krisp AI
+descript	Descript
+capcut	CapCut
+vllo	VLLO
+inshot	InShot
+kinemaster	KineMaster
+powerdirector	PowerDirector
+filmora	Filmora
+wondershare	Wondershare
+vn	VN
+vrew	Vrew
+premiererush	Premiere Rush
+lumafusion	LumaFusion
+picsart	Picsart
+snapseed	Snapseed
+vsco	VSCO
+lightroommobile	Lightroom Mobile
+beautyplus	BeautyPlus
+faceapp	FaceApp
+facetune	Facetune
+lensa	Lensa
+photoroom	PhotoRoom
+removebg	remove.bg
+canvapro	Canva Pro
+pixlr	Pixlr
+fotor	Fotor
+befunky	BeFunky
+hypetype	Hype Type
+dazz	Dazz
+hujicam	Huji Cam
+ulike	Ulike
+lomography	Lomography
+notionai	Notion AI
+notioncalendar	Notion Calendar
+todoist	Todoist
+ticktick	TickTick
+omnifocus	OmniFocus
+anydo	Any.do
+wunderlist	Wunderlist
+habitica	Habitica
+focustodo	Focus To-Do
+toggl	Toggl
+toggltrack	Toggl Track
+clockify	Clockify
+rescuetime	RescueTime
+busycal	BusyCal
+sparkmail	Spark Mail
+mozillathunderbird	Mozilla Thunderbird
+becky	Becky!
+outlookmobile	Outlook Mobile
+protonmail	ProtonMail
+protonvpn	Proton VPN
+tutanota	Tutanota
+fastmail	Fastmail
+zohomail	Zoho Mail
+zohocrm	Zoho CRM
+mailchimp	Mailchimp
+sendgrid	SendGrid
+mailgun	Mailgun
+amazonses	Amazon SES
+brevo	Brevo
+sendinblue	Sendinblue
+klaviyo	Klaviyo
+hubspot	HubSpot
+salesforce	Salesforce
+slackconnect	Slack Connect
+marketo	Marketo
+pardot	Pardot
+accountengagement	Account Engagement
+eloqua	Eloqua
+marketoengage	Marketo Engage
+onesignal	OneSignal
+zendesk	Zendesk
+freshdesk	Freshdesk
+freshworks	Freshworks
+helpscout	Help Scout
+gorgias	Gorgias
+kustomer	Kustomer
+livechat	LiveChat
+chatplus	ChatPlus
+relation	Re:lation
+formrun	formrun
+typeform	Typeform
+jotform	Jotform
+surveymonkey	SurveyMonkey
+questant	Questant
+qualtrics	Qualtrics
+hotjar	Hotjar
+mixpanel	Mixpanel
+fullstory	FullStory
+logrocket	LogRocket
+optimizely	Optimizely
+vwo	VWO
+googleoptimize	Google Optimize
+ptengine	Ptengine
+microsoftclarity	Microsoft Clarity
+similarweb	Similarweb
+ahrefs	Ahrefs
+semrush	SEMrush
+moz	Moz
+ubersuggest	Ubersuggest
+screamingfrog	Screaming Frog
+grc	GRC
+keywordmap	Keywordmap
+yoast	Yoast
+yoastseo	Yoast SEO
+rankmath	Rank Math
+elementor	Elementor
+gutenberg	Gutenberg
+woocommerce	WooCommerce
+akismet	Akismet
+wprocket	WP Rocket
+affinger	AFFINGER
+thethor	THE THOR
+snowmonkey	Snow Monkey
+lionmedia	LION MEDIA
+arkhe	Arkhe
+wix	Wix
+squarespace	Squarespace
+weebly	Weebly
+jimdo	Jimdo
+webflow	Webflow
+framersites	Framer Sites
+adalo	Adalo
+softr	Softr
+appsheet	AppSheet
+outsystems	OutSystems
+mendix	Mendix
+zapier	Zapier
+integromat	Integromat
+ifttt	IFTTT
+uipath	UiPath
+automationanywhere	Automation Anywhere
+blueprism	Blue Prism
+winactor	WinActor
+bizrobo	BizRobo!
+yoom	Yoom
+anyflow	Anyflow
+waymo	Waymo
+modely	Model Y
+modelx	Model X
+cybertruck	Cybertruck
+fsd	FSD
+powerwall	Powerwall
+spacex	SpaceX
+blueorigin	Blue Origin
+neuralink	Neuralink
+nvidiashield	NVIDIA Shield
+sonos	Sonos
+bosequietcomfort	Bose QuietComfort
+quietcomfort	QuietComfort
+soundlink	SoundLink
+jbl	JBL
+anker	Anker
+soundcore	Soundcore
+eufy	Eufy
+aukey	AUKEY
+ravpower	RAVPower
+belkin	Belkin
+ugreen	UGREEN
+baseus	Baseus
+esr	ESR
+spigen	Spigen
+sony	Sony
+walkman	WALKMAN
+bravia	BRAVIA
+playstation	PlayStation
+psp	PSP
+psvita	PS Vita
+playstationplus	PlayStation Plus
+psplus	PS Plus
+playstationnetwork	PlayStation Network
+psn	PSN
+playstationvr	PlayStation VR
+psvr	PSVR
+dualsense	DualSense
+dualshock	DualShock
+playstationportal	PlayStation Portal
+cybershot	Cyber-shot
+handycam	Handycam
+linkbuds	LinkBuds
+nintendoswitch	Nintendo Switch
+joycon	Joy-Con
+amiibo	amiibo
+ds	DS
+wii	Wii
+wiiu	Wii U
+gamecube	GameCube
+superfamicom	Super Famicom
+famicom	Famicom
+gameboy	Game Boy
+gba	GBA
+virtualboy	Virtual Boy
+nintendoaccount	Nintendo Account
+eshop	eShop
+steamworks	Steamworks
+steamvr	SteamVR
+valveindex	Valve Index
+epicgames	Epic Games
+gog	GOG
+gogcom	GOG.com
+itchio	itch.io
+humblebundle	Humble Bundle
+eaapp	EA app
+ubisoftconnect	Ubisoft Connect
+uplay	Uplay
+battlenet	Battle.net
+riotclient	Riot Client
+xboxapp	Xbox App
+geforcenow	GeForce NOW
+boosteroid	Boosteroid
+playstationnow	PlayStation Now
+dmmgames	DMM GAMES
+gree	GREE
+mixi	mixi
+ameblo	Ameblo
+livedoor	livedoor
+seesaa	Seesaa
+infoseek	Infoseek
+msnjapan	MSN Japan
+newspicks	NewsPicks
+smartnews	SmartNews
+gunosy	Gunosy
+togetter	Togetter
+naver	NAVER
+lineblog	LINE BLOG
+hatenabookmark	Hatena Bookmark
+instapaper	Instapaper
+feedly	Feedly
+inoreader	Inoreader
+flipboard	Flipboard
+readwise	Readwise
+raindropio	Raindrop.io
+zoomphone	Zoom Phone
+zoomwebinar	Zoom Webinar
+zoomworkplace	Zoom Workplace
+slackhuddle	Slack Huddle
+discordserver	Discord Server
+kakaotalk	KakaoTalk
+icq	ICQ
+msnmessenger	MSN Messenger
+googleduo	Google Duo
+kik	Kik
+wickr	Wickr
+threema	Threema
+gathertown	Gather Town
+ovice	oVice
+spatialchat	SpatialChat
+clustervr	clusterVR
+recroom	Rec Room
+neosvr	NeosVR
+resonite	Resonite
+chilloutvr	ChilloutVR
+decentraland	Decentraland
+thesandbox	The Sandbox
+roblox	Roblox
+zepeto	Zepeto
+fortnite	Fortnite
+minecraftjava	Minecraft Java
+minecraftbe	Minecraft BE
+amongus	Among Us
+fallguys	Fall Guys
+apexlegends	Apex Legends
+valorant	VALORANT
+tbsfree	TBS FREE
+skyperfectv	SKY PerfecTV!
+jcomtv	J:COM TV
+spotifyfree	Spotify Free
+pdfelement	PDFelement
+foxit	Foxit
+foxitreader	Foxit Reader
+sumatrapdf	SumatraPDF
+smallpdf	Smallpdf
+ilovepdf	iLovePDF
+adobescan	Adobe Scan
+camscanner	CamScanner
+microsoftlens	Microsoft Lens
+officelens	Office Lens
+geniusscan	Genius Scan
+evernotescannable	Evernote Scannable
+scansnap	ScanSnap
+readdle	Readdle
+pdfexpert	PDF Expert
+goodnotes	GoodNotes
+noteshelf	Noteshelf
+metamojinote	MetaMoJi Note
+collanote	Collanote
+flexcil	Flexcil
+liquidtext	LiquidText
+marginnote	MarginNote
+zotero	Zotero
+mendeley	Mendeley
+endnote	EndNote
+paperpile	Paperpile
+readcube	Readcube
+semanticscholar	Semantic Scholar
+researchgate	ResearchGate
+academiaedu	Academia.edu
+arxiv	arXiv
+biorxiv	bioRxiv
+medrxiv	medRxiv
+ssrn	SSRN
+pubmed	PubMed
+cinii	CiNii
+jstage	J-STAGE
+jstor	JSTOR
+sciencedirect	ScienceDirect
+springer	Springer
+springerlink	SpringerLink
+wiley	Wiley
+elsevier	Elsevier
+scopus	Scopus
+orcid	ORCID
+publons	Publons
+connectedpapers	Connected Papers
+scispace	SciSpace
+scite	scite
+researchrabbit	Research Rabbit
+perplexitypro	Perplexity Pro
+wolframalpha	Wolfram Alpha
+desmos	Desmos
+geogebra	GeoGebra
+photomath	Photomath
+symbolab	Symbolab
+mathway	Mathway
+cheggstudy	Chegg Study
+brainly	Brainly
+clearnote	Clearnote
+quizletplus	Quizlet Plus
+winrar	WinRAR
+lhaplus	Lhaplus
+lhaz	Lhaz
+explzh	Explzh
+cubeice	CubeICE
+bandizip	Bandizip
+theunarchiver	The Unarchiver
+peazip	PeaZip
+winzip	WinZip
+ccleaner	CCleaner
+revouninstaller	Revo Uninstaller
+wox	Wox
+powertoysrun	PowerToys Run
+flowlauncher	Flow Launcher
+raycast	Raycast
+launchbar	LaunchBar
+keyboardmaestro	Keyboard Maestro
+bettertouchtool	BetterTouchTool
+karabinerelements	Karabiner-Elements
+autohotkey	AutoHotkey
+ahk	AHK
+clibor	Clibor
+clcl	CLCL
+maccy	Maccy
+moom	Moom
+monitorcontrol	MonitorControl
+istatmenus	iStat Menus
+cleanmymac	CleanMyMac
+appcleaner	AppCleaner
+diskdrill	Disk Drill
+recuva	Recuva
+easeus	EaseUS
+aomei	AOMEI
+macriumreflect	Macrium Reflect
+acronis	Acronis
+veeam	Veeam
+superduper	SuperDuper!
+backblaze	Backblaze
+crashplan	CrashPlan
+arq	Arq
+duplicati	Duplicati
+restic	Restic
+borgbackup	BorgBackup
+rufus	Rufus
+balenaetcher	balenaEtcher
+ventoy	Ventoy
+unetbootin	UNetbootin
+crystaldiskinfo	CrystalDiskInfo
+crystaldiskmark	CrystalDiskMark
+hwinfo	HWiNFO
+cpuz	CPU-Z
+gpuz	GPU-Z
+hwmonitor	HWMonitor
+speccy	Speccy
+msiafterburner	MSI Afterburner
+rivatuner	RivaTuner
+occt	OCCT
+cinebench	Cinebench
+geekbench	Geekbench
+antutu	AnTuTu
+passmark	PassMark
+pcmark	PCMark
+userbenchmark	UserBenchmark
+furmark	FurMark
+processexplorer	Process Explorer
+processmonitor	Process Monitor
+autoruns	Autoruns
+tcpview	TCPView
+sandboxie	Sandboxie
+vmwarefusion	VMware Fusion
+parallelsdesktop	Parallels Desktop
+lutris	Lutris
+playnite	Playnite
+rewasd	reWASD
+joytokey	JoyToKey
+steaminput	Steam Input
+discordoverlay	Discord Overlay
+overwolf	Overwolf
+medaltv	Medal.tv
+outplayed	Outplayed
+mobalytics	Mobalytics
+opgg	OP.GG
+porofessor	Porofessor
+trackergg	Tracker.gg
+liquipedia	Liquipedia
+wikia	Wikia
+wikipedia	Wikipedia
+wikimedia	Wikimedia
+wiktionary	Wiktionary
+wikidata	Wikidata
+wikibooks	Wikibooks
+wikihow	WikiHow
+uncyclopedia	Uncyclopedia
+weblio	Weblio
+alc	ALC
+longman	Longman
+oxford	Oxford
+cambridgedictionary	Cambridge Dictionary
+merriamwebster	Merriam-Webster
+dictionarycom	Dictionary.com
+thesauruscom	Thesaurus.com
+urbandictionary	Urban Dictionary
+linguee	Linguee
+reverso	Reverso
+forvo	Forvo
+youglish	YouGlish
+hinative	HiNative
+italki	italki
+preply	Preply
+cambly	Cambly
+rarejob	RareJob
+nativecamp	Native Camp
+bizmates	Bizmates
+qqenglish	QQEnglish
+elsaspeak	ELSA Speak
+praktika	Praktika
+lingokids	Lingokids
+mondly	Mondly
+clozemaster	Clozemaster
+lingq	LingQ
+beelinguapp	Beelinguapp
+abceed	abceed
+btc	BTC
+eth	ETH
+usdt	USDT
+usdc	USDC
+jpyc	JPYC
+avax	AVAX
+sol	SOL
+xrp	XRP
+bnb	BNB
+doge	DOGE
+defi	DeFi
+bitcoin	Bitcoin
+ethereum	Ethereum
+solana	Solana
+cardano	Cardano
+polkadot	Polkadot
+matic	MATIC
+pol	POL
+chainlink	Chainlink
+litecoin	Litecoin
+ltc	LTC
+bitcoincash	Bitcoin Cash
+bch	BCH
+ethereumclassic	Ethereum Classic
+xlm	XLM
+trx	TRX
+tezos	Tezos
+xtz	XTZ
+algorand	Algorand
+algo	ALGO
+usdcoin	USD Coin
+busd	BUSD
+pyusd	PYUSD
+usde	USDe
+frax	FRAX
+shib	SHIB
+bonk	BONK
+wif	WIF
+floki	FLOKI
+dogecoin	Dogecoin
+monero	Monero
+xmr	XMR
+zcash	Zcash
+zec	ZEC
+eos	EOS
+miota	MIOTA
+vechain	VeChain
+hedera	Hedera
+hbar	HBAR
+filecoin	Filecoin
+fil	FIL
+arweave	Arweave
+internetcomputer	Internet Computer
+icp	ICP
+nearprotocol	NEAR Protocol
+aptos	Aptos
+celestia	Celestia
+injective	Injective
+inj	INJ
+arbitrum	Arbitrum
+arb	ARB
+zksync	zkSync
+zk	ZK
+starknet	Starknet
+strk	STRK
+linea	Linea
+mnt	MNT
+metis	Metis
+imx	IMX
+immutablex	Immutable X
+axieinfinity	Axie Infinity
+axs	AXS
+slp	SLP
+enj	ENJ
+chiliz	Chiliz
+chz	CHZ
+rndr	RNDR
+fetchai	Fetch.ai
+fet	FET
+singularitynet	SingularityNET
+agix	AGIX
+oceanprotocol	Ocean Protocol
+worldcoin	Worldcoin
+wld	WLD
+thegraph	The Graph
+grt	GRT
+uniswap	Uniswap
+sushiswap	SushiSwap
+pancakeswap	PancakeSwap
+crv	CRV
+cvx	CVX
+bal	BAL
+aave	Aave
+comp	COMP
+makerdao	MakerDAO
+mkr	MKR
+ldo	LDO
+steth	stETH
+wsteth	wstETH
+rocketpool	Rocket Pool
+rpl	RPL
+reth	rETH
+eigenlayer	EigenLayer
+ethena	Ethena
+pendle	Pendle
+gmx	GMX
+dydx	dYdX
+synthetix	Synthetix
+snx	SNX
+yfi	YFI
+fraxfinance	Frax Finance
+jup	JUP
+raydium	Raydium
+pyth	Pyth
+layerzero	LayerZero
+zro	ZRO
+axelar	Axelar
+axl	AXL
+polygonzkevm	Polygon zkEVM
+bitget	Bitget
+bgb	BGB
+okb	OKB
+kcs	KCS
+ht	HT
+gt	GT
+ftt	FTT
+toncoin	Toncoin
+notcoin	Notcoin
+hamsterkombat	Hamster Kombat
+kaspa	Kaspa
+kas	KAS
+stx	STX
+lightningnetwork	Lightning Network
+segwit	SegWit
+bitcoinetf	Bitcoin ETF
+etheretf	Ether ETF
+ibit	IBIT
+gbtc	GBTC
+microstrategy	MicroStrategy
+grayscale	Grayscale
+blackrock	BlackRock
+ishares	iShares
+coinbase	Coinbase
+binance	Binance
+binancejapan	Binance Japan
+bitfinex	Bitfinex
+bybit	Bybit
+okx	OKX
+kucoin	KuCoin
+gateio	Gate.io
+huobi	Huobi
+htx	HTX
+mexc	MEXC
+upbit	Upbit
+bithumb	Bithumb
+bitstamp	Bitstamp
+cryptocom	Crypto.com
+ftx	FTX
+bitflyer	bitFlyer
+coincheck	Coincheck
+bitbank	bitbank
+sbivc	SBIVC
+dmmbitcoin	DMM Bitcoin
+bitpoint	BITPOINT
+zaif	Zaif
+linebitmax	LINE BITMAX
+bitmax	BITMAX
+okj	OKJ
+okcoinjapan	OKCoinJapan
+bitgetjapan	Bitget Japan
+bittrade	BitTrade
+cointrade	CoinTrade
+coinbook	Coinbook
+huobijapan	Huobi Japan
+quoine	QUOINE
+coinbasewallet	Coinbase Wallet
+metamask	MetaMask
+trustwallet	Trust Wallet
+rabby	Rabby
+gnosissafe	Gnosis Safe
+ledgernano	Ledger Nano
+trezor	Trezor
+tangem	Tangem
+safepal	SafePal
+okxwallet	OKX Wallet
+bluewallet	BlueWallet
+etherscan	Etherscan
+bscscan	BscScan
+solscan	Solscan
+polygonscan	Polygonscan
+arbiscan	Arbiscan
+blockchair	Blockchair
+mempoolspace	mempool.space
+defillama	DeFiLlama
+coinmarketcap	CoinMarketCap
+coingecko	CoinGecko
+duneanalytics	Dune Analytics
+glassnode	Glassnode
+messari	Messari
+arkham	Arkham
+chainalysis	Chainalysis
+tradingview	TradingView
+coindesk	CoinDesk
+cointelegraph	Cointelegraph
+theblock	The Block
+coinpost	CoinPost
+nftgo	NFTGo
+opensea	OpenSea
+magiceden	Magic Eden
+rarible	Rarible
+superrare	SuperRare
+looksrare	LooksRare
+niftygateway	Nifty Gateway
+coinchecknft	Coincheck NFT
+linenft	LINE NFT
+adambygmo	Adam byGMO
+hexa	HEXA
+boredape	Bored Ape
+bayc	BAYC
+mayc	MAYC
+cryptopunks	CryptoPunks
+clonex	CloneX
+moonbirds	Moonbirds
+pudgypenguins	Pudgy Penguins
+artblocks	Art Blocks
+cryptokitties	CryptoKitties
+stepn	STEPN
+gmt	GMT
+gst	GST
+gamefi	GameFi
+socialfi	SocialFi
+depin	DePIN
+rwa	RWA
+refi	ReFi
+cefi	CeFi
+tradfi	TradFi
+cex	CEX
+amm	AMM
+tvl	TVL
+apy	APY
+apr	APR
+il	IL
+mev	MEV
+pow	PoW
+dpos	DPoS
+poh	PoH
+post	PoSt
+bft	BFT
+pbft	PBFT
+zkrollup	zk-Rollup
+optimisticrollup	Optimistic Rollup
+zkevm	zkEVM
+evm	EVM
+svm	SVM
+movevm	MoveVM
+eip	EIP
+erc	ERC
+spl	SPL
+zkp	ZKP
+mpc	MPC
+tss	TSS
+hdwallet	HD Wallet
+travelrule	Travel Rule
+fatf	FATF
+jvcea	JVCEA
+jcba	JCBA
+ico	ICO
+ieo	IEO
+sto	STO
+st	ST
+saft	SAFT
+sats	sats
+gwei	Gwei
+hodl	HODL
+fud	FUD
+ath	ATH
+dyor	DYOR
+wagmi	WAGMI
+ngmi	NGMI
+gn	GN
+lfg	LFG
+rugpull	rug pull
+vitalik	Vitalik
+vitalikbuterin	Vitalik Buterin
+cz	CZ
+sbf	SBF
+metaverse	Metaverse
+dapps	DApps
+dapp	dApp
+vyper	Vyper
+hardhat	Hardhat
+ganache	Ganache
+remixide	Remix IDE
+openzeppelin	OpenZeppelin
+ethersjs	ethers.js
+viem	viem
+rainbowkit	RainbowKit
+infura	Infura
+quicknode	QuickNode
+moralis	Moralis
+thirdweb	Thirdweb
+chainstack	Chainstack
+ankr	Ankr
+ipfs	IPFS
+filebase	Filebase
+ens	ENS
+unstoppabledomains	Unstoppable Domains
+lensprotocol	Lens Protocol
+farcaster	Farcaster
+warpcast	Warpcast
+friendtech	Friend.tech
+gitcoin	Gitcoin
+polymarket	Polymarket
+kalshi	Kalshi
+paxos	Paxos
+tetherlimited	Tether Limited
+ripplelabs	Ripple Labs
+consensys	Consensys
+ethereumfoundation	Ethereum Foundation
+solanafoundation	Solana Foundation
+astar	Astar
+astarnetwork	Astar Network
+astr	ASTR
+oasys	Oasys
+oas	OAS
+xym	XYM
+nem	NEM
+xem	XEM
+monacoin	Monacoin
+plt	PLT
+financie	FiNANCiE
+fnct	FNCT
+iost	IOST
+qtum	Qtum
+lisk	Lisk
+lsk	LSK
+bravebrowser	Brave Browser
+xdc	XDC
+qnt	QNT
+klay	KLAY
+klaytn	Klaytn
+wemix	WEMIX
+zil	ZIL
+zilliqa	Zilliqa
+ont	ONT
+icx	ICX
+ecash	eCash
+ravencoin	Ravencoin
+horizen	Horizen
+siacoin	Siacoin
+storj	Storj
+hnt	HNT
+iotex	IoTeX
+iotx	IOTX
+akash	Akash
+bittensor	Bittensor
+ionet	io.net
+goatseus	Goatseus
+fartcoin	Fartcoin
+melania	MELANIA
+pinetwork	Pi Network
+hyperliquid	Hyperliquid
+berachain	Berachain
+megaeth	MegaETH
+storyprotocol	Story Protocol
+dow	Dow
+djia	DJIA
+acwi	ACWI
+msciacwi	MSCI ACWI
+msciworld	MSCI World
+mscikokusai	MSCI Kokusai
+ftseallworld	FTSE All-World
+crsp	CRSP
+vt	VT
+vti	VTI
+vym	VYM
+qqq	QQQ
+tqqq	TQQQ
+soxl	SOXL
+soxx	SOXX
+smh	SMH
+spyd	SPYD
+ivv	IVV
+iwm	IWM
+hdv	HDV
+schd	SCHD
+jepq	JEPQ
+gld	GLD
+slv	SLV
+tlt	TLT
+agg	AGG
+bnd	BND
+arkk	ARKK
+emaxis	eMAXIS
+emaxisslim	eMAXIS Slim
+ifree	iFree
+ifreenext	iFreeNEXT
+maxis	MAXIS
+nextfunds	NEXT FUNDS
+globalx	Global X
+wisdomtree	WisdomTree
+invesco	Invesco
+schwab	Schwab
+charlesschwab	Charles Schwab
+statestreet	State Street
+spdr	SPDR
+pimco	PIMCO
+jpmorgan	JPMorgan
+goldmansachs	Goldman Sachs
+morganstanley	Morgan Stanley
+citi	Citi
+citigroup	Citigroup
+wellsfargo	Wells Fargo
+barclays	Barclays
+deutschebank	Deutsche Bank
+creditsuisse	Credit Suisse
+bnpparibas	BNP Paribas
+societegenerale	Société Générale
+santander	Santander
+ing	ING
+jpbank	JP BANK
+monex	Monex
+webull	Webull
+robinhood	Robinhood
+etoro	eToro
+interactivebrokers	Interactive Brokers
+ibkr	IBKR
+saxo	Saxo
+exness	Exness
+xm	XM
+xmtrading	XMTrading
+fxgt	FXGT
+titanfx	TitanFX
+axiory	AXIORY
+metatrader	MetaTrader
+ctrader	cTrader
+investingcom	Investing.com
+yahoofinance	Yahoo Finance
+bloomberg	Bloomberg
+reuters	Reuters
+refinitiv	Refinitiv
+lseg	LSEG
+factset	FactSet
+spglobal	S&P Global
+moodys	Moody's
+fitch	Fitch
+jcr	JCR
+morningstar	Morningstar
+irbank	IRBANK
+buffettcode	Buffett Code
+edinet	EDINET
+tdnet	TDnet
+bps	BPS
+psr	PSR
+evebitda	EV/EBITDA
+cagr	CAGR
+yoy	YoY
+qoq	QoQ
+mom	MoM
+ytd	YTD
+ttm	TTM
+ltm	LTM
+fy	FY
+otc	OTC
+adr	ADR
+gdr	GDR
+spac	SPAC
+oco	OCO
+ifd	IFD
+ifdoco	IFDOCO
+gtc	GTC
+fok	FOK
+pboc	PBOC
+snb	SNB
+rba	RBA
+rbnz	RBNZ
+boc	BOC
+pce	PCE
+ism	ISM
+nfp	NFP
+adp	ADP
+cb	CB
+umich	UMich
+sofr	SOFR
+libor	LIBOR
+tibor	TIBOR
+euribor	EURIBOR
+ois	OIS
+cds	CDS
+clo	CLO
+mbs	MBS
+cmbs	CMBS
+rmbs	RMBS
+jgb	JGB
+ust	UST
+tbill	T-Bill
+tnote	T-Note
+tbond	T-Bond
+ycc	YCC
+qe	QE
+zirp	ZIRP
+nirp	NIRP
+mmt	MMT
+gafa	GAFA
+gafam	GAFAM
+faang	FAANG
+batx	BATX
+tmt	TMT
+garp	GARP
+sri	SRI
+sx	SX
+tcfd	TCFD
+tnfd	TNFD
+issb	ISSB
+sbti	SBTi
+sasb	SASB
+gri	GRI
+pri	PRI
+revolut	Revolut
+venmo	Venmo
+zelle	Zelle
+cashapp	Cash App
+payoneer	Payoneer
+paysafe	Paysafe
+klarna	Klarna
+afterpay	Afterpay
+sezzle	Sezzle
+adyen	Adyen
+checkoutcom	Checkout.com
+braintree	Braintree
+worldpay	Worldpay
+fiserv	Fiserv
+globalpayments	Global Payments
+mastercard	Mastercard
+americanexpress	American Express
+dinersclub	Diners Club
+unionpay	UnionPay
+revolutcard	Revolut Card
+uc	UC
+orico	Orico
+jcbw	JCB W
+kyash	Kyash
+revolutjapan	Revolut Japan
+wisejapan	Wise Japan
+bitwallet	Bitwallet
+sticpay	STICPAY
+ecopayz	ecoPayz
+skrill	Skrill
+neteller	Neteller
+muchbetter	MuchBetter
+paysafecard	Paysafecard
+vpreca	V-Preca
+toyotawallet	TOYOTA Wallet
+revolutbusiness	Revolut Business
+airwallex	Airwallex
+zaim	Zaim
+moneytree	Moneytree
+wealthnavi	Wealthnavi
+robopro	ROBOPRO
+creal	CREAL
+cozuchi	COZUCHI
+tecrowd	TECROWD
+rimple	Rimple
+ownersbook	OwnersBook
+crowdbank	Crowd Bank
+lendex	LENDEX
+pocketfunding	Pocket Funding
+fantasfunding	FANTAS funding
+renosy	Renosy
+gatechnologies	GA technologies
+iyell	iYell
+nike	NIKE
+adidas	adidas
+uniqlo	UNIQLO
+muji	MUJI
+ikea	IKEA
+zara	ZARA
+hm	H&M
+oldnavy	Old Navy
+bananarepublic	Banana Republic
+bershka	Bershka
+pullbear	Pull&Bear
+stradivarius	Stradivarius
+massimodutti	Massimo Dutti
+arket	ARKET
+primark	Primark
+uniqlou	Uniqlo U
+levis	Levi's
+edwin	EDWIN
+calvinklein	Calvin Klein
+tommyhilfiger	Tommy Hilfiger
+ralphlauren	Ralph Lauren
+lacoste	LACOSTE
+fredperry	Fred Perry
+burberry	Burberry
+barbour	Barbour
+aquascutum	Aquascutum
+paulsmith	Paul Smith
+viviennewestwood	Vivienne Westwood
+drmartens	Dr. Martens
+clarks	Clarks
+timberland	Timberland
+ugg	UGG
+crocs	CROCS
+birkenstock	Birkenstock
+merrell	Merrell
+salomon	Salomon
+onrunning	On Running
+asics	ASICS
+onitsukatiger	Onitsuka Tiger
+reebok	Reebok
+newbalance	New Balance
+fila	FILA
+umbro	Umbro
+descente	DESCENTE
+ellesse	Ellesse
+diadora	Diadora
+saucony	Saucony
+underarmour	Under Armour
+lululemon	lululemon
+gymshark	Gymshark
+aloyoga	Alo Yoga
+athleta	Athleta
+danskin	Danskin
+goldwin	Goldwin
+patagonia	Patagonia
+columbia	Columbia
+arcteryx	Arc'teryx
+mammut	Mammut
+marmot	Marmot
+montbell	Mont-bell
+snowpeak	Snow Peak
+coleman	Coleman
+logos	LOGOS
+helinox	Helinox
+nordisk	Nordisk
+karrimor	Karrimor
+deuter	Deuter
+petzl	Petzl
+moncler	Moncler
+pyrenex	Pyrenex
+woolrich	Woolrich
+stussy	Stussy
+wtaps	WTAPS
+offwhite	Off-White
+kith	KITH
+carhartt	Carhartt
+carharttwip	Carhartt WIP
+dickies	Dickies
+bendavis	Ben Davis
+xgirl	X-girl
+xlarge	XLARGE
+schott	Schott
+avirex	Avirex
+alphaindustries	Alpha Industries
+buzzricksons	Buzz Rickson's
+danner	Danner
+chippewa	Chippewa
+whitesboots	White's Boots
+alden	Alden
+churchs	Church's
+johnlobb	John Lobb
+trickers	Tricker's
+jmweston	J.M. Weston
+hushpuppies	Hush Puppies
+colehaan	Cole Haan
+ecco	ECCO
+rockport	Rockport
+allenedmonds	Allen Edmonds
+paraboot	Paraboot
+sperry	Sperry
+grenson	Grenson
+loake	Loake
+louisvuitton	Louis Vuitton
+chanel	Chanel
+hermes	Hermès
+gucci	Gucci
+prada	Prada
+dior	Dior
+christiandior	Christian Dior
+fendi	Fendi
+celine	Celine
+loewe	Loewe
+bottegaveneta	Bottega Veneta
+balenciaga	Balenciaga
+saintlaurent	Saint Laurent
+ysl	YSL
+givenchy	Givenchy
+valentino	Valentino
+versace	Versace
+dolcegabbana	Dolce&Gabbana
+dg	D&G
+armani	Armani
+giorgioarmani	Giorgio Armani
+emporioarmani	Emporio Armani
+armaniexchange	ARMANI EXCHANGE
+burberrylondon	Burberry London
+salvatoreferragamo	Salvatore Ferragamo
+ferragamo	Ferragamo
+tods	Tod's
+mcm	MCM
+michaelkors	Michael Kors
+katespade	Kate Spade
+toryburch	Tory Burch
+furla	Furla
+longchamp	Longchamp
+samanthathavasa	Samantha Thavasa
+anyahindmarch	Anya Hindmarch
+marcjacobs	Marc Jacobs
+jilsander	Jil Sander
+maisonmargiela	Maison Margiela
+margiela	Margiela
+acnestudios	Acne Studios
+apc	A.P.C.
+amiparis	Ami Paris
+maisonkitsune	Maison Kitsuné
+cdg	CDG
+yohjiyamamoto	Yohji Yamamoto
+isseymiyake	Issey Miyake
+pleatsplease	PLEATS PLEASE
+hommeplisse	HOMME PLISSÉ
+sacai	Sacai
+visvim	visvim
+kapital	KAPITAL
+auralee	AURALEE
+comoli	COMOLI
+graphpaper	Graphpaper
+nanamica	nanamica
+beamsplus	BEAMS PLUS
+raybeams	Ray BEAMS
+unitedarrows	UNITED ARROWS
+beautyyouth	BEAUTY&YOUTH
+urbanresearch	URBAN RESEARCH
+journalstandard	JOURNAL STANDARD
+spickspan	Spick&Span
+plage	Plage
+deuxiemeclasse	Deuxieme Classe
+lappartement	L'Appartement
+framework	FRAMeWORK
+nanouniverse	nano universe
+ropepicnic	Rope Picnic
+tomorrowland	TOMORROWLAND
+ronherman	Ron Herman
+estnation	ESTNATION
+dresskip	Dresskip
+mackintoshphilosophy	MACKINTOSH PHILOSOPHY
+icb	ICB
+snidel	SNIDEL
+frayid	FRAY I.D
+gelatopique	gelato pique
+lilybrown	Lily Brown
+mercuryduo	MERCURYDUO
+moussy	moussy
+gyda	GYDA
+laguagem	LAGUA GEM
+dazzlin	dazzlin
+lowrysfarm	LOWRYS FARM
+globalwork	GLOBAL WORK
+nikoand	niko and...
+studioclip	studio CLIP
+earthmusicecology	earth music&ecology
+lepsim	LEPSIM
+spinns	SPINNS
+ingni	INGNI
+lizlisa	LIZ LISA
+ankrouge	Ank Rouge
+amavel	AMAVEL
+honeycinnamon	Honey Cinnamon
+swankiss	Swankiss
+axesfemme	axes femme
+pinkhouse	Pink house
+angelicpretty	ANGELIC PRETTY
+hnaoto	h.NAOTO
+ciaopanic	CIAOPANIC
+coen	coen
+righton	Right-on
+jeansmate	Jeans Mate
+workmanplus	Workman Plus
+uniqloc	Uniqlo C
+orihica	ORIHICA
+psfa	P.S.FA
+suitsquare	SUIT SQUARE
+brooksbrothers	Brooks Brothers
+jcrew	J.Crew
+abercrombie	Abercrombie
+af	A&F
+hollister	Hollister
+americaneagle	American Eagle
+eddiebauer	Eddie Bauer
+llbean	L.L.Bean
+landsend	Lands' End
+orvis	Orvis
+filson	Filson
+pendleton	Pendleton
+barbourinternational	Barbour International
+belstaff	Belstaff
+aigle	AIGLE
+monclergrenoble	Moncler Grenoble
+rolex	Rolex
+cartier	Cartier
+tiffany	Tiffany
+bvlgari	Bvlgari
+harrywinston	Harry Winston
+chopard	Chopard
+piaget	Piaget
+boucheron	Boucheron
+chaumet	Chaumet
+debeers	De Beers
+starjewelry	STAR JEWELRY
+ahkah	AHKAH
+vendomeaoyama	Vendome Aoyama
+swarovski	Swarovski
+chromehearts	Chrome Hearts
+goros	Goro's
+justindavis	Justin Davis
+patekphilippe	Patek Philippe
+audemarspiguet	Audemars Piguet
+vacheronconstantin	Vacheron Constantin
+jaegerlecoultre	Jaeger-LeCoultre
+breguet	Breguet
+blancpain	Blancpain
+iwc	IWC
+hublot	Hublot
+tagheuer	Tag Heuer
+breitling	Breitling
+longines	Longines
+tissot	Tissot
+oris	Oris
+frederiqueconstant	Frederique Constant
+nomos	Nomos
+junghans	Junghans
+grandseiko	Grand Seiko
+casio	CASIO
+gshock	G-SHOCK
+babyg	Baby-G
+oceanus	OCEANUS
+protrek	PRO TREK
+orientstar	Orient Star
+credor	Credor
+danielwellington	Daniel Wellington
+dw	DW
+skagen	Skagen
+garmin	Garmin
+coros	COROS
+amazfit	Amazfit
+huaweiwatch	Huawei Watch
+miband	Mi Band
+fitbitcharge	Fitbit Charge
+ouraring	Oura Ring
+sonystore	Sony Store
+biccamera	Bic Camera
+yodobashicamera	Yodobashi Camera
+ksdenki	K's Denki
+bestdenki	Best Denki
+sofmap	Sofmap
+donquijote	Don Quijote
+tokyuhands	Tokyu Hands
+francfranc	Francfranc
+afternoontea	Afternoon Tea
+salut	salut!
+cando	Can Do
+standardproducts	Standard Products
+threeppy	THREEPPY
+cainz	Cainz
+kohnan	Kohnan
+vivahome	Viva Home
+joyfulhonda	Joyful Honda
+hornbeck	Hornbeck
+bookoff	BOOKOFF
+trefac	TREFAC
+hardoff	Hard Off
+offhouse	Off House
+brandoff	Brand Off
+ragtag	RAGTAG
+kindal	Kindal
+doubletrust	DOUBLE TRUST
+melonbooks	Melonbooks
+lashinbang	Lashinbang
+gsc	GSC
+maxfactory	Max Factory
+nendoroid	Nendoroid
+revoltech	Revoltech
+bandaispirits	BANDAI SPIRITS
+bandainamco	Bandai Namco
+gunpla	Gunpla
+hg	HG
+mg	MG
+rg	RG
+pg	PG
+tamashiinations	Tamashii Nations
+shfiguarts	S.H.Figuarts
+figuarts	Figuarts
+metalbuild	METAL BUILD
+takaratomy	TAKARA TOMY
+tomica	Tomica
+plarail	Plarail
+licca	Licca
+beyblade	Beyblade
+zoids	Zoids
+duelmasters	Duel Masters
+lego	LEGO
+legoduplo	LEGO DUPLO
+duplo	Duplo
+playmobil	Playmobil
+mattel	Mattel
+barbie	Barbie
+hotwheels	Hot Wheels
+hasbro	Hasbro
+funkopop	Funko Pop
+sylvanianfamilies	Sylvanian Families
+megahouse	Megahouse
+medicomtoy	Medicom Toy
+berbrick	BE@RBRICK
+bearbrick	BEARBRICK
+kaws	KAWS
+hellokitty	Hello Kitty
+mymelody	My Melody
+cinnamoroll	Cinnamoroll
+pochacco	Pochacco
+aggretsuko	Aggretsuko
+sanx	San-X
+rilakkuma	Rilakkuma
+miffy	Miffy
+snoopy	Snoopy
+pokemoncenter	Pokémon Center
+disneyland	Disneyland
+tokyodisneyland	Tokyo Disneyland
+tdl	TDL
+tds	TDS
+tdr	TDR
+disneysea	DisneySea
+disneystore	Disney Store
+pixar	Pixar
+mcu	MCU
+dccomics	DC Comics
+dceu	DCEU
+starwars	Star Wars
+lucasfilm	Lucasfilm
+usj	USJ
+warnerbros	Warner Bros.
+wb	WB
+sonypictures	Sony Pictures
+studioghibli	Studio Ghibli
+ghibli	Ghibli
+aniplex	Aniplex
+ufotable	ufotable
+productionig	Production I.G
+witstudio	WIT STUDIO
+cloverworks	CloverWorks
+studiotrigger	Studio Trigger
+jcstaff	J.C.STAFF
+paworks	P.A.WORKS
+sciencesaru	Science SARU
+studiochizu	Studio Chizu
+studioponoc	Studio Ponoc
+davidproduction	David Production
+kinemacitrus	Kinema Citrus
+lerche	Lerche
+silverlink	SILVER LINK.
+studiobind	Studio Bind
+cygamespictures	CygamesPictures
+olm	OLM
+cocacola	Coca-Cola
+pepsi	Pepsi
+pepsico	Pepsi Co
+drpepper	Dr Pepper
+mountaindew	Mountain Dew
+redbull	Red Bull
+monsterenergy	Monster Energy
+lipton	Lipton
+nestle	Nestlé
+nescafe	Nescafé
+kitkat	KitKat
+nespresso	Nespresso
+dolcegusto	Dolce Gusto
+starbucks	Starbucks
+tullys	Tully's
+tullyscoffee	TULLY'S COFFEE
+doutor	Doutor
+excelsiorcaffe	Excelsior Caffé
+bluebottle	Blue Bottle
+arabica	% Arabica
+veloce	Veloce
+saintmarc	Saint Marc
+kaldi	Kaldi
+costco	Costco
+kirkland	Kirkland
+kirklandsignature	Kirkland Signature
+traderjoes	Trader Joe's
+hokkaidoice	Hokkaido Ice
+haagendazs	Haagen-Dazs
+baskinrobbins	Baskin-Robbins
+lindt	Lindt
+ghirardelli	Ghirardelli
+hersheys	Hershey's
+twix	Twix
+toblerone	Toblerone
+ferrerorocher	Ferrero Rocher
+nutella	Nutella
+pocky	Pocky
+pretz	Pretz
+pringles	Pringles
+doritos	Doritos
+lays	Lay's
+cheetos	Cheetos
+ritz	Ritz
+calbee	Calbee
+glico	Glico
+lotte	Lotte
+cupnoodle	Cup Noodle
+mizkan	Mizkan
+kewpie	Kewpie
+qp	QP
+housefoods	House Foods
+sb	S&B
+suntory	Suntory
+heineken	Heineken
+budweiser	Budweiser
+stellaartois	Stella Artois
+guinness	Guinness
+hoegaarden	Hoegaarden
+carlsberg	Carlsberg
+tsingtao	Tsingtao
+singha	Singha
+budlight	Bud Light
+coors	Coors
+premiummalts	Premium Malt's
+strongzero	Strong Zero
+johnniewalker	Johnnie Walker
+jackdaniels	Jack Daniel's
+jimbeam	Jim Beam
+makersmark	Maker's Mark
+fourroses	Four Roses
+bulleit	Bulleit
+jameson	Jameson
+glenfiddich	Glenfiddich
+glenlivet	Glenlivet
+theglenlivet	The Glenlivet
+macallan	Macallan
+themacallan	The Macallan
+laphroaig	Laphroaig
+lagavulin	Lagavulin
+ardbeg	Ardbeg
+talisker	Talisker
+bowmore	Bowmore
+highlandpark	Highland Park
+dewars	Dewar's
+chivasregal	Chivas Regal
+ballantines	Ballantine's
+yamazakiwhisky	Yamazaki whisky
+ichirosmalt	Ichiro's Malt
+moet	Moët
+domperignon	Dom Pérignon
+veuveclicquot	Veuve Clicquot
+krug	Krug
+bollinger	Bollinger
+taittinger	Taittinger
+perrierjouet	Perrier-Jouët
+hennessy	Hennessy
+remymartin	Rémy Martin
+martell	Martell
+courvoisier	Courvoisier
+bacardi	Bacardi
+captainmorgan	Captain Morgan
+smirnoff	Smirnoff
+absolut	Absolut
+greygoose	Grey Goose
+tanqueray	Tanqueray
+bombaysapphire	Bombay Sapphire
+hendricks	Hendrick's
+josecuervo	Jose Cuervo
+donjulio	Don Julio
+campari	Campari
+aperol	Aperol
+kahlua	Kahlúa
+baileys	Baileys
+jagermeister	Jägermeister
+cointreau	Cointreau
+grandmarnier	Grand Marnier
+volvic	Volvic
+perrier	Perrier
+sanpellegrino	San Pellegrino
+spellegrino	S.Pellegrino
+contrex	Contrex
+fijiwater	Fiji Water
+crystalgeyser	Crystal Geyser
+pocarisweat	Pocari Sweat
+cclemon	CC Lemon
+calpis	Calpis
+yakult	Yakult
+meijibulgaria	Meiji Bulgaria
+activia	Activia
+oikos	Oikos
+lipovitand	Lipovitan D
+oronaminc	Oronamin C
+yunker	Yunker
+realgold	Real Gold
+mcdonalds	McDonald's
+mosburger	MOS BURGER
+mos	MOS
+burgerking	Burger King
+lotteria	Lotteria
+freshnessburger	Freshness Burger
+kfc	KFC
+shakeshack	Shake Shack
+carlsjr	Carl's Jr.
+wendys	Wendy's
+fiveguys	Five Guys
+innout	In-N-Out
+tacobell	Taco Bell
+dominos	Domino's
+dominospizza	Domino's Pizza
+pizzahut	Pizza Hut
+pizzala	PIZZA-LA
+pizzacalifornia	Pizza California
+strawberrycones	Strawberry Cones
+napolis	Napoli's
+dennys	Denny's
+jonathans	Jonathan's
+royalhost	Royal Host
+jollypasta	Jolly Pasta
+cocoichi	CoCoICHI
+gindaco	Gindaco
+misterdonut	Mister Donut
+krispykreme	Krispy Kreme
+dunkin	Dunkin'
+timhortons	Tim Hortons
+chateraise	Chateraise
+lawson	Lawson
+naturallawson	Natural Lawson
+familymart	FamilyMart
+seveneleven	Seven-Eleven
+ministop	Ministop
+dailyyamazaki	Daily Yamazaki
+newdays	NewDays
+seicomart	Seicomart
+cocostore	Coco Store
+aeonmall	AEON MALL
+maxvalu	MaxValu
+okstore	OK Store
+gyomusuper	Gyomu Super
+queensisetan	Queen's Isetan
+tokyustore	Tokyu Store
+precce	Precce
+peacockstore	Peacock Store
+matsukiyococokara	MatsukiyoCocokara
+welcia	Welcia
+sundrug	Sundrug
+daikokudrug	Daikoku Drug
+pola	Pola
+skii	SK-II
+ipsa	IPSA
+rmk	RMK
+suqqu	SUQQU
+lunasol	Lunasol
+coffretdor	Coffret d'Or
+maquillage	Maquillage
+curel	Curél
+hadalabo	Hada Labo
+melanocc	Melano CC
+mujilabo	Muji Labo
+canmake	Canmake
+majolicamajorca	Majolica Majorca
+kissme	Kiss Me
+diorbeauty	Dior Beauty
+chanelbeaute	Chanel Beauté
+lancome	Lancôme
+esteelauder	Estée Lauder
+clinique	Clinique
+bobbibrown	Bobbi Brown
+nars	NARS
+jomalone	Jo Malone
+lelabo	Le Labo
+diptyque	Diptyque
+byredo	Byredo
+tomford	Tom Ford
+kiehls	Kiehl's
+larocheposay	La Roche-Posay
+bioderma	Bioderma
+cetaphil	Cetaphil
+cerave	CeraVe
+neutrogena	Neutrogena
+olay	Olay
+hs	H&S
+herbalessences	Herbal Essences
+ululis	ululis
+yolu	YOLU
+milbon	Milbon
+moroccanoil	Moroccanoil
+kerastase	Kérastase
+loreal	L'Oréal
+maybelline	Maybelline
+revlon	Revlon
+rimmel	Rimmel
+nyx	NYX
+fentybeauty	Fenty Beauty
+rarebeauty	Rare Beauty
+charlottetilbury	Charlotte Tilbury
+toofaced	Too Faced
+urbandecay	Urban Decay
+hudabeauty	Huda Beauty
+sephora	Sephora
+ulta	Ulta
+innisfree	Innisfree
+laneige	Laneige
+sulwhasoo	Sulwhasoo
+drjart	Dr.Jart+
+cosrx	COSRX
+torriden	Torriden
+roundlab	Round Lab
+medicube	Medicube
+vtcosmetics	VT Cosmetics
+cica	CICA
+mediheal	Mediheal
+romnd	rom&nd
+romand	romand
+hince	Hince
+dasique	dasique
+fwee	Fwee
+unleashia	unleashia
+holikaholika	Holika Holika
+naturerepublic	Nature Republic
+skinfood	Skinfood
+banilaco	Banila Co
+oliveyoung	Olive Young
+stylenanda	Stylenanda
+lexus	Lexus
+mazda	Mazda
+acura	Acura
+gr	GR
+gazooracing	GAZOO Racing
+trd	TRD
+modellista	Modellista
+nismo	NISMO
+sti	STI
+ralliart	Ralliart
+prius	Prius
+camry	Camry
+alphard	Alphard
+vellfire	Vellfire
+voxy	Voxy
+yaris	Yaris
+gryaris	GR Yaris
+landcruiser	Land Cruiser
+hiace	Hiace
+hilux	Hilux
+chr	C-HR
+nbox	N-BOX
+nwgn	N-WGN
+hrv	HR-V
+zrv	ZR-V
+vezel	Vezel
+stepwgn	Step WGN
+nsx	NSX
+integra	Integra
+fairladyz	Fairlady Z
+gtr	GT-R
+nissangtr	Nissan GT-R
+xtrail	X-Trail
+elgrand	Elgrand
+dayz	Dayz
+roox	Roox
+impreza	Impreza
+levorg	Levorg
+wrx	WRX
+brz	BRZ
+crosstrek	Crosstrek
+jimny	Jimny
+swiftsport	Swift Sport
+spacia	Spacia
+wagonr	Wagon R
+copen	Copen
+delica	Delica
+ek	eK
+lancerevolution	Lancer Evolution
+mercedesbenz	Mercedes-Benz
+mercedes	Mercedes
+benz	Benz
+amg	AMG
+mercedesamg	Mercedes-AMG
+maybach	Maybach
+bmwmini	BMW MINI
+rollsroyce	Rolls-Royce
+volkswagen	Volkswagen
+porsche	Porsche
+macan	Macan
+taycan	Taycan
+lamborghini	Lamborghini
+alfaromeo	Alfa Romeo
+abarth	Abarth
+lancia	Lancia
+chrysler	Chrysler
+cadillac	Cadillac
+chevrolet	Chevrolet
+chevy	Chevy
+camaro	Camaro
+rivian	Rivian
+polestar	Polestar
+volvo	Volvo
+saab	Saab
+peugeot	Peugeot
+citroen	Citroën
+dsautomobiles	DS Automobiles
+renault	Renault
+bentley	Bentley
+astonmartin	Aston Martin
+mclaren	McLaren
+landrover	Land Rover
+rangerover	Range Rover
+hyundai	Hyundai
+geely	Geely
+xpeng	XPeng
+liauto	Li Auto
+zeekr	Zeekr
+ducati	Ducati
+harleydavidson	Harley-Davidson
+ktm	KTM
+husqvarna	Husqvarna
+aprilia	Aprilia
+mvagusta	MV Agusta
+piaggio	Piaggio
+royalenfield	Royal Enfield
+gsxr	GSX-R
+cbr	CBR
+supercub	Super Cub
+pcx	PCX
+huntercub	Hunter Cub
+crosscub	Cross Cub
+bridgestone	Bridgestone
+advan	ADVAN
+dunlop	Dunlop
+toyotires	Toyo Tires
+falken	Falken
+michelin	Michelin
+pirelli	Pirelli
+goodyear	Goodyear
+hankook	Hankook
+nexen	Nexen
+kumho	Kumho
+bbs	BBS
+volkracing	Volk Racing
+recaro	Recaro
+sparco	Sparco
+nardi	Nardi
+hks	HKS
+cusco	Cusco
+brembo	Brembo
+akrapovic	Akrapovič
+ogk	OGK
+ogkkabuto	OGK KABUTO
+agv	AGV
+hjc	HJC
+rstaichi	RS Taichi
+alpinestars	Alpinestars
+dainese	Dainese
+garminzumo	Garmin Zumo
+carrozzeria	Carrozzeria
+kenwood	Kenwood
+panasonicstrada	Panasonic Strada
+comtec	Comtec
+cellstar	Cellstar
+thinkware	Thinkware
+panasonic	Panasonic
+mitsubishielectric	Mitsubishi Electric
+olympus	OLYMPUS
+omsystem	OM SYSTEM
+omdigital	OM Digital
+fujifilm	FUJIFILM
+instax	instax
+ricoh	Ricoh
+pentax	PENTAX
+griii	GR III
+tamron	Tamron
+leica	Leica
+hasselblad	Hasselblad
+zeiss	Zeiss
+carlzeiss	Carl Zeiss
+voigtlander	Voigtländer
+kodak	Kodak
+ilford	Ilford
+lomo	Lomo
+gopro	GoPro
+dji	DJI
+osmo	Osmo
+osmopocket	Osmo Pocket
+osmoaction	Osmo Action
+mavic	Mavic
+zhiyun	Zhiyun
+manfrotto	Manfrotto
+gitzo	Gitzo
+peakdesign	Peak Design
+pgytech	Pgytech
+ulanzi	Ulanzi
+smallrig	SmallRig
+godox	Godox
+profoto	Profoto
+aputure	Aputure
+nanlite	Nanlite
+elinchrom	Elinchrom
+audiotechnica	Audio-Technica
+sennheiser	Sennheiser
+beyerdynamic	Beyerdynamic
+akg	AKG
+neumann	Neumann
+blueyeti	Blue Yeti
+bluemicrophones	Blue Microphones
+hyperxquadcast	HyperX QuadCast
+quadcast	QuadCast
+focusrite	Focusrite
+universalaudio	Universal Audio
+rme	RME
+steinberg	Steinberg
+roland	Roland
+korg	KORG
+yamahamusic	YAMAHA Music
+casioprivia	Casio Privia
+moog	Moog
+arturia	Arturia
+teenageengineering	Teenage Engineering
+elektron	Elektron
+behringer	Behringer
+tascam	TASCAM
+marantz	Marantz
+pioneerdj	Pioneer DJ
+alphatheta	AlphaTheta
+technics	Technics
+accuphase	Accuphase
+luxman	Luxman
+mcintosh	McIntosh
+bw	B&W
+harmankardon	Harman Kardon
+gibson	Gibson
+ibanez	Ibanez
+epiphone	Epiphone
+prs	PRS
+esp	ESP
+squier	Squier
+gretsch	Gretsch
+rickenbacker	Rickenbacker
+musicman	Music Man
+orangeamps	Orange Amps
+mesaboogie	Mesa/Boogie
+mxr	MXR
+electroharmonix	Electro-Harmonix
+ehx	EHX
+strymon	Strymon
+kemper	Kemper
+fractalaudio	Fractal Audio
+neuraldsp	Neural DSP
+positivegrid	Positive Grid
+dwdrums	DW Drums
+zildjian	Zildjian
+meinl	Meinl
+selmer	Selmer
+steinway	Steinway
+bosendorfer	Bösendorfer
+bechstein	Bechstein
+sonymusic	Sony Music
+universalmusic	Universal Music
+warnermusic	Warner Music
+avex	avex
+johnnys	Johnny's
+startoentertainment	STARTO ENTERTAINMENT
+hybe	HYBE
+smentertainment	SM Entertainment
+ygentertainment	YG Entertainment
+jyp	JYP
+jypentertainment	JYP Entertainment
+ldh	LDH
+helloproject	Hello! Project
+morningmusume	Morning Musume
+babymetal	BABYMETAL
+oneokrock	ONE OK ROCK
+mrsgreenapple	Mrs. GREEN APPLE
+kinggnu	King Gnu
+radwimps	RADWIMPS
+vaundy	Vaundy
+lisa	LiSA
+manwithamission	MAN WITH A MISSION
+backnumber	back number
+spyair	SPYAIR
+uverworld	UVERworld
+larcenciel	L'Arc~en~Ciel
+xjapan	X JAPAN
+glay	GLAY
+lunasea	LUNA SEA
+bz	B'z
+mrchildren	Mr.Children
+smap	SMAP
+heysayjump	Hey! Say! JUMP
+kingprince	King & Prince
+sixtones	SixTONES
+travisjapan	Travis Japan
+timelesz	timelesz
+befirst	BE:FIRST
+niziu	NiziU
+xg	XG
+blackpink	BLACKPINK
+newjeans	NewJeans
+lesserafim	LE SSERAFIM
+aespa	aespa
+gidle	(G)I-DLE
+itzy	ITZY
+nmixx	NMIXX
+stayc	STAYC
+redvelvet	Red Velvet
+straykids	Stray Kids
+enhypen	ENHYPEN
+txt	TXT
+ateez	ATEEZ
+nct	NCT
+nctdream	NCT DREAM
+wayv	WayV
+exo	EXO
+shinee	SHINee
+bigbang	BIGBANG
+girlsgeneration	Girls' Generation
+snsd	SNSD
+monstax	MONSTA X
+theboyz	THE BOYZ
+zerobaseone	ZEROBASEONE
+boynextdoor	BOYNEXTDOOR
+tws	TWS
+illit	ILLIT
+babymonster	BABYMONSTER
+apink	Apink
+wjsn	WJSN
+billlie	Billlie
+triples	tripleS
+qwer	QWER
+plave	PLAVE
+kpop	K-POP
+jpop	J-POP
+cpop	C-POP
+tpop	T-POP
+jrock	J-ROCK
+edm	EDM
+rb	R&B
+hiphop	Hip-Hop
+lofi	Lo-fi
+vaporwave	Vaporwave
+citypop	City Pop
+vsinger	Vsinger
+ffxiv	FFXIV
+ffvii	FFVII
+finalfantasy	Final Fantasy
+dq	DQ
+dqx	DQX
+dragonquest	Dragon Quest
+mh	MH
+mhw	MHW
+mhwilds	MHWilds
+mhrise	MHRise
+monsterhunter	Monster Hunter
+residentevil	Resident Evil
+biohazard	BIOHAZARD
+streetfighter	Street Fighter
+smashbros	Smash Bros
+ssbu	SSBU
+mariokart	Mario Kart
+splatoon	Splatoon
+animalcrossing	Animal Crossing
+zelda	Zelda
+botw	BotW
+totk	TotK
+pokemonsleep	Pokémon Sleep
+pokemontcg	Pokémon TCG
+ptcg	PTCG
+ptcgl	PTCGL
+pokemonscarlet	Pokémon Scarlet
+pokemonviolet	Pokémon Violet
+pokemonlegends	Pokemon Legends
+fireemblem	Fire Emblem
+xenoblade	Xenoblade
+kirby	Kirby
+metroid	Metroid
+pikmin	Pikmin
+kingdomhearts	Kingdom Hearts
+kh	KH
+nier	NieR
+nierautomata	NieR:Automata
+smt	SMT
+tetris	Tetris
+pacman	Pac-Man
+spaceinvaders	Space Invaders
+bomberman	Bomberman
+castlevania	Castlevania
+metalgear	Metal Gear
+mgs	MGS
+silenthill	Silent Hill
+deathstranding	Death Stranding
+eldenring	Elden Ring
+darksouls	Dark Souls
+bloodborne	Bloodborne
+armoredcore	Armored Core
+fromsoftware	FromSoftware
+granturismo	Gran Turismo
+gow	GoW
+tlou	TLOU
+spiderman	Spider-Man
+marvelsspiderman	Marvel's Spider-Man
+dragonball	Dragon Ball
+dbz	DBZ
+onepiece	One Piece
+hxh	HxH
+chainsawman	Chainsaw Man
+demonslayer	Demon Slayer
+mha	MHA
+bluelock	Blue Lock
+frieren	Frieren
+evangelion	Evangelion
+gundam	Gundam
+codegeass	Code Geass
+steinsgate	Steins;Gate
+lycorisrecoil	Lycoris Recoil
+cowboybebop	Cowboy Bebop
+macross	Macross
+lovelive	Love Live!
+idolmaster	Idolmaster
+theidolmster	THE IDOLM@STER
+idolmster	iDOLM@STER
+bangdream	BanG Dream!
+mygo	MyGO!!!!!
+avemujica	Ave Mujica
+fategrandorder	Fate/Grand Order
+fgo	FGO
+fatestaynight	Fate/stay night
+typemoon	TYPE-MOON
+bluearchive	Blue Archive
+genshinimpact	Genshin Impact
+hsr	HSR
+zzz	ZZZ
+hoyoverse	HoYoverse
+arknights	Arknights
+azurlane	Azur Lane
+girlsfrontline	Girls' Frontline
+wutheringwaves	Wuthering Waves
+snowbreak	Snowbreak
+limbuscompany	Limbus Company
+projectmoon	Project Moon
+lobotomycorporation	Lobotomy Corporation
+granbluefantasy	Granblue Fantasy
+gbf	GBF
+cygames	Cygames
+princessconnect	Princess Connect
+shadowverse	Shadowverse
+dragalialost	Dragalia Lost
+monsterstrike	Monster Strike
+feh	FEH
+pokemonmasters	Pokémon Masters
+pokemoncafe	Pokémon Café
+hearthstone	Hearthstone
+mtg	MTG
+mtgarena	MTG Arena
+yugioh	Yu-Gi-Oh!
+masterduel	Master Duel
+duellinks	Duel Links
+lorcana	Lorcana
+battlespirits	Battle Spirits
+zx	Z/X
+wixoss	WIXOSS
+shadowverseevolve	Shadowverse Evolve
+gwent	Gwent
+lor	LoR
+marvelsnap	Marvel Snap
+balatro	Balatro
+hollowknight	Hollow Knight
+silksong	Silksong
+undertale	Undertale
+deltarune	Deltarune
+cuphead	Cuphead
+stardewvalley	Stardew Valley
+terraria	Terraria
+csgo	CS:GO
+counterstrike	Counter-Strike
+overwatch	Overwatch
+pubg	PUBG
+pubgmobile	PUBG MOBILE
+cod	CoD
+codwarzone	CoD:Warzone
+bf	BF
+titanfall	Titanfall
+tarkov	Tarkov
+palworld	Palworld
+valheim	Valheim
+factorio	Factorio
+rimworld	RimWorld
+dwarffortress	Dwarf Fortress
+citiesskylines	Cities: Skylines
+thesims	The Sims
+simcity	SimCity
+civ	Civ
+europauniversalis	Europa Universalis
+crusaderkings	Crusader Kings
+stellaris	Stellaris
+starcraft	StarCraft
+starcraftii	StarCraft II
+warcraft	Warcraft
+wow	WoW
+diabloiv	Diablo IV
+overwatchleague	Overwatch League
+blizzardentertainment	Blizzard Entertainment
+teamfighttactics	Teamfight Tactics
+tft	TFT
+mobilelegends	Mobile Legends
+mlbb	MLBB
+wildrift	Wild Rift
+brawlstars	Brawl Stars
+clashroyale	Clash Royale
+supercell	Supercell
+hayday	Hay Day
+candycrush	Candy Crush
+niantic	Niantic
+pikminbloom	Pikmin Bloom
+identityv	Identity V
+dbd	DbD
+phasmophobia	Phasmophobia
+lethalcompany	Lethal Company
+stumbleguys	Stumble Guys
+rocketleague	Rocket League
+efootball	eFootball
+winningeleven	Winning Eleven
+eafc	EA FC
+forzahorizon	Forza Horizon
+forzamotorsport	Forza Motorsport
+assettocorsa	Assetto Corsa
+iracing	iRacing
+marioparty	Mario Party
+marioodyssey	Mario Odyssey
+splatoonraiders	Splatoon Raiders
+guiltygear	Guilty Gear
+ggst	GGST
+gbvs	GBVS
+blazblue	BlazBlue
+undernight	Under Night
+kof	KOF
+mortalkombat	Mortal Kombat
+mk	MK
+meltyblood	Melty Blood
+dnfduel	DNF Duel
+virtuafighter	Virtua Fighter
+vf	VF
+crcup	CRCUP
+vct	VCT
+vcj	VCJ
+valorantchampions	VALORANT Champions
+ljl	LJL
+lck	LCK
+lpl	LPL
+lec	LEC
+lcs	LCS
+theinternational	The International
+capcomcup	Capcom Cup
+cpt	CPT
+sfl	SFL
+rageshadowverse	RAGE Shadowverse
+pjs	PJS
+apac	APAC
+algs	ALGS
+pgl	PGL
+iem	IEM
+dreamhack	DreamHack
+gamescom	Gamescom
+tgs	TGS
+tga	TGA
+bitsummit	BitSummit
+nintendodirect	Nintendo Direct
+playstationshowcase	PlayStation Showcase
+xboxshowcase	Xbox Showcase
+steamsale	Steam Sale
+zetadivision	ZETA DIVISION
+crazyraccoon	Crazy Raccoon
+cr	CR
+detonation	DetonatioN
+detonationfocusme	DetonatioN FocusMe
+fennel	FENNEL
+scarz	SCARZ
+sengokugaming	Sengoku Gaming
+northeption	NORTHEPTION
+murashgaming	Murash Gaming
+varrel	Varrel
+sbiesports	SBI e-Sports
+fnatic	Fnatic
+geng	Gen.G
+teamliquid	Team Liquid
+tsm	TSM
+fazeclan	FaZe Clan
+optic	OpTic
+opticgaming	OpTic Gaming
+natusvincere	Natus Vincere
+teamvitality	Team Vitality
+paperrex	Paper Rex
+prx	PRX
+drx	DRX
+nrg	NRG
+ktrolster	KT Rolster
+hanwhalife	Hanwha Life
+dwgkia	DWG KIA
+dpluskia	Dplus KIA
+tes	TES
+weibogaming	Weibo Gaming
+teamsecret	Team Secret
+evilgeniuses	Evil Geniuses
+eg	EG
+mouz	MOUZ
+astralis	Astralis
+ence	ENCE
+hololive	hololive
+hololiveproduction	hololive production
+holostars	holostars
+hololiveen	hololive EN
+holoen	holoEN
+hololiveid	hololive ID
+anycolor	ANYCOLOR
+vspo	VSPO!
+neoporte	Neo-Porte
+nanashiinc	Nanashi Inc.
+riotmusic	RIOT MUSIC
+vwp	V.W.P
+phaseconnect	Phase Connect
+vshojo	VShojo
+idolcorp	Idol Corp
+hololivedevis	Hololive DEV_IS
+regloss	ReGLOSS
+flowglow	FLOW GLOW
+vroidhub	VRoid Hub
+mmd	MMD
+mikumikudance	MikuMikuDance
+pmx	PMX
+kagaminelen	Kagamine Len
+megurineluka	Megurine Luka
+voiceroid	VOICEROID
+softalk	SofTalk
+aquestalk	AquesTalk
+projectsekai	Project SEKAI
+pjsk	PJSK
+projectdiva	Project DIVA
+musedash	Muse Dash
+arcaea	Arcaea
+phigros	Phigros
+cytus	Cytus
+voez	VOEZ
+maimaidx	maimai DX
+chunithm	CHUNITHM
+soundvoltex	SOUND VOLTEX
+sdvx	SDVX
+beatmaniaiidx	beatmania IIDX
+iidx	IIDX
+dancedancerevolution	DanceDanceRevolution
+popnmusic	pop'n music
+jubeat	jubeat
+beatsaber	Beat Saber
+rhythmheaven	Rhythm Heaven
+groovecoaster	Groove Coaster
+lovelivesif	LoveLive! SIF
+idolypride	IDOLY PRIDE
+blueprotocol	Blue Protocol
+ngs	NGS
+ffxi	FFXI
+mhf	MHF
+tos	ToS
+ragnarokonline	Ragnarok Online
+maplestory	MapleStory
+lostark	Lost Ark
+blackdesert	Black Desert
+skyrim	Skyrim
+starfield	Starfield
+thewitcher	The Witcher
+dragonage	Dragon Age
+masseffect	Mass Effect
+gta	GTA
+gtav	GTAV
+gtavi	GTA VI
+rockstargames	Rockstar Games
+bethesda	Bethesda
+ubisoft	Ubisoft
+assassinscreed	Assassin's Creed
+farcry	Far Cry
+rainbowsix	Rainbow Six
+splintercell	Splinter Cell
+ghostrecon	Ghost Recon
+justdance	Just Dance
+electronicarts	Electronic Arts
+activision	Activision
+activisionblizzard	Activision Blizzard
+capcom	Capcom
+squareenix	SQUARE ENIX
+sqex	SQEX
+atlus	ATLUS
+bne	BNE
+koeitecmo	Koei Tecmo
+spikechunsoft	Spike Chunsoft
+nis	NIS
+falcom	Falcom
+platinumgames	PlatinumGames
+gamefreak	Game Freak
+intelligentsystems	Intelligent Systems
+monolithsoft	Monolith Soft
+grasshoppermanufacture	Grasshopper Manufacture
+ideafactory	Idea Factory
+compileheart	Compile Heart
+omegaforce	Omega Force
+teamninja	Team Ninja
+tecmo	Tecmo
+enix	Enix
+squaresoft	Squaresoft
+gungho	GungHo
+colopl	COLOPL
+aniplexgames	Aniplex Games
+yostar	Yostar
+nexon	NEXON
+netmarble	Netmarble
+ncsoft	NCSOFT
+krafton	Krafton
+pearlabyss	Pearl Abyss
+smilegate	Smilegate
+shiftup	Shift Up
+tencent	Tencent
+netease	NetEase
+lilithgames	Lilith Games
+hypergryph	Hypergryph
+kurogames	Kuro Games
+sunborn	Sunborn
+riotgames	Riot Games
+cdprojekt	CD PROJEKT
+cdpr	CDPR
+larian	Larian
+paradoxinteractive	Paradox Interactive
+rockstarnorth	Rockstar North
+naughtydog	Naughty Dog
+insomniacgames	Insomniac Games
+polyphonydigital	Polyphony Digital
+kojimaproductions	Kojima Productions
+bioware	BioWare
+inxile	inXile
+arkane	Arkane
+idsoftware	id Software
+machinegames	MachineGames
+mojang	Mojang
+mojangstudios	Mojang Studios
+robloxcorporation	Roblox Corporation
+zynga	Zynga
+playrix	Playrix
+moonstudios	Moon Studios
+teamcherry	Team Cherry
+concernedape	ConcernedApe
+tobyfox	Toby Fox
+megacrit	Mega Crit
+localthunk	LocalThunk
+klei	Klei
+kleientertainment	Klei Entertainment
+relogic	Re-Logic
+hellogames	Hello Games
+subnautica	Subnautica
+unknownworlds	Unknown Worlds
+facepunch	Facepunch
+garrysmod	Garry's Mod
+gmod	GMod
+halflife	Half-Life
+dotaunderlords	Dota Underlords
+steamworkshop	Steam Workshop
+wbsc	WBSC
+jfl	JFL
+jrfu	JRFU
+rwc	RWC
+irb	IRB
+worldrugby	World Rugby
+sixnations	Six Nations
+superrugby	Super Rugby
+nrl	NRL
+afl	AFL
+ucl	UCL
+cl	CL
+uel	UEL
+europaleague	Europa League
+ecl	ECL
+conferenceleague	Conference League
+premierleague	Premier League
+epl	EPL
+laliga	La Liga
+bundesliga	Bundesliga
+eredivisie	Eredivisie
+mlscup	MLS Cup
+afc	AFC
+conmebol	CONMEBOL
+copaamerica	Copa América
+concacaf	CONCACAF
+goldcup	Gold Cup
+cwc	CWC
+ballondor	Ballon d'Or
+var	VAR
+fk	FK
+ck	CK
+df	DF
+mf	MF
+fw	FW
+wg	WG
+sh	SH
+xa	xA
+realmadrid	Real Madrid
+barca	Barça
+atleticomadrid	Atlético Madrid
+atletico	Atlético
+manchesterunited	Manchester United
+manunited	Man United
+manchestercity	Manchester City
+mancity	Man City
+astonvilla	Aston Villa
+crystalpalace	Crystal Palace
+westham	West Ham
+bayernmunich	Bayern Munich
+fcbayern	FC Bayern
+borussiadortmund	Borussia Dortmund
+bvb	BVB
+rbleipzig	RB Leipzig
+bayerleverkusen	Bayer Leverkusen
+eintrachtfrankfurt	Eintracht Frankfurt
+intermilan	Inter Milan
+acmilan	AC Milan
+asroma	AS Roma
+psg	PSG
+parissaintgermain	Paris Saint-Germain
+psv	PSV
+sportingcp	Sporting CP
+fenerbahce	Fenerbahçe
+alnassr	Al Nassr
+alhilal	Al Hilal
+intermiami	Inter Miami
+lagalaxy	LA Galaxy
+lafc	LAFC
+kashimaantlers	Kashima Antlers
+urawareds	Urawa Reds
+kawasakifrontale	Kawasaki Frontale
+visselkobe	Vissel Kobe
+cerezoosaka	Cerezo Osaka
+sanfreccehiroshima	Sanfrecce Hiroshima
+fctokyo	FC Tokyo
+nagoyagrampus	Nagoya Grampus
+kashiwareysol	Kashiwa Reysol
+consadolesapporo	Consadole Sapporo
+machidazelvia	Machida Zelvia
+avispafukuoka	Avispa Fukuoka
+albirexniigata	Albirex Niigata
+jubiloiwata	Jubilo Iwata
+shimizuspulse	Shimizu S-Pulse
+tokyoverdy	Tokyo Verdy
+shonanbellmare	Shonan Bellmare
+yokohamafc	Yokohama FC
+samuraiblue	Samurai Blue
+npbawards	NPB AWARDS
+worldseries	World Series
+alcs	ALCS
+nlcs	NLCS
+alds	ALDS
+nlds	NLDS
+al	AL
+cyyoung	Cy Young
+silverslugger	Silver Slugger
+goldglove	Gold Glove
+ops	OPS
+babip	BABIP
+fip	FIP
+xfip	xFIP
+qs	QS
+rbi	RBI
+obp	OBP
+dh	DH
+lf	LF
+ut	UT
+statcast	Statcast
+ladodgers	LA Dodgers
+dodgers	Dodgers
+laangels	LA Angels
+yankees	Yankees
+redsox	Red Sox
+mets	Mets
+padres	Padres
+bluejays	Blue Jays
+astros	Astros
+phillies	Phillies
+orioles	Orioles
+whitesox	White Sox
+brewers	Brewers
+rockies	Rockies
+diamondbacks	Diamondbacks
+dbacks	D-backs
+marlins	Marlins
+lakers	Lakers
+celtics	Celtics
+knicks	Knicks
+mavs	Mavs
+sixers	Sixers
+clippers	Clippers
+raptors	Raptors
+pacers	Pacers
+cavs	Cavs
+timberwolves	Timberwolves
+trailblazers	Trail Blazers
+nbafinals	NBA Finals
+nbaallstar	NBA All-Star
+gleague	G League
+wnba	WNBA
+fiba	FIBA
+alvarktokyo	Alvark Tokyo
+chibajets	Chiba Jets
+utsunomiyabrex	Utsunomiya Brex
+sunrockersshibuya	Sunrockers Shibuya
+levangahokkaido	Levanga Hokkaido
+superbowl	Super Bowl
+nfldraft	NFL Draft
+qb	QB
+wr	WR
+ol	OL
+td	TD
+stanleycup	Stanley Cup
+nhldraft	NHL Draft
+pgatour	PGA Tour
+lpgatour	LPGA Tour
+livgolf	LIV Golf
+themasters	The Masters
+usopen	US Open
+theopen	The Open
+pgachampionship	PGA Championship
+rydercup	Ryder Cup
+solheimcup	Solheim Cup
+owgr	OWGR
+callaway	Callaway
+taylormade	TaylorMade
+titleist	Titleist
+cobragolf	Cobra Golf
+mizunogolf	Mizuno Golf
+srixon	Srixon
+xxio	XXIO
+bridgestonegolf	Bridgestone Golf
+tourb	TOUR B
+pxg	PXG
+scottycameron	Scotty Cameron
+footjoy	Footjoy
+pearlygates	Pearly Gates
+munsingwear	Munsingwear
+itf	ITF
+atpfinals	ATP Finals
+wimbledon	Wimbledon
+rolandgarros	Roland Garros
+australianopen	Australian Open
+daviscup	Davis Cup
+bjkcup	BJK Cup
+babolat	Babolat
+yonex	Yonex
+dunloptennis	Dunlop Tennis
+tecnifibre	Tecnifibre
+lacostetennis	Lacoste Tennis
+formulae	Formula E
+superformula	Super Formula
+supergt	SUPER GT
+wec	WEC
+lemans	Le Mans
+imsa	IMSA
+indycar	IndyCar
+nascar	NASCAR
+rallyjapan	Rally Japan
+dakarrally	Dakar Rally
+wsbk	WSBK
+sbk	SBK
+scuderiaferrari	Scuderia Ferrari
+sauber	Sauber
+kicksauber	Kick Sauber
+racingbulls	Racing Bulls
+alphatauri	AlphaTauri
+drs	DRS
+ers	ERS
+mguk	MGU-K
+mguh	MGU-H
+kers	KERS
+vsc	VSC
+dsq	DSQ
+pp	PP
+krush	Krush
+onechampionship	ONE Championship
+bellator	Bellator
+pfl	PFL
+pancrase	Pancrase
+breakingdown	BreakingDown
+aew	AEW
+ajpw	AJPW
+ddt	DDT
+dragongate	DRAGONGATE
+tjpw	TJPW
+iwgp	IWGP
+nxt	NXT
+smackdown	SmackDown
+wrestlemania	WrestleMania
+royalrumble	Royal Rumble
+summerslam	SummerSlam
+survivorseries	Survivor Series
+tko	TKO
+mma	MMA
+bjj	BJJ
+ibjjf	IBJJF
+adcc	ADCC
+thering	The Ring
+pfp	PFP
+monsterinoue	Monster Inoue
+gpf	GPF
+skateamerica	Skate America
+skatecanada	Skate Canada
+pcs	PCS
+joc	JOC
+ipc	IPC
+jpc	JPC
+cas	CAS
+worldaquatics	World Aquatics
+iaaf	IAAF
+worldathletics	World Athletics
+jaaf	JAAF
+fis	FIS
+fivb	FIVB
+jva	JVA
+ittf	ITTF
+wtt	WTT
+jtta	JTTA
+bwf	BWF
+issf	ISSF
+uci	UCI
+giroditalia	Giro d'Italia
+vuelta	Vuelta
+campagnolo	Campagnolo
+cannondale	Cannondale
+pinarello	Pinarello
+colnago	Colnago
+cervelo	Cervélo
+bmc	BMC
+zwift	ZWIFT
+strava	Strava
+garminconnect	Garmin Connect
+garminedge	Garmin Edge
+polarflow	Polar Flow
+nrc	NRC
+adidasrunning	adidas Running
+runtastic	Runtastic
+runkeeper	Runkeeper
+fitbod	Fitbod
+myfitnesspal	MyFitnessPal
+asken	Asken
+finc	FiNC
+calna	CALNA
+rizap	RIZAP
+chocozap	chocoZAP
+anytimefitness	Anytime Fitness
+goldsgym	Gold's Gym
+konamisports	Konami Sports
+joyfit	JOYFIT
+tipness	Tipness
+centralsports	Central Sports
+megalos	Megalos
+bmonster	b-monster
+feelcycle	FEELCYCLE
+crossfit	CrossFit
+hiit	HIIT
+wpi	WPI
+wpc	WPC
+myprotein	Myprotein
+savas	SAVAS
+optimumnutrition	Optimum Nutrition
+belegend	be LEGEND
+xplosion	X-PLOSION
+valx	VALX
+ultora	ULTORA
+grong	GronG
+bulksports	BULK SPORTS
+glicopowerpro	Glico Powerpro
+omron	OMRON
+withings	Withings
+inbody	InBody
+hydroflask	Hydro Flask
+nalgene	Nalgene
+owala	Owala
+kleankanteen	Klean Kanteen
+contigo	Contigo
+camelbak	CamelBak
