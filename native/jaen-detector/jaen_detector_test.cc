@@ -34,7 +34,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -84,6 +84,7 @@ int main() {
   lexicon.Add("slack", true);
   lexicon.Add("nec", true);
   lexicon.Add("chatgpt", true);
+  lexicon.Add("ntt", true);
   for (const char* w : {"dog", "cat"}) lexicon.Add(w);
   for (const char* w : {"london", "mac", "sumo", "gand"}) lexicon.AddSignalOnly(w);
   lexicon.AddSignalOnly("kite");  // already a word: stays a plain word
@@ -121,6 +122,7 @@ int main() {
   Expect(english("campushahiroi") == "campus|", "campus|ha stays: campu is no word");
   Expect(english("londonheikimasu") == "london|", "a rarer word with a sign (lo: ぉ) is taken");
   Expect(english("londonniikimasu") == "london|", "a word may end inside nn read as ん (london|ni)");
+  Expect(english("matijikanntte").empty(), "no word starts at the second n of nn or ends inside って (ntt in matijikan|nntte)");
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
