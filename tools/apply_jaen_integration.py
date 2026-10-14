@@ -2666,10 +2666,10 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
       has_fixed |= segment.segment_type() == Segment::FIXED_VALUE;
     }
     if (!has_fixed) return;
-    // MYIME_RUN_MIN_SEGMENTS (default 2): the shortest run queried.
+    // MYIME_RUN_MIN_SEGMENTS (default 1): the shortest run queried.
     static const size_t kMinRunSegments = [] {
       const char* value = std::getenv("MYIME_RUN_MIN_SEGMENTS");
-      return value && *value >= '1' && *value <= '9' ? static_cast<size_t>(*value - '0') : size_t{2};
+      return value && *value >= '1' && *value <= '9' ? static_cast<size_t>(*value - '0') : size_t{1};
     }();
     for (size_t begin = 0; begin < count;) {
       if (segments->conversion_segment(begin).segment_type() != Segment::FREE) { ++begin; continue; }
@@ -2770,6 +2770,19 @@ edit("converter/english_lexicon.cc",
 
 # （実験用）人工知能の選択の記録に要る取り込み
 edit("engine/engine.cc", "#include <cstdint>\n", "#include <cstdint>\n#include <cstdio>\n")
+
+# 英単語の前後の1文節の日本語: 節: 「きのうから|sale|が始まった」の「きのうから」のような
+# 1文節の部分は、文全体の処理（2文節以上が前提）に入らず、Mozc の順位（機能から）のままだった。
+# 英単語で区切られた部分の処理のときだけ、1文節でも人工知能に見せる。
+edit("engine/engine.cc", "#include <cstdio>\n",
+     "#include <cstdio>\n\n// Fewest segments the whole-phrase query takes (1 only for runs between English words).\n"
+     "static thread_local size_t g_whole_phrase_min_segments = 2;\n")
+edit("engine/engine.cc", "    if (segments->resized() || count < 2 || count > 128 || original.size() != count) return;",
+     "    if (segments->resized() || count < g_whole_phrase_min_segments || count > 128 || original.size() != count) return;")
+edit("engine/engine.cc", "        PreferWholePhrase(options, mozc, azoo, prefetch, deadline, pos, &run, run_left, run_right, original);",
+     "        g_whole_phrase_min_segments = 1;\n"
+     "        PreferWholePhrase(options, mozc, azoo, prefetch, deadline, pos, &run, run_left, run_right, original);\n"
+     "        g_whole_phrase_min_segments = 2;")
 
 # 強い印のときだけの英単語: 節: SCOWL のより珍しい語と固有名（london、ukulele、pilates）を
 # 組み込む（tools/build_english_lexicon.py の signal-words.txt）。打った形が普通の
