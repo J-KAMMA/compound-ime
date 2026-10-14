@@ -19,8 +19,9 @@ struct NumberSpan {
 };
 
 // Non-overlapping spans found left to right, the longest first at each start.
-// |kana| is UTF-8 hiragana (ー allowed). Taken: a number of two or more digits
-// or with じゅう/ひゃく/せん/まん/おく plus a counter; the special day readings
+// |kana| is UTF-8 hiragana (ー allowed). Taken: a number
+// made of two or more parts (digit or じゅう/ひゃく/せん/まん/おく; a lone
+// じゅう, ひゃく, せん or まん counts as one) plus a counter; the special day readings
 // (ついたち ... はつか); "月" followed by a day ("ごがつむいか" -> "5月6日");
 // ごぜん/ごご plus an hour ("ごぜんくじ" -> "午前9時"). 回 and 階 both read かい
 // and are written 回. "じゅうぶん" is left alone (10分 or 十分).
