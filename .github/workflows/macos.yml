@@ -183,7 +183,7 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src
           cd $S
-          bazelisk build --config oss_macos -c opt --nocheck_visibility --action_env=MOZC_VERSION=${{ inputs.version || '3.34.6239.0' }} //mac:package_files > $W/bazel.log 2>&1 || { grep -v "install_name_tool: warning" $W/bazel.log | grep -B3 -A25 "ERROR\|error:\|Traceback" | head -120; exit 1; }
+          bazelisk build --config oss_macos -c opt --nocheck_visibility --action_env=MOZC_VERSION=${{ inputs.version || '3.34.6239.0' }} --embed_label=${{ inputs.version || '3.34.6239.0' }} //mac:package_files > $W/bazel.log 2>&1 || { grep -v "install_name_tool: warning" $W/bazel.log | grep -B3 -A25 "ERROR\|error:\|Traceback" | head -120; exit 1; }
           rm -rf $W/pkg && mkdir $W/pkg && cd $W/pkg && unzip -q $S/bazel-bin/mac/package_files.zip
           find . -maxdepth 6 -name "*.app" | head -20
           CONV=$(find . -path "*CompoundIME.app/Contents/Resources/CompoundIMEConverter.app" -maxdepth 8 | head -1)
