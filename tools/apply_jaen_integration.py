@@ -2694,9 +2694,9 @@ edit(E, """  // Context cues pick among homophones (tools/data/homophone-cues.ts
           same = run.conversion_segment(i - begin).key() == segments->conversion_segment(i).key();
         if (std::getenv("RUN_DEBUG")) {  // (exp/context only)
           std::string before, after;
-          for (size_t i = begin; i < end; ++i) before += segments->conversion_segment(i).key() + "=" + values[i] + "|";
-          for (const auto& s : run.conversion_segments()) after += s.key() + "=" + (s.candidates_size() ? s.candidate(0).value : "") + "|";
-          std::fprintf(stderr, "RUN left=[%s] right=[%s] before=%s after=%s same=%d\n", run_left.c_str(), run_right.c_str(),
+          for (size_t i = begin; i < end; ++i) before += std::string(segments->conversion_segment(i).key()) + "=" + values[i] + "|";
+          for (const auto& s : run.conversion_segments()) after += std::string(s.key()) + "=" + (s.candidates_size() ? s.candidate(0).value : "") + "|";
+          std::fprintf(stderr, "RUN left=[%s] right=[%s] before=%s after=%s same=%d\\n", run_left.c_str(), run_right.c_str(),
                        before.c_str(), after.c_str(), same ? 1 : 0);
         }
         for (size_t i = begin; same && i < end; ++i) {
