@@ -2793,6 +2793,12 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
 
+# 変換後の数字は半角: 節: Mozc の既定は数字の変換後の幅が「前回の幅」で、使い始めは全角
+# （１０月１０日）になる。変換後の数字を半角（10月10日）にする。打っている途中の表示は
+# 全角のまま。利用者が設定を変えていればその設定が使われる。
+edit("config/config_handler.cc", '  AddCharacterFormRule("0", kFullWidth, kLastForm, &config);\n',
+     '  AddCharacterFormRule("0", kFullWidth, Config::HALF_WIDTH, &config);\n')
+
 # Product identity: CompoundIME (separate script, last).
 import subprocess  # noqa: E402
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
