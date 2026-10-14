@@ -111,6 +111,13 @@ jobs:
           # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
+          # （実験用）人工知能へのプロフィール・文体の違いで比べる
+          for v in "p|日本語で日常や仕事の文章を書く人|" "s||新聞やビジネス文書の一般的な表記" "ps|日本語で日常や仕事の文章を書く人|新聞やビジネス文書の一般的な表記"; do
+            IFS='|' read -r name prof style <<< "$v"
+            for set in ja400 jaen200b; do
+              MYIME_ZENZAI_PROFILE="$prof" MYIME_ZENZAI_STYLE="$style" bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/$set.txt $W/results/$set-$name.tsv 4
+            done
+          done
           python3 $W/repo/tools/score_categories.py $W/results/ja400.tsv $T/ja400.json | head -12
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
           python3 $W/repo/tools/compare_results.py $T/expected-windows-139.tsv $W/results/inputs.tsv | head -60

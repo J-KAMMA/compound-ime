@@ -45,4 +45,20 @@ assert t.count(old) == 1
 pkg.write_text(t.replace(old, """    name: "azookey-engine",
     platforms: [.macOS(.v13)],
     products: ["""), encoding="utf-8", newline="")
+
+# 人工知能（zenz 第3版）へのプロフィールと文体: MYIME_ZENZAI_PROFILE・MYIME_ZENZAI_STYLE があれば
+# その文（25文字まで）を渡す。
+# （実験用。効くと分かれば既定の文を決める）
+p = engine / "AzookeyEngine.swift"
+t = p.read_text(encoding="utf-8")
+old = """            versionDependentMode: .v3(.init(
+                leftSideContext: leftContext,
+                rightSideContext: rightContext)),"""
+new = """            versionDependentMode: .v3(.init(
+                profile: ProcessInfo.processInfo.environment["MYIME_ZENZAI_PROFILE"].flatMap { $0.isEmpty ? nil : $0 },
+                style: ProcessInfo.processInfo.environment["MYIME_ZENZAI_STYLE"].flatMap { $0.isEmpty ? nil : $0 },
+                leftSideContext: leftContext,
+                rightSideContext: rightContext)),"""
+assert t.count(old) == 1
+p.write_text(t.replace(old, new), encoding="utf-8", newline="")
 print("engine port ok")
