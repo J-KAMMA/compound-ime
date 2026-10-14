@@ -112,6 +112,10 @@ jobs:
           python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/typo150b.json > $W/typo150b.txt
           MYIME_TYPO_MARGIN=off bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/typo150b.txt $W/results/typo150b-off.tsv 4
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/typo150b.txt $W/results/typo150b.tsv 4
+          # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
+          python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" $T/ja400.json > $W/ja400.txt
+          bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/ja400.txt $W/results/ja400.tsv 4
+          python3 $W/repo/tools/score_categories.py $W/results/ja400.tsv $T/ja400.json | head -12
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $T/inputs.txt $W/results/inputs.tsv 4
           python3 $W/repo/tools/compare_results.py $T/expected-windows-139.tsv $W/results/inputs.tsv | head -60
 

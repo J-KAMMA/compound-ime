@@ -117,6 +117,8 @@ def main():
                         help="per unit of Mozc cost: common katakana words win close calls")
     parser.add_argument("--margin", type=float, default=0.05)
     parser.add_argument("--min-length", type=int, default=4)
+    parser.add_argument("--all-words", action="store_true",
+                        help="also words Mozc does not read entirely as kana (for katakana-to-English candidates)")
     args = parser.parse_args()
     romaji = Romaji(args.mozc / "data/preedit/romanji-hiragana.tsv")
     katakana_cost = {}
@@ -138,7 +140,8 @@ def main():
     pairs = []
     for english in args.lexicon.read_text(encoding="utf-8").split():
         if (len(english) < args.min_length or not english.isalpha() or not english.islower() or
-                english not in pronunciations or not HIRAGANA.fullmatch(romaji.read(english))):
+                english not in pronunciations or
+                (not args.all_words and not HIRAGANA.fullmatch(romaji.read(english)))):
             continue
         best = {}
         for source in pronunciations[english]:
