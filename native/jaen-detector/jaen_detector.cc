@@ -193,10 +193,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       boundary[start + 1] = true;  // "nn" read as ん: "berlin|ni", "darwin|no"
       no_start[start + 1] = true;  // but no word starts at its second n ("matijikan|ntt|e")
     }
-    // A doubled key read as っ ("tte" って): a word may end after the first
-    // key ("meeting|ga" in gga) but not before the vowel ("ntt|e").
-    if (!chunk.conversion.empty() && chunk.conversion.starts_with("っ") && !small && r.size() >= 3) {
-      for (size_t k = 2; k < r.size(); ++k) no_end[start + k] = true;
+    // A doubled key and a vowel read as っ+kana ("tte" って): a word may end
+    // after the first key ("meeting|ga" in gga) but not before the vowel
+    // ("ntt|e"). Longer chunks ("ppye" of "happy|ending") are left alone.
+    if (chunk.conversion.starts_with("っ") && !small && r.size() == 3 && Lower(r[0]) == Lower(r[1]) &&
+        IsVowel(r[2])) {
+      no_end[start + 2] = true;
     }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];
