@@ -6,6 +6,13 @@ on:
   push:
     branches: ['exp/**']
   workflow_dispatch:
+    inputs:
+      model_release:
+        description: 人工知能を差し替えて比べるときの、下書きの配布ページの目印（例 model-ft-v1）。空なら公式の人工知能
+        default: ''
+      model_file:
+        description: その配布ページのファイル名（例 zenz-v3.2-small-ft-v1-Q5_K_M.gguf）
+        default: ''
 
 permissions:
   contents: read
@@ -129,6 +136,9 @@ jobs:
     needs: build
     runs-on: ubuntu-24.04
     timeout-minutes: 120
+    # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
+    permissions:
+      contents: write
     strategy:
       fail-fast: false
       matrix:
@@ -142,6 +152,8 @@ jobs:
           name: linux-bin
           path: bin
       - name: 変換の試験（組 ${{ matrix.group }}）
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -eo pipefail
           W=$GITHUB_WORKSPACE
