@@ -142,7 +142,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a1, a2, b, c, d1, d2, e]
+        group: [a1, a2, b, c, d1, d2, e1, e2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -158,9 +158,16 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE
           chmod +x $W/bin/engine/session_handler_main
-          curl -fsSL -o $W/model.gguf \
-            https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
-          echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
+          if [ -n "${{ inputs.model_release }}" ]; then
+            # 比べるための人工知能（公開しない下書きの配布ページから）
+            gh release download "${{ inputs.model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.model_file }}" -O $W/model.gguf
+            echo "差し替えた人工知能: ${{ inputs.model_file }}"
+            sha256sum $W/model.gguf
+          else
+            curl -fsSL -o $W/model.gguf \
+              https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
+            echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
+          fi
           bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
       - uses: actions/upload-artifact@v4
         if: always()
@@ -191,6 +198,10 @@ jobs:
           if [ -f results/variants-1.tsv ] && [ -f results/variants-2.tsv ]; then
             cat results/variants-1.tsv results/variants-2.tsv > results/variants.tsv && rm results/variants-1.tsv results/variants-2.tsv
             python3 repo/tools/score_variants.py repo/tests/conversion/variants.tsv results/variants.tsv | tee results/variants-score.txt | head -40
+          fi
+          if [ -f results/wiki-typing-1.tsv ] && [ -f results/wiki-typing-2.tsv ]; then
+            cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
+            python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
           fi
           ls results
       - uses: actions/upload-artifact@v4

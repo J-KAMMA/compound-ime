@@ -2423,6 +2423,29 @@ deps = b.index('        ":win32_image_util",\n', start)
 b = b[:deps] + '        "//renderer:renderer_style_handler",\n' + b[deps:]
 (src / B).write_text(b, encoding="utf-8", newline="")
 
+# 画面ごとの倍率: 「そのほかの文字種」の窓と、入力の種類の表示（あ、_A）も、出す画面の倍率に
+# 合わせる。これまでは候補の窓だけが合わせ、この2つはシステム全体の倍率（150% など）のままで、
+# 倍率の低い画面（100%）では1.5倍の大きさで出ていた。
+edit("renderer/win32/window_manager.cc", "  infolist_window_->UpdateDpi(target_dpi);\n",
+     "  infolist_window_->UpdateDpi(target_dpi);\n  cascading_window_->UpdateDpi(target_dpi);\n")
+edit(I, """    if (RendererStyleHandler::IsDarkTheme() != dark_theme_) ReloadSprites();""",
+     """    // The scale of the monitor it is shown on (the system scale may differ).
+    const double scaling = GetDPIScalingFactor(
+        GetDpiForPoint(indicator_layout.window_rect.left, indicator_layout.window_rect.bottom));
+    if (scaling != dpi_scaling_) {
+      dpi_scaling_ = scaling;
+      ReloadSprites();
+    } else if (RendererStyleHandler::IsDarkTheme() != dark_theme_) {
+      ReloadSprites();
+    }""")
+edit(I, '#include "renderer/renderer_style_handler.h"\n',
+     '#include "renderer/renderer_style_handler.h"\n#include "renderer/win32/win32_dpi_util.h"\n')
+b = (src / B).read_text(encoding="utf-8")
+start = b.index('    name = "indicator_window",')
+deps = b.index('        "//renderer:renderer_style_handler",\n', start)
+b = b[:deps] + '        ":win32_dpi_util",\n' + b[deps:]
+(src / B).write_text(b, encoding="utf-8", newline="")
+
 # Brand and service names typed in lowercase get their official spelling
 # first (tools/data/brand-casing.tsv), the word as typed second.
 pairs = [line.split("\t") for line in (REPO / "tools/data/brand-casing.tsv").read_text(encoding="utf-8").splitlines()

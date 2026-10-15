@@ -6,7 +6,7 @@
 #   b: 日本語だけの400文、予測変換、速さ、候補の並び、利用者が見つけた失敗
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
 #   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
-#   e: ウィキペディアの文をローマ字で打ち込む（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
+#   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -77,14 +77,15 @@ d1|d2)
   if [ "$GROUP" = d1 ]; then head -n $half $W/variants.txt > $W/v.txt; else tail -n +$((half + 1)) $W/variants.txt > $W/v.txt; fi
   $BATCH $W/v.txt $OUT/variants-${GROUP#d}.tsv 4
   ;;
-e)
-  # ウィキペディアの文をローマ字で打ち、元の文と比べる（英字が混じった文は全部挙げる）
+e1|e2)
+  # ウィキペディアの文をローマ字で打つ（前半と後半。採点はまとめの段で）
   if [ -f $T/wiki-typing.tsv ]; then
     grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
-    $BATCH $W/wiki.txt $OUT/wiki-typing.tsv 4
-    python3 $REPO/tools/score_wiki_typing.py $T/wiki-typing.tsv $OUT/wiki-typing.tsv | tee $OUT/wiki-typing-score.txt | head -40
+    half=$(( ($(wc -l < $W/wiki.txt) + 1) / 2 ))
+    if [ "$GROUP" = e1 ]; then head -n $half $W/wiki.txt > $W/w.txt; else tail -n +$((half + 1)) $W/wiki.txt > $W/w.txt; fi
+    $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
   fi
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2 のどれか" >&2; exit 2 ;;
 esac
