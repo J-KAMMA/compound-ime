@@ -27,8 +27,8 @@ PAD_ID = 1
 # tok_s は学習の速さの仮の値（1 秒あたりの文字数）。実際の値は学習を始めてから測って出し直す。
 PROFILES = {
     "A100": {"precision": "bf16", "micro": 128, "tok_s": 110_000, "units_per_hour": 11.77},
-    "L4": {"precision": "bf16", "micro": 128, "tok_s": 45_000, "units_per_hour": 4.82},
-    "T4": {"precision": "fp16", "micro": 64, "tok_s": 20_000, "units_per_hour": 1.76},
+    "L4": {"precision": "bf16", "micro": 64, "tok_s": 45_000, "units_per_hour": 4.82},
+    "T4": {"precision": "fp16", "micro": 16, "tok_s": 13_500, "units_per_hour": 1.76},  # 64 では長い問題の束で記憶が足りなくなった（2026-10-15、400歩目）
 }
 
 
