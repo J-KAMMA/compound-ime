@@ -142,7 +142,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a1, a2, b, c, d1, d2, e]
+        group: [a1, a2, b, c, d1, d2, e1, e2]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -198,6 +198,10 @@ jobs:
           if [ -f results/variants-1.tsv ] && [ -f results/variants-2.tsv ]; then
             cat results/variants-1.tsv results/variants-2.tsv > results/variants.tsv && rm results/variants-1.tsv results/variants-2.tsv
             python3 repo/tools/score_variants.py repo/tests/conversion/variants.tsv results/variants.tsv | tee results/variants-score.txt | head -40
+          fi
+          if [ -f results/wiki-typing-1.tsv ] && [ -f results/wiki-typing-2.tsv ]; then
+            cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
+            python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
           fi
           ls results
       - uses: actions/upload-artifact@v4
