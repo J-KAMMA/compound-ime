@@ -1,0 +1,328 @@
+# ウィンドウズ版を組み立てて、MSI（インストーラー）を作る。手動で動き、版の番号を受け取る。
+# 手順は BUILD.md の 2〜9 と同じ。できた MSI は成果物 windows-package、
+# 試験用の一式（session_handler_main.exe と変換エンジンの DLL）は windows-bin として残る。
+name: Windows
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 版の番号（例 3.34.6239.142）
+        required: true
+
+permissions:
+  contents: read
+
+jobs:
+  package:
+    runs-on: windows-2022
+    timeout-minutes: 350
+    defaults:
+      run:
+        shell: bash
+    env:
+      USE_BAZEL_VERSION: 9.0.2
+      PYTHONUTF8: '1'
+      BAZEL_SH: C:\Program Files\Git\usr\bin\bash.exe
+      # 作業場（長い道筋は Windows で失敗しやすいので短くする）
+      W: C:/w
+      VERSION: ${{ inputs.version }}
+    steps:
+      # 改行コードの自動変換を止めてから取り出す（パッチと台本は LF）
+      - run: git config --global core.autocrlf false
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - name: 版の番号を確かめる
+        run: |
+          set -eo pipefail
+          echo "$VERSION" | grep -Eq '^3\.34\.6239\.[0-9]+$' || { echo "版の番号は 3.34.6239.<番号> の形"; exit 1; }
+          powershell -NoProfile -Command "Get-PSDrive -PSProvider FileSystem | Format-Table Name,@{n='FreeGB';e={[int]($_.Free/1GB)}},@{n='UsedGB';e={[int]($_.Used/1GB)}}"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.13'
+
+      # Swift（変換エンジンの組み立てに使う。MyIME の組み立てと同じ止め方）
+      - name: Swift 6.3.3
+        uses: SwiftyLab/setup-swift@38f54a76b70d989321de9dc7c840618c08cf56e9 # v1.14.0
+        with:
+          swift-version: '6.3.3'
+
+      - name: 道具
+        run: |
+          set -eo pipefail
+          mkdir -p /c/tools
+          curl -fsSL -o /c/tools/bazelisk.exe https://github.com/bazelbuild/bazelisk/releases/download/v1.25.0/bazelisk-windows-amd64.exe
+          echo "C:\\tools" >> "$GITHUB_PATH"
+          pip -q install pillow
+          swift --version
+          # BAZEL_VC は Visual Studio の VC の場所
+          VS=$("/c/Program Files (x86)/Microsoft Visual Studio/Installer/vswhere.exe" -latest -products '*' -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -property installationPath)
+          echo "VS: $VS"
+          echo "BAZEL_VC=$VS\\VC" >> "$GITHUB_ENV"
+          echo "VS_VC=$VS\\VC" >> "$GITHUB_ENV"
+          ls "/c/Program Files/LLVM/bin/clang-cl.exe" && "/c/Program Files/LLVM/bin/clang-cl.exe" --version
+          dotnet --list-sdks; dotnet --list-runtimes
+
+      - name: 上流のソースと土台の改修
+        run: |
+          set -eo pipefail
+          # 改行コードの自動変換を止める（パッチは LF）
+          git config --global core.autocrlf false
+          git config --global core.longpaths true
+          mkdir -p $W && cd $W
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init --recursive
+          R=$GITHUB_WORKSPACE/repo
+          git -C myime/mozc apply --whitespace=nowarn $R/patches/mozc-base.patch
+          git -C myime apply --whitespace=nowarn $R/patches/myime-engine.patch
+          git init -q llama.cpp && cd llama.cpp && git remote add origin https://github.com/fkunn1326/llama.cpp.git
+          git fetch -q --depth 1 origin 10131b23ee0dbd9d03dfc618cec9fe3402919277 && git checkout -q FETCH_HEAD
+          git apply --ignore-whitespace $R/patches/llama-utf8.patch
+
+      # 組み立ての途中の結果を使い回す。失敗しても途中まで残すため、復元と保存を分けている
+      - name: 変換エンジンの控えを戻す
+        id: engine-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: C:/w/engine-out
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
+
+      - name: Qt の控えを戻す
+        id: qt-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: C:/w/myime/mozc/src/third_party/qt
+          key: win-qt-6.9.1-v1
+
+      - name: Bazel の控えを戻す
+        id: bazel-cache
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            C:/bazel-disk
+            C:/bazel-repo
+          key: win-bazel-${{ github.run_id }}
+          restore-keys: win-bazel-
+
+      - name: 生成器と改造の適用
+        run: |
+          set -eo pipefail
+          S=$W/myime/mozc/src; R=$GITHUB_WORKSPACE/repo
+          python $R/tools/build_english_lexicon.py --out $W/lex
+          mkdir -p $W/ut
+          curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
+            https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
+          echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | sha256sum -c
+          python - <<'PY'
+          import bz2, os
+          w = os.environ["W"] + "/ut/"
+          open(w + "mozcdic-ut-sudachidict.txt", "wb").write(bz2.open(w + "mozcdic-ut-sudachidict.txt.bz2").read())
+          PY
+          python $R/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          cp $R/native/precision117/engine.cc $S/engine/engine.cc
+          cp $R/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
+          python $R/tools/apply_jaen_integration.py $S $W/lex
+          # 版の番号は version.bzl に書く（--action_env だと全部の組み立て結果の鍵が変わり、控えが効かない）
+          IFS=. read -r MA MI BU RE <<< "$VERSION"
+          sed -i -e "s/^BUILD_OSS = .*/BUILD_OSS = $BU/" -e "s/^REVISION = .*/REVISION = $RE/" $S/version.bzl
+          grep -E "^(MAJOR|MINOR|BUILD_OSS|REVISION) = " $S/version.bzl
+          # ウィンドウズでは版の最後の数字が 0 に置き換わるので、そのまま使うようにする
+          sed -i "s/'Windows': '0'/'Windows': ''/" $S/build_tools/mozc_version.py
+          # 開発版の枝は版の最後が 100 に決まってしまうので、version.bzl の値を使う
+          sed -i "s/^    revision = '100'$/    revision = template_dict.get('REVISION', None)/" $S/build_tools/mozc_version.py
+          grep -n "revision = " $S/build_tools/mozc_version.py
+          grep -n "'Windows'" $S/build_tools/mozc_version.py
+
+      # llama.cpp（日本語などを含む道筋から推論用 DLL を読めるパッチ入り）は CPU だけで組み立てる
+      - name: llama.cpp
+        if: steps.engine-cache.outputs.cache-hit != 'true'
+        run: |
+          set -eo pipefail
+          cd $W/llama.cpp
+          cmake -B build -G "Visual Studio 17 2022" -A x64 \
+            -DCMAKE_BUILD_TYPE=Release -DGGML_BACKEND_DL=ON -DGGML_NATIVE=OFF -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON \
+            -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF -DBUILD_SHARED_LIBS=ON > cmake.log 2>&1 || { tail -40 cmake.log; exit 1; }
+          cmake --build build --config Release --parallel --target llama ggml ggml-base ggml-cpu > build.log 2>&1 || { tail -60 build.log; exit 1; }
+          L=$W/myime/src/AzooKeyKanaKanjiConverter/lib/windows
+          mkdir -p $L $W/engine-out
+          cp build/bin/Release/*.dll $L/
+          cp build/bin/Release/*.dll $W/engine-out/
+          cp build/src/Release/llama.lib build/ggml/src/Release/ggml.lib build/ggml/src/Release/ggml-base.lib $L/
+          ls $W/engine-out $L
+
+      - name: 変換エンジン（Swift）
+        if: steps.engine-cache.outputs.cache-hit != 'true'
+        run: |
+          set -eo pipefail
+          cd $W/myime/src/swift-engine
+          cp $GITHUB_WORKSPACE/repo/tools/swift-Package.resolved Package.resolved
+          swift build -c release --arch x86_64 > $W/swift.log 2>&1 || { grep -B2 -A12 "error:" $W/swift.log | head -80; tail -20 $W/swift.log; exit 1; }
+          tail -5 $W/swift.log
+          DLL=$(find .build -name azookey-engine.dll -path '*release*' | head -1)
+          echo "DLL: $DLL"; test -n "$DLL"
+          cp "$DLL" $W/engine-out/
+          for d in AzooKeyKanaKanjiConverter_KanaKanjiConverterModuleWithDefaultDictionary.resources AzooKeyKanaKanjiConverter_EfficientNGram.resources; do
+            cp -r "$(dirname "$DLL")/$d" $W/engine-out/
+          done
+          powershell -NoProfile -ExecutionPolicy Bypass -File $W/myime/scripts/ci/copy-swift-runtime.ps1 -OutputDir "C:\\w\\engine-out"
+          ls $W/engine-out
+
+      - name: 保存できるものの確認（エンジン）
+        id: have
+        if: always()
+        run: |
+          [ -f $W/engine-out/azookey-engine.dll ] && echo "engine=yes" >> "$GITHUB_OUTPUT" || echo "engine=no" >> "$GITHUB_OUTPUT"
+
+      - name: 変換エンジンの控えを保存
+        if: always() && steps.engine-cache.outputs.cache-hit != 'true' && steps.have.outputs.engine == 'yes'
+        uses: actions/cache/save@v4
+        with:
+          path: C:/w/engine-out
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
+
+      - name: Qt 6.9.1
+        if: steps.qt-cache.outputs.cache-hit != 'true'
+        run: |
+          set -eo pipefail
+          S=$W/myime/mozc/src
+          mkdir -p $S/third_party_cache
+          curl -fsSL -o $S/third_party_cache/qtbase-everywhere-src-6.9.1.tar.xz https://download.qt.io/archive/qt/6.9/6.9.1/submodules/qtbase-everywhere-src-6.9.1.tar.xz
+          echo "40caedbf83cc9a1959610830563565889878bc95f115868bbf545d1914acf28e  $S/third_party_cache/qtbase-everywhere-src-6.9.1.tar.xz" | sha256sum -c
+          cd $S
+          # ninja と WiX はここで取る（LLVM は実行機の入れ済みを使う）
+          python build_tools/update_deps.py --noqt --nollvm --nomsys2 --nondk --nowix
+          python build_tools/build_qt.py --release --confirm_license > $W/qt.log 2>&1 || { tail -60 $W/qt.log; exit 1; }
+          tail -5 $W/qt.log
+          ls third_party/qt
+          rm -rf third_party/qt_src third_party_cache
+
+      - name: 保存できるものの確認（Qt）
+        id: haveqt
+        if: always()
+        run: |
+          [ -f $W/myime/mozc/src/third_party/qt/bin/Qt6Core.dll ] && echo "qt=yes" >> "$GITHUB_OUTPUT" || echo "qt=no" >> "$GITHUB_OUTPUT"
+
+      - name: Qt の控えを保存
+        if: always() && steps.qt-cache.outputs.cache-hit != 'true' && steps.haveqt.outputs.qt == 'yes'
+        uses: actions/cache/save@v4
+        with:
+          path: C:/w/myime/mozc/src/third_party/qt
+          key: win-qt-6.9.1-v1
+
+      - name: Mozc の部品
+        env:
+          MSYS_NO_PATHCONV: '1'
+        run: |
+          set -eo pipefail
+          # Mozc の組み立てが読む変換エンジンの置き場
+          mkdir -p $W/myime/build/x64/release && cp -r $W/engine-out/. $W/myime/build/x64/release/
+          cd $W/myime/mozc/src
+          bazelisk --output_user_root=C:/b build --config=oss_windows -c opt --spawn_strategy=local \
+            --generate_json_trace_profile=no --nocheck_visibility \
+            --disk_cache=C:/bazel-disk --repository_cache=C:/bazel-repo \
+            //server:mozc_server_win //renderer/win32:win32_renderer_main //win32/broker:mozc_broker_main \
+            //win32/cache_service:mozc_cache_service //win32/tip:mozc_tip32 //win32/tip:mozc_tip64 \
+            //win32/custom_action //gui/tool:mozc_tool_win //session:session_handler_main //base:mozc_version_txt > $W/bazel.log 2>&1 \
+            || { grep -B3 -A25 "ERROR\|error:" $W/bazel.log | head -150; tail -20 $W/bazel.log; exit 1; }
+          tail -8 $W/bazel.log
+
+      - name: Bazel の控えを保存
+        if: always() && steps.bazel-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            C:/bazel-disk
+            C:/bazel-repo
+          key: win-bazel-${{ github.run_id }}
+
+      - name: 部品を集める
+        env:
+          MSYS_NO_PATHCONV: '1'
+        run: |
+          set -eo pipefail
+          cd $W/myime/mozc/src
+          BIN=$(bazelisk --output_user_root=C:/b info bazel-bin --config=oss_windows -c opt 2>/dev/null | tail -1 | tr -d "[:cntrl:]")
+          echo "bazel-bin: $BIN"
+          BO=$(dirname "$(dirname "$BIN")")
+          find "$BO" -name mozc_version.txt | while read -r f; do echo "== $f"; grep REVISION "$f"; done
+          grep -n "REVISION" $W/myime/mozc/src/version.bzl
+          C=$W/parts; rm -rf $C; mkdir -p $C
+          # 出力名=組み立ての対象が作るファイル名（インストーラーの定義が読むもの）
+          for pair in mozc_server.exe=mozc_server_win.exe mozc_tool.exe=mozc_tool_win.exe mozc_renderer.exe=win32_renderer_main.exe mozc_broker.exe=mozc_broker_main.exe mozc_cache_service.exe=mozc_cache_service.exe mozc_tip32.dll=mozc_tip32.dll mozc_tip64.dll=mozc_tip64.dll mozc_installer_helper.dll=custom_action.dll session_handler_main.exe=session_handler_main.exe mozc_version.txt=mozc_version.txt; do
+            n=${pair%%=*}; src=${pair#*=}
+            # 構成ごとに出力先が違う（x64 への切り替えなど）ので bazel-out 全体から探す
+            f=$(find "$BO" -name "$src" -path '*/bin/*' -not -path '*/_objs/*' -not -path '*.runfiles/*' -not -path '*-exec*' | head -1)
+            echo "$n <- $f"
+            if [ -z "$f" ]; then echo "見つからない: $n"; find "$BO" \( -name '*.exe' -o -name '*.dll' \) -path '*/bin/*' -not -path '*/_objs/*' -not -path '*.runfiles/*' | head -60; exit 1; fi
+            cp "$f" $C/$n
+          done
+          cat $C/mozc_version.txt
+          # 部品の版がすべて入力の版でなければ作らない
+          for f in $C/*.exe $C/*.dll; do
+            v=$(powershell -NoProfile -Command "(Get-Item '$(cygpath -w $f)').VersionInfo.FileVersion")
+            echo "$(basename $f) $v"
+            case "$(basename $f)" in session_handler_main.exe) ;; *) [ "$v" = "$VERSION" ] || { echo "版が違う: $f $v"; exit 1; } ;; esac
+          done
+
+      - name: MSI
+        run: |
+          set -eo pipefail
+          S=$W/myime/mozc/src; R=$GITHUB_WORKSPACE/repo; C=$W/parts
+          export DOTNET_ROLL_FORWARD=Major DOTNET_CLI_HOME=$W/dotnet-home
+          dotnet tool install wix --version 5.0.2 --tool-path $W/wixtool
+          # 変換エンジンの一式（インストーラーの定義がここから読む）。絵文字辞書は許諾の記載がないので除く
+          E=$W/msi-engine; rm -rf $E; mkdir -p $E
+          cp $W/engine-out/*.dll $E/
+          cp $R/tools/update-check/update_check.ps1 $E/
+          for d in $W/engine-out/*.resources; do cp -r $d $E/; rm -rf $E/$(basename $d)/EmojiDictionary; done
+          mkdir -p $W/docs && cp $R/docs/credits_en.html $W/docs/
+          mkdir -p $W/out
+          cd $S
+          python -X utf8 -B -m win32.installer.build_installer \
+            --output $W/out/CompoundIME_${VERSION}_x64.msi \
+            --branding Mozc --arch x64 --vs_install_dir "$VS_VC" \
+            --azookey_dll_dir $E --version_file $C/mozc_version.txt \
+            --mozc_server $C/mozc_server.exe --mozc_tool $C/mozc_tool.exe \
+            --mozc_tip64 $C/mozc_tip64.dll --mozc_tip32 $C/mozc_tip32.dll \
+            --mozc_renderer $C/mozc_renderer.exe --mozc_broker $C/mozc_broker.exe \
+            --mozc_cache_service $C/mozc_cache_service.exe \
+            --custom_action $C/mozc_installer_helper.dll \
+            --icon_path $S/data/images/win/product_icon.ico \
+            --credit_file $W/docs/credits_en.html \
+            --qt_core_dll $S/third_party/qt/bin/Qt6Core.dll \
+            --wxs_path $S/win32/installer/installer_oss_64bit.wxs \
+            --wix_path $W/wixtool/wix.exe
+          ls -la $W/out
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-package
+          path: C:/w/out/*.msi
+          if-no-files-found: error
+
+      # 試験用の一式: ここで変換の一括試験を流せるようにする
+      - name: 試験に使う一式をまとめる
+        run: |
+          set -eo pipefail
+          B=$W/bin/engine; mkdir -p $B
+          cp -r $W/engine-out/. $B/
+          cp $W/parts/session_handler_main.exe $B/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: windows-bin
+          path: C:/w/bin/
+          retention-days: 7
+
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: windows-logs
+          path: |
+            C:/w/*.log
+            C:/w/llama.cpp/*.log
+          if-no-files-found: ignore
+          retention-days: 3
