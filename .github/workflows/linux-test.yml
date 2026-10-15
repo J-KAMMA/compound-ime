@@ -158,9 +158,16 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE
           chmod +x $W/bin/engine/session_handler_main
-          curl -fsSL -o $W/model.gguf \
-            https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
-          echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
+          if [ -n "${{ inputs.model_release }}" ]; then
+            # 比べるための人工知能（公開しない下書きの配布ページから）
+            gh release download "${{ inputs.model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.model_file }}" -O $W/model.gguf
+            echo "差し替えた人工知能: ${{ inputs.model_file }}"
+            sha256sum $W/model.gguf
+          else
+            curl -fsSL -o $W/model.gguf \
+              https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
+            echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
+          fi
           bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
       - uses: actions/upload-artifact@v4
         if: always()
