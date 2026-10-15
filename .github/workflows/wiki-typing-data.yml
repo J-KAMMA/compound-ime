@@ -1,0 +1,42 @@
+# ウィキペディアの打ち込み試験の文（tests/conversion/wiki-typing.tsv）を作る。手動で動く。
+# できたファイルは成果物 wiki-typing に残る。中身を確かめてからリポジトリに入れる。
+name: Wiki typing data
+
+on:
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 文の数
+        default: '3000'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: 材料（版と SHA256 を固定）
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
+          curl -fsSL -o wiki.parquet \
+            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00007-of-00015.parquet
+          echo "b112e83cf73327ba2246fd9c31eb1af501e51bac8450d8420963e29132d9b04b  wiki.parquet" | sha256sum -c
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+      - name: 文を作る
+        run: |
+          set -eo pipefail
+          mkdir -p out
+          venv/bin/python tools/wiki_typing_test.py --wiki wiki.parquet --table romanji-hiragana.tsv \
+            --out out/wiki-typing.tsv --count ${{ inputs.count }}
+          head -5 out/wiki-typing.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wiki-typing
+          path: out/
+          retention-days: 7
