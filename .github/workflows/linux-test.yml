@@ -132,7 +132,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a1, a2, b, c, d1, d2]
+        group: [a1, a2, b, c, d1, d2, e]
     steps:
       - uses: actions/checkout@v4
         with:
