@@ -181,7 +181,9 @@ bool InsideNormalSpelling(std::string_view raw, size_t begin, size_t end, const 
 
 std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon& lexicon,
                                 const RomajiParser& parse, const Choices* choices,
-                                const ReadingCheck* is_reading) {
+                                const ReadingCheck* is_reading,
+                                const ReadingCheck* reads_naturally) {
+  const ReadingCheck* own_reading = reads_naturally ? reads_naturally : is_reading;
   std::string raw;
   std::vector<bool> boundary(1, true);  // boundary[i]: i is an original chunk edge
   std::vector<bool> blocked(1, false);  // blocked[i]: i is inside an x?/l? small kana
@@ -391,7 +393,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         cost = -length;
       } else if (is_reading && learned == 0 && !place &&
                  word.size() >= kMinUnreadWordLength && boundary[i] && boundary[j] &&
-                 kana_at[j] > kana_at[i] && !(*is_reading)(kana_text(kana_at[i], kana_at[j])) &&
+                 kana_at[j] > kana_at[i] && !(*own_reading)(kana_text(kana_at[i], kana_at[j])) &&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)

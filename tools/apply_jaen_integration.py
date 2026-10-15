@@ -3312,6 +3312,29 @@ EOP
 # 中身は native/jaen-detector/converter_reading_check.inc。
 edit("converter/converter.cc", "    return modules().GetDictionary().HasKey(kana);",
      "    return ReadsAsJapanese(modules(), kana);")
+
+# 英単語のかなが自然な日本語として読めるか: 辞書にあっても、珍しい語としてしか読めないかな
+# （へろ、さふぇ、いであ、めぬ、らぢお）は日本語の読みと見なさない。Mozc の辞書の単語の費用と
+# 接続の費用で一番安い読み方（打ち間違いの直しと同じ ReadingCost）が 6600 未満なら自然な読み。
+# 手元の計算で、日本語の語（こと、ねこ、きもの、かめ、だて）は 6213 以下、英語のつづりの
+# かな（いであ 7064、にけ、あぴ、らぢお、ぞね、きうぃ、びけ、へろ、あれあ、さふぇ、めぬ、
+# いっすえ）は 7064 以上だった。英単語そのもののかなの判定だけに使い、前後の読みとの
+# 交わりの判定はこれまでどおり。
+edit("converter/converter.cc", "    return ReadsAsJapanese(modules(), kana);\n  };\n",
+     "    return ReadsAsJapanese(modules(), kana);\n  };\n"
+     "  // Whether a word's own kana reads as natural Japanese (not only as a rare entry).\n"
+     "  std::unordered_map<std::string, PrefixWords> reading_cache;\n"
+     "  const jaen::ReadingCheck reads_naturally = [this, &reading_cache](std::string_view kana) {\n"
+     "    constexpr int64_t kNaturalReadingCost = 6600;\n"
+     "    return ReadsAsJapanese(modules(), kana) &&\n"
+     "           ReadingCost(modules(), kana, &reading_cache) < kNaturalReadingCost;\n"
+     "  };\n")
+edit("converter/converter.cc",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading);",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);")
+edit("converter/converter.cc",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading);",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);")
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")

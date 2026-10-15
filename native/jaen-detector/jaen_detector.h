@@ -123,6 +123,10 @@ bool IsForeignChunk(const Chunk& chunk);
 // typed chunk edges whose kana is no Japanese reading (remote: れもて, safe:
 // さふぇ) is English too, unless a Japanese reading of 3+ kana crosses one of
 // its edges (the て of "kono|te|gami" belongs to 手紙).
+// |reads_naturally| (optional) replaces |is_reading| for that word's own kana:
+// whether it reads as natural Japanese (a cheap way through the dictionary),
+// not merely as some rare entry (へろ, さふぇ, いであ are in the dictionary but
+// read only as rare words: hero, safe, idea stay English).
 // Returns an empty vector when no English piece is chosen.
 inline constexpr size_t kMinPlainWordLength = 5;
 inline constexpr size_t kMinUnreadWordLength = 4;
@@ -131,7 +135,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks,
                                 const Lexicon& lexicon,
                                 const RomajiParser& parse,
                                 const Choices* choices = nullptr,
-                                const ReadingCheck* is_reading = nullptr);
+                                const ReadingCheck* is_reading = nullptr,
+                                const ReadingCheck* reads_naturally = nullptr);
 
 }  // namespace jaen
 
