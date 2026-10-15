@@ -95,10 +95,14 @@ struct Choices {
   // that is plain romaji (no foreign chunk) is taken like a curated word after
   // kPlainChoiceCount commits.
   std::unordered_map<std::string, int> english;
-  // Words turned back into Japanese; never taken as English.
+  // Words turned back into Japanese kJapaneseChoiceCount times; never taken
+  // as English. One such commit (a stray pick of ぎてゅｂ for "github") only
+  // waits in japanese_once.
   std::unordered_set<std::string> japanese;
+  std::unordered_set<std::string> japanese_once;
 };
 inline constexpr int kEnglishChoiceCount = 2;
+inline constexpr int kJapaneseChoiceCount = 2;
 inline constexpr int kPlainChoiceCount = 3;
 
 // Evidence that a chunk is not Japanese romaji. Strong: keys the table left as

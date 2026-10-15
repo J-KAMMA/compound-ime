@@ -85,8 +85,10 @@ void ChoiceStore::Record(Choice choice, std::string_view word) {
     return;  // nothing changes
   }
   auto next = std::make_shared<Choices>(*choices_);
-  const bool known = next->english.contains(w) || next->japanese.contains(w);
-  if (!known && next->english.size() + next->japanese.size() >= kMaxWords) {
+  const bool known =
+      next->english.contains(w) || next->japanese.contains(w) || next->japanese_once.contains(w);
+  if (!known &&
+      next->english.size() + next->japanese.size() + next->japanese_once.size() >= kMaxWords) {
     // Full: forget the least used English word (Japanese choices fix mistakes).
     const auto least = std::ranges::min_element(
         next->english, {}, [](const auto& entry) { return entry.second; });
@@ -95,11 +97,15 @@ void ChoiceStore::Record(Choice choice, std::string_view word) {
   }
   if (choice == Choice::kEnglish) {
     next->japanese.erase(w);
+    next->japanese_once.erase(w);
     int& count = next->english[w];
     count = std::min(count + 1, kMaxCount);
-  } else {
+  } else if (next->japanese_once.erase(w) > 0) {
+    // The second Japanese commit (kJapaneseChoiceCount): never English.
     next->english.erase(w);
     next->japanese.insert(w);
+  } else {
+    next->japanese_once.insert(w);
   }
   choices_ = std::move(next);
   SaveLocked();
@@ -119,7 +125,9 @@ void ChoiceStore::Clear() {
   }
 }
 
-// Format: one word per line, "e<TAB>word<TAB>count" or "j<TAB>word".
+// Format: one word per line, "e<TAB>word<TAB>count", "j<TAB>word<TAB>2" (never
+// English) or "j<TAB>word<TAB>1" (turned back once). Files written before the
+// count was kept have "j<TAB>word": read as once, since one stray pick made it.
 void ChoiceStore::LoadLocked() {
   if (loaded_) return;
   std::error_code error;
@@ -134,7 +142,8 @@ void ChoiceStore::LoadLocked() {
   loaded_ = true;
   auto loaded = std::make_shared<Choices>();
   std::string line;
-  while (std::getline(in, line) && loaded->english.size() + loaded->japanese.size() < kMaxWords) {
+  while (std::getline(in, line) &&
+         loaded->english.size() + loaded->japanese.size() + loaded->japanese_once.size() < kMaxWords) {
     if (!line.empty() && line.back() == '\r') line.pop_back();
     std::istringstream fields(line);
     std::string kind, word;
@@ -148,7 +157,12 @@ void ChoiceStore::LoadLocked() {
       }
       loaded->english[word] = count;
     } else if (kind == "j") {
-      loaded->japanese.insert(word);
+      std::string number;
+      if (std::getline(fields, number, '\t') && std::atoi(number.c_str()) >= kJapaneseChoiceCount) {
+        loaded->japanese.insert(word);
+      } else {
+        loaded->japanese_once.insert(word);
+      }
     }
   }
   choices_ = std::move(loaded);
@@ -162,7 +176,8 @@ void ChoiceStore::SaveLocked() const {
     std::ofstream out(temp, std::ios::binary | std::ios::trunc);
     if (!out) return;
     for (const auto& [word, count] : choices_->english) out << "e\t" << word << '\t' << count << '\n';
-    for (const std::string& word : choices_->japanese) out << "j\t" << word << '\n';
+    for (const std::string& word : choices_->japanese) out << "j\t" << word << '\t' << kJapaneseChoiceCount << '\n';
+    for (const std::string& word : choices_->japanese_once) out << "j\t" << word << "\t1\n";
     if (!out.flush()) {
       out.close();
       std::filesystem::remove(temp, ignored);

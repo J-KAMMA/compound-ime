@@ -270,12 +270,16 @@ int main() {
       store.Record(jaen::Choice::kEnglish, "Netflix");
       store.Record(jaen::Choice::kEnglish, "netflix");
       store.Record(jaen::Choice::kJapanese, "google");
+      store.Record(jaen::Choice::kJapanese, "github");
+      store.Record(jaen::Choice::kJapanese, "google");
       store.Record(jaen::Choice::kEnglish, "x1");  // not a word
     }
     jaen::ChoiceStore again(file);
     auto c = again.Get();
     Expect(c->english.size() == 1 && c->english.at("netflix") == 2 && c->japanese.contains("google"),
            "store round trip");
+    Expect(!c->japanese.contains("github") && c->japanese_once.contains("github"),
+           "one Japanese commit only waits (a stray pick of ぎてゅｂ)");
     again.Record(jaen::Choice::kEnglish, "google");
     c = jaen::ChoiceStore(file).Get();
     Expect(c->english.contains("google") && !c->japanese.contains("google"), "latest choice wins");
@@ -288,8 +292,9 @@ int main() {
         full.Record(jaen::Choice::kEnglish, w);
       }
       full.Record(jaen::Choice::kJapanese, "zzzz");
+      full.Record(jaen::Choice::kJapanese, "zzzz");
       const auto f = full.Get();
-      Expect(f->japanese.contains("zzzz") && f->english.size() + f->japanese.size() ==
+      Expect(f->japanese.contains("zzzz") && f->english.size() + f->japanese.size() + f->japanese_once.size() ==
                                                   jaen::ChoiceStore::kMaxWords,
              "full store still learns Japanese");
     }
