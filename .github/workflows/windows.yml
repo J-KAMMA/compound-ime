@@ -223,7 +223,7 @@ jobs:
             --disk_cache=C:/bazel-disk --repository_cache=C:/bazel-repo \
             //server:mozc_server_win //renderer/win32:win32_renderer_main //win32/broker:mozc_broker_main \
             //win32/cache_service:mozc_cache_service //win32/tip:mozc_tip32 //win32/tip:mozc_tip64 \
-            //win32/custom_action //gui/tool:mozc_tool_win //session:session_handler_main > $W/bazel.log 2>&1 \
+            //win32/custom_action //gui/tool:mozc_tool_win //session:session_handler_main //base:mozc_version_txt > $W/bazel.log 2>&1 \
             || { grep -B3 -A25 "ERROR\|error:" $W/bazel.log | head -150; tail -20 $W/bazel.log; exit 1; }
           tail -8 $W/bazel.log
 
