@@ -7,6 +7,8 @@
 #include "correction_log.h"
 #include "jaen_typo.h"
 
+#include <chrono>
+#include <cmath>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -265,37 +267,219 @@ int main() {
   {
     const auto file = std::filesystem::temp_directory_path() / "jaen_choices_test.txt";
     std::filesystem::remove(file);
+    constexpr int64_t kDay = 86400;
+    const int64_t t0 = std::chrono::duration_cast<std::chrono::seconds>(
+                           std::chrono::system_clock::now().time_since_epoch()).count();
+    const auto strong = [](std::string_view w) { return w == "github" || w == "netflix"; };
+    const auto reset = [&] {
+      std::filesystem::remove(file);
+      std::filesystem::remove(std::filesystem::path(file) += ".tmp");
+    };
+    using jaen::Choice;
     {
       jaen::ChoiceStore store(file);
-      store.Record(jaen::Choice::kEnglish, "Netflix");
-      store.Record(jaen::Choice::kEnglish, "netflix");
-      store.Record(jaen::Choice::kJapanese, "google");
-      store.Record(jaen::Choice::kEnglish, "x1");  // not a word
+      store.Record(Choice::kEnglish, "Netflix");
+      store.Record(Choice::kEnglish, "netflix");
+      store.Record(Choice::kJapanese, "google");
+      store.Record(Choice::kJapanese, "github");
+      store.Record(Choice::kJapanese, "google");
+      store.Record(Choice::kEnglish, "x1");  // not a word
     }
     jaen::ChoiceStore again(file);
     auto c = again.Get();
     Expect(c->english.size() == 1 && c->english.at("netflix") == 2 && c->japanese.contains("google"),
            "store round trip");
-    again.Record(jaen::Choice::kEnglish, "google");
+    Expect(!c->japanese.contains("github"), "one Japanese commit does not decide (a stray pick of ぎてゅｂ)");
+    {
+      std::ifstream in(file);
+      std::string first;
+      std::getline(in, first);
+      Expect(first == "# v2", "file starts with the version line");
+    }
+    again.Record(Choice::kEnglish, "google");
     c = jaen::ChoiceStore(file).Get();
-    Expect(c->english.contains("google") && !c->japanese.contains("google"), "latest choice wins");
+    Expect(c->english.contains("google") && c->english.at("google") == 1 && !c->japanese.contains("google"),
+           "English pick resets a Japanese mark (score 1: not yet taken)");
     {
       std::ofstream(std::filesystem::path(file) += ".tmp") << "e\tleft\t1\n";
+    }
+    again.Clear();
+    Expect(!std::filesystem::exists(std::filesystem::path(file) += ".tmp"), "clear removes the temp file");
+    Expect(!std::filesystem::exists(file) && jaen::ChoiceStore(file).Get()->english.empty(), "clear");
+
+    // Scenarios (fixed clock).
+    {
+      reset();
+      int64_t now = t0;
+      jaen::ChoiceStore s(file, jaen::ChoiceStore::kMaxWords, [&] { return now; });
+      s.SetStrongPredicate(strong);
+      const auto japanese = [&](const char* w) { return s.Get()->japanese.contains(w); };
+      const auto english = [&](const char* w) {
+        const auto m = s.Get()->english;
+        const auto it = m.find(w);
+        return it == m.end() ? 0 : it->second;
+      };
+      // A stray pick of a brand word stays English; three deliberate ones turn it.
+      s.Record(Choice::kJapanese, "github");
+      Expect(!japanese("github"), "scenario: one stray Japanese pick of a brand stays English");
+      s.Record(Choice::kJapanese, "github");
+      Expect(!japanese("github"), "scenario: two picks of a brand are not enough");
+      s.Record(Choice::kJapanese, "github");
+      Expect(japanese("github"), "scenario: three deliberate picks of a brand make it Japanese");
+      // One deliberate English pick undoes it at once.
+      s.Record(Choice::kEnglish, "github");
+      Expect(!japanese("github") && s.Score("github", now) == 1.0, "scenario: Japanese then English is undone");
+      // A plain word: two deliberate picks.
+      s.Record(Choice::kJapanese, "sakura");
+      Expect(!japanese("sakura"), "scenario: plain word, one pick");
+      s.Record(Choice::kJapanese, "sakura");
+      Expect(japanese("sakura"), "scenario: two deliberate picks of a plain word make it Japanese");
+      // Weak evidence counts half.
+      for (int i = 0; i < 3; ++i) s.Record(Choice::kJapanese, "hello", false);
+      Expect(!japanese("hello") && s.Score("hello", now) == -1.5, "scenario: three weak picks are 1.5");
+      s.Record(Choice::kJapanese, "hello", false);
+      Expect(japanese("hello"), "scenario: four weak picks make a plain word Japanese");
+      for (int i = 0; i < 5; ++i) s.Record(Choice::kJapanese, "netflix", false);
+      Expect(!japanese("netflix"), "scenario: five weak picks of a brand are not enough");
+      s.Record(Choice::kJapanese, "netflix", false);
+      Expect(japanese("netflix"), "scenario: six weak picks of a brand are");
+      // Two picks a few days apart still count as two.
+      s.Record(Choice::kJapanese, "berry", true, now);
+      s.Record(Choice::kJapanese, "berry", true, now + 3 * kDay);
+      Expect(s.Get(now + 3 * kDay)->japanese.contains("berry"), "scenario: picks three days apart add up");
+      // English counts: a weak commit is half, one F10 is not enough.
+      s.Record(Choice::kEnglish, "snsno");
+      Expect(english("snsno") == 1, "scenario: one deliberate English pick counts once");
+      s.Record(Choice::kEnglish, "tweet", false);
+      s.Record(Choice::kEnglish, "tweet", false);
+      s.Record(Choice::kEnglish, "tweet", false);
+      Expect(english("tweet") == 1, "scenario: three weak English commits count once");
+      s.Record(Choice::kEnglish, "tweet", false);
+      Expect(english("tweet") == 2, "scenario: four weak English commits count twice");
+      // Fading: the score halves every 60 days.
+      Expect(japanese("sakura") && s.Get(now + 30 * kDay)->japanese.contains("sakura") == false,
+             "scenario: a Japanese mark fades within 30 days (-2 -> -1.4)");
+      Expect(s.Get(now + 59 * kDay)->japanese.contains("sakura") == false, "scenario: faded after 59 days");
+      Expect(s.Score("sakura", now + 120 * kDay) > -0.51 && s.Score("sakura", now + 120 * kDay) < -0.49,
+             "scenario: 120 days make -2 into -0.5");
+      Expect(s.Get(now + 120 * kDay)->english.contains("tweet") == false, "scenario: an English count fades too");
+      Expect(s.Get(now + 1000 * kDay)->japanese.empty() && s.Get(now + 1000 * kDay)->english.empty(),
+             "scenario: everything fades away");
+      // The new score starts from the faded one.
+      now += 120 * kDay;
+      s.Record(Choice::kJapanese, "sakura");
+      Expect(std::abs(s.Score("sakura", now) + 1.5) < 0.01 && !japanese("sakura"),
+             "scenario: a pick after 120 days adds to the faded score");
+      // The file keeps all of it.
+      jaen::ChoiceStore reread(file, jaen::ChoiceStore::kMaxWords, [&] { return now; });
+      reread.SetStrongPredicate(strong);
+      Expect(std::abs(reread.Score("sakura", now) + 1.5) < 0.01 && reread.Get()->japanese.contains("hello") == false,
+             "scenario: reread after fading (hello -2 -> -0.5)");
+    }
+
+    // Old formats: e count, j 2, j 1, j alone; time from the file.
+    {
+      reset();
+      {
+        std::ofstream out(file, std::ios::binary);
+        out << "e\tnetflix\t3\nj\tgoogle\t2\nj\tgithub\t1\nj\tfoo\ne\tbar\nj\tbaz\t5\r\n";
+      }
+      const int64_t now = t0;
+      jaen::ChoiceStore s(file, jaen::ChoiceStore::kMaxWords, [&] { return now; });
+      s.SetStrongPredicate(strong);
+      const auto got = s.Get();
+      Expect(got->english.at("netflix") == 3 && s.Score("netflix", now) > 2.9, "old format: e count is the score");
+      Expect(got->japanese.contains("google") && !got->japanese.contains("github") &&
+                 std::abs(s.Score("github", now) + 1) < 0.01 && std::abs(s.Score("foo", now) + 1) < 0.01,
+             "old format: j 2 is -2, j 1 and bare j are -1");
+      Expect(got->english.at("bar") == 1 && got->japanese.contains("baz") && std::abs(s.Score("baz", now) + 2) < 0.01,
+             "old format: e without count is 1, a larger j count is -2");
+      s.Record(Choice::kJapanese, "newword");  // saved as v2
+      std::ifstream in(file);
+      std::string text((std::istreambuf_iterator<char>(in)), std::istreambuf_iterator<char>());
+      Expect(text.starts_with("# v2\n") && text.find("w\tnewword\t-1.0000\t" + std::to_string(now) + "\n") != std::string::npos &&
+                 text.find("\ne\t") == std::string::npos,
+             "old format: rewritten as v2");
+    }
+    // Old format with an old file time: the age counts.
+    {
+      reset();
+      { std::ofstream(file, std::ios::binary) << "e\tnetflix\t4\nj\tgoogle\t2\n"; }
+      std::filesystem::last_write_time(file, std::filesystem::file_time_type::clock::now() -
+                                                  std::chrono::hours(24 * 60));
+      jaen::ChoiceStore s(file, jaen::ChoiceStore::kMaxWords, [&] { return t0; });
+      Expect(std::abs(s.Score("netflix", t0) - 2.0) < 0.05 && std::abs(s.Score("google", t0) + 1.0) < 0.05,
+             "old format: the file time is the last change (60 days halve the scores)");
+    }
+    // Full store: the entry nearest 0 (the oldest of them) goes.
+    {
+      reset();
+      int64_t now = t0;
+      jaen::ChoiceStore s(file, 5, [&] { return now; });
+      s.Record(Choice::kJapanese, "aa");
+      s.Record(Choice::kJapanese, "aa");
+      s.Record(Choice::kJapanese, "aa");
+      s.Record(Choice::kEnglish, "bb");
+      s.Record(Choice::kEnglish, "bb");
+      now += 10;
+      s.Record(Choice::kEnglish, "cc");
+      now += 10;
+      s.Record(Choice::kEnglish, "dd");
+      now += 10;
+      s.Record(Choice::kEnglish, "ee");
+      now += 10;
+      s.Record(Choice::kEnglish, "ff");  // full: cc (oldest of the weakest) goes
+      Expect(s.Score("cc", now) == 0 && std::abs(s.Score("aa", now) + 3) < 0.01 &&
+                 std::abs(s.Score("bb", now) - 2) < 0.01 &&
+                 s.Score("dd", now) > 0.99 && s.Score("ee", now) > 0.99 && s.Score("ff", now) > 0.99,
+             "full store: the weakest, oldest entry is replaced");
+      s.Record(Choice::kJapanese, "zzzz");  // full store still learns Japanese
+      s.Record(Choice::kJapanese, "zzzz");
+      Expect(s.Get()->japanese.contains("zzzz") && std::abs(s.Score("aa", now) + 3) < 0.01 &&
+                 std::abs(s.Score("bb", now) - 2) < 0.01,
+             "full store: strong entries stay");
+      size_t lines = 0;
+      std::ifstream in(file);
+      for (std::string l; std::getline(in, l);) lines += l.starts_with("w\t");
+      Expect(lines == 5, "full store: the file keeps the limit");
+    }
+    // Edits behind our back (tools/learned-words.ps1) are noticed.
+    {
+      reset();
+      int64_t now = t0;
+      jaen::ChoiceStore s(file, jaen::ChoiceStore::kMaxWords, [&] { return now; });
+      s.Record(Choice::kJapanese, "sakura");
+      s.Record(Choice::kJapanese, "sakura");
+      Expect(s.Get()->japanese.contains("sakura"), "outside edit: before");
+      { std::ofstream(file, std::ios::binary) << "# v2\n"; }
+      std::filesystem::last_write_time(file, std::filesystem::file_time_type::clock::now() +
+                                                  std::chrono::hours(1));
+      Expect(s.Get()->japanese.contains("sakura"), "outside edit: not looked at within 10 seconds");
+      now += 20;
+      Expect(!s.Get()->japanese.contains("sakura") && s.Score("sakura", now) == 0,
+             "outside edit: the word is gone");
+      std::filesystem::remove(file);
+      now += 20;
+      s.Record(Choice::kEnglish, "tweet");
+      Expect(s.Get()->english.contains("tweet"), "outside edit: a deleted file starts over");
+    }
+    {
+      // Default limit, many words.
+      reset();
       jaen::ChoiceStore full(file);
       for (size_t i = 0; i < jaen::ChoiceStore::kMaxWords + 5; ++i) {
         std::string w = "w";
         for (size_t k = i; k > 0; k /= 26) w += static_cast<char>('a' + k % 26);
-        full.Record(jaen::Choice::kEnglish, w);
+        full.Record(Choice::kEnglish, w);
       }
-      full.Record(jaen::Choice::kJapanese, "zzzz");
+      full.Record(Choice::kJapanese, "zzzz");
+      full.Record(Choice::kJapanese, "zzzz");
       const auto f = full.Get();
       Expect(f->japanese.contains("zzzz") && f->english.size() + f->japanese.size() ==
                                                   jaen::ChoiceStore::kMaxWords,
              "full store still learns Japanese");
     }
-    again.Clear();
-    Expect(!std::filesystem::exists(std::filesystem::path(file) += ".tmp"), "clear removes the temp file");
-    Expect(!std::filesystem::exists(file) && jaen::ChoiceStore(file).Get()->english.empty(), "clear");
+    reset();
   }
 
   {

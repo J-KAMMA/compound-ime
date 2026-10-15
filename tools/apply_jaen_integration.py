@@ -10,7 +10,8 @@ On Space conversion, English words typed in romaji (native/jaen-detector) become
 FIXED_VALUE segments holding the typed ASCII; the rest converts as before.
 Compositions without detected English are left untouched. Words the user
 commits as ASCII (F10) or turns back into kana are remembered in the user
-profile (jaen_choices.txt) and cleared with the user history. One mistyped key
+profile (jaen_choices.txt, a score per word that fades with a 60-day half-life)
+and cleared with the user history. One mistyped key
 that leaves romaji unread is fixed, English words show as typed while
 composing, and with no surrounding text the AI still picks the whole sentence.
 """
@@ -266,6 +267,11 @@ std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(
 
 # Learned English/Japanese choices (jaen_choices.*), F6-F10 on English-split
 # segments, and partial commit across English pieces.
+# 学習は語ごとの点数: 英語を選ぶと加点、日本語を選ぶと減点で、半減期60日で薄れる。
+# 自分で候補を選んだとき（RERANKED、F6〜F10を含む）は1点、そのまま確定したときは
+# 0.5点。日本語扱い（英語に取らない）は-2点から、辞書の厳選語・ブランド名は-3点から。
+# 英語を選ぶと負の点は0に戻してから加える。ファイルは "# v2" の次に
+# w<TAB>語<TAB>点<TAB>時刻（tools/learned-words.ps1 で見る・消す）。
 for name in ("jaen_choices.h", "jaen_choices.cc"):
     text = (REPO / "native/jaen-detector" / name).read_text(encoding="utf-8")
     write(f"converter/{name}", text.replace('#include "jaen_detector.h"', '#include "converter/jaen_detector.h"')
@@ -317,8 +323,13 @@ edit("converter/english_lexicon.cc", """  return *lexicon;
 jaen::ChoiceStore& EnglishChoices() {
   static jaen::ChoiceStore* const store = [] {
     const std::string dir = SystemUtil::GetUserProfileDirectory();  // UTF-8
-    return new jaen::ChoiceStore(std::filesystem::path(std::u8string(dir.begin(), dir.end())) /
-                                 "jaen_choices.txt");
+    auto* choices = new jaen::ChoiceStore(
+        std::filesystem::path(std::u8string(dir.begin(), dir.end())) / "jaen_choices.txt");
+    // Curated words and brands need more Japanese picks to stop being English.
+    choices->SetStrongPredicate([](std::string_view word) {
+      return EnglishLexicon().IsCurated(word) || !BrandCasing(word).empty();
+    });
+    return choices;
   }();
   return *store;
 }
@@ -1193,7 +1204,10 @@ edit("converter/converter.cc", """    const jaen::Choice choice =
         choice == jaen::Choice::kJapanese && place && place->surface == segment.candidate(0).value) {
       continue;
     }
-    if (choice != jaen::Choice::kNone) EnglishChoices().Record(choice, word);""")
+    // Picking a non-first candidate (or F6-F10) is deliberate: a full point;
+    // the first candidate as it came counts half.
+    const bool deliberate = (segment.candidate(0).attributes & Attribute::RERANKED) != 0;
+    if (choice != jaen::Choice::kNone) EnglishChoices().Record(choice, word, deliberate);""")
 
 # After a typo fix the keys are read again, so "tokyp" -> "tokyo" can become
 # the place name (tokyo, 東京 second) rather than stay ときょ.

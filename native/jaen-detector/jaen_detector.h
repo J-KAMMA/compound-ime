@@ -87,15 +87,17 @@ class Lexicon {
 // to 32 letters), or an empty string.
 std::string NormalizeWord(std::string_view word);
 
-// What the user chose before (keys are NormalizeWord forms).
+// What the user chose before (keys are NormalizeWord forms). ChoiceStore
+// derives this from its decaying scores (see jaen_choices.h).
 struct Choices {
   // Words committed as typed ASCII instead of the kana they were read as,
-  // with how often. Taken like lexicon words after kEnglishChoiceCount
-  // commits (one F10 over "snsno" must not make it English for good); a word
-  // that is plain romaji (no foreign chunk) is taken like a curated word after
-  // kPlainChoiceCount commits.
+  // with a count (the positive score, rounded down). Taken like lexicon words
+  // after kEnglishChoiceCount (one F10 over "snsno" must not make it English
+  // for good); a word that is plain romaji (no foreign chunk) is taken like a
+  // curated word after kPlainChoiceCount.
   std::unordered_map<std::string, int> english;
-  // Words turned back into Japanese; never taken as English.
+  // Words the user turned back into Japanese often enough (score -2, or -3
+  // for strongly English words such as brands); never taken as English.
   std::unordered_set<std::string> japanese;
 };
 inline constexpr int kEnglishChoiceCount = 2;
