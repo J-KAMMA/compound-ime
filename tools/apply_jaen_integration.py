@@ -1893,7 +1893,10 @@ edit(E, '''  static void PreferWholePhrase(const ConversionOptions& options,
       if (piece.conversion_segments_size() == 1) {
         const auto& segment = piece.conversion_segment(0);
         const auto found = std::find_if(segment.candidates().begin(), segment.candidates().end(),
-            [&](const auto* c) { return c && c->value == piece_value && c->key == piece_key; });
+            [&](const auto* c) {
+              return c && c->value == piece_value && c->key == piece_key &&
+                     !(c->attributes & private_surface::kNotSpellingKey);
+            });
         if (found == segment.candidates().end()) return false;
         indices.push_back(static_cast<int>(found - segment.candidates().begin()));
       } else if (auto path = private_surface::Find(piece, piece_key, piece_value, piece_original)) {

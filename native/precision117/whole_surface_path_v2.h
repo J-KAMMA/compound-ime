@@ -1,6 +1,7 @@
 #ifndef MYIME_PRIVATE_WHOLE_SURFACE_PATH_V2_H_
 #define MYIME_PRIVATE_WHOLE_SURFACE_PATH_V2_H_
 #include <algorithm>
+#include <cstdint>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -12,9 +13,15 @@
 #include "converter/segments.h"
 namespace mozc::private_surface {
 inline bool Text(std::string_view s) { return !s.empty() && s.find('\0') == s.npos && strings::IsValidUtf8(s); }
+// Candidates whose text need not spell their key: a typing or spelling fix
+// (いっしょにい read as 一緒に drops a kana) or a key widened by the dictionary.
+inline constexpr uint32_t kNotSpellingKey =
+    converter::Attribute::TYPING_CORRECTION | converter::Attribute::SPELLING_CORRECTION |
+    converter::Attribute::POST_CORRECTION | converter::Attribute::KEY_EXPANDED_IN_DICTIONARY;
 inline bool Safe(const converter::Candidate& c, std::string_view key) {
   if (c.key != key || !Text(c.value) || c.value.size() > 512 || c.effective_converted_segment_count() != 1 ||
       (c.attributes & (converter::Attribute::COMMAND_CANDIDATE | converter::Attribute::PARTIALLY_KEY_CONSUMED)) ||
+      (c.attributes & kNotSpellingKey) ||
       (c.consumed_key_size && c.consumed_key_size != Util::CharsLen(key)) ||
       (!c.content_key.empty() && !Text(c.content_key)) || (!c.content_value.empty() && !Text(c.content_value)) ||
       c.key.compare(0,c.content_key.size(),c.content_key) || c.value.compare(0,c.content_value.size(),c.content_value)) return false;
