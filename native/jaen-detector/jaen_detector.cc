@@ -294,12 +294,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     return false;
   };
-  // A small kana k that joins the kana before it in a Japanese reading of 3+
-  // kana (うぉ of うぉれっと typed "ulo"): the l or x was typed for that kana.
+  // A loanword kana k (IsKanaForLoanword) inside a Japanese reading of 3+
+  // kana, or starting one (うぉ of うぉれっと typed "ulo", ゔぁ of ゔぁいおりん
+  // typed "va"): the keys were typed for that kana.
   const auto small_in_reading = [&](size_t k) {
-    if (!is_reading || k == 0) return false;
+    if (!is_reading) return false;
     constexpr size_t kLongest = 8;
-    for (size_t a = k >= kLongest ? k - kLongest : 0; a < k; ++a) {
+    for (size_t a = k >= kLongest ? k - kLongest : 0; a <= k; ++a) {
       for (size_t b = std::max(k + 1, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
         if ((*is_reading)(kana_text(a, b))) return true;
       }
