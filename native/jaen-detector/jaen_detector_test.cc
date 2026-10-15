@@ -323,7 +323,7 @@ int main() {
       }
       return std::nullopt;
     };
-    Expect(edit("tsuduukete", "tsudukete") == 0, "a doubled vowel may be dropped for free (つづうけて)");
+    Expect(edit("tsuduukete", "tsudukete") == jaen::TypoPriors{}.doubled_vowel, "a doubled vowel may be dropped cheaply (つづうけて)");
     Expect(edit("ashitadesu", "shitadesu") == std::nullopt, "the first key is never edited");
     Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
     Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");

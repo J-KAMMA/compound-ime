@@ -52,7 +52,10 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
 // Extra cost (in the converter's cost units) charged for each kind of slip,
 // so a likelier slip needs a smaller gain to be taken.
 struct TypoPriors {
-  int doubled_vowel = 0;         // "tsuduukete" for tsudukete
+  // "tsuduukete" for tsudukete. Not 0: "isshoniikokka" (一緒に行こっか) reads
+  // 3039 cheaper as いっしょにこっか (一緒に国家); the smallest real such slip
+  // in the tests reads 3167 cheaper. 100 puts the 3000 margin between them.
+  int doubled_vowel = 100;
   int doubled_consonant = 2000;  // "hayyaku" for hayaku ("nikki" is a word)
   int swapped = 1000;            // "kareu" for kaeru
   int neighbor = 1500;           // "kiagi" for kaigi... a key next to the right one
