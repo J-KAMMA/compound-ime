@@ -135,6 +135,9 @@ jobs:
           grep -E "^(MAJOR|MINOR|BUILD_OSS|REVISION) = " $S/version.bzl
           # ウィンドウズでは版の最後の数字が 0 に置き換わるので、そのまま使うようにする
           sed -i "s/'Windows': '0'/'Windows': ''/" $S/build_tools/mozc_version.py
+          # 開発版の枝は版の最後が 100 に決まってしまうので、version.bzl の値を使う
+          sed -i "s/^    revision = '100'$/    revision = template_dict.get('REVISION', None)/" $S/build_tools/mozc_version.py
+          grep -n "revision = " $S/build_tools/mozc_version.py
           grep -n "'Windows'" $S/build_tools/mozc_version.py
 
       # llama.cpp（日本語などを含む道筋から推論用 DLL を読めるパッチ入り）は CPU だけで組み立てる
