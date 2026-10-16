@@ -5581,7 +5581,7 @@ index c37750c..c233516 100644
 +    let lines = text.components(separatedBy: .newlines)
 +    let line = left ? (lines.last ?? "") : (lines.first ?? "")
 +    let clean = String(line.unicodeScalars.filter { !(0xEE00...0xEE08).contains($0.value) })
-+    return left ? String(clean.suffix(40)) : String(clean.prefix(40))
++    return left ? String(clean.suffix(120)) : String(clean.prefix(40))
 +}
 +
 +/// Stateless context API: context belongs to this request and is never stored in config.
