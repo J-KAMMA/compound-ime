@@ -113,8 +113,7 @@ def trace_scores(segs, i, positions):
                 best = min(p for _, p in items) - 1.0
             scores[v] = best - lp
             break
-        else:
-            scores[v] = 0.0
+        # 記録の中で違いが見つからない表記（記録の終わりより先で違う）は点をつけない
     return scores
 
 
@@ -277,6 +276,9 @@ FEATURE_NAMES = (
 USE_ZENZ = True  # --no-zenz で False（Zenz の尤度を使わない、軽い選び手）
 MAX_ALTS = 7  # --max-alts: 1文節で比べる別の表記の数（Zenz で採点する数を減らす）
 ZENZ_SOURCE = "score"  # --zenz-source: score（採点し直した尤度）か trace（Zenzai の計算済みの分布）
+REQUIRE_ZENZ = False  # --require-zenz: Zenz の点のある表記にだけ替える
+GATE = None  # --gate: (Zenz を使わない選び手の確からしさ, 門のしきい値)
+GATE_STATS = {"segments": 0, "scored": 0, "surfaces": 0, "sentences": 0}
 
 
 def pair_features(segs, zenz, i, j):
@@ -359,6 +361,11 @@ def best_alternatives(items, prob):
             continue
         for i in range(len(it["segs"])):
             for j in alternatives(it["segs"], i):
+                if REQUIRE_ZENZ:
+                    # Zenz の点のない表記には替えない（数字を読みに替えるなど、裏付けのない替え方を防ぐ）
+                    z = it["zenz"][i] if it["zenz"] else None
+                    if not z or it["segs"][i][1][j]["value"] not in z or it["segs"][i][1][0]["value"] not in z:
+                        continue
                 feats.append(pair_features(it["segs"], it["zenz"], i, j))
                 where.append((n, i, j))
     ps = prob(feats) if feats else []
@@ -367,6 +374,31 @@ def best_alternatives(items, prob):
     for (n, i, j), p in zip(where, ps):
         if p > items[n]["best"][i][1]:
             items[n]["best"][i] = (j, float(p))
+    if GATE is None:
+        return
+    # 次の一歩2の見積もり: Zenz を使わない軽い選び手で「迷う文節」を選び、そこだけ Zenz で採点する。
+    # 門を通らない文節は替えない。採点する文節と表記の数を数える。
+    global USE_ZENZ
+    gate_prob, gate_t = GATE
+    USE_ZENZ = False
+    gfeats = [pair_features(items[n]["segs"], items[n]["zenz"], i, j) for n, i, j in where]
+    USE_ZENZ = True
+    gp = gate_prob(gfeats) if gfeats else []
+    passed = set()
+    for (n, i, j), p in zip(where, gp):
+        if p >= gate_t:
+            passed.add((n, i))
+    for n, it in enumerate(items):
+        if it["segs"] is None:
+            continue
+        for i in range(len(it["segs"])):
+            GATE_STATS["segments"] += 1
+            if (n, i) in passed:
+                GATE_STATS["scored"] += 1
+                GATE_STATS["surfaces"] += 1 + len(alternatives(it["segs"], i))
+            else:
+                it["best"][i] = (0, 0.0)
+    GATE_STATS["sentences"] += sum(1 for it in items if it["segs"] is not None)
 
 
 def apply_selector(item, threshold):
@@ -425,12 +457,15 @@ def main():
     ap.add_argument("--max-alts", type=int, default=7, help="1文節で比べる別の表記の数（既定は全部）")
     ap.add_argument("--zenz-source", default="score", choices=["score", "trace"],
                     help="Zenz の点: score は採点し直した文全体の尤度（段階1）、trace は Zenzai の計算済みの分布（段階2b）")
-    ap.add_argument("--weights-in", help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
+    ap.add_argument("--require-zenz", action="store_true", help="Zenz の点のある表記にだけ替える")
+    ap.add_argument("--gate", type=float, help="Zenz を使わない選び手でこの確からしさ以上の文節だけ採点する（見積もり）")
+    ap.add_argument("--weights-in",help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
     args = ap.parse_args()
-    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE
+    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ
     USE_ZENZ = not args.no_zenz
     MAX_ALTS = args.max_alts
     ZENZ_SOURCE = args.zenz_source
+    REQUIRE_ZENZ = args.require_zenz
     import numpy as np
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.linear_model import LogisticRegression
@@ -484,6 +519,17 @@ def main():
             return 1.0 / (1.0 + np.exp(-z))
         say(f"選び手は学習し直さず {args.weights_in} の重みを使う")
 
+    if args.gate is not None:
+        USE_ZENZ = False
+        grows = [r for it in fit_items for r in examples(it)]
+        USE_ZENZ = True
+        gX = np.array([r[0] for r in grows], dtype=float)
+        gy = np.array([r[1] for r in grows])
+        gscaler = StandardScaler().fit(gX)
+        gclf = LogisticRegression(C=0.3, max_iter=3000).fit(gscaler.transform(gX), gy)
+        GATE = (lambda feats: gclf.predict_proba(gscaler.transform(np.array(feats, dtype=float)))[:, 1], args.gate)
+        say(f"門: Zenz を使わない選び手の確からしさ ≥ {args.gate} の文節だけ Zenz で採点する")
+
     thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
     sets = [("確かめ（学習用の残り2割）", val_items),
             ("ja400", data.get("ja400", [])), ("jaen（270+200b）", data.get("jaen", [])),
@@ -506,6 +552,10 @@ def main():
                 totals[t][1] += r["broken"]
         say(f"{name}\t{base['wrong']}({base['reach']})/{base['right']}\t{base['fixed']}/{base['broken']}\t" + "\t".join(cells))
     say("試験の合計\t\t\t" + "\t".join(f"{a}/{b}" for a, b in totals.values()))
+    if GATE is not None and GATE_STATS["sentences"]:
+        s = GATE_STATS
+        say(f"門を通った文節 {s['scored']}/{s['segments']}（{s['scored'] / s['segments']:.1%}）、"
+            f"1文あたり 文節 {s['scored'] / s['sentences']:.2f} 個・採点する表記 {s['surfaces'] / s['sentences']:.2f} 個")
     if args.show:
         say(f"\nしきい値 {args.show} で 直る（+）と壊れる（-）例（出力 → 選び手の後、正解）:")
         for name, items in sets[1:]:
