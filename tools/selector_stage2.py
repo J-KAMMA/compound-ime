@@ -207,10 +207,18 @@ FEATURE_NAMES = (
     + [f"c_attr_{n}" for n, _ in ATTRS] + [f"t_attr_{n}" for n, _ in ATTRS])
 
 
+USE_ZENZ = True  # --no-zenz で False（Zenz の尤度を使わない、軽い選び手）
+MAX_ALTS = 7  # --max-alts: 1文節で比べる別の表記の数（Zenz で採点する数を減らす）
+
+
 def pair_features(segs, zenz, i, j):
     key, cands = segs[i]
     t, c = cands[0], cands[j]
-    z = zenz[i] if zenz else None
+    z = zenz[i] if zenz and USE_ZENZ else None
+    if z and MAX_ALTS < 7:
+        # 採点する候補を絞ったとき（Zenz の時間を減らす）は、その候補の尤度だけを見る
+        allowed = {cands[0]["value"]} | {cands[k]["value"] for k in alternatives(segs, i)}
+        z = {s: v for s, v in z.items() if s in allowed}
     zt = z.get(t["value"]) if z else None
     zc = z.get(c["value"]) if z else None
     have = zt is not None and zc is not None
@@ -248,6 +256,8 @@ def alternatives(segs, i):
     for j, c in enumerate(segs[i][1]):
         if j == 0 or c["value"] in seen:
             continue
+        if len(out) >= MAX_ALTS:
+            break
         seen.add(c["value"])
         out.append(j)
     return out
@@ -273,22 +283,31 @@ def examples(item):
 
 # ---- 当てはめと数え ----
 
-def apply_selector(item, prob, threshold):
-    """選び手を当てた後の文。prob(特徴の一覧) → 確からしさの一覧。"""
+def best_alternatives(items, prob):
+    """各文の各文節で、替える確からしさが最も高い候補 (番号, 確からしさ) を一度にまとめて求める。"""
+    feats, where = [], []
+    for n, it in enumerate(items):
+        if it["segs"] is None:
+            continue
+        for i in range(len(it["segs"])):
+            for j in alternatives(it["segs"], i):
+                feats.append(pair_features(it["segs"], it["zenz"], i, j))
+                where.append((n, i, j))
+    ps = prob(feats) if feats else []
+    for it in items:
+        it["best"] = [(0, 0.0)] * len(it["segs"]) if it["segs"] is not None else None
+    for (n, i, j), p in zip(where, ps):
+        if p > items[n]["best"][i][1]:
+            items[n]["best"][i] = (j, float(p))
+
+
+def apply_selector(item, threshold):
+    """選び手を当てた後の文（best_alternatives を先に呼ぶ）。"""
     segs = item["segs"]
     if segs is None:
         return item["out"]
-    out = []
-    for i in range(len(segs)):
-        alts = alternatives(segs, i)
-        pick = 0
-        if alts:
-            ps = prob([pair_features(segs, item["zenz"], i, j) for j in alts])
-            k = max(range(len(alts)), key=lambda x: ps[x])
-            if ps[k] >= threshold:
-                pick = alts[k]
-        out.append(segs[i][1][pick]["value"])
-    return "".join(out)
+    return "".join(cands[j if p >= threshold else 0]["value"]
+                   for (_, cands), (j, p) in zip(segs, item["best"]))
 
 
 def zenz_only(item):
@@ -332,8 +351,14 @@ def main():
     ap.add_argument("--model", default="lr", choices=["lr", "tree", "gbdt"])
     ap.add_argument("--out")
     ap.add_argument("--weights")
+    ap.add_argument("--show", type=float, help="このしきい値で直る例と壊れる例を並べる")
     ap.add_argument("--seed", type=int, default=20261017)
+    ap.add_argument("--no-zenz", action="store_true", help="Zenz の尤度を特徴に使わない")
+    ap.add_argument("--max-alts", type=int, default=7, help="1文節で比べる別の表記の数（既定は全部）")
     args = ap.parse_args()
+    global USE_ZENZ, MAX_ALTS
+    USE_ZENZ = not args.no_zenz
+    MAX_ALTS = args.max_alts
     import numpy as np
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.linear_model import LogisticRegression
@@ -389,15 +414,24 @@ def main():
         if not items:
             continue
         base = count(items, zenz_only)
+        best_alternatives(items, prob)
         cells = []
         for t in thresholds:
-            r = count(items, lambda it, t=t: apply_selector(it, prob, t))
+            r = count(items, lambda it, t=t: apply_selector(it, t))
             cells.append(f"{r['fixed']}/{r['broken']}")
             if not name.startswith("確かめ"):
                 totals[t][0] += r["fixed"]
                 totals[t][1] += r["broken"]
         say(f"{name}\t{base['wrong']}({base['reach']})/{base['right']}\t{base['fixed']}/{base['broken']}\t" + "\t".join(cells))
     say("試験の合計\t\t\t" + "\t".join(f"{a}/{b}" for a, b in totals.values()))
+    if args.show:
+        say(f"\nしきい値 {args.show} で 直る（+）と壊れる（-）例（出力 → 選び手の後、正解）:")
+        for name, items in sets[1:]:
+            for it in items:
+                after = apply_selector(it, args.show)
+                before_ok, after_ok = is_right(it["out"], it["answers"]), is_right(after, it["answers"])
+                if before_ok != after_ok:
+                    say(f"  {'+' if after_ok else '-'} [{name}] {it['out']} → {after}（{it['answers'][0]}）")
 
     if args.model == "lr":
         names = FEATURE_NAMES
