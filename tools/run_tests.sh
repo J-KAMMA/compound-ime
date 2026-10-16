@@ -6,6 +6,7 @@
 #   b: 日本語だけの400文、予測変換、速さ、候補の並び、利用者が見つけた失敗
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
 #   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
+#   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
@@ -86,6 +87,15 @@ e1|e2)
     $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
   fi
   ;;
+f)
+  # 前の文を入力欄の前の文として渡したときと渡さないときの正解の数を比べる
+  if [ -f $T/context.tsv ]; then
+    CTX="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/context.tsv"
+    $CTX $OUT/context-with.tsv with 4
+    $CTX $OUT/context-without.tsv without 4
+    python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with.tsv $OUT/context-without.tsv | tee $OUT/context-score.txt | head -30
+  fi
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2 のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f のどれか" >&2; exit 2 ;;
 esac

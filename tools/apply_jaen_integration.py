@@ -3352,4 +3352,20 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")
 
+# 前後の文がある試験: 試験用の道具（session_handler_main）に SET_PRECEDING_TEXT<TAB>文 を足す。
+# 以後のキーに、入力欄の前の文（アプリが IME に教える文）として付ける。引数なしで消える。
+H = "session/session_handler_tool.h"
+edit(H, "  void SetCallbackText(absl::string_view text);\n",
+     "  void SetCallbackText(absl::string_view text);\n"
+     "  void SetPrecedingText(absl::string_view text) { preceding_text_ = std::string(text); }\n")
+edit(H, "  std::string callback_text_;\n", "  std::string callback_text_;\n  std::string preceding_text_;\n")
+T = "session/session_handler_tool.cc"
+edit(T, """  input->set_id(id_);
+  commands::Command command;""", """  input->set_id(id_);
+  if (!preceding_text_.empty()) input->mutable_context()->set_preceding_text(preceding_text_);
+  commands::Command command;""")
+edit(T, """  } else if (command == "SET_SELECTION_TEXT") {""", """  } else if (command == "SET_PRECEDING_TEXT") {
+    client_->SetPrecedingText(args.size() >= 2 ? args[1] : "");
+  } else if (command == "SET_SELECTION_TEXT") {""")
+
 print("applied")
