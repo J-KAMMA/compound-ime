@@ -86,10 +86,11 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE
           chmod +x $W/bin/engine/session_handler_main
+          # 本線と同じ人工知能 v1（zenz-v3.2-small-ft-v1）。Zenz で採点し直す尤度も取る（段階3の学習用）
           curl -fsSL -o $W/model.gguf \
-            https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
-          echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | sha256sum -c
-          bash $W/repo/tools/selector_collect.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/material \
+            https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
+          echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
+          SELECTOR_SCORE=1 bash $W/repo/tools/selector_collect.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/material \
             $W/sentences/train.tsv 16
       - uses: actions/upload-artifact@v4
         if: always()
