@@ -2,7 +2,7 @@
   "myime": {"url":"https://github.com/unok/myime.git","commit":"a8486eca5312556ff88fed7f1850a28843b67977"},
   "mozc": {"url":"https://github.com/unok/mozc.git","commit":"2d993fd532c0df849ff3a5f6c7851b3757471ed6"},
   "llama": {"url":"https://github.com/fkunn1326/llama.cpp.git","commit":"10131b23ee0dbd9d03dfc618cec9fe3402919277","tag":"b4846"},
-  "model": {"url":"https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf","sha256":"29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673"},
+  "model": {"url":"https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf","sha256":"8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f","base":"https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf"},
   "swift":"6.3.3",
   "bazel":"9.0.2",
   "qt":"6.9.1",

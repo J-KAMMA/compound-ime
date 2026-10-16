@@ -3291,14 +3291,14 @@ edit(E, """  if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/"
   if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/";
 #endif  // __APPLE__""")
 
-edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 変換モデル（zenz-v3.2-small、約74MB）を公式の配布元から取得し、SHA-256 を照合する
+edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 変換モデル（zenz-v3.2-small を追加学習した ft-v1、約74MB）を配布ページから取得し、SHA-256 を照合する
 M="/Library/Application Support/CompoundIME/models"
-MODEL="$M/ggml-model-Q5_K_M.gguf"
-SUM=29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673
+MODEL="$M/zenz-v3.2-small-ft-v1-Q5_K_M.gguf"
+SUM=8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f
 /bin/mkdir -p "$M"
 if ! echo "$SUM  $MODEL" | /usr/bin/shasum -a 256 -c -s 2>/dev/null; then
   /usr/bin/curl -fsL -o "$MODEL.part" \\
-    https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf \\
+    https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf \\
     && echo "$SUM  $MODEL.part" | /usr/bin/shasum -a 256 -c -s && /bin/mv "$MODEL.part" "$MODEL"
   /bin/rm -f "$MODEL.part"
 fi
@@ -3407,5 +3407,43 @@ edit(T, """  input->set_id(id_);
 edit(T, """  } else if (command == "SET_SELECTION_TEXT") {""", """  } else if (command == "SET_PRECEDING_TEXT") {
     client_->SetPrecedingText(args.size() >= 2 ? args[1] : "");
   } else if (command == "SET_SELECTION_TEXT") {""")
+
+# 人工知能を、zenz-v3.2-small を追加学習した ft-v1 に替える（tools/zenz-finetune、配布ページ model-zenz-ft-v1）。
+# ファイル名を変えるので、前の版を入れた人も導入時に新しいほうを取りに行く。取れなかったときは前の名前のファイルを使う。
+FT_URL = ('L"https://github.com/J-KAMMA/compound-ime/releases/download/"\n'
+          '    L"model-zenz-ft-v1/"\n'
+          '    L"zenz-v3.2-small-ft-v1-Q5_K_M.gguf";')
+FT_SUM = '"8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f";'
+OLD_URL = ('L"https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/"\n'
+           '    L"c67e03e07d215c869f591b274c1631170d3e11fe/"\n'
+           '    L"ggml-model-Q5_K_M.gguf";')
+OLD_SUM = '"29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673";'
+for path, size in (("win32/custom_action/custom_action.cc", "kZenzaiModelSize = 73871936;"),
+                   ("gui/zenzai_download/zenzai_download_dialog.cc", "kZenzaiModelSize = 73871936ULL;")):
+    edit(path, OLD_URL, FT_URL)
+    edit(path, OLD_SUM, FT_SUM)
+    edit(path, size, size.replace("73871936", "73871776"))
+edit("win32/custom_action/custom_action.cc", 'kZenzaiModelFileName = L"ggml-model-Q5_K_M.gguf";',
+     'kZenzaiModelFileName = L"zenz-v3.2-small-ft-v1-Q5_K_M.gguf";')
+edit("converter/engine_config.h", 'kZenzaiModelName = "ggml-model-Q5_K_M.gguf";',
+     'kZenzaiModelName = "zenz-v3.2-small-ft-v1-Q5_K_M.gguf";\n'
+     'constexpr const char* kZenzaiLegacyModelName = "ggml-model-Q5_K_M.gguf";')
+edit("converter/engine_config.h", 'kZenzaiModelVersion = "zenz-v3.2-small";',
+     'kZenzaiModelVersion = "zenz-v3.2-small-ft-v1";')
+edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
+    return install_path;
+  }
+  return user_path;""", """  if (FileExists(install_path)) {
+    return install_path;
+  }
+  // 新しい人工知能を取れなかったときは、前の版の人工知能を使う
+  for (const std::string& legacy :
+       {GetZenzaiUserModelDirectory() + kZenzaiLegacyModelName,
+        GetZenzaiInstallModelDirectory() + kZenzaiLegacyModelName}) {
+    if (FileExists(legacy)) {
+      return legacy;
+    }
+  }
+  return user_path;""")
 
 print("applied")

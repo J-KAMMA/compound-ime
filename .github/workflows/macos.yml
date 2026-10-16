@@ -81,8 +81,8 @@ jobs:
           cp -R $R/*.framework $E/ 2>/dev/null || true
           cp $W/myime/mozc/src/bazel-bin/session/session_handler_main $E/
           curl -fsSL -o $W/model.gguf \
-            https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
-          echo "29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673  $W/model.gguf" | shasum -a 256 -c
+            https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
+          echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | shasum -a 256 -c
           head -20 $W/repo/tests/conversion/inputs.txt > $W/small.txt
           bash $W/repo/tools/batch_convert.sh $E/session_handler_main $E $W/model.gguf $W/small.txt $W/small.tsv 1
           cat $W/small.tsv

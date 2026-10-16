@@ -63,15 +63,16 @@ mkdir -p /usr/lib/compound-ime
 cp -a "$HERE/lib/." /usr/lib/compound-ime/
 mkdir -p /usr/share/doc/compound-ime
 cp "$HERE/credits_en.html" "$HERE/LICENSE" /usr/share/doc/compound-ime/
-# 変換モデルを公式の配布元から取得し、SHA-256 を照合する
+# 変換モデル（zenz-v3.2-small を追加学習した ft-v1）を配布ページから取得し、SHA-256 を照合する
 M=/usr/share/compound-ime/models; mkdir -p $M
-URL=https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/c67e03e07d215c869f591b274c1631170d3e11fe/ggml-model-Q5_K_M.gguf
-SUM=29c223d4c23327b80fd13ebb5ab2555057a46317997d5da391584ffbef0db673
-if ! echo "$SUM  $M/ggml-model-Q5_K_M.gguf" | sha256sum -c --status 2>/dev/null; then
+F=zenz-v3.2-small-ft-v1-Q5_K_M.gguf
+URL=https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/$F
+SUM=8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f
+if ! echo "$SUM  $M/$F" | sha256sum -c --status 2>/dev/null; then
   echo "変換モデル（約74MB）を取得しています..."
-  curl -fL -o $M/ggml-model-Q5_K_M.gguf.part "$URL"
-  echo "$SUM  $M/ggml-model-Q5_K_M.gguf.part" | sha256sum -c --status || { echo "モデルの照合に失敗しました"; rm -f $M/*.part; exit 1; }
-  mv $M/ggml-model-Q5_K_M.gguf.part $M/ggml-model-Q5_K_M.gguf
+  curl -fL -o $M/$F.part "$URL"
+  echo "$SUM  $M/$F.part" | sha256sum -c --status || { echo "モデルの照合に失敗しました"; rm -f $M/*.part; exit 1; }
+  mv $M/$F.part $M/$F
 fi
 echo "入れました。ibus を再起動してください: ibus restart"
 echo "そのあと、設定の「キーボード」または ibus-setup で「コンパウンドIME」を追加します。"
