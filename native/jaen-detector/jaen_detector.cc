@@ -24,10 +24,13 @@ bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
 bool IsVowel(char c) { return std::string_view("aiueo").find(Lower(c)) != std::string_view::npos; }
 
+bool IsAsciiDigit(char c) { return c >= '0' && c <= '9'; }
+
+// Letters and ' (a word), or digits and letters with a letter in them (3d, mp3).
 std::optional<std::string> Normalize(std::string_view word) {
   if (word.empty() || word.size() > kMaxWordLength ||
-      !std::ranges::all_of(word, [](char c) { return IsAsciiAlpha(c) || c == '\''; }) ||
-      !IsAsciiAlpha(word.front())) {
+      !std::ranges::all_of(word, [](char c) { return IsAsciiAlpha(c) || IsAsciiDigit(c) || c == '\''; }) ||
+      !(IsAsciiAlpha(word.front()) || IsAsciiDigit(word.front())) || std::ranges::none_of(word, IsAsciiAlpha)) {
     return std::nullopt;
   }
   std::string lower(word);
@@ -373,6 +376,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         }
       }
       // A set phrase on chunk edges ("seeyou", "madeinjapan") is one piece.
+      // A listed word with digits (3d, 4k, mp3) is one piece like a set phrase:
+      // "3d|purinnta-" (3Dプリンター), not "dpu" (DPU) after a ３.
+      if (boundary[i] && boundary[j] && std::ranges::any_of(word, IsAsciiDigit) && lexicon.Contains(word)) {
+        english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()) - kPhraseBonus);
+        continue;
+      }
       if (boundary[i] && boundary[j] && lexicon.FindPhrase(word)) {
         english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()) - kPhraseBonus);
         continue;
