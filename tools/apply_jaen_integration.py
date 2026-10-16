@@ -3465,7 +3465,7 @@ edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversi
     std::vector<std::string> first;
     for (const Segment* segment : segs) {
       reading += segment->key();
-      first.push_back(segment->candidates_size() > 0 ? segment->candidate(0).value : segment->key());
+      first.push_back(std::string(segment->candidates_size() > 0 ? std::string_view(segment->candidate(0).value) : std::string_view(segment->key())));
     }
     std::string firsts;
     for (size_t j = 0; j < first.size(); ++j) {
@@ -3479,7 +3479,7 @@ edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversi
     for (size_t i = 0; i < segs.size(); ++i) {
       std::vector<std::string> surfaces;
       for (size_t c = 0; c < segs[i]->candidates_size() && c < 8; ++c) {
-        const std::string& value = segs[i]->candidate(c).value;
+        const std::string value(segs[i]->candidate(c).value);
         if (std::find(surfaces.begin(), surfaces.end(), value) == surfaces.end()) surfaces.push_back(value);
       }
       if (surfaces.size() < 2 || !clean(reading) || firsts.find('\t') != std::string::npos) continue;
