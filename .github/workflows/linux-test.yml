@@ -209,6 +209,11 @@ jobs:
                 repo/tests/conversion/$n.json romanji-hiragana.tsv > results/ceiling-$n.txt && head -14 results/ceiling-$n.txt
             done
           fi
+          # 選び手の段階1: Zenz の尤度だけで選べるか（tools/selector_stage1.py）
+          for n in ja400 jaen200b; do
+            [ -f results/score-$n.txt ] && python3 repo/tools/selector_stage1.py results/score-$n.txt results/$n.tsv \
+              repo/tests/conversion/$n.json > results/stage1-$n.txt && head -8 results/stage1-$n.txt
+          done
           if [ -f results/wiki-typing-1.tsv ] && [ -f results/wiki-typing-2.tsv ]; then
             cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
             python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
