@@ -3591,4 +3591,54 @@ edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversi
   // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
 ''')
 
+# 選び手の段階2b: Zenzai が候補を確かめるときに計算済みの分布（tools/apply_selector_trace.py の
+# GetSelectorTrace）を、MYIME_SELECTOR_FEATURES の行の終わりに U+0003 で区切って足す（記録だけ）。
+edit(A, "  using ScoreSentencesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n",
+     "  using ScoreSentencesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n"
+     "  using GetSelectorTraceFunc = const char* (*)(const char*);\n")
+edit(A, "  ScoreSentencesFunc ScoreSentences = nullptr;\n",
+     "  ScoreSentencesFunc ScoreSentences = nullptr;\n  GetSelectorTraceFunc GetSelectorTrace = nullptr;\n")
+edit(A, """    ScoreSentences = reinterpret_cast<ScoreSentencesFunc>(
+        GetProcAddress(dll_handle_, "ScoreSentences"));
+""", """    ScoreSentences = reinterpret_cast<ScoreSentencesFunc>(
+        GetProcAddress(dll_handle_, "ScoreSentences"));
+    GetSelectorTrace = reinterpret_cast<GetSelectorTraceFunc>(
+        GetProcAddress(dll_handle_, "GetSelectorTrace"));
+""")
+edit(A, "    MYIME_LOAD(ScoreSentences);\n", "    MYIME_LOAD(ScoreSentences);\n    MYIME_LOAD(GetSelectorTrace);\n")
+edit(A, "    ScoreSentences = nullptr;\n", "    ScoreSentences = nullptr;\n    GetSelectorTrace = nullptr;\n")
+edit(A, "AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)\n    : config_(config) {\n",
+     """bool SelectorTraceForText(absl::string_view text, std::string* trace) {
+  if (text.empty() || trace == nullptr || text.find('\\0') != absl::string_view::npos) return false;
+  auto& loader = AzooKeyDllLoader::GetInstance();
+  const std::lock_guard<std::mutex> operation(loader.operation_mutex());
+  if (!loader.IsLoaded() || !loader.GetSelectorTrace) return false;
+  const std::string t(text);
+  const char* result = loader.GetSelectorTrace(t.c_str());
+  if (result == nullptr) return false;
+  trace->assign(result);
+  loader.FreeString(result);
+  return true;
+}
+
+AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)
+    : config_(config) {
+""")
+edit("converter/azookey_immutable_converter.h",
+     "[[nodiscard]] bool ScoreZenzaiSentences(",
+     "// 選び手の段階2b（記録だけ）: text をたどった Zenzai の分布の記録。変換エンジンに入り口がなければ false。\n"
+     "[[nodiscard]] bool SelectorTraceForText(absl::string_view text, std::string* trace);\n\n"
+     "[[nodiscard]] bool ScoreZenzaiSentences(")
+edit("engine/engine.cc", """    line += '\\n';
+    static std::mutex features_mutex;""", """    std::string text, trace;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (segment.candidates_size() > 0) text += segment.candidate(0).value;
+    }
+    if (SelectorTraceForText(text, &trace)) {
+      line += '\\x03';
+      line += trace;
+    }
+    line += '\\n';
+    static std::mutex features_mutex;""")
+
 print("applied")

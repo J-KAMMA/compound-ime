@@ -66,7 +66,7 @@ jobs:
           path: |
             llama.cpp/build
             myime/src/swift-engine/.build
-          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/swift-Package.resolved') }}
+          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/swift-Package.resolved') }}
 
       - name: 生成器と改造の適用
         run: |
@@ -85,6 +85,8 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+          # 選び手の段階2b: Zenzai の計算済みの分布の記録（MYIME_SELECTOR_FEATURES のときだけ動く）
+          $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
 
       - name: llama.cpp と変換エンジン
         run: |

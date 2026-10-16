@@ -59,13 +59,75 @@ def read_answers(repo, material):
     return answers
 
 
+class SegList(list):
+    """文節の一覧（trace に Zenzai の分布の記録を持つ）。"""
+    trace = ""
+
+
+def parse_trace(trace):
+    """記録 → [(バイトの位置, 選んだ番号, [(語片のバイト列, 対数確率)…])]。"""
+    out = []
+    for tok in trace.split():
+        p = tok.split(":", 2)
+        if len(p) < 3:
+            continue
+        items = []
+        for it in p[2].split(";"):
+            h, _, lp = it.partition(",")
+            try:
+                items.append((bytes.fromhex(h), float(lp)))
+            except ValueError:
+                items.append((b"", -99.0))
+        out.append((int(p[0]), int(p[1]), items))
+    return out
+
+
+def trace_scores(segs, i, positions):
+    """段階2b: 文節 i の各表記の、Zenzai の計算済みの分布から見た点（1位を 0 とする）。
+    別の表記に替えた文が1位の文と初めて違う語片の位置で、その表記に合う語片の対数確率から
+    1位の語片の対数確率を引く（合う語片が上位12個になければ、12番目より 1 低いとみなす）。"""
+    if not positions:
+        return None
+    firsts = [c[0]["value"].encode("utf-8") for _, c in segs]
+    text = b"".join(firsts)
+    start = sum(len(f) for f in firsts[:i])
+    end = start + len(firsts[i])
+    covered = positions[-1][0] + len(positions[-1][2][positions[-1][1]][0])
+    if covered < min(end, len(text)):
+        return None  # 記録がこの文節までたどれていない
+    scores = {segs[i][1][0]["value"]: 0.0}
+    for c in segs[i][1][1:]:
+        v = c["value"]
+        if v in scores:
+            continue
+        alt = text[:start] + v.encode("utf-8") + text[end:]
+        for off, chosen, items in positions:
+            piece, lp = items[chosen]
+            if off + len(piece) <= start or alt[off:off + len(piece)] == piece:
+                continue
+            best = None
+            for pc, plp in items:
+                if pc and off < len(alt) and alt.startswith(pc[:len(alt) - off], off) and (best is None or plp > best):
+                    best = plp
+            if best is None:
+                best = min(p for _, p in items) - 1.0
+            scores[v] = best - lp
+            break
+        else:
+            scores[v] = 0.0
+    return scores
+
+
 def parse_features(path):
     """読み（文節の読みをつないだもの）→ 文節の一覧 [(読み, [候補の辞書…])]。同じ読みは最後の行。"""
     out = {}
     if not path.exists():
         return out
     for line in path.read_text(encoding="utf-8", errors="replace").splitlines():
-        segs = []
+        # 段階2b: 行の終わりの U+0003 の後は Zenzai の計算済みの分布の記録
+        line, _, trace = line.partition("\x03")
+        segs = SegList()
+        segs.trace = trace
         for s in line.split("\x01"):
             parts = s.split("\t")
             cands = []
@@ -129,7 +191,12 @@ def load_group(material, group, answers, table):
                 reading = "".join(k for k, _ in segs)
                 joined = "\x01".join(firsts)
                 item["segs"] = segs
-                item["zenz"] = [scores.get((reading, joined, i)) for i in range(len(segs))]
+                if ZENZ_SOURCE == "trace":
+                    # 段階2b: 追加の推論なしで、Zenzai の計算済みの分布から点をつける
+                    positions = parse_trace(getattr(segs, "trace", ""))
+                    item["zenz"] = [trace_scores(segs, i, positions) for i in range(len(segs))]
+                else:
+                    item["zenz"] = [scores.get((reading, joined, i)) for i in range(len(segs))]
         items.append(item)
     return items
 
@@ -209,6 +276,7 @@ FEATURE_NAMES = (
 
 USE_ZENZ = True  # --no-zenz で False（Zenz の尤度を使わない、軽い選び手）
 MAX_ALTS = 7  # --max-alts: 1文節で比べる別の表記の数（Zenz で採点する数を減らす）
+ZENZ_SOURCE = "score"  # --zenz-source: score（採点し直した尤度）か trace（Zenzai の計算済みの分布）
 
 
 def pair_features(segs, zenz, i, j):
@@ -355,10 +423,14 @@ def main():
     ap.add_argument("--seed", type=int, default=20261017)
     ap.add_argument("--no-zenz", action="store_true", help="Zenz の尤度を特徴に使わない")
     ap.add_argument("--max-alts", type=int, default=7, help="1文節で比べる別の表記の数（既定は全部）")
+    ap.add_argument("--zenz-source", default="score", choices=["score", "trace"],
+                    help="Zenz の点: score は採点し直した文全体の尤度（段階1）、trace は Zenzai の計算済みの分布（段階2b）")
+    ap.add_argument("--weights-in", help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
     args = ap.parse_args()
-    global USE_ZENZ, MAX_ALTS
+    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE
     USE_ZENZ = not args.no_zenz
     MAX_ALTS = args.max_alts
+    ZENZ_SOURCE = args.zenz_source
     import numpy as np
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.linear_model import LogisticRegression
@@ -401,6 +473,16 @@ def main():
 
         def prob(feats):
             return clf.predict_proba(np.array(feats, dtype=float))[:, 1]
+    if args.weights_in:
+        # 学習し直さず、前に学習したロジスティック回帰の重みで当てる
+        wj = json.loads(Path(args.weights_in).read_text(encoding="utf-8"))
+        w_mean, w_scale, w_coef = (np.array(wj[k], dtype=float) for k in ("mean", "scale", "coef"))
+        w_b = wj["intercept"]
+
+        def prob(feats):  # noqa: F811
+            z = ((np.array(feats, dtype=float) - w_mean) / w_scale) @ w_coef + w_b
+            return 1.0 / (1.0 + np.exp(-z))
+        say(f"選び手は学習し直さず {args.weights_in} の重みを使う")
 
     thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
     sets = [("確かめ（学習用の残り2割）", val_items),

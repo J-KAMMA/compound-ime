@@ -16,7 +16,9 @@ W=$(mktemp -d); mkdir -p "$OUT"; OUT=$(cd "$OUT" && pwd)
 export LD_LIBRARY_PATH="$E${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
 export MYIME_SELECTOR_DUMP=$OUT/dump-$GROUP.txt
 export MYIME_SELECTOR_FEATURES=$OUT/features-$GROUP.txt
-export MYIME_SELECTOR_SCORE=$OUT/score-$GROUP.txt
+# Zenz で採点し直す尤度（段階1、重い）は SELECTOR_SCORE=1 のときだけ。段階2b の Zenzai の計算済みの
+# 分布の記録は features-<組>.txt の行の終わりに入る（推論は増えない）。
+if [ "${SELECTOR_SCORE:-0}" = 1 ]; then export MYIME_SELECTOR_SCORE=$OUT/score-$GROUP.txt; else unset MYIME_SELECTOR_SCORE; fi
 romaji() { python3 -c "import json,sys; print('\n'.join(i['romaji'] for i in json.load(open(sys.argv[1]))['items']))" "$1"; }
 # shard <ファイル> <組の数> <番号>: 行を組の数に分けた <番号> 番目（1から）
 shard() { awk -v n="$2" -v k="$3" '(NR - 1) % n == k - 1' "$1"; }
@@ -49,4 +51,4 @@ x*)
 *)
   echo "組は t<番号>、ja400、jaen、w<番号>、x<番号> のどれか" >&2; exit 2 ;;
 esac
-echo "$GROUP: $(wc -l < $OUT/$GROUP.tsv) 文、書き出し $(wc -l < $MYIME_SELECTOR_DUMP) 行、尤度 $(wc -l < $MYIME_SELECTOR_SCORE 2>/dev/null || echo 0) 行"
+echo "$GROUP: $(wc -l < $OUT/$GROUP.tsv) 文、書き出し $(wc -l < $MYIME_SELECTOR_DUMP) 行、分布の記録つき $(grep -c $'\x03' $MYIME_SELECTOR_FEATURES || true) 行"
