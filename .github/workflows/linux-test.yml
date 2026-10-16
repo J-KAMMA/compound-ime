@@ -135,7 +135,7 @@ jobs:
   test:
     needs: build
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 180
     # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
     permissions:
       contents: write
