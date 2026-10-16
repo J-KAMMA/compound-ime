@@ -92,6 +92,8 @@ int main() {
   lexicon.AddPhrase("log in");
   lexicon.Add("login");
   for (const char* w : {"dog", "cat"}) lexicon.Add(w);
+  lexicon.Add("3d", true);
+  lexicon.AddSignalOnly("dpu");
   for (const char* w : {"london", "mac", "sumo", "gand"}) lexicon.AddSignalOnly(w);
   lexicon.AddSignalOnly("kite");  // already a word: stays a plain word
   const auto split = [&](std::string_view raw) {
@@ -144,6 +146,8 @@ int main() {
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
+  Expect(english("3dpurinnta") == "3d|", "a listed word with digits is one piece (3d|purinnta, not dpu)");
+  Expect(jaen::NormalizeWord("3d") == "3d" && jaen::NormalizeWord("123").empty(), "digits need a letter to be a word");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
     const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい", "ふぁいる", "ゔぁいおりん", "へゔぃめたる"};
@@ -211,7 +215,7 @@ int main() {
   // Lexicon normalization boundaries.
   jaen::Lexicon edge;
   for (const std::string w : {std::string(32, 'a'), std::string(33, 'b'), std::string("'tis"),
-                              std::string("x1"), std::string()}) {
+                              std::string("x-1"), std::string()}) {
     edge.Add(w);
   }
   Expect(edge.size() == 1, "only valid words up to 32 letters are kept");
@@ -285,7 +289,7 @@ int main() {
       store.Record(Choice::kJapanese, "google");
       store.Record(Choice::kJapanese, "github");
       store.Record(Choice::kJapanese, "google");
-      store.Record(Choice::kEnglish, "x1");  // not a word
+      store.Record(Choice::kEnglish, "x-1");  // not a word (a hyphen)
     }
     jaen::ChoiceStore again(file);
     auto c = again.Get();
