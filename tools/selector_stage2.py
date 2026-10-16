@@ -459,6 +459,8 @@ def main():
                     help="Zenz の点: score は採点し直した文全体の尤度（段階1）、trace は Zenzai の計算済みの分布（段階2b）")
     ap.add_argument("--require-zenz", action="store_true", help="Zenz の点のある表記にだけ替える")
     ap.add_argument("--gate", type=float, help="Zenz を使わない選び手でこの確からしさ以上の文節だけ採点する（見積もり）")
+    ap.add_argument("--export-stage3", help="段階3の重み（門と選び手）を書き出すファイル（--gate と --model lr のとき）")
+    ap.add_argument("--export-threshold", type=float, default=0.7, help="段階3で1位を替えるしきい値")
     ap.add_argument("--weights-in",help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
     args = ap.parse_args()
     global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ
@@ -529,6 +531,15 @@ def main():
         gclf = LogisticRegression(C=0.3, max_iter=3000).fit(gscaler.transform(gX), gy)
         GATE = (lambda feats: gclf.predict_proba(gscaler.transform(np.array(feats, dtype=float)))[:, 1], args.gate)
         say(f"門: Zenz を使わない選び手の確からしさ ≥ {args.gate} の文節だけ Zenz で採点する")
+        if args.export_stage3 and args.model == "lr":
+            # 段階3（IME への組み込み）の重み: 門と選び手のロジスティック回帰（tools/apply_selector_stage3.py が読む）
+            def pack(sc, cl):
+                return {"mean": sc.mean_.round(6).tolist(), "scale": sc.scale_.round(6).tolist(),
+                        "coef": cl.coef_[0].round(6).tolist(), "intercept": float(round(cl.intercept_[0], 6))}
+            Path(args.export_stage3).write_text(json.dumps({
+                "features": FEATURE_NAMES, "max_alts": MAX_ALTS, "gate_threshold": args.gate,
+                "threshold": args.export_threshold, "gate": pack(gscaler, gclf), "main": pack(scaler, clf)},
+                ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
 
     thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
     sets = [("確かめ（学習用の残り2割）", val_items),

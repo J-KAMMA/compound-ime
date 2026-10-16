@@ -32,7 +32,9 @@ a1|a2)
 b)
   # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
   romaji $T/ja400.json > $W/ja400.txt
-  MYIME_SELECTOR_SCORE=$OUT/score-ja400.txt MYIME_SELECTOR_DUMP=$OUT/dump-ja400.txt $BATCH $W/ja400.txt $OUT/ja400.tsv 4
+  # 選び手の段階3の確かめ: 判断の記録（selector-log）と、選び手を当てる前の候補とコスト（features）
+  MYIME_SELECTOR_LOG=$OUT/selector-log-ja400.txt MYIME_SELECTOR_FEATURES=$OUT/features-ja400.txt \
+    MYIME_SELECTOR_SCORE=$OUT/score-ja400.txt MYIME_SELECTOR_DUMP=$OUT/dump-ja400.txt $BATCH $W/ja400.txt $OUT/ja400.tsv 4
   python3 $REPO/tools/score_categories.py $OUT/ja400.tsv $T/ja400.json | head -12
   # 予測変換: 最初の100文を最後まで打ち、変換キーを押す前の候補の上位3つに正解が出るか
   python3 -c "import json,sys; [print(i['romaji']+'\t'+'\t'.join([i['intended']]+i.get('alternatives',[]))) for i in json.load(open(sys.argv[1]))['items'][:100]]" $T/ja400.json > $W/pred-items.tsv
