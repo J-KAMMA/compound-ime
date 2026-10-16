@@ -1,0 +1,53 @@
+{
+  "comment": "分野の文書の出どころ。版（commit）を固定する。取り出し方は fetch_domain_sources.py、文の取り出しは domain_text.py。",
+  "sources": [
+    {
+      "name": "mdn", "title": "MDN Web Docs 日本語版", "domain": "prog",
+      "repo": "https://github.com/mdn/translated-content", "commit": "a213f11cfccf67d53332521cbe1f7ce97ab4443d",
+      "paths": ["files/ja"], "root": "files/ja", "glob": "**/*.md", "format": "md",
+      "license": "CC BY-SA 2.5", "license_url": "https://creativecommons.org/licenses/by-sa/2.5/",
+      "attribution": "MDN contributors（MDN Web Docs の日本語訳）",
+      "test_doc_fraction": 0.12, "test_quota": 100
+    },
+    {
+      "name": "python", "title": "Python 文書の日本語訳", "domain": "prog",
+      "repo": "https://github.com/python/python-docs-ja", "commit": "d2a3519d4c21856b2e48d7676a24022117283527",
+      "paths": [], "root": "", "glob": "**/*.po", "format": "po", "exclude": [".github", "scripts"],
+      "license": "PSF License（Python 文書の日本語訳。po の訳文だけを使う）", "license_url": "https://docs.python.org/ja/3/license.html",
+      "attribution": "Python Software Foundation と Python ドキュメント翻訳の貢献者",
+      "test_doc_fraction": 0.12, "test_quota": 90
+    },
+    {
+      "name": "kubernetes", "title": "Kubernetes 日本語版ドキュメント", "domain": "prog",
+      "repo": "https://github.com/kubernetes/website", "commit": "2f85f2802e59eb2128543dbfbf114ad641db4be0",
+      "paths": ["content/ja"], "root": "content/ja", "glob": "**/*.md", "format": "md",
+      "license": "CC BY 4.0", "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "The Kubernetes Authors",
+      "test_doc_fraction": 0.12, "test_quota": 70
+    },
+    {
+      "name": "react", "title": "React 日本語版（ja.react.dev）", "domain": "prog",
+      "repo": "https://github.com/reactjs/ja.react.dev", "commit": "356741e6e8311f6fbcab19abee7d6ca2388fe979",
+      "paths": ["src/content"], "root": "src/content", "glob": "**/*.md", "format": "md",
+      "license": "CC BY 4.0", "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "Meta Platforms, Inc. と React の翻訳者",
+      "test_doc_fraction": 0.2, "test_quota": 25
+    },
+    {
+      "name": "rust", "title": "プログラミング言語Rust 日本語版", "domain": "prog",
+      "repo": "https://github.com/rust-lang-ja/book-ja", "commit": "5092e5395bf32a65b277c3b1cc1a81ba288c7d46",
+      "paths": ["src"], "root": "src", "glob": "**/*.md", "format": "md", "exclude": ["SUMMARY.md"],
+      "license": "MIT または Apache-2.0", "license_url": "https://github.com/rust-lang-ja/book-ja/blob/5092e5395bf32a65b277c3b1cc1a81ba288c7d46/LICENSE-MIT",
+      "attribution": "The Rust Project Developers と日本語訳の貢献者",
+      "test_doc_fraction": 0.2, "test_quota": 15
+    },
+    {
+      "name": "ethereum", "title": "ethereum.org 日本語版", "domain": "crypto",
+      "repo": "https://github.com/ethereum/ethereum-org-website", "commit": "1b3d51c02e7128d181d0126757b7eca0a9253db4",
+      "paths": ["public/content/translations/ja"], "root": "public/content/translations/ja", "glob": "**/*.md", "format": "md",
+      "license": "CC BY 4.0（文章のみ。コードは別の条件で、使わない）", "license_url": "https://creativecommons.org/licenses/by/4.0/",
+      "attribution": "ethereum.org の貢献者",
+      "test_doc_fraction": 0.25, "test_quota": 200
+    }
+  ]
+}

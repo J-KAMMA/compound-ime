@@ -1,0 +1,80 @@
+# プログラミングと仮想通貨の分野の材料から、打ち込み試験の文（tests/conversion/domain-prog.tsv、domain-crypto.tsv）と、
+# zenz の追加学習の練習問題（分野＋ウィキペディアの混ぜもの）を作る。手動で動く。
+# 材料は版（コミット）を固定して取り出す（tools/zenz-finetune/domain_sources.json）。リポジトリには材料を入れない。
+# 結果は成果物 domain-data に残る（tests/ に試験の tsv、dataset/ に train.jsonl・valid.jsonl・manifest.json）。試験の tsv は、中身を確かめてからリポジトリに入れる。
+name: Domain data
+
+on:
+  # 実験の枝 exp/domain-data では、この流れのファイルを変えて push したときも動く
+  # （main に入るまで、gh workflow run で呼べないため）
+  push:
+    branches: ['exp/domain-data']
+    paths: ['.github/workflows/domain-data.yml']
+  workflow_dispatch:
+    inputs:
+      size:
+        description: 練習問題の数（分野とウィキペディアなどの合計）
+        default: '400000'
+      domain_share:
+        description: そのうち分野の問題にする割合（残りはウィキペディアなど）
+        default: '0.5'
+      prog:
+        description: プログラミングの試験の文の数
+        default: '300'
+      crypto:
+        description: 仮想通貨の試験の文の数
+        default: '200'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@v4
+      - name: 道具
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
+          git --version
+      - name: 分野の文書（版を固定）
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/zenz-finetune/fetch_domain_sources.py --out src
+      - name: ウィキペディアとローマ字表（版と SHA256 を固定）
+        run: |
+          set -eo pipefail
+          curl -fsSL -o wiki.parquet \
+            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00007-of-00015.parquet
+          echo "b112e83cf73327ba2246fd9c31eb1af501e51bac8450d8420963e29132d9b04b  wiki.parquet" | sha256sum -c
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+      - name: 文を取り出す
+        run: |
+          set -eo pipefail
+          mkdir -p out
+          venv/bin/python tools/zenz-finetune/domain_text.py --src-root src --out out
+          head -c 1500 out/counts.json
+      - name: 打ち込み試験の文を作る
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/domain_typing_test.py --sentences out/sentences.jsonl --table romanji-hiragana.tsv \
+            --out-dir out/tests --prog ${{ inputs.prog || '300' }} --crypto ${{ inputs.crypto || '200' }}
+          head -12 out/tests/domain-prog.tsv
+          head -12 out/tests/domain-crypto.tsv
+      - name: 練習問題を作る
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/zenz-finetune/build_dataset.py --out out/dataset --romaji-table romanji-hiragana.tsv \
+            --wiki wiki.parquet --domain-text out/sentences.jsonl --domain-share ${{ inputs.domain_share || '0.5' }} \
+            --extra-test out/tests/domain-prog.tsv out/tests/domain-crypto.tsv \
+            --size ${{ inputs.size || '400000' }} --show 1 --progress 5000
+          wc -l out/dataset/train.jsonl out/dataset/valid.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: domain-data
+          path: out/
+          retention-days: 14

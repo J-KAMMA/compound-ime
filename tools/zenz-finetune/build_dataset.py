@@ -28,6 +28,12 @@ expected-windows-139.tsv）の文と、表記または読みが同じか、そ�
 
 読みの付け方: ウィキペディアの文は SudachiPy（Apache-2.0）と SudachiDict
 （Apache-2.0）で読みを付ける。自作の一覧（tools/data/）は一覧にある読みを使う。
+
+分野の文（--domain-text）: プログラミングと仮想通貨の文書から tools/zenz-finetune/domain_text.py で
+取り出した文（sentences.jsonl の練習用の文だけ）を混ぜる。--size のうち --domain-share（既定 0.5）が分野、
+残りがウィキペディアなど。分野の文の英字の言葉（git、npm、Python など）は確定済みの文節として左右の文脈に入れ、
+日本語の部分を問う。新しい試験のファイルは --extra-test で指定すると、その文も除く。出どころ・版・利用条件・件数は
+manifest.json の domain に残る（tools/zenz-finetune/domain_sources.json）。
 """
 from __future__ import annotations
 
@@ -61,6 +67,15 @@ DEFAULT_WEIGHTS = {
     "english_phrases": 0.02, # 英語の決まった言い回しを文脈に含む文（english-phrases.txt）
 }
 SYNTHETIC_KINDS = ("casual", "modern_words", "english_phrases")
+# 分野の文書（プログラミング・仮想通貨。tools/zenz-finetune/domain_text.py で取り出した文）の問題。
+# --domain-text を付けたときだけ作り、全体の --domain-share（既定 0.5）をこの4種類で分ける。
+DOMAIN_WEIGHTS = {
+    "domain_whole": 0.30,    # 文全体（文脈なし）
+    "domain_context": 0.15,  # 文全体＋前の文
+    "domain_span": 0.20,     # 文の一部＋左右の文脈
+    "domain_english": 0.35,  # 英字の言葉（git、npm、Python など）を含む文の、日本語の部分。英字は文脈側
+}
+DOMAIN_KINDS = tuple(DOMAIN_WEIGHTS)
 WIKI_KINDS = ("wiki_whole", "wiki_context", "wiki_span", "homophone", "mixed_english")
 
 # ---------------------------------------------------------------- 文字の処理
@@ -187,7 +202,8 @@ class TestExclusion:
     SURFACE_MIN = 4
     READING_MIN = 6
 
-    def __init__(self, test_dir: Path, romaji_table: dict, english_to_katakana=None):
+    def __init__(self, test_dir: Path, romaji_table: dict, english_to_katakana=None, ignore=(), extra_files=(),
+                 ascii_containment=True):
         english_to_katakana = english_to_katakana or {}
         self.files = []
         surfaces, readings = set(), set()
@@ -238,23 +254,28 @@ class TestExclusion:
                 if line.strip():
                     add_reading(line.strip())
             self.files.append(inputs)
-        for name, column in (("variants.tsv", 3), ("expected-windows-139.tsv", 2), ("wiki-typing.tsv", 1)):
-            path = test_dir / name
+        tsv_files = [(test_dir / name, column) for name, column in
+                     (("variants.tsv", 3), ("expected-windows-139.tsv", 2), ("wiki-typing.tsv", 1),
+                      ("domain-prog.tsv", 1), ("domain-crypto.tsv", 1)) if name not in ignore]
+        extra = [Path(p) for p in extra_files]
+        tsv_files += [(p, 1) for p in extra]  #これから足す試験（分野の試験を作った直後など）
+        for path, column in tsv_files:
             if not path.exists():
                 continue
+            typing_test = path.name in ("wiki-typing.tsv", "domain-prog.tsv", "domain-crypto.tsv") or path in extra
             for line in path.read_text(encoding="utf-8").splitlines():
                 if line.startswith("#"):
                     continue
                 cols = line.split("\t")
-                if name == "wiki-typing.tsv" and cols[0]:
-                    add_reading(cols[0])  # ウィキペディアの打ち込み試験: ローマ字と元の文の両方で除く
+                if typing_test and cols[0]:
+                    add_reading(cols[0])  # 打ち込み試験: ローマ字と元の文の両方で除く
                 if len(cols) > column and cols[column]:
                     surfaces.add(norm_surface(cols[column]))
-                if name == "variants.tsv" and len(cols) > 4 and cols[4]:
+                if path.name == "variants.tsv" and len(cols) > 4 and cols[4]:
                     for alt in cols[4].split("|"):
                         surfaces.add(norm_surface(alt))
             self.files.append(path)
-        known = {p.name for p in self.files}
+        known = {p.name for p in self.files} | set(ignore)
         for path in sorted(test_dir.iterdir()):
             if path.is_file() and path.name not in known and path.suffix in (".txt", ".tsv"):
                 # 新しく足された試験のファイルも、1行目の列をローマ字として扱う
@@ -267,13 +288,21 @@ class TestExclusion:
         readings.discard("")
         self.surface_exact = surfaces
         self.reading_exact = readings
-        self.surface_index = SubstringIndex(s for s in surfaces if len(s) >= self.SURFACE_MIN)
-        self.reading_index = SubstringIndex(r for r in readings if len(r) >= self.READING_MIN)
+        # 英字だけの試験の語（github、python など）を含む文まで消すと、分野の文書の文が大量に消える。
+        # ascii_containment=False では、英字だけの語は「同じ」だけを調べ、「含む」は調べない
+        # （日本語を含む試験の文は、今までどおり「含む」も調べる）
+        japanese = re.compile(r"[ぁ-ゖァ-ヺ一-鿿]")
+
+        def contains_checked(key: str, minimum: int) -> bool:
+            return len(key) >= minimum and (ascii_containment or bool(japanese.search(key)))
+
+        self.surface_index = SubstringIndex(s for s in surfaces if contains_checked(s, self.SURFACE_MIN))
+        self.reading_index = SubstringIndex(r for r in readings if contains_checked(r, self.READING_MIN))
         self.stats = {
             "surface_keys": len(surfaces),
-            "surface_keys_checked_by_containment": sum(len(s) >= self.SURFACE_MIN for s in surfaces),
+            "surface_keys_checked_by_containment": sum(contains_checked(s, self.SURFACE_MIN) for s in surfaces),
             "reading_keys": len(readings),
-            "reading_keys_checked_by_containment": sum(len(r) >= self.READING_MIN for r in readings),
+            "reading_keys_checked_by_containment": sum(contains_checked(r, self.READING_MIN) for r in readings),
         }
 
     def blocked(self, surface: str, readings=()) -> str | None:
@@ -610,7 +639,8 @@ class Builder:
             for katakana, english in load_katakana_english(self.data_dir / name).items():
                 english_to_katakana.setdefault(english.lower().replace(" ", ""), katakana)
         self.exclusion = TestExclusion(self.repo / "tests" / "conversion",
-                                       load_romaji_table(Path(args.romaji_table)), english_to_katakana)
+                                       load_romaji_table(Path(args.romaji_table)), english_to_katakana,
+                                       extra_files=args.extra_test, ascii_containment=not args.domain_text)
         self.weights = dict(DEFAULT_WEIGHTS)
         for item in (args.mix.split(",") if args.mix else []):
             name, value = item.split("=")
@@ -618,35 +648,53 @@ class Builder:
                 raise SystemExit(f"--mix の種類が不明: {name}")
             self.weights[name] = float(value)
         total = sum(self.weights.values())
-        self.quota = {k: int(round(args.size * v / total)) for k, v in self.weights.items()}
-        self.train = {k: [] for k in self.weights}
-        self.valid = {k: [] for k in self.weights}
+        # 分野の文を使うときは、全体のうち --domain-share を分野に、残りをウィキペディアなどに回す
+        self.domain_enabled = bool(args.domain_text)
+        domain_size = int(round(args.size * args.domain_share)) if self.domain_enabled else 0
+        base_size = args.size - domain_size
+        self.quota = {k: int(round(base_size * v / total)) for k, v in self.weights.items()}
+        if self.domain_enabled:
+            domain_total = sum(DOMAIN_WEIGHTS.values())
+            self.quota.update({k: int(round(domain_size * v / domain_total)) for k, v in DOMAIN_WEIGHTS.items()})
+        self.train = {k: [] for k in self.quota}
+        self.valid = {k: [] for k in self.quota}
+        self.valid_fraction = {k: (args.domain_valid_fraction if k in DOMAIN_KINDS else args.valid_fraction)
+                               for k in self.quota}
+        self.domain_per_source = {}  # 出典ごとの練習問題・確かめ問題の数
         self.seen = set()
         self.excluded = []
         self.excluded_count = 0
         self.rejected = {"wiki_sentence_shape": 0, "wiki_reading": 0}
+        self._reader = None
+
+    def reader(self):
+        if self._reader is None:
+            self._reader = SudachiReader(self.args.sudachi_dict)
+        return self._reader
 
     # 学習用か確かめ用かは、記事・見出し語（group）で決める
-    def is_valid(self, group: str) -> bool:
-        return stable_unit(self.args.seed, group) < self.args.valid_fraction
+    def is_valid(self, group: str, kind: str | None = None) -> bool:
+        fraction = self.valid_fraction[kind] if kind else self.args.valid_fraction
+        return stable_unit(self.args.seed, group) < fraction
 
     def add(self, kind, record, group):
+        """入れたら "train" か "valid"、入れなかったら False を返す。"""
         if record is None:
             return False
         key = hashlib.sha1((record["prompt"] + "\t" + record["output"]).encode("utf-8")).digest()
         if key in self.seen:
             return False
-        if self.is_valid(group):
+        if self.is_valid(group, kind):
             if len(self.valid[kind]) >= self.args.valid_per_kind:
                 return False
             self.seen.add(key)
             self.valid[kind].append(record)
-            return True
+            return "valid"
         if len(self.train[kind]) >= self.quota[kind]:
             return False
         self.seen.add(key)
         self.train[kind].append(record)
-        return True
+        return "train"
 
     def check(self, surface, readings) -> bool:
         reason = self.exclusion.blocked(surface, readings)
@@ -659,7 +707,7 @@ class Builder:
 
     def full(self, kind) -> bool:
         return len(self.train[kind]) >= self.quota[kind] and (
-            len(self.valid[kind]) >= self.args.valid_per_kind or self.args.valid_fraction == 0)
+            len(self.valid[kind]) >= self.args.valid_per_kind or self.valid_fraction[kind] == 0)
 
     # ---- 自作の一覧
     def build_synthetic(self):
@@ -692,7 +740,7 @@ class Builder:
         args = self.args
         if not args.wiki:
             return
-        reader = SudachiReader(args.sudachi_dict)
+        reader = self.reader()
         self.reader_versions = reader.versions()
         kata_map = load_katakana_english(self.data_dir / "katakana-english-common.tsv")
         groups = load_homophone_groups(self.data_dir / "homophone-cues.tsv")
@@ -765,6 +813,122 @@ class Builder:
             start, end = random_span(tokens, rng)
             self.add(kind, span_example(kind, tokens, start, end, previous if rng.random() < 0.5 else ""), group)
 
+    # ---- 分野の文書（tools/zenz-finetune/domain_text.py の出力）
+    def load_domain_items(self):
+        """練習用の文を、日本語の部分の読みを付けた形にする。試験の文と重なるものは捨てる。"""
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from domain_text import pieces_of
+        reader = self.reader()
+        self.reader_versions = reader.versions()
+        items, rejected = [], {"not_train": 0, "pieces": 0, "reading": 0}
+        for line in open(self.args.domain_text, encoding="utf-8"):
+            row = json.loads(line)
+            if row["split"] != "train":
+                rejected["not_train"] += 1
+                continue
+            pieces = pieces_of(row["text"])
+            if not pieces:
+                rejected["pieces"] += 1
+                continue
+            units, key = [], ""
+            for kind, text in pieces:
+                if kind == "en":
+                    units.append({"en": True, "text": text})
+                    key += text
+                    continue
+                tokens = reader.analyze(text)
+                if not tokens:
+                    units = None
+                    break
+                reading = "".join(t.reading for t in tokens)
+                units.append({"en": False, "text": text, "tokens": tokens, "reading": reading})
+                key += reading
+            if units is None:
+                rejected["reading"] += 1
+                continue
+            if not self.check(row["text"], [key]):
+                continue
+            prev = row.get("prev", "")
+            if prev:
+                prev_pieces = pieces_of(prev)
+                if not prev_pieces or not self.check(prev, [""]):
+                    prev = ""
+            items.append({"source": row["source"], "doc": row["doc"], "text": row["text"], "prev": prev,
+                          "units": units, "has_english": any(u["en"] for u in units), "whole_reading": key})
+        self.domain_rejected = rejected
+        return items
+
+    def domain_run_example(self, kind, item, index, span, use_prev):
+        """日本語の部分（units[index]）を問う問題。ほかの部分（英字を含む）は左右の文脈に入れる。"""
+        units = item["units"]
+        unit = units[index]
+        before = (item["prev"] if use_prev else "") + "".join(u["text"] for u in units[:index])
+        after = "".join(u["text"] for u in units[index + 1:])
+        if span:
+            tokens = unit["tokens"]
+            start, end = random_span(tokens, self.rng)
+            left = before + "".join(t.surface for t in tokens[:start])
+            right = "".join(t.surface for t in tokens[end:]) + after
+            reading = "".join(t.reading for t in tokens[start:end])
+            surface = "".join(t.surface for t in tokens[start:end])
+        else:
+            left, right, reading, surface = before, after, unit["reading"], unit["text"]
+        if not reading or len(reading) > READING_MAX or not re.search(r"[ぁ-ゖァ-ヺ一-鿿]", surface):
+            return None
+        return example(kind, reading, surface, left, right)
+
+    def domain_sentence(self, item):
+        rng = self.rng
+        group = f"domain:{item['source']}:{item['doc']}"
+        units = item["units"]
+        open_kinds = [k for k in DOMAIN_KINDS if not self.full(k)]
+        if not open_kinds:
+            return
+        runs = [i for i, u in enumerate(units) if not u["en"] and re.search(r"[ぁ-ゖァ-ヺ一-鿿]", u["text"])]
+        if not runs:
+            return
+        if item["has_english"]:
+            if "domain_english" not in open_kinds:
+                return
+            index = rng.choice(runs)
+            record = self.domain_run_example("domain_english", item, index, rng.random() < 0.3,
+                                             bool(item["prev"]) and rng.random() < 0.3)
+            kind = "domain_english"
+        else:
+            kinds = [k for k in open_kinds if k != "domain_english"]
+            if not kinds:
+                return
+            need = [max(1, self.quota[k] - len(self.train[k])) for k in kinds]
+            kind = rng.choices(kinds, weights=need)[0]
+            if kind == "domain_context" and not item["prev"]:
+                kind = "domain_whole"
+            record = self.domain_run_example(kind, item, runs[0], kind == "domain_span",
+                                             kind == "domain_context")
+        where = self.add(kind, record, group)
+        if where:
+            counts = self.domain_per_source.setdefault(item["source"], {"train": 0, "valid": 0})
+            counts[where] += 1
+
+    def build_domain(self):
+        if not self.domain_enabled:
+            return
+        started = time.time()
+        items = self.load_domain_items()
+        print(f"分野の練習用の文 {len(items)}（読み付けと試験の文の検査に {time.time() - started:.0f} 秒）", flush=True)
+        self.domain_items = len(items)
+        passes = 0
+        for passes in range(1, self.args.domain_passes + 1):
+            order = list(range(len(items)))
+            self.rng.shuffle(order)
+            for i in order:
+                if all(self.full(k) for k in DOMAIN_KINDS):
+                    break
+                self.domain_sentence(items[i])
+            if all(self.full(k) for k in DOMAIN_KINDS):
+                break
+        # 埋まらなかった分は予定より少ないまま（終わりの表示と manifest.json に出る）
+        self.domain_passes_used = passes
+
     def write(self):
         out = Path(self.args.out)
         out.mkdir(parents=True, exist_ok=True)
@@ -808,6 +972,38 @@ class Builder:
                            "wikimedia/wikipedia のデータセットは CC BY-SA 3.0 と GFDL と表示。"
                            "学習した模型を配る場合は出典（ウィキペディア）を示し、同じ条件で配る。",
             })
+        domain = None
+        if self.domain_enabled:
+            config_path = Path(args.domain_config)
+            config = json.loads(config_path.read_text(encoding="utf-8"))
+            counts_path = Path(args.domain_text).with_name("counts.json")
+            extraction = json.loads(counts_path.read_text(encoding="utf-8")) if counts_path.exists() else {}
+            domain_sources = []
+            for source in config["sources"]:
+                per = self.domain_per_source.get(source["name"], {"train": 0, "valid": 0})
+                entry = {
+                    "name": f"{source['title']}（{source['repo']}）", "id": source["name"], "domain": source["domain"],
+                    "commit": source["commit"], "license": source["license"], "license_url": source["license_url"],
+                    "attribution": source["attribution"],
+                    "use": "文書から取り出した日本語の文（読みは SudachiPy で付ける）。試験用の文書と別の文書だけ",
+                    "extraction": (extraction.get("sources") or {}).get(source["name"]),
+                    "train_examples": per["train"], "valid_examples": per["valid"],
+                }
+                domain_sources.append(entry)
+                sources.append({k: entry[k] for k in ("name", "commit", "license", "license_url", "use")})
+            domain = {
+                "sentences_file": {"name": Path(args.domain_text).name, "sha256": sha256_file(Path(args.domain_text))},
+                "config": {"name": config_path.name, "sha256": sha256_file(config_path)},
+                "domain_text_sha256": sha256_file(Path(__file__).resolve().with_name("domain_text.py")),
+                "share": args.domain_share, "valid_fraction": args.domain_valid_fraction,
+                "weights": DOMAIN_WEIGHTS, "quota": {k: self.quota[k] for k in DOMAIN_KINDS},
+                "passes_used": getattr(self, "domain_passes_used", 0), "passes_max": args.domain_passes,
+                "train_sentences_usable": getattr(self, "domain_items", 0),
+                "rejected": getattr(self, "domain_rejected", {}),
+                "extra_test_files": [{"name": str(p), "sha256": sha256_file(Path(p))}
+                                     for p in args.extra_test if Path(p).exists()],
+                "sources": domain_sources,
+            }
         sources.append({"name": args.romaji_table, "sha256": sha256_file(Path(args.romaji_table)),
                         "use": "試験の文のローマ字をかなにする（除外の検査だけに使う）",
                         "license": "Mozc の romanji-hiragana.tsv（BSD-3-Clause）"})
@@ -827,6 +1023,7 @@ class Builder:
                        "train_by_kind": {k: len(v) for k, v in self.train.items()},
                        "valid_by_kind": {k: len(v) for k, v in self.valid.items()}},
             "wiki": getattr(self, "wiki_stats", None),
+            "domain": domain,
             "rejected": self.rejected,
             "test_exclusion": {
                 "rule": "tests/conversion/ の文と、表記または読みが同じか、それを含む文は使わない"
@@ -856,6 +1053,13 @@ def main(argv=None):
     parser.add_argument("--max-articles", type=int, default=0, help="読む記事の上限（0 は上限なし）")
     parser.add_argument("--progress", type=int, default=2000, help="何記事ごとに進み具合を出すか（0 は出さない）")
     parser.add_argument("--show", type=int, default=0, help="終わりに各種類の例をいくつ表示するか")
+    parser.add_argument("--domain-text", default="", help="domain_text.py が作った sentences.jsonl（プログラミング・仮想通貨の文）。付けると分野の問題も作る")
+    parser.add_argument("--domain-share", type=float, default=0.5, help="--size のうち分野の問題にする割合（残りはウィキペディアなど）")
+    parser.add_argument("--domain-valid-fraction", type=float, default=0.05, help="確かめ用に回す分野の文書の割合")
+    parser.add_argument("--domain-passes", type=int, default=3, help="分野の文を何周まで使うか（1周で足りない分は別の形の問題にして足す）")
+    parser.add_argument("--domain-config", default=str(here / "domain_sources.json"), help="分野の出どころ（版・利用条件）の一覧")
+    parser.add_argument("--extra-test", nargs="*", default=[],
+                        help="リポジトリの tests/conversion にまだない試験のファイル（作った直後の domain-*.tsv など）。その文も除く")
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
@@ -863,10 +1067,13 @@ def main(argv=None):
     builder = Builder(args)
     print("試験の文の目印:", builder.exclusion.stats, flush=True)
     builder.build_synthetic()
+    builder.build_domain()
     builder.build_wiki()
     train, valid = builder.write()
     print(f"学習用 {len(train)} 問、確かめ用 {len(valid)} 問、試験と重なり除いた文 {builder.excluded_count}")
     print("種類ごと（学習用）:", {k: len(v) for k, v in builder.train.items()})
+    if builder.domain_enabled:
+        print("分野の出典ごと（練習用・確かめ用）:", builder.domain_per_source)
     short = {k: q - len(builder.train[k]) for k, q in builder.quota.items() if len(builder.train[k]) < q}
     if short:
         print("予定より少ない種類（材料が足りない）:", short)

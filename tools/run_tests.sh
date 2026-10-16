@@ -8,6 +8,7 @@
 #   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
+#   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -87,6 +88,16 @@ e1|e2)
     $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
   fi
   ;;
+g)
+  # 分野の文（プログラミング 300、仮想通貨 200 ほど）をローマ字で打つ。英字の言葉（git、npm、Python、DeFi、NFT など）は
+  # 打ったまま元の文どおり出ることを期待する。採点はまとめの段で（tools/score_wiki_typing.py）
+  for field in prog crypto; do
+    if [ -f $T/domain-$field.tsv ]; then
+      grep -v '^#' $T/domain-$field.tsv | cut -f1 > $W/domain-$field.txt
+      $BATCH $W/domain-$field.txt $OUT/domain-$field.tsv 4
+    fi
+  done
+  ;;
 f)
   # 前の文を入力欄の前の文として渡したときと渡さないときの正解の数を比べる
   if [ -f $T/context.tsv ]; then
@@ -97,5 +108,5 @@ f)
   fi
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g のどれか" >&2; exit 2 ;;
 esac
