@@ -18,7 +18,8 @@ constexpr int64_t kSpanCost = 100;      // minus kLengthBonus per letter
 constexpr int64_t kLengthBonus = 3;     // longer words win ("sheet|wo" over "shee|two")
 constexpr int64_t kCutCost = 5;         // English edge inside an original chunk
 constexpr int64_t kPhraseBonus = 20;    // a set phrase wins over its words read apart
-constexpr int64_t kStealCost = 50;      // a word ending in the s of shi, the c of chi, the t of tsu
+constexpr int64_t kLeadingParticleCost = 30;  // 助詞で始まる語（deform）より、助詞と残りの語（de + form）
+constexpr int64_t kStealCost = 50;     // a word ending in the s of shi, the c of chi, the t of tsu
 
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
@@ -433,6 +434,33 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {
         cost = -length;  // a word whose kana is no Japanese reading (remote: れもて)
+      }
+      // 助詞で始まる語（市役所 de form の "deform"）: 直前が日本語（助詞でない）で、
+      // 助詞を打った鍵がそのまま 1 文字の仮名で、残りが 4 文字以上の別の語なら、
+      // 助詞と残りの語に分けるほうを選びやすくする。よく使う語（design）、
+      // 手で選んだ語、「default」のような助詞の後に来ない語はそのまま。
+      if (cost && learned == 0 && !place && i > 0 && word.size() >= 6 && !unread[i - 1] &&
+          kana_at[i] > 0 && !lexicon.IsCurated(word) && !lexicon.IsCommon(word)) {
+        struct Particle { std::string_view key; std::string_view kana; };
+        static constexpr Particle kLeading[] = {{"de", "で"}, {"ni", "に"}, {"wo", "を"}, {"ga", "が"},
+                                                {"ha", "は"}, {"to", "と"}, {"mo", "も"}, {"no", "の"},
+                                                {"ya", "や"}, {"he", "へ"}};
+        static constexpr std::string_view kKeepWhole[] = {"default", "decode", "delimit", "denote", "devote"};
+        static constexpr std::string_view kParticleKana[] = {"で", "に", "を", "は", "が", "と", "も", "へ", "の", "や"};
+        const std::string lower = [&] {
+          std::string s(word);
+          std::ranges::transform(s, s.begin(), Lower);
+          return s;
+        }();
+        for (const Particle& p : kLeading) {
+          const size_t e = i + p.key.size();
+          if (!lower.starts_with(p.key) || lower.size() - p.key.size() < 4 || e >= j || !boundary[e]) continue;
+          if (kana_at[e] != kana_at[i] + 1 || kana[kana_at[i]] != p.kana) continue;
+          if (std::ranges::find(kParticleKana, kana[kana_at[i] - 1]) != std::end(kParticleKana)) continue;
+          if (std::ranges::find(kKeepWhole, lower) != std::end(kKeepWhole)) continue;
+          if (lexicon.Contains(lower.substr(p.key.size()))) *cost += kLeadingParticleCost;
+          break;
+        }
       }
       // A word ending in the first letter of sh, ch or tsu, when the word
       // without it is a word too ("sets|hita": the s of shi), likely took it
