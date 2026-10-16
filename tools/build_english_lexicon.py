@@ -36,6 +36,8 @@ def main():
     if hashlib.sha256(data).hexdigest() != SHA256:
         raise SystemExit("SCOWL archive SHA-256 mismatch")
     words = set()
+    common = set()  # level 20 or less: the common words (hero, safe, idea; not omen, redo)
+    level_of = {}
     signal = set()
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:
         root = "scowl-2020.12.07/"
@@ -45,7 +47,12 @@ def main():
             kind, _, level = name.rpartition(".")
             if kind in ("english-words", "american-words") and level.isdigit() and int(level) <= args.level:
                 text = tar.extractfile(member).read().decode("iso-8859-1")
-                words.update(w for w in text.split() if WORD.fullmatch(w))
+                found = [w for w in text.split() if WORD.fullmatch(w)]
+                words.update(found)
+                for w in found:
+                    level_of[w] = min(level_of.get(w, 99), int(level))
+                if int(level) <= 20:
+                    common.update(found)
             if (kind.startswith(("english-", "american-")) and kind.endswith(("-words", "-upper", "-proper-names"))
                     and level.isdigit() and int(level) <= args.signal_level):
                 text = tar.extractfile(member).read().decode("iso-8859-1")
@@ -62,7 +69,10 @@ def main():
     (args.out / "curated-words.txt").write_text("".join(w + "\n" for w in sorted(curated)), encoding="ascii")
     signal -= words
     (args.out / "signal-words.txt").write_text("".join(w + "\n" for w in sorted(signal)), encoding="ascii")
+    (args.out / "common-words.txt").write_text("".join(w + "\n" for w in sorted(common)), encoding="ascii")
     (args.out / "SCOWL-Copyright.txt").write_bytes(copyright_text)
+    probe = "hero safe idea radio menu area zone dune mute share kiwi bike issue omen redo name home note token kite base".split()
+    print("levels", " ".join(f"{w}:{level_of.get(w, '-')}" for w in probe))
     print(f"words\t{len(words)}\tlevel\t{args.level}\tsignal\t{len(signal)}\tlevel\t{args.signal_level}")
 
 

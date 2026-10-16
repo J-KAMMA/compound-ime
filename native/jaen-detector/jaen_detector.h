@@ -73,6 +73,11 @@ class Lexicon {
   // Rarer words and names (london, ukulele, pilates) taken only when what was
   // typed is no plain Japanese romaji (lo: ぉ, a pending c), on chunk edges.
   void AddSignalOnly(std::string_view word);
+  // Common English words (SCOWL level 20 or less): only these are kept as
+  // English when their kana reads only as a rare Japanese entry (hero: へろ),
+  // not rarer ones (omen: お面, redo).
+  void AddCommon(std::string_view word);
+  bool IsCommon(std::string_view word) const;
   bool IsSignalOnly(std::string_view word) const;
 
  private:
@@ -80,6 +85,7 @@ class Lexicon {
   std::unordered_map<std::string, Place> places_;
   std::unordered_set<std::string> joined_;
   std::unordered_set<std::string> signal_only_;
+  std::unordered_set<std::string> common_;
   std::unordered_map<std::string, std::vector<size_t>> phrases_;
 };
 
@@ -123,7 +129,8 @@ bool IsForeignChunk(const Chunk& chunk);
 // typed chunk edges whose kana is no Japanese reading (remote: れもて, safe:
 // さふぇ) is English too, unless a Japanese reading of 3+ kana crosses one of
 // its edges (the て of "kono|te|gami" belongs to 手紙).
-// |reads_naturally| (optional) replaces |is_reading| for that word's own kana:
+// |reads_naturally| (optional), for a common word (Lexicon::IsCommon), also
+// takes it as English when its own kana does not read naturally:
 // whether it reads as natural Japanese (a cheap way through the dictionary),
 // not merely as some rare entry (へろ, さふぇ, いであ are in the dictionary but
 // read only as rare words: hero, safe, idea stay English).

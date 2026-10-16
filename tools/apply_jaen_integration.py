@@ -2844,6 +2844,19 @@ edit("converter/english_lexicon.cc",
      "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n"
      "    for (const char* phrase : kPhrases) words->AddPhrase(phrase);\n")
 
+# よく使う英単語: 節: SCOWL の水準20以下の語（tools/build_english_lexicon.py の common-words.txt）を
+# 組み込む。英単語のかなが自然な日本語として読めないとき（へろ、さふぇ）に英語のまま残すのは、
+# この語だけにする（omen の おめん＝お面、redo は日本語のまま）。古い一覧の置き場所にこの
+# ファイルがなければ組み込まない（その場合この判定は働かない）。
+common_path = lexdir / "common-words.txt"
+common = common_path.read_text(encoding="ascii").split() if common_path.exists() else []
+inc = src / "converter/english_lexicon_data.inc"
+inc.write_text(inc.read_text(encoding="utf-8") + array("kCommonWords", common or [""]), encoding="utf-8", newline="\n")
+edit("converter/english_lexicon.cc",
+     "    for (const char* phrase : kPhrases) words->AddPhrase(phrase);\n",
+     "    for (const char* phrase : kPhrases) words->AddPhrase(phrase);\n"
+     "    for (const char* word : kCommonWords) words->AddCommon(word);\n")
+
 # かなとして読める打ち間違い: 節: 「tsuduukete」（つづうけて）のように、かなとして
 # 読めてしまう打ち間違いを直す。1キーの直し（重ねて打ったキーを1つ抜く・隣どうしの
 # 入れ替え・隣のキー・抜けた母音。最初のキーは変えない。jaen::ReadableTypoEdits）の
