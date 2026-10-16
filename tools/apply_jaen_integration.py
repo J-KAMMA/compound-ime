@@ -3360,4 +3360,36 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")
 
+# 選び手の段階0: 候補の書き出し。MYIME_SELECTOR_DUMP=<ファイル> のときだけ、変換の最後に
+# 各文節の読みと候補の上位8つを1行ずつ書き足す（普段は何もしない）。正しい答えが候補の
+# 上位8つから選べるか（選び手で直せる上限）を tools/selector_ceiling.py で数える。
+edit("engine/engine.cc", "    if (homophone_cues) ApplyHomophoneCues(segments, left_context, right_context);\n",
+     "    if (homophone_cues) ApplyHomophoneCues(segments, left_context, right_context);\n"
+     "    DumpCandidates(*segments);\n")
+edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
+     """  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
+  // U+0001, each "key<TAB>candidate<TAB>candidate..." (the first 8).
+  static void DumpCandidates(const Segments& segments) {
+    static const char* path = std::getenv("MYIME_SELECTOR_DUMP");
+    if (!path || !*path) return;
+    static std::mutex mutex;
+    std::string line;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (!line.empty()) line += '\\x01';
+      line += segment.key();
+      for (size_t c = 0; c < segment.candidates_size() && c < 8; ++c) {
+        line += '\\t';
+        line += segment.candidate(c).value;
+      }
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fputc('\\n', f);
+      std::fclose(f);
+    }
+  }
+  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
+edit("engine/engine.cc", "#include <cstdint>\n", "#include <cstdint>\n#include <cstdio>\n#include <mutex>\n")
+
 print("applied")
