@@ -3392,4 +3392,78 @@ edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, s
   static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
 edit("engine/engine.cc", "#include <cstdint>\n", "#include <cstdint>\n#include <cstdio>\n#include <mutex>\n")
 
+# 常用漢字の表記: 1番目の候補に常用漢字表にない漢字（綺、藪、嬉）があり、同じ読みの候補の中に
+# その部分だけをひらがなにした形（竹やぶ、うれしい）か、全部ひらがなの形（きれい）があれば、
+# それを1番目にする（常用漢字表と「公用文作成の考え方」に合わせる）。人名・地名と、利用者が
+# 選んだ候補（学習・利用者の辞書）は動かさない。常用漢字は tools/data/joyo-kanji.txt
+# （Unicode Unihan の kJoyoKanji）。MYIME_JOYO=0 で止める。
+joyo = "".join(line.strip() for line in (REPO / "tools/data/joyo-kanji.txt").read_text(encoding="utf-8").splitlines()
+               if line.strip() and not line.startswith("#"))
+edit("engine/engine.cc", "    DumpCandidates(*segments);\n", "    PreferJoyoSpelling(segments);\n    DumpCandidates(*segments);\n")
+edit("engine/engine.cc", "  static void DumpCandidates(const Segments& segments) {",
+     """  static std::u32string ToU32(std::string_view s) {
+    std::u32string out;
+    for (size_t i = 0; i < s.size();) {
+      const auto b = static_cast<unsigned char>(s[i]);
+      const size_t len = b < 0x80 ? 1 : b < 0xE0 ? 2 : b < 0xF0 ? 3 : 4;
+      char32_t c = len == 1 ? b : len == 2 ? (b & 0x1F) : len == 3 ? (b & 0x0F) : (b & 0x07);
+      for (size_t k = 1; k < len && i + k < s.size(); ++k) c = (c << 6) | (static_cast<unsigned char>(s[i + k]) & 0x3F);
+      out.push_back(c);
+      i += len;
+    }
+    return out;
+  }
+  static bool IsKanji(char32_t c) { return (c >= 0x4E00 && c <= 0x9FFF) || (c >= 0x3400 && c <= 0x4DBF) || c == 0x3005; }
+  static bool IsHiragana(char32_t c) { return (c >= 0x3041 && c <= 0x3096) || c == 0x30FC; }
+  static bool IsJoyo(char32_t c) {
+    static const std::u32string* joyo = new std::u32string(ToU32(\"""" + joyo + """\"));
+    return c == 0x3005 || joyo->find(c) != std::u32string::npos;
+  }
+  // Whether `text` is `first` with each run of non-Joyo kanji written in hiragana.
+  static bool KanaForNonJoyo(const std::u32string& first, const std::u32string& text) {
+    size_t i = 0, j = 0;
+    while (i < first.size()) {
+      if (IsKanji(first[i]) && !IsJoyo(first[i])) {
+        while (i < first.size() && IsKanji(first[i]) && !IsJoyo(first[i])) ++i;
+        const size_t start = j;
+        while (j < text.size() && IsHiragana(text[j]) && (i >= first.size() || text[j] != first[i])) ++j;
+        if (j == start) return false;
+      } else {
+        if (j >= text.size() || text[j] != first[i]) return false;
+        ++i; ++j;
+      }
+    }
+    return j == text.size();
+  }
+  void PreferJoyoSpelling(Segments* segments) const {
+    static const bool enabled = [] {
+      const char* value = std::getenv("MYIME_JOYO");
+      return !value || std::string_view(value) != "0";
+    }();
+    if (!enabled) return;
+    for (size_t s = 0; s < segments->conversion_segments_size(); ++s) {
+      Segment* segment = segments->mutable_conversion_segment(s);
+      if (segment->candidates_size() < 2) continue;
+      const converter::Candidate& top = segment->candidate(0);
+      if (top.attributes & (converter::Attribute::USER_DICTIONARY | converter::Attribute::RERANKED |
+                            converter::Attribute::USER_HISTORY_PREDICTION) ||
+          pos_matcher_.IsUniqueNoun(top.lid)) continue;
+      const std::u32string first = ToU32(top.content_value);
+      if (std::none_of(first.begin(), first.end(), [](char32_t c) { return IsKanji(c) && !IsJoyo(c); })) continue;
+      const std::string suffix = top.value.substr(std::min(top.value.size(), top.content_value.size()));
+      int pick = -1;
+      for (size_t c = 1; c < segment->candidates_size() && c < 16; ++c) {
+        const converter::Candidate& cand = segment->candidate(c);
+        if (cand.key != top.key || cand.content_key != top.content_key ||
+            cand.value.size() < cand.content_value.size() ||
+            cand.value.substr(cand.content_value.size()) != suffix) continue;
+        const std::u32string text = ToU32(cand.content_value);
+        if (KanaForNonJoyo(first, text)) { pick = static_cast<int>(c); break; }
+        if (pick < 0 && cand.content_value == top.content_key) pick = static_cast<int>(c);
+      }
+      if (pick > 0) segment->move_candidate(pick, 0);
+    }
+  }
+  static void DumpCandidates(const Segments& segments) {""")
+
 print("applied")
