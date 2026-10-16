@@ -36,6 +36,7 @@ std::optional<std::string> Normalize(std::string_view word) {
 }
 
 int64_t ForeignWeight(const Chunk& chunk);
+bool IsKanaForLoanword(const Chunk& chunk);
 
 // A small kana typed with x?/l? (ぁ, っ, ゃ ...); "xn" for ん is not one.
 bool IsSmallKana(const Chunk& chunk) {
@@ -141,15 +142,29 @@ int64_t ForeignWeight(const Chunk& chunk) {
   const char head = raw.empty() ? '\0' : Lower(raw[0]);
   const bool consonant_w = raw.size() == 3 && Lower(raw[1]) == 'w' && IsVowel(raw[2]) &&
                            IsAsciiAlpha(raw[0]) && !IsVowel(raw[0]) && head != 'w';
-  if (consonant_w || std::ranges::any_of(chunk.conversion + chunk.pending, IsAsciiAlpha)) {
+  // "two" read as とぉ is English ("seat|wo"); twu/dwu/kwa (トゥ, ドゥ, クァ) are
+  // how loanwords are typed (タトゥー): only a weak sign.
+  if ((consonant_w && Lower(raw[2]) == 'o') ||
+      std::ranges::any_of(chunk.conversion + chunk.pending, IsAsciiAlpha)) {
     return kForeignCost;
   }
-  // Japanese typists do use these now and then (toxu for とぅ, vi for ゔぃ).
-  // wi/we are not signs: loanwords like ウェブ are commonly typed that way.
-  const bool small_kana = IsSmallKana(chunk);
-  const bool rare_key = !chunk.conversion.empty() &&
-                        (head == 'v' || head == 'q' || (head == 'c' && (raw.size() < 2 || Lower(raw[1]) != 'h')));
-  return small_kana || rare_key ? kWeakForeignCost : 0;
+  // c not in ch (ca for か) is a weak sign too, but never typed for a
+  // Japanese word's kana: "camera" is English, a Japanese typist types kamera.
+  const bool c_key = !chunk.conversion.empty() && head == 'c' && (raw.size() < 2 || Lower(raw[1]) != 'h');
+  return IsKanaForLoanword(chunk) || c_key ? kWeakForeignCost : 0;
+}
+
+// A chunk Japanese typists use now and then for a loanword's kana: a small
+// kana typed with x/l (toxu for とぅ), v (vi for ゔぃ), q, or consonant+w+vowel
+// other than wo (twu for とぅ). wi/we are not among them: loanwords like ウェブ
+// are commonly typed that way.
+bool IsKanaForLoanword(const Chunk& chunk) {
+  const std::string_view raw = chunk.raw;
+  if (raw.empty() || chunk.conversion.empty()) return false;
+  const char head = Lower(raw[0]);
+  const bool consonant_w = raw.size() == 3 && Lower(raw[1]) == 'w' && IsVowel(raw[2]) &&
+                           Lower(raw[2]) != 'o' && IsAsciiAlpha(raw[0]) && !IsVowel(raw[0]) && head != 'w';
+  return IsSmallKana(chunk) || consonant_w || head == 'v' || head == 'q';
 }
 }  // namespace
 
@@ -190,7 +205,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   std::vector<bool> no_start(1, false);  // no English word starts at i
   std::vector<bool> no_end(1, false);    // no English word ends at i
   std::vector<bool> unread;              // unread[k]: raw key k was left unread (no kana)
-  std::vector<bool> small_start(1, false);  // small_start[i]: an x?/l? small kana starts at i
+  std::vector<bool> small_start(1, false);  // small_start[i]: a loanword kana chunk (IsKanaForLoanword) starts at i
   std::vector<std::string> kana;        // the typed kana, one character each
   std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   for (const Chunk& chunk : chunks) {
@@ -202,7 +217,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     no_end.resize(raw.size() + 1, false);
     unread.resize(raw.size(), chunk.conversion.empty());
     small_start.resize(raw.size() + 1, false);
-    small_start[raw.size() - chunk.raw.size()] = small;
+    small_start[raw.size() - chunk.raw.size()] = IsKanaForLoanword(chunk);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
     // Chunks the romaji table formed across a word's last letter count their
@@ -283,10 +298,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     return false;
   };
-  // A small kana k that joins the kana before it in a Japanese reading of 3+
-  // kana (うぉ of うぉれっと typed "ulo"): the l or x was typed for that kana.
+  // A loanword kana k (IsKanaForLoanword) joining the kana before it in a
+  // Japanese reading of 3+ kana (うぉ of うぉれっと typed "ulo", ゔぃ of へゔぃめたる
+  // typed "hevi"): the keys were typed for that kana. Not one starting at k:
+  // "video" read as ゔぃでお is English.
   const auto small_in_reading = [&](size_t k) {
-    if (!is_reading || k == 0) return false;
+    if (!is_reading) return false;
     constexpr size_t kLongest = 8;
     for (size_t a = k >= kLongest ? k - kLongest : 0; a < k; ++a) {
       for (size_t b = std::max(k + 1, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
