@@ -22,7 +22,7 @@
 （tools/apply_jaen_integration.py の PreferWholePhraseRuns）。この形の問題を作る。
 
 試験の文は学習に入れない: tests/conversion/ の全ファイル（ja400.json、jaen270.json、
-jaen200b.json、typo150*.json、reported.json、inputs.txt、variants.tsv、
+jaen200b.json、typo150*.json、reported.json、inputs.txt、variants.tsv、wiki-typing.tsv、
 expected-windows-139.tsv）の文と、表記または読みが同じか、それを含む文は、
 問題にする前に捨てる（TestExclusion）。文脈に使う前後の文も同じ検査を通ったものだけ。
 
@@ -238,12 +238,16 @@ class TestExclusion:
                 if line.strip():
                     add_reading(line.strip())
             self.files.append(inputs)
-        for name, column in (("variants.tsv", 3), ("expected-windows-139.tsv", 2)):
+        for name, column in (("variants.tsv", 3), ("expected-windows-139.tsv", 2), ("wiki-typing.tsv", 1)):
             path = test_dir / name
             if not path.exists():
                 continue
             for line in path.read_text(encoding="utf-8").splitlines():
+                if line.startswith("#"):
+                    continue
                 cols = line.split("\t")
+                if name == "wiki-typing.tsv" and cols[0]:
+                    add_reading(cols[0])  # ウィキペディアの打ち込み試験: ローマ字と元の文の両方で除く
                 if len(cols) > column and cols[column]:
                     surfaces.add(norm_surface(cols[column]))
                 if name == "variants.tsv" and len(cols) > 4 and cols[4]:
