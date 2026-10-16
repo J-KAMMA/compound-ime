@@ -66,6 +66,34 @@
    "intended": "ファイルを開く",
    "alternatives": [],
    "note": "2026-10-15 報告の関連（l で打った小さい ぁ）"
+  },
+  {
+   "id": "r008",
+   "category": "reported",
+   "romaji": "3dpurinnta-",
+   "intended": "3Dプリンター",
+   "alternatives": [
+    "3Dプリンタ"
+   ],
+   "note": "2026-10-16 報告の関連: ３DPUリンター になった（数字と英字の言葉）"
+  },
+  {
+   "id": "r009",
+   "category": "reported",
+   "romaji": "4kterebiwokatta",
+   "intended": "4Kテレビを買った",
+   "alternatives": [],
+   "note": "2026-10-16 数字と英字の言葉"
+  },
+  {
+   "id": "r010",
+   "category": "reported",
+   "romaji": "github",
+   "intended": "GitHub",
+   "alternatives": [
+    "github"
+   ],
+   "note": "2026-10-15 報告: 学習の記録で ぎてゅｂ になった（学習の作り直し）"
   }
  ]
 }
