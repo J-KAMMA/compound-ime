@@ -1,0 +1,33 @@
+# 常用漢字の一覧（tools/data/joyo-kanji.txt）を Unicode の Unihan（kJoyoKanji）から作る。手動で動く。
+# できたファイルは成果物 joyo-kanji に残る。中身を確かめてからリポジトリに入れる。
+name: Joyo kanji data
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - name: Unihan から常用漢字を取り出す
+        run: |
+          set -eo pipefail
+          curl -fsSL -o Unihan.zip https://www.unicode.org/Public/16.0.0/ucd/Unihan.zip
+          sha256sum Unihan.zip
+          unzip -q Unihan.zip Unihan_OtherMappings.txt
+          mkdir -p out
+          {
+            echo "# 常用漢字表（2010年内閣告示）の字。Unicode Unihan 16.0.0 の kJoyoKanji から作成（Unicode License v3）。"
+            grep -P '\tkJoyoKanji\t' Unihan_OtherMappings.txt | cut -f1 | sed 's/U+//' | while read -r h; do printf "\\U$(printf '%08x' 0x$h)\n"; done
+          } > out/joyo-kanji.txt
+          echo "字の数: $(grep -vc '^#' out/joyo-kanji.txt)"
+          head -5 out/joyo-kanji.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: joyo-kanji
+          path: out/
+          retention-days: 7
