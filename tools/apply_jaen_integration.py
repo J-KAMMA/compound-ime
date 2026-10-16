@@ -3446,4 +3446,237 @@ edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
   }
   return user_path;""")
 
+# 選び手の段階1: Zenz の尤度による選び（記録だけ。出力は変えない）。
+# MYIME_SELECTOR_SCORE=<ファイル> のときだけ、同じ読みに2つ以上の違う表記が候補の上位8つにある
+# 文節ごとに、文全体（前の文節と後ろの文節は今の先頭候補）を候補ごとに Zenz で採点して書き足す。
+# 採点は変換エンジンの新しい入り口 ScoreSentences（patches/myime-engine.patch）で行う。
+edit(A, "  using ConvertTextWithContextFunc = const char* (*)(const char*, const char*, const char*, int);\n",
+     "  using ConvertTextWithContextFunc = const char* (*)(const char*, const char*, const char*, int);\n"
+     "  using ScoreSentencesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n")
+edit(A, "  ConvertTextWithContextFunc ConvertTextWithContext = nullptr;\n",
+     "  ConvertTextWithContextFunc ConvertTextWithContext = nullptr;\n"
+     "  ScoreSentencesFunc ScoreSentences = nullptr;\n")
+edit(A, """    ConvertTextWithContext = reinterpret_cast<ConvertTextWithContextFunc>(
+        GetProcAddress(dll_handle_, "ConvertTextWithContext"));
+""", """    ConvertTextWithContext = reinterpret_cast<ConvertTextWithContextFunc>(
+        GetProcAddress(dll_handle_, "ConvertTextWithContext"));
+    ScoreSentences = reinterpret_cast<ScoreSentencesFunc>(
+        GetProcAddress(dll_handle_, "ScoreSentences"));
+""")
+edit(A, "    MYIME_LOAD(ConvertTextWithContext);\n",
+     "    MYIME_LOAD(ConvertTextWithContext);\n    MYIME_LOAD(ScoreSentences);\n")
+edit(A, "    ConvertTextWithContext = nullptr;\n    GetZenzaiStatus = nullptr;\n",
+     "    ConvertTextWithContext = nullptr;\n    ScoreSentences = nullptr;\n    GetZenzaiStatus = nullptr;\n")
+edit(A, "AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)\n    : config_(config) {\n",
+     """bool ScoreZenzaiSentences(absl::string_view reading, absl::string_view left,
+                           absl::string_view right, absl::string_view joined_texts,
+                           std::string* scores) {
+  if (reading.empty() || joined_texts.empty() || scores == nullptr ||
+      reading.find('\\0') != absl::string_view::npos ||
+      joined_texts.find('\\0') != absl::string_view::npos) {
+    return false;
+  }
+  auto& loader = AzooKeyDllLoader::GetInstance();
+  const std::lock_guard<std::mutex> operation(loader.operation_mutex());
+  if (!loader.IsLoaded() || !loader.ScoreSentences) return false;
+  const std::string r(reading), l(left), rt(right), t(joined_texts);
+  const char* result = loader.ScoreSentences(r.c_str(), l.c_str(), rt.c_str(), t.c_str());
+  if (result == nullptr) return false;
+  scores->assign(result);
+  loader.FreeString(result);
+  return true;
+}
+
+AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)
+    : config_(config) {
+""")
+edit("converter/azookey_immutable_converter.h",
+     "[[nodiscard]] bool HasLoadedZenzaiModelForReading(absl::string_view reading);\n",
+     "[[nodiscard]] bool HasLoadedZenzaiModelForReading(absl::string_view reading);\n\n"
+     "// Selector stage 1: Zenz log-probability of each text (joined by U+0001) as a whole\n"
+     "// sentence for `reading`; `scores` gets one number per text joined by tab (\"nan\" when\n"
+     "// unavailable). False when the engine lacks the optional ScoreSentences export.\n"
+     "[[nodiscard]] bool ScoreZenzaiSentences(absl::string_view reading, absl::string_view left,\n"
+     "                                        absl::string_view right, absl::string_view joined_texts,\n"
+     "                                        std::string* scores);\n")
+edit("engine/engine.cc", "    DumpCandidates(*segments);\n",
+     "    DumpCandidates(*segments);\n    ScoreCandidates(*segments, left_context, right_context);\n")
+edit("engine/engine.cc", "#include <cstdint>\n#include <cstdio>\n#include <mutex>\n",
+     "#include <chrono>\n#include <cmath>\n#include <cstdint>\n#include <cstdio>\n#include <mutex>\n")
+edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by\n",
+     r'''  // MYIME_SELECTOR_SCORE=<file>: selector stage 1 (record only, output unchanged). For each
+  // segment whose first 8 candidates hold 2+ different surfaces, scores the whole sentence once
+  // per surface with Zenz (the other segments keep their current first candidate) and appends
+  // "reading<TAB>current first candidates joined by U+0001<TAB>segment<TAB>pick<TAB>ms<TAB>
+  // surface<TAB>score<TAB>surface<TAB>score...".
+  // pick is the index (0 = current output) of the highest score, -1 when none was scored.
+  static void ScoreCandidates(const Segments& segments, std::string_view left, std::string_view right) {
+    static const char* path = std::getenv("MYIME_SELECTOR_SCORE");
+    if (!path || !*path) return;
+    std::vector<const Segment*> segs;
+    for (const auto& segment : segments.conversion_segments()) segs.push_back(&segment);
+    std::string reading;
+    std::vector<std::string> first;
+    for (const Segment* segment : segs) {
+      reading += segment->key();
+      first.push_back(std::string(segment->candidates_size() > 0 ? std::string_view(segment->candidate(0).value) : std::string_view(segment->key())));
+    }
+    std::string firsts;
+    for (size_t j = 0; j < first.size(); ++j) {
+      if (j > 0) firsts += '\x01';
+      firsts += first[j];
+    }
+    auto clean = [](const std::string& s) {
+      return s.find('\t') == std::string::npos && s.find('\x01') == std::string::npos &&
+             s.find('\n') == std::string::npos;
+    };
+    for (size_t i = 0; i < segs.size(); ++i) {
+      std::vector<std::string> surfaces;
+      for (size_t c = 0; c < segs[i]->candidates_size() && c < 8; ++c) {
+        const std::string value(segs[i]->candidate(c).value);
+        if (std::find(surfaces.begin(), surfaces.end(), value) == surfaces.end()) surfaces.push_back(value);
+      }
+      if (surfaces.size() < 2 || !clean(reading) || firsts.find('\t') != std::string::npos) continue;
+      std::string prefix, suffix, joined;
+      for (size_t j = 0; j < i; ++j) prefix += first[j];
+      for (size_t j = i + 1; j < segs.size(); ++j) suffix += first[j];
+      bool ok = true;
+      for (size_t s = 0; s < surfaces.size(); ++s) {
+        if (!clean(surfaces[s])) ok = false;
+        if (s > 0) joined += '\x01';
+        joined += prefix + surfaces[s] + suffix;
+      }
+      if (!ok) continue;
+      const auto begin = std::chrono::steady_clock::now();
+      std::string scores;
+      if (!ScoreZenzaiSentences(reading, left, right, joined, &scores)) continue;
+      const long ms = static_cast<long>(std::chrono::duration_cast<std::chrono::milliseconds>(
+          std::chrono::steady_clock::now() - begin).count());
+      std::vector<double> values;
+      size_t at = 0;
+      while (true) {
+        const size_t tab = scores.find('\t', at);
+        const std::string piece = scores.substr(at, tab == std::string::npos ? std::string::npos : tab - at);
+        values.push_back(piece == "nan" ? std::nan("") : std::strtod(piece.c_str(), nullptr));
+        if (tab == std::string::npos) break;
+        at = tab + 1;
+      }
+      if (values.size() != surfaces.size()) continue;
+      int pick = -1;
+      for (size_t s = 0; s < values.size(); ++s) {
+        if (std::isfinite(values[s]) && (pick < 0 || values[s] > values[pick])) pick = static_cast<int>(s);
+      }
+      std::string line = reading + '\t' + firsts + '\t' + std::to_string(i) + '\t' +
+                         std::to_string(pick) + '\t' + std::to_string(ms);
+      for (size_t s = 0; s < surfaces.size(); ++s) {
+        char number[40];
+        std::snprintf(number, sizeof(number), "%.4f", values[s]);
+        line += '\t' + surfaces[s] + '\t' + number;
+      }
+      static std::mutex score_mutex;
+      std::lock_guard<std::mutex> lock(score_mutex);
+      if (FILE* f = std::fopen(path, "ab")) {
+        std::fwrite(line.data(), 1, line.size(), f);
+        std::fputc('\n', f);
+        std::fclose(f);
+      }
+    }
+  }
+  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
+''')
+
+# 選び手の段階2: 学習の材料（記録だけ。出力は変えない）。MYIME_SELECTOR_FEATURES=<ファイル> のときだけ、
+# 変換の最後に各文節の読みと候補の上位8つを、候補ごとに Mozc のコストなどを添えて1行に書き足す。
+# 並びは MYIME_SELECTOR_DUMP と同じ（文節は U+0001、候補はタブ）で、候補の中の値は U+0002 で区切る:
+# 表記、cost、wcost、structure_cost、lid、rid、attributes、content_value。tools/selector_stage2.py が読む。
+edit("engine/engine.cc", "    DumpCandidates(*segments);\n",
+     "    DumpCandidates(*segments);\n    DumpFeatures(*segments);\n")
+edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by\n",
+     r'''  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。MYIME_SELECTOR_DUMP と
+  // 同じ並びで、候補ごとに 表記、cost、wcost、structure_cost、lid、rid、attributes、content_value を
+  // U+0002 で区切って書く。
+  static void DumpFeatures(const Segments& segments) {
+    static const char* path = std::getenv("MYIME_SELECTOR_FEATURES");
+    if (!path || !*path) return;
+    std::string line;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (!line.empty()) line += '\x01';
+      line += segment.key();
+      for (size_t c = 0; c < segment.candidates_size() && c < 8; ++c) {
+        const auto& cand = segment.candidate(c);
+        line += '\t';
+        line += cand.value;
+        for (const long long n : {static_cast<long long>(cand.cost), static_cast<long long>(cand.wcost),
+                                  static_cast<long long>(cand.structure_cost), static_cast<long long>(cand.lid),
+                                  static_cast<long long>(cand.rid), static_cast<long long>(cand.attributes)}) {
+          line += '\x02';
+          line += std::to_string(n);
+        }
+        line += '\x02';
+        line += cand.content_value;
+      }
+    }
+    line += '\n';
+    static std::mutex features_mutex;
+    std::lock_guard<std::mutex> lock(features_mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      // 1行を1回で書く（同時に動く別の処理の行と混ざらないように）
+      std::setvbuf(f, nullptr, _IOFBF, line.size() + 16);
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fclose(f);
+    }
+  }
+  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
+''')
+
+# 選び手の段階2b: Zenzai が候補を確かめるときに計算済みの分布（tools/apply_selector_trace.py の
+# GetSelectorTrace）を、MYIME_SELECTOR_FEATURES の行の終わりに U+0003 で区切って足す（記録だけ）。
+edit(A, "  using ScoreSentencesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n",
+     "  using ScoreSentencesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n"
+     "  using GetSelectorTraceFunc = const char* (*)(const char*);\n")
+edit(A, "  ScoreSentencesFunc ScoreSentences = nullptr;\n",
+     "  ScoreSentencesFunc ScoreSentences = nullptr;\n  GetSelectorTraceFunc GetSelectorTrace = nullptr;\n")
+edit(A, """    ScoreSentences = reinterpret_cast<ScoreSentencesFunc>(
+        GetProcAddress(dll_handle_, "ScoreSentences"));
+""", """    ScoreSentences = reinterpret_cast<ScoreSentencesFunc>(
+        GetProcAddress(dll_handle_, "ScoreSentences"));
+    GetSelectorTrace = reinterpret_cast<GetSelectorTraceFunc>(
+        GetProcAddress(dll_handle_, "GetSelectorTrace"));
+""")
+edit(A, "    MYIME_LOAD(ScoreSentences);\n", "    MYIME_LOAD(ScoreSentences);\n    MYIME_LOAD(GetSelectorTrace);\n")
+edit(A, "    ScoreSentences = nullptr;\n", "    ScoreSentences = nullptr;\n    GetSelectorTrace = nullptr;\n")
+edit(A, "AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)\n    : config_(config) {\n",
+     """bool SelectorTraceForText(absl::string_view text, std::string* trace) {
+  if (text.empty() || trace == nullptr || text.find('\\0') != absl::string_view::npos) return false;
+  auto& loader = AzooKeyDllLoader::GetInstance();
+  const std::lock_guard<std::mutex> operation(loader.operation_mutex());
+  if (!loader.IsLoaded() || !loader.GetSelectorTrace) return false;
+  const std::string t(text);
+  const char* result = loader.GetSelectorTrace(t.c_str());
+  if (result == nullptr) return false;
+  trace->assign(result);
+  loader.FreeString(result);
+  return true;
+}
+
+AzooKeyImmutableConverter::AzooKeyImmutableConverter(const AzooKeyConfig& config)
+    : config_(config) {
+""")
+edit("converter/azookey_immutable_converter.h",
+     "[[nodiscard]] bool ScoreZenzaiSentences(",
+     "// 選び手の段階2b（記録だけ）: text をたどった Zenzai の分布の記録。変換エンジンに入り口がなければ false。\n"
+     "[[nodiscard]] bool SelectorTraceForText(absl::string_view text, std::string* trace);\n\n"
+     "[[nodiscard]] bool ScoreZenzaiSentences(")
+edit("engine/engine.cc", """    line += '\\n';
+    static std::mutex features_mutex;""", """    std::string text, trace;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (segment.candidates_size() > 0) text += segment.candidate(0).value;
+    }
+    if (SelectorTraceForText(text, &trace)) {
+      line += '\\x03';
+      line += trace;
+    }
+    line += '\\n';
+    static std::mutex features_mutex;""")
+
 print("applied")
