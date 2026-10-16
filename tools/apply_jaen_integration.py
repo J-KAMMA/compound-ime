@@ -3547,4 +3547,48 @@ edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversi
   // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
 ''')
 
+# 選び手の段階2: 学習の材料（記録だけ。出力は変えない）。MYIME_SELECTOR_FEATURES=<ファイル> のときだけ、
+# 変換の最後に各文節の読みと候補の上位8つを、候補ごとに Mozc のコストなどを添えて1行に書き足す。
+# 並びは MYIME_SELECTOR_DUMP と同じ（文節は U+0001、候補はタブ）で、候補の中の値は U+0002 で区切る:
+# 表記、cost、wcost、structure_cost、lid、rid、attributes、content_value。tools/selector_stage2.py が読む。
+edit("engine/engine.cc", "    DumpCandidates(*segments);\n",
+     "    DumpCandidates(*segments);\n    DumpFeatures(*segments);\n")
+edit("engine/engine.cc", "  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by\n",
+     r'''  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。MYIME_SELECTOR_DUMP と
+  // 同じ並びで、候補ごとに 表記、cost、wcost、structure_cost、lid、rid、attributes、content_value を
+  // U+0002 で区切って書く。
+  static void DumpFeatures(const Segments& segments) {
+    static const char* path = std::getenv("MYIME_SELECTOR_FEATURES");
+    if (!path || !*path) return;
+    std::string line;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (!line.empty()) line += '\x01';
+      line += segment.key();
+      for (size_t c = 0; c < segment.candidates_size() && c < 8; ++c) {
+        const auto& cand = segment.candidate(c);
+        line += '\t';
+        line += cand.value;
+        for (const long long n : {static_cast<long long>(cand.cost), static_cast<long long>(cand.wcost),
+                                  static_cast<long long>(cand.structure_cost), static_cast<long long>(cand.lid),
+                                  static_cast<long long>(cand.rid), static_cast<long long>(cand.attributes)}) {
+          line += '\x02';
+          line += std::to_string(n);
+        }
+        line += '\x02';
+        line += cand.content_value;
+      }
+    }
+    line += '\n';
+    static std::mutex features_mutex;
+    std::lock_guard<std::mutex> lock(features_mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      // 1行を1回で書く（同時に動く別の処理の行と混ざらないように）
+      std::setvbuf(f, nullptr, _IOFBF, line.size() + 16);
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fclose(f);
+    }
+  }
+  // MYIME_SELECTOR_DUMP=<file>: one line per conversion, segments joined by
+''')
+
 print("applied")

@@ -131,9 +131,17 @@ jobs:
           path: lex/
           retention-days: 14
 
+  # 選び手の段階2の材料集め（selector-data.yml）。exp/selector-stage2 の枝のときだけ。
+  selector-data:
+    needs: build
+    if: github.ref_name == 'exp/selector-stage2'
+    uses: ./.github/workflows/selector-data.yml
+
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
+  # 選び手の材料集めの枝では、計算機を材料集めに回すため流さない。
   test:
     needs: build
+    if: github.ref_name != 'exp/selector-stage2'
     runs-on: ubuntu-24.04
     timeout-minutes: 120
     # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
