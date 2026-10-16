@@ -19,6 +19,7 @@
 | `finetune.ipynb` | Colab で上から順に押していく手順書（日本語）。①〜⑬のセル |
 | `build_dataset.py` | 練習問題を作る。試験の文を除き、出どころと利用条件の目録（manifest.json）も作る |
 | `zenz_tune.py` | 手順書から呼ぶ部品（GGUF を学習できる形に戻す、学習、途中からの再開、成績、GGUF の確認） |
+| `domain_text.py`、`fetch_domain_sources.py`、`domain_sources.json` | プログラミング・仮想通貨の文書から文を取り出す（下の「分野の練習問題と試験」） |
 
 ## やること（クリックする所）
 
@@ -149,10 +150,85 @@ jaen200b.json、typo150.json、typo150b.json、reported.json、inputs.txt、vari
   （試験のファイルは形を確かめるために先頭と末尾の1件を見ただけです。手元の試運転で、除いた文の記録に
   試験の語がいくつか出ましたが、それに合わせて型を変えてはいません）。
 
+## 分野の練習問題と試験（プログラミング・仮想通貨）
+
+プログラミングと仮想通貨の文は、ウィキペディアにあまり出てこない言葉（git、npm、Python、DeFi、NFT、
+ブロックチェーン、デプロイ…）が多いため、その分野の文書から文を取り出して、練習問題と試験を作ります。
+学習はこの道具ではしません。
+
+| ファイル | 役目 |
+|---|---|
+| `domain_sources.json` | 出どころの一覧（リポジトリ・コミット・取り出す場所・利用条件・試験に回す文書の割合） |
+| `fetch_domain_sources.py` | 出どころを、コミットを固定して git の sparse checkout で取り出す（リポジトリには材料を入れない） |
+| `domain_text.py` | 文書から日本語の文を取り出す（下記）。`sentences.jsonl` と出典ごとの件数 `counts.json` を作る |
+| `../domain_typing_test.py` | 試験用の文書の文から、打ち込み試験 `tests/conversion/domain-prog.tsv`、`domain-crypto.tsv` を作る |
+| `build_dataset.py --domain-text …` | 練習用の文書の文を、ウィキペディアなどと混ぜて train/valid にする |
+
+**出どころ（版は固定）**
+
+| 名前 | 分野 | 版（コミット） | 利用条件 |
+|---|---|---|---|
+| mdn: MDN Web Docs 日本語版（mdn/translated-content の files/ja） | プログラミング | `a213f11c…` | CC BY-SA 2.5 |
+| python: Python 文書の日本語訳（python/python-docs-ja。po の訳文 msgstr だけ、未訳・fuzzy は除く） | プログラミング | `d2a3519d…` | PSF |
+| kubernetes: Kubernetes 日本語版（kubernetes/website の content/ja） | プログラミング | `2f85f280…` | CC BY 4.0 |
+| react: ja.react.dev（reactjs/ja.react.dev の src/content） | プログラミング（補助） | `356741e6…` | CC BY 4.0 |
+| rust: プログラミング言語Rust（rust-lang-ja/book-ja の src） | プログラミング（補助） | `5092e539…` | MIT または Apache-2.0 |
+| ethereum: ethereum.org 日本語版（ethereum/ethereum-org-website の translations/ja。文章のみ） | 仮想通貨 | `1b3d51c0…` | CC BY 4.0 |
+
+**文の取り出し（`domain_text.py`）**: md の前置き（front matter）・コードの囲み・表・HTML・見出し・リンクの書式、
+マクロ（MDN の `{{ }}`、Kubernetes の `{{< >}}`、mdbook の `{{#include}}`）を除き、句点（。！？）で文に分けます。
+`git` のような短いコードの書式は英字の言葉として文に残し、複雑なコードや使えないマクロを含む文は捨てます。
+日本語の割合が 6 割に満たない文、10 字未満・80 字超の文、使えない記号（括弧書きなど）を含む文、重複した文も捨てます。
+英字だけの括弧書き（`分散型金融 (DeFi)` の `(DeFi)`）は取り除いて文を残します。日本語の隣の空白は消します
+（ローマ字で打つときに空白は入らないため）。
+
+**試験用と練習用は文書の単位で分けます**（同じ文書の文が両方に入りません）。分け方は文書の名前と種（20261015）で
+決まるので、同じ版の材料なら毎回同じです。試験用の文書にある文は、ほかの文書に同じ文があっても練習用に入れません。
+試験の tsv にした文は、さらに `TestExclusion` で練習問題から除かれます（`--extra-test` で、まだリポジトリに入れていない
+試験の tsv も指定できます）。
+
+**打ち込み試験（`domain-prog.tsv` 300 文、`domain-crypto.tsv` 200 文ほど）**: 10〜45 字で句点で終わり、漢字・かな・
+英字の言葉（最大 3 語、数字や記号なし）だけでできた文を、出典ごとの枠（`domain_sources.json` の `test_quota`）で選びます。
+英字の言葉を含む文を 4 割ねらい、1 つの文書から 3 文まで。ローマ字は日本語の部分だけ SudachiPy の読みから作り、
+英字の言葉は小文字で打ったままにします。期待する答えは元の文どおり（`git`、`npm`、`Python`、`DeFi`、`NFT`）です。
+先頭の `#` の行に出典・コミット・利用条件を書き、各行の 3 列目に出典名を入れます。採点は
+`tools/score_wiki_typing.py`（出典別・英字入りの文別の内訳つき）。
+
+**練習問題への混ぜ方**: `--domain-text out/sentences.jsonl`（`--domain-share` が分野の割合。既定 0.5 で、
+`--size` のうち半分が分野、残りがウィキペディアなど）。分野の問題は 4 種類です。
+
+| 種類 | 割合（分野の中） | 中身 |
+|---|---|---|
+| domain_whole | 30% | 英字の言葉のない文を、文脈なしで変換 |
+| domain_context | 15% | 同じ段落の前の文を左の文脈にして変換 |
+| domain_span | 20% | 文の一部（文節1〜3つ）を、左右の文脈つきで変換 |
+| domain_english | 35% | 英字の言葉を含む文の日本語の部分。英字の言葉は左右の文脈側（実行時と同じ形） |
+
+1 周で足りない種類は、同じ文の別の形の問題で最大 3 周（`--domain-passes`）まで足します。それでも足りない分は
+予定より少ないまま、終わりの表示と `manifest.json` に出ます。確かめ用は分野の文書の 5%（`--domain-valid-fraction`）。
+`manifest.json` の `domain` に、出典ごとの名前・コミット・利用条件・取り出した文の数・練習用/確かめ用の問題の数を記録します。
+英字だけの試験の語（`github`、`python` など）は「同じ」だけを調べ、「含む」は調べません（調べると、その語を含む
+分野の文が大量に消えるため。日本語を含む試験の文は今までどおり「含む」も調べます）。
+
+**GitHub での作り方**: `.github/workflows/domain-data.yml`（手動）。材料の取り出し → 文の取り出し → 試験の文 → 練習問題
+の順に流し、成果物 `domain-data` に `sentences.jsonl`・`counts.json`・`tests/domain-*.tsv`・`dataset/`
+（`train.jsonl`、`valid.jsonl`、`manifest.json`、`excluded.txt`）を置きます。試験の tsv は中身を確かめてから
+`tests/conversion/` に入れます。入れたあとは `linux-test.yml` の組 `g` が、今の人工知能の点数を出します。
+
+**Colab の手順の変更点**: ① の設定に `USE_DOMAIN`（既定 True）と `DOMAIN_SHARE`（既定 0.5）が増えました。⑦ が
+分野の材料を取り出して文にし（CPU で数分〜十数分、追加の操作は不要）、`--domain-text` を付けて練習問題を作ります。
+試験の tsv（`tests/conversion/domain-*.tsv`）が `REPO_REF` の枝に入っていることを確かめてから動かしてください。
+⑩ の成績の表に `domain_*` の行が増えます。ふつうの文（wiki_*）が下がっていないことの確認は今までどおりです。
+`USE_DOMAIN = False` にすると今までと同じ問題になります。
+
 ## 利用条件と、守ること
 
 | もの | 利用条件 | 守ること |
 |---|---|---|
+| MDN Web Docs 日本語版（mdn/translated-content） | CC BY-SA 2.5 | 表示・同じ条件（同じ条件で配る） |
+| Python 文書の日本語訳（python/python-docs-ja） | PSF | 表示（訳文 msgstr だけを使う） |
+| Kubernetes 日本語版、ja.react.dev、ethereum.org 日本語版（文章のみ） | CC BY 4.0 | 表示（出典・変更したこと） |
+| プログラミング言語Rust 日本語版（rust-lang-ja/book-ja） | MIT または Apache-2.0 | 著作権表示 |
 | zenz-v3.2-small（元の模型） | 配布ページの表示は Apache-2.0。ただし元になった ku-nlp/gpt2-small-japanese-char と zenz の以前の版（v1〜v3.1）は CC BY-SA 4.0 | 下の理由で CC BY-SA 4.0 として扱う |
 | ku-nlp/gpt2-small-japanese-char | CC BY-SA 4.0 | 表示・同じ条件 |
 | ウィキペディア日本語版の本文 | CC BY-SA（データセット wikimedia/wikipedia は CC BY-SA 3.0 と GFDL と表示） | 表示・同じ条件 |

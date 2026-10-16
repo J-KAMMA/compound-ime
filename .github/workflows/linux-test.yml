@@ -142,7 +142,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a1, a2, b, c, d1, d2, e1, e2, f]
+        group: [a1, a2, b, c, d1, d2, e1, e2, f, g]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -213,6 +213,14 @@ jobs:
             cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
             python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
           fi
+          # 分野の打ち込み試験（プログラミング、仮想通貨）の採点
+          for f in prog crypto; do
+            if [ -f results/domain-$f.tsv ] && [ -f repo/tests/conversion/domain-$f.tsv ]; then
+              case $f in prog) label="分野の打ち込み（プログラミング）";; *) label="分野の打ち込み（仮想通貨）";; esac
+              python3 repo/tools/score_wiki_typing.py repo/tests/conversion/domain-$f.tsv results/domain-$f.tsv "$label" > results/domain-$f-score.txt
+              head -12 results/domain-$f-score.txt
+            fi
+          done
           ls results
       - uses: actions/upload-artifact@v4
         with:
