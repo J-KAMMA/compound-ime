@@ -35,6 +35,15 @@ jobs:
           venv/bin/python tools/wiki_typing_test.py --wiki wiki.parquet --table romanji-hiragana.tsv \
             --out out/wiki-typing.tsv --count ${{ inputs.count }}
           head -5 out/wiki-typing.tsv
+      # 前後の文がある試験の文（学習に使ったのと別のファイルから。tools/context_test.py）
+      - name: 前後の文がある試験の文を作る
+        run: |
+          set -eo pipefail
+          curl -fsSL -o wiki3.parquet \
+            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00003-of-00015.parquet
+          sha256sum wiki3.parquet
+          venv/bin/python tools/context_test.py --wiki wiki3.parquet --table romanji-hiragana.tsv --out out/context.tsv --count 1000
+          head -4 out/context.tsv
       - uses: actions/upload-artifact@v4
         with:
           name: wiki-typing
