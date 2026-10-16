@@ -5,6 +5,11 @@
 name: Domain data
 
 on:
+  # 実験の枝 exp/domain-data では、この流れのファイルを変えて push したときも動く
+  # （main に入るまで、gh workflow run で呼べないため）
+  push:
+    branches: ['exp/domain-data']
+    paths: ['.github/workflows/domain-data.yml']
   workflow_dispatch:
     inputs:
       size:
@@ -57,16 +62,16 @@ jobs:
         run: |
           set -eo pipefail
           venv/bin/python tools/domain_typing_test.py --sentences out/sentences.jsonl --table romanji-hiragana.tsv \
-            --out-dir out/tests --prog ${{ inputs.prog }} --crypto ${{ inputs.crypto }}
+            --out-dir out/tests --prog ${{ inputs.prog || '300' }} --crypto ${{ inputs.crypto || '200' }}
           head -12 out/tests/domain-prog.tsv
           head -12 out/tests/domain-crypto.tsv
       - name: 練習問題を作る
         run: |
           set -eo pipefail
           venv/bin/python tools/zenz-finetune/build_dataset.py --out out/dataset --romaji-table romanji-hiragana.tsv \
-            --wiki wiki.parquet --domain-text out/sentences.jsonl --domain-share ${{ inputs.domain_share }} \
+            --wiki wiki.parquet --domain-text out/sentences.jsonl --domain-share ${{ inputs.domain_share || '0.5' }} \
             --extra-test out/tests/domain-prog.tsv out/tests/domain-crypto.tsv \
-            --size ${{ inputs.size }} --show 1 --progress 5000
+            --size ${{ inputs.size || '400000' }} --show 1 --progress 5000
           wc -l out/dataset/train.jsonl out/dataset/valid.jsonl
       - uses: actions/upload-artifact@v4
         with:
