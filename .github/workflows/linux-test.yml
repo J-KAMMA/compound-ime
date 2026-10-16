@@ -199,6 +199,16 @@ jobs:
             cat results/variants-1.tsv results/variants-2.tsv > results/variants.tsv && rm results/variants-1.tsv results/variants-2.tsv
             python3 repo/tools/score_variants.py repo/tests/conversion/variants.tsv results/variants.tsv | tee results/variants-score.txt | head -40
           fi
+          # 選び手の段階0: 候補の上位8つから正解を組める間違いの数（tools/selector_ceiling.py）
+          if ls results/dump-*.txt > /dev/null 2>&1; then
+            curl -fsSL -o romanji-hiragana.tsv \
+              https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+            echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+            for n in ja400 jaen270 jaen200b; do
+              [ -f results/dump-$n.txt ] && python3 repo/tools/selector_ceiling.py results/dump-$n.txt results/$n.tsv \
+                repo/tests/conversion/$n.json romanji-hiragana.tsv > results/ceiling-$n.txt && head -14 results/ceiling-$n.txt
+            done
+          fi
           if [ -f results/wiki-typing-1.tsv ] && [ -f results/wiki-typing-2.tsv ]; then
             cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
             python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
