@@ -14,7 +14,7 @@ are read with SudachiPy and written in the base romaji style
 (tools/romaji_variants.py); the English words are typed as they are, in lower
 case, and expected as they are in the document. A sentence whose romaji does
 not read back to the same kana is left out, and so is any test sentence of
-tests/conversion (TestExclusion). Up to 3 sentences per document, about 40%
+tests/conversion (TestExclusion). Up to 4 sentences per document, about 40%
 with English words. The quota of each source is in
 tools/zenz-finetune/domain_sources.json (a source with too few sentences hands
 its quota to the others of the same field).
@@ -98,7 +98,7 @@ def main():
     ap.add_argument("--prog", type=int, default=300)
     ap.add_argument("--crypto", type=int, default=200)
     ap.add_argument("--english-share", type=float, default=0.4, help="英字の言葉を含む文の割合のねらい")
-    ap.add_argument("--per-doc", type=int, default=3, help="1つの文書から取る文の上限")
+    ap.add_argument("--per-doc", type=int, default=4, help="1つの文書から取る文の上限")
     ap.add_argument("--seed", type=int, default=20261015)
     ap.add_argument("--repo", default=str(HERE.parent))
     args = ap.parse_args()

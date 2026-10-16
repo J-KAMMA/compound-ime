@@ -47,7 +47,7 @@
       "paths": ["public/content/translations/ja"], "root": "public/content/translations/ja", "glob": "**/*.md", "format": "md",
       "license": "CC BY 4.0（文章のみ。コードは別の条件で、使わない）", "license_url": "https://creativecommons.org/licenses/by/4.0/",
       "attribution": "ethereum.org の貢献者",
-      "test_doc_fraction": 0.12, "test_quota": 200
+      "test_doc_fraction": 0.25, "test_quota": 200
     }
   ]
 }

@@ -189,7 +189,7 @@ jaen200b.json、typo150.json、typo150b.json、reported.json、inputs.txt、vari
 
 **打ち込み試験（`domain-prog.tsv` 300 文、`domain-crypto.tsv` 200 文ほど）**: 10〜45 字で句点で終わり、漢字・かな・
 英字の言葉（最大 3 語、数字や記号なし）だけでできた文を、出典ごとの枠（`domain_sources.json` の `test_quota`）で選びます。
-英字の言葉を含む文を 4 割ねらい、1 つの文書から 3 文まで。ローマ字は日本語の部分だけ SudachiPy の読みから作り、
+英字の言葉を含む文を 4 割ねらい、1 つの文書から 4 文まで。ローマ字は日本語の部分だけ SudachiPy の読みから作り、
 英字の言葉は小文字で打ったままにします。期待する答えは元の文どおり（`git`、`npm`、`Python`、`DeFi`、`NFT`）です。
 先頭の `#` の行に出典・コミット・利用条件を書き、各行の 3 列目に出典名を入れます。採点は
 `tools/score_wiki_typing.py`（出典別・英字入りの文別の内訳つき）。

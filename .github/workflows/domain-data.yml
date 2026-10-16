@@ -1,7 +1,7 @@
 # プログラミングと仮想通貨の分野の材料から、打ち込み試験の文（tests/conversion/domain-prog.tsv、domain-crypto.tsv）と、
 # zenz の追加学習の練習問題（分野＋ウィキペディアの混ぜもの）を作る。手動で動く。
 # 材料は版（コミット）を固定して取り出す（tools/zenz-finetune/domain_sources.json）。リポジトリには材料を入れない。
-# 結果は成果物 domain-data に残る。試験の tsv は、中身を確かめてからリポジトリに入れる。
+# 結果は成果物 domain-data に残る（tests/ に試験の tsv、dataset/ に train.jsonl・valid.jsonl・manifest.json）。試験の tsv は、中身を確かめてからリポジトリに入れる。
 name: Domain data
 
 on:
