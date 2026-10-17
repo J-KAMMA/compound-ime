@@ -56,6 +56,9 @@ def main():
     parser.add_argument("--skip-composable", default="", metavar="名前,名前",
                         help="この名前の辞書から、Mozc の2つの項目の連なりで作れる言葉と、--max-reading より長い読みの言葉（長い句）は足さない")
     parser.add_argument("--max-reading", type=int, default=99, help="--skip-composable で絞る辞書の、読みの長さの上限")
+    parser.add_argument("--first-wins", action="store_true",
+                        help="同じ (読み, 表記) が複数の辞書にあるとき、--sources で先に書いた辞書の品詞と費用を残す"
+                             "（既定は費用の低いほう。後の辞書の品詞が先の辞書の語を上書きしないため）")
     parser.add_argument("--min-reading", type=int, default=3)
     parser.add_argument("--install", action="store_true",
                         help="also copy to data/dictionary_oss/dictionary10.txt and list it in BUILD.bazel")
@@ -94,7 +97,7 @@ def main():
         name, _, limit = item.partition("=")
         cost_limits[name] = int(limit)
     entries, counts = {}, {}
-    for source in args.sources.split(","):
+    for tier, source in enumerate(args.sources.split(",")):
         pos_id = ids[POS[source]]
         kept = 0
         source_path = locals_.get(source, args.ut / f"mozcdic-ut-{source}.txt")
@@ -117,27 +120,47 @@ def main():
             if reading in max_cost:
                 cost = max(cost, max_cost[reading] + MARGIN)
             key = (reading, surface)
-            if key not in entries or cost < entries[key][1]:
-                entries[key] = (pos_id, cost)
+            if key not in entries or (cost < entries[key][1] and not args.first_wins):
+                entries[key] = (pos_id, cost, tier)
                 kept += 1
         counts[source] = kept
     groups = {}
     for (reading, surface), value in entries.items():
         groups.setdefault(reading, []).append((surface, value))
+
+    def arrange(reading, group, pos_id=None, floor=None):
+        """同じ読みの言葉を並べ直す。品詞は1つにそろえる（でないと接続の費用でまた順番が入れ替わる）。"""
+        def rank_key(entry):
+            c = composed(reading, entry[0])
+            return (c is None, c or 0, entry[1][1], entry[0])
+        ranked = sorted(group, key=rank_key)
+        if pos_id is None:
+            pos_id = ranked[0][1][0]
+        if floor is None:
+            floor = min(value[1] for _, value in group)
+        return [(s, (pos_id, floor + rank * 50, value[2])) for rank, (s, value) in enumerate(ranked)]
+
     with args.out.open("w", encoding="utf-8", newline="\n") as out:
         for reading in sorted(groups):
             group = groups[reading]
-            if len(group) > 1:
-                def rank_key(entry):
-                    c = composed(reading, entry[0])
-                    return (c is None, c or 0, entry[1][1], entry[0])
-                # One part of speech per reading, or connection costs would
-                # reorder the variants again.
-                floor = min(cost for _, (_, cost) in group)
-                ranked = sorted(group, key=rank_key)
-                pos_id = ranked[0][1][0]
-                group = [(s, (pos_id, floor + rank * 50)) for rank, (s, _) in enumerate(ranked)]
-            for surface, (pos_id, cost) in sorted(group):
+            if args.first_wins:
+                # 先に書いた辞書の言葉は、後の辞書を足さないときと同じにする。後の辞書の言葉は、その後ろに足す。
+                tiers = {}
+                for item in group:
+                    tiers.setdefault(item[1][2], []).append(item)
+                group, pos_id, top = [], None, 0
+                for tier in sorted(tiers):
+                    if pos_id is None:
+                        part = arrange(reading, tiers[tier]) if len(tiers[tier]) > 1 else tiers[tier]
+                        pos_id = part[0][1][0]
+                        part = [(s, (pos_id, v[1], v[2])) for s, v in part]
+                    else:
+                        part = arrange(reading, tiers[tier], pos_id, top + 50)
+                    top = max(v[1] for _, v in part)
+                    group += part
+            elif len(group) > 1:
+                group = arrange(reading, group)
+            for surface, (pos_id, cost, _) in sorted(group):
                 out.write(f"{reading}\t{pos_id}\t{pos_id}\t{cost}\t{surface}\n")
     print("entries", len(entries), counts)
     if args.install:
