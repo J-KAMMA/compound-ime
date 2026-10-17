@@ -191,7 +191,9 @@ j)
   # すぐ動くようにして（MYIME_PREFETCH_DELAY=1）、キーを1つずつ送り続ける。途中で1字消して打ち直す。
   # 上限は既定の 1000 ミリ秒、1 ミリ秒（計算の途中の打ち切りがほぼ毎回起きる）、それに裏の変換
   # （MYIME_ASYNC_CONVERSION=1）でも流す。処理が最後まで動き、全部の文が確定することを確かめる。
-  romaji $T/ja400.json | head -40 > $W/stress.txt
+  # head に直接つなぐと、pipefail のもとで Python が書き込み先の切れた誤り（終了の番号 120）で止まる
+  romaji $T/ja400.json > $W/stress-all.txt
+  head -40 $W/stress-all.txt > $W/stress.txt
   expected=$(wc -l < $W/stress.txt)
   fail=0
   for variant in t1000 t1 async; do
