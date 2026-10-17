@@ -129,7 +129,8 @@ y)
   # 診断（原因調べの間だけ）: 文末の記号の組み直し。従来の動き（MYIME_RESEG_SYMBOL=0）と新しい動きを、人工知能の候補と組み直しの記録付きで流す
   if [ -f $T/colloquial.tsv ]; then
     grep -v '^#' $T/colloquial.tsv | cut -f1 > $W/colloquial.txt
-    MYIME_RESEG_SYMBOL=0 MYIME_AI_DUMP=$OUT/ai-old.txt MYIME_RESEGMENT_LOG=$OUT/reseg-old.txt $BATCH $W/colloquial.txt $OUT/old.tsv 4
+    MYIME_RESEG_SYMBOL=0 MYIME_RESEG_SYNTH=0 MYIME_RESEG_GUARD=0 MYIME_AI_DUMP=$OUT/ai-old.txt MYIME_RESEGMENT_LOG=$OUT/reseg-old.txt $BATCH $W/colloquial.txt $OUT/old.tsv 4
+    MYIME_RESEG_SYNTH=0 MYIME_RESEGMENT_LOG=$OUT/reseg-sym.txt $BATCH $W/colloquial.txt $OUT/sym.tsv 4
     MYIME_AI_DUMP=$OUT/ai-new.txt MYIME_RESEGMENT_LOG=$OUT/reseg-new.txt $BATCH $W/colloquial.txt $OUT/new.tsv 4
   fi
   ;;

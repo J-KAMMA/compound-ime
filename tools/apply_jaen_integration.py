@@ -3812,6 +3812,101 @@ edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, s
     return false;
   }
   static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
+# 組み直しで、人工知能の区画の文字列（寝てるの、直人は、平和ボケ）を Mozc が一つの候補として持たないとき
+# （Mozc は区画を「は寝てるの」でなく「は」と「寝てるの」に分けるなど）、今までは断っていた（人工知能が正しいのに
+# 全部ひらがなや別の漢字のまま残る原因）。断らずに、その区画の読みに、人工知能の文字列を一つの候補として作って置く。
+# 守り: 人工知能の文にカタカナが増えるときは、その区画に Mozc の固有名詞（人名など）のカタカナ候補が含まれること。
+# MYIME_RESEG_SYNTH=0 で従来どおり断る。
+# もう一つ、文末の記号の許可（上）で、Mozc の今の一番上の文が人工知能の上位の候補にもあるときは、組み直さない
+# （人工知能の一番上が誤りでも Mozc と人工知能の二番目以降が一致している。藍月のうも ←→ あいつ昨日も）。
+# 読みそのままのひらがなの文は対象外。MYIME_RESEG_GUARD=0 で外す。
+edit("engine/engine.cc", """      const std::string piece_value(std::string_view(candidate.value).substr(value_offset, length.value_len));""",
+     """      const std::string piece_value = NormalizeSingleSymbol(std::string_view(candidate.value).substr(value_offset, length.value_len));""")
+edit("engine/engine.cc", """        if (found == segment.candidates().end()) return false;
+        indices.push_back(static_cast<int>(found - segment.candidates().begin()));
+      } else if (auto path = private_surface::Find(piece, piece_key, piece_value, piece_original)) {
+        indices = std::move(*path);
+      } else {
+        return false;
+      }
+""", """        if (found == segment.candidates().end()) synthesize = true;
+        else indices.push_back(static_cast<int>(found - segment.candidates().begin()));
+      } else if (auto path = private_surface::Find(piece, piece_key, piece_value, piece_original)) {
+        indices = std::move(*path);
+      } else {
+        synthesize = true;
+      }
+      if (synthesize) {
+        if (!ResegmentSynthesize()) return false;
+        if (katakana(piece_value) > 0 && extra_katakana) {
+          bool has_name = false;
+          for (const auto& piece_segment : piece.conversion_segments())
+            for (const auto* c : piece_segment.candidates())
+              if (c && pos.IsUniqueNoun(c->lid) && katakana(c->value) > 0 &&
+                  piece_value.find(c->value) != std::string::npos) has_name = true;
+          if (!has_name) return false;
+        }
+        Segment made = piece.conversion_segment(0);
+        const converter::Candidate first = made.candidate(0);
+        const int last_rid = piece.conversion_segment(piece.conversion_segments_size() - 1).candidate(0).rid;
+        made.clear_candidates();
+        made.set_key(piece_key);
+        converter::Candidate* c = made.push_back_candidate();
+        *c = first;
+        c->key = piece_key; c->value = piece_value;
+        c->content_key = piece_key; c->content_value = piece_value;
+        c->rid = last_rid; c->attributes = 0; c->consumed_key_size = 0;
+        c->inner_segment_boundary.clear(); c->description.clear();
+        rebuilt.push_back(std::move(made));
+        continue;
+      }
+""")
+edit("engine/engine.cc", """      std::vector<int> indices;
+      if (piece.conversion_segments_size() == 1) {""", """      std::vector<int> indices;
+      bool synthesize = false;
+      if (piece.conversion_segments_size() == 1) {""")
+edit("engine/engine.cc", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))""",
+     """          (!ResegmentGuard() || !MozcTopIsAiAlternative(*segments, full.conversion_segment(0))) &&
+          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))""")
+edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
+     """  static bool ResegmentEnv(const char* name) {
+    const char* value = std::getenv(name);
+    return !value || std::string_view(value) != "0";
+  }
+  static bool ResegmentSynthesize() { static const bool v = ResegmentEnv("MYIME_RESEG_SYNTH"); return v; }
+  static bool ResegmentGuard() { static const bool v = ResegmentEnv("MYIME_RESEG_GUARD"); return v; }
+  // ASCII ? ! , . to the full-width marks Mozc uses.
+  static std::string NormalizeSymbols(std::string text) {
+    static const std::pair<const char*, const char*> kMap[] = {
+        {"?", "\\xEF\\xBC\\x9F"}, {"!", "\\xEF\\xBC\\x81"}, {",", "\\xE3\\x80\\x81"}, {".", "\\xE3\\x80\\x82"}};
+    for (const auto& entry : kMap) {
+      size_t at = 0;
+      const size_t to_size = std::char_traits<char>::length(entry.second);
+      while ((at = text.find(entry.first, at)) != std::string::npos) {
+        text.replace(at, 1, entry.second);
+        at += to_size;
+      }
+    }
+    return text;
+  }
+  static std::string NormalizeSingleSymbol(std::string_view text) {
+    return Util::CharsLen(text) == 1 ? NormalizeSymbols(std::string(text)) : std::string(text);
+  }
+  // True when Mozc's current first sentence (not just the reading) is also one
+  // of the AI's first eight sentences.
+  static bool MozcTopIsAiAlternative(const Segments& segments, const Segment& ai) {
+    std::string top, reading;
+    for (const auto& segment : segments.conversion_segments()) {
+      top += segment.candidate(0).value;
+      reading += segment.key();
+    }
+    top = NormalizeSymbols(top);
+    if (top == NormalizeSymbols(reading)) return false;
+    for (size_t i = 0; i < ai.candidates_size() && i < 8; ++i)
+      if (NormalizeSymbols(ai.candidate(i).value) == top) return true;
+    return false;
+  }
+  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
 _engine = (src / "engine/engine.cc").read_text(encoding="utf-8")
 _start = _engine.index("  static bool ResegmentToWholePhrase(")
 _end = _engine.index("  static void PreferWholePhrase(", _start)
