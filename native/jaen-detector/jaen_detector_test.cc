@@ -146,6 +146,23 @@ int main() {
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
+  {
+    // 助詞で始まる語（deform の de）: 直前が日本語の名詞なら助詞と語に分ける。
+    jaen::Lexicon particle;
+    for (const char* w : {"deform", "form", "design", "sign", "default", "fault", "detouring", "touring", "token", "ken"}) {
+      particle.Add(w);
+    }
+    particle.AddCommon("design");
+    const auto split_english = [&](std::string_view raw) {
+      return Text(raw, jaen::SplitEnglish(Parse(raw), particle, Parse), true);
+    };
+    Expect(split_english("kinoudeformwomita") == "form|", "名詞の後の deform は で + form");
+    Expect(split_english("kinoudetouringshita") == "touring|", "名詞の後の detouring は で + touring");
+    Expect(split_english("deformwomita") == "deform|", "文頭の deform はそのまま");
+    Expect(split_english("kinounodeformwomita") == "deform|", "助詞の後の deform はそのまま");
+    Expect(split_english("kinoudesignwomita") == "design|", "よく使う design はそのまま");
+    Expect(split_english("kinoudefaultwomita") == "default|", "default はそのまま");
+  }
   Expect(english("3dpurinnta") == "3d|", "a listed word with digits is one piece (3d|purinnta, not dpu)");
   Expect(jaen::NormalizeWord("3d") == "3d" && jaen::NormalizeWord("123").empty(), "digits need a letter to be a word");
   {
