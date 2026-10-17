@@ -135,7 +135,8 @@ h)
     MYIME_ZENZAI_TIME_LIMIT_MS=$ms $BATCH $W/h100.txt $OUT/slow-idle$ms.tsv 1
   done
   # 前の文がある変換（人工知能を一番使う）60文を、空いた計算機で、上限 300 ミリ秒と上限なしにした場合
-  grep -v '^#' $T/context.tsv | head -60 > $W/ctx60.tsv
+  grep -v '^#' $T/context.tsv > $W/ctxall.tsv
+  head -60 $W/ctxall.tsv > $W/ctx60.tsv
   for ms in 300 0; do
     MYIME_ZENZAI_TIME_LIMIT_MS=$ms bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $W/ctx60.tsv $OUT/slow-ctx$ms.tsv with 1
   done
