@@ -119,7 +119,7 @@ jobs:
             --probe probe --expect-sources wiki,persona,tatoeba,domain,synthetic
           venv/bin/python tools/zenz-finetune/measure_dataset.py --data small --tokenizer tokenizer
           ls -la small
-      - name: 2. 本番の規模（Colab と同じ分け方: text と wiki 2 工程）
+      - name: 2. 本番の規模（Colab と同じ分け方（text と wiki の2工程））
         run: |
           set -eo pipefail
           SIZE=${{ inputs.full_size || '3000000' }}
