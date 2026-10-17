@@ -2014,126 +2014,10 @@ b = a + """      // A lone kana that is not a particle (the い of しつもん�
       static constexpr std::string_view kParticles[] = {
           "は", "が", "を", "に", "で", "と", "も", "へ", "や", "の", "か", "ね", "よ"};
       if (Util::CharsLen(piece_key) == 1 &&
-          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles)) {
-        // A lone sentence-final mark (？ ！ 。) is no kana: it passes only when
-        // some other piece had to be made whole (see lone_mark below).
-        if (Util::GetScriptType(piece_key) == Util::HIRAGANA || Util::GetScriptType(piece_key) == Util::KATAKANA)
-          return false;
-        lone_mark = true;
-      }
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles))
+        return false;
 """
 edit(E, a, b)
-edit(E, """    std::vector<Segment> rebuilt;
-    size_t key_offset = 0, value_offset = 0;
-""", """    std::vector<Segment> rebuilt;
-    size_t key_offset = 0, value_offset = 0;
-    bool lone_mark = false, made_whole = false;
-""")
-edit(E, """    if (key_offset != key.size() || value_offset != candidate.value.size() || rebuilt.size() > 128) return false;
-""", """    // A sentence with a lone mark piece is re-split only when a piece had to
-    // be made whole; otherwise it keeps Mozc's split as before (the AI's
-    // wrong 藍月 for あいつ must not get through just because of a ？).
-    if (lone_mark && !made_whole) return false;
-    if (key_offset != key.size() || value_offset != candidate.value.size() || rebuilt.size() > 128) return false;
-""")
-# 組み直しで、Mozc の文節の組み合わせでは人工知能の区画の表記を綴れないとき（助詞が次の語に付く、
-# 人名の読みが Mozc の区切りと合わない）、その区画を人工知能の表記で1文節にする。
-edit(E, """        if (found == segment.candidates().end()) return false;
-        indices.push_back(static_cast<int>(found - segment.candidates().begin()));
-      } else if (auto path = private_surface::Find(piece, piece_key, piece_value, piece_original)) {
-        indices = std::move(*path);
-      } else {
-        return false;
-      }
-""", """        if (found != segment.candidates().end())
-          indices.push_back(static_cast<int>(found - segment.candidates().begin()));
-      } else if (auto path = private_surface::Find(piece, piece_key, piece_value, piece_original)) {
-        indices = std::move(*path);
-      }
-      if (indices.empty()) {
-        Segment whole;
-        if (!MakePieceWhole(pos, piece, piece_key, piece_value, &whole)) return false;
-        ResegmentLog("WHOLE\\t" + piece_key + "\\t" + piece_value);
-        rebuilt.push_back(std::move(whole));
-        made_whole = true;
-        continue;
-      }
-""")
-edit(E, """  // Rebuilds the conversion segments at the boundaries of the AI's sentence""", """  // Mozc's segments cannot spell the AI's piece (the AI joins a particle to
-  // the next word, or reads a name where Mozc splits differently): make the
-  // piece one segment spelled as the AI does, with Mozc's own spelling next.
-  // Refused when the AI's piece would drop a name Mozc knows, or brings in
-  // katakana that Mozc has no word for. MYIME_RESEG_WHOLE_PIECE=0 turns it off.
-  static bool MakePieceWhole(const dictionary::PosMatcher& pos, const Segments& piece,
-                             const std::string& piece_key, const std::string& piece_value,
-                             Segment* out) {
-    static const bool enabled = [] {
-      const char* value = std::getenv("MYIME_RESEG_WHOLE_PIECE");
-      return !value || std::string_view(value) != "0";
-    }();
-    const size_t count = piece.conversion_segments_size();
-    // Never a lone mark, and never a piece that differs only in kana or width.
-    if (!enabled || count == 0 || piece_value == piece_key || Util::CharsLen(piece_key) < 2 ||
-        !(Util::ContainsScriptType(piece_value, Util::KANJI) ||
-          Util::ContainsScriptType(piece_value, Util::KATAKANA)))
-      return false;
-    std::string mozc_value;
-    for (const auto& segment : piece.conversion_segments()) {
-      if (segment.candidates_size() == 0) return false;
-      const auto& top = segment.candidate(0);
-      if ((top.attributes & private_surface::kNotSpellingKey) || top.key != segment.key()) return false;
-      if (pos.IsUniqueNoun(top.lid) && piece_value.find(top.content_value) == std::string::npos) return false;
-      mozc_value += top.value;
-    }
-    // Every katakana run of the AI's piece must be a name Mozc has as a
-    // proper noun, or part of Mozc's own first candidate.
-    const auto known = [&](const std::string& run) {
-      for (const auto& segment : piece.conversion_segments()) {
-        if (segment.candidate(0).value.find(run) != std::string::npos) return true;
-        for (const auto* c : segment.candidates())
-          if (c && c->value == run && pos.IsUniqueNoun(c->lid)) return true;
-      }
-      return false;
-    };
-    std::string run;
-    for (size_t i = 0; i <= piece_value.size();) {
-      bool katakana = false;
-      size_t length = 1;
-      if (i < piece_value.size()) {
-        const unsigned char b0 = static_cast<unsigned char>(piece_value[i]);
-        length = b0 < 0x80 ? 1 : b0 >= 0xF0 ? 4 : b0 >= 0xE0 ? 3 : 2;
-        if (b0 == 0xE3 && i + 3 <= piece_value.size()) {
-          const unsigned b1 = static_cast<unsigned char>(piece_value[i + 1]);
-          const unsigned b2 = static_cast<unsigned char>(piece_value[i + 2]);
-          const unsigned code = ((b0 & 0x0Fu) << 12) | ((b1 & 0x3Fu) << 6) | (b2 & 0x3Fu);
-          katakana = (code >= 0x30A1 && code <= 0x30FA) || code == 0x30FC;
-        }
-      }
-      if (katakana) {
-        run.append(piece_value, i, length);
-      } else {
-        if (!run.empty() && !known(run)) return false;
-        run.clear();
-      }
-      i += length;
-    }
-    const auto& first = piece.conversion_segment(0).candidate(0);
-    const auto& last = piece.conversion_segment(count - 1).candidate(0);
-    out->set_key(piece_key);
-    const auto add = [&](const std::string& value, int extra_cost) {
-      converter::Candidate* candidate = out->add_candidate();
-      candidate->key = candidate->content_key = piece_key;
-      candidate->value = candidate->content_value = value;
-      candidate->lid = first.lid;
-      candidate->rid = last.rid;
-      candidate->cost = first.cost + extra_cost;
-    };
-    add(piece_value, 0);
-    if (mozc_value != piece_value) add(mozc_value, 1);
-    return true;
-  }
-  // Rebuilds the conversion segments at the boundaries of the AI's sentence""")
-
 
 
 # Candidate and usage windows: light and dark themes that follow the Windows
@@ -3885,12 +3769,33 @@ edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, s
   }
   static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
 
-# 組み直し（ResegmentToWholePhrase）の記録。
+# 組み直し（ResegmentToWholePhrase）の記録と、文末の記号の扱い。
 # MYIME_RESEGMENT_LOG=<ファイル> のときだけ、組み直しを試すたびに「読み、人工知能の文、人工知能の区切り」と、
 # 断ったときはどの断り方か（関数の中の return false の通し番号）を1行ずつ書き足す（普段は何もしない）。
 # 断りの通し番号は、この節で return false を ResegmentFail(番号, ...) に置き換えて付ける。
+# 文末の記号（？ ！ 。 、）が人工知能の区切りで1文字だけの区画になるとき、「ひらがな一文字の区画は助詞以外断る」
+# の決まりに当たって組み直しが断られていた。ひらがなでもカタカナでもない1文字の区画は、この決まりの対象から外す
+# （MYIME_RESEG_SYMBOL=0 で従来どおり断る）。
+edit("engine/engine.cc", """      if (Util::CharsLen(piece_key) == 1 &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles))
+        return false;
+""", """      if (Util::CharsLen(piece_key) == 1 &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles) &&
+          !(ResegmentSymbolPieces() && Util::GetScriptType(piece_key) != Util::HIRAGANA &&
+            Util::GetScriptType(piece_key) != Util::KATAKANA))
+        return false;
+""")
 edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
-     """  // MYIME_RESEGMENT_LOG=<file>: one line per resegmentation attempt or refusal.
+     """  // MYIME_RESEG_SYMBOL=0: a one-character piece that is neither hiragana nor
+  // katakana (a sentence-final ？) is refused like a lone non-particle kana.
+  static bool ResegmentSymbolPieces() {
+    static const bool enabled = [] {
+      const char* value = std::getenv("MYIME_RESEG_SYMBOL");
+      return !value || std::string_view(value) != "0";
+    }();
+    return enabled;
+  }
+  // MYIME_RESEGMENT_LOG=<file>: one line per resegmentation attempt or refusal.
   static void ResegmentLog(const std::string& line) {
     static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
     if (!path || !*path) return;
