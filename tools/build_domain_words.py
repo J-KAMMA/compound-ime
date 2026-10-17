@@ -53,7 +53,9 @@ def main():
     parser.add_argument("--min-count", type=int, default=5)
     parser.add_argument("--min-docs", type=int, default=2, help="この数以上の文書に出る言葉だけ")
     parser.add_argument("--report", type=Path, help="拾った言葉の出る回数つきの一覧")
-    parser.add_argument("--compose", action="store_true", help="辞書の組の連なりで作れる言葉は除く（既定は組の有無だけで除く。連なりは1文字の組でも作れてしまい、ほとんど除かれるため）")
+    parser.add_argument("--compounds", action="store_true",
+                        help="名詞が続く複合語（2〜4語、漢字を含む）も拾う。読みは各語の読みをつなぐ")
+    parser.add_argument("--compose",action="store_true", help="辞書の組の連なりで作れる言葉は除く（既定は組の有無だけで除く。連なりは1文字の組でも作れてしまい、ほとんど除かれるため）")
     args = parser.parse_args()
 
     from sudachipy import dictionary, tokenizer
@@ -74,24 +76,46 @@ def main():
             if row["split"] != "train" or row["text"] in banned:
                 continue
             used += 1
+            seen = set()
+            run = []  # 名詞が続く間の (表記, 読み)。名詞のつながり（複合語）を拾うため
+
+            def flush():
+                if args.compounds and len(run) >= 2:
+                    for i in range(len(run)):
+                        for j in range(i + 2, min(i + 4, len(run)) + 1):
+                            if run[i][2] or run[j - 1][2]:  # 接尾辞で始まる・終わる連なり（クラスター内、つ以上）は除く
+                                continue
+                            surface = "".join(s for s, _, _ in run[i:j])
+                            reading = "".join(r for _, r, _ in run[i:j])
+                            if 3 <= len(surface) <= 10 and len(reading) <= 16 and HAS_KANJI.search(surface):
+                                key = (reading, surface)
+                                if key not in seen:
+                                    seen.add(key)
+                                    counts[key] += 1
+                                    docs.setdefault(key, set()).add(row["doc"])
+                                    pos_of.setdefault(key, ("名詞", "複合語", "*"))
+                run.clear()
+
             for m in tok.tokenize(row["text"], mode):
                 pos = m.part_of_speech()
                 surface = m.surface()
-                if pos[0] != "名詞" or ASCII.search(surface) or len(surface) < 2:
-                    continue
-                if pos[1] in ("数詞", "代名詞") or pos[2] in ("人名", "地名") or pos[1] == "固有名詞" and pos[2] in ("人名", "地名"):
-                    continue
-                if not KATA.fullmatch(surface):  # カタカナの言葉だけ。漢字まじりは読みの当てずっぽうが混ざる
-                    continue
-                if m.is_oov() and HAS_KANJI.search(surface):
-                    continue
                 reading = to_hiragana(m.reading_form())
-                if not re.fullmatch(r"[ぁ-ゖー]+", reading) or len(reading) < 3:
+                usable = (pos[0] in ("名詞", "接頭辞", "接尾辞") and not ASCII.search(surface) and
+                          pos[1] not in ("数詞", "代名詞") and pos[2] not in ("人名", "地名") and
+                          re.fullmatch(r"[ぁ-ゖー]+", reading) and not (m.is_oov() and HAS_KANJI.search(surface)))
+                if usable:
+                    run.append((surface, reading, pos[0] == "接尾辞"))
+                else:
+                    flush()
+                if not usable or pos[0] != "名詞" or len(surface) < 2 or len(reading) < 3:
+                    continue
+                if not KATA.fullmatch(surface):  # 単語はカタカナだけ。漢字まじりは読みの当てずっぽうが混ざる
                     continue
                 key = (reading, surface)
                 counts[key] += 1
                 docs.setdefault(key, set()).add(row["doc"])
                 pos_of[key] = pos
+            flush()
     print("使った文", used, "言葉の種類", len(counts), file=sys.stderr)
 
     data = args.mozc / "data/dictionary_oss"
