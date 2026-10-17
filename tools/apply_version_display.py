@@ -175,4 +175,7 @@ edit("gui/about_dialog/about_dialog.cc", """  std::string version_info = "(" + V
       compound_version + " (" + Version::GetMozcVersion() + ")";
   version_label->setText(GuiUtil::ProductName() + QLatin1Char(' ') +
                          QString::fromUtf8(version_info.c_str()));""")
+# 「このソフトについて」の画面の英語の文を日本語にし、人工知能の状態の出し方を直す。
+import subprocess  # noqa: E402
+subprocess.run([sys.executable, str(Path(__file__).with_name("apply_about_dialog_text.py")), str(src)], check=True)
 print("version display applied")
