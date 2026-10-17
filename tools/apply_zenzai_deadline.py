@@ -8,7 +8,7 @@ patches/myime-engine.patch を当てたあとの作業ツリーに、1回だけ�
 1. 変換1回あたりの人工知能の時間の上限（ZenzaiDeadline）。人工知能を使い始めてから
    上限を過ぎたら、それ以上の評価をやめ、そこまでの結果（人工知能なしの変換結果）を返す。
    llama.cpp の計算の途中でも、中断の関数（abort callback）で打ち切る。
-   上限は SetZenzaiTimeLimit（ミリ秒、0 で無制限）で決める。既定は 300。
+   上限は SetZenzaiTimeLimit（ミリ秒、0 で無制限）で決める。既定は 1000。
 2. 重みの読み込みで use_mlock を指定し、メモリに固定する（SetZenzaiMemoryLock、既定は有効）。
    固定できなくても（ウィンドウズの VirtualLock の上限など）読み込みは続く。結果は
    ZenzaiMemoryLock.status と GetZenzaiStatus の memoryLock に出し、標準エラーにも1行書く。
@@ -282,7 +282,7 @@ func finishZenzaiDeadline() {
 ae = engine / "AzookeyEngine.swift"
 edit(ae, "    var zenzaiInferenceLimit: Int = 10\n", """    var zenzaiInferenceLimit: Int = 10
     /// 変換1回あたりの人工知能の時間の上限（ミリ秒）。0 で上限なし。
-    var zenzaiTimeLimitMs: Int = 300
+    var zenzaiTimeLimitMs: Int = 1000
 """)
 edit(ae, """@_cdecl("SetZenzaiWeightPath")""", """@_cdecl("SetZenzaiTimeLimit")
 public func setZenzaiTimeLimit(_ milliseconds: Int32) {
@@ -345,4 +345,8 @@ edit(ae, """        "inferenceLimit": config.zenzaiInferenceLimit,
         "deadlineAborts": ZenzaiDeadline.aborts,
         "deadlineSkips": ZenzaiDeadline.skips,
 """)
+# 選び手の採点（ScoreSentences）も、変換と同じ上限で囲む。上限に当たったら採点は nan になる（選び手が働かないだけ）
+edit(ae, """    let scores = conv.selectorSentenceScores(""", """    ZenzaiDeadline.begin(milliseconds: config.zenzaiTimeLimitMs)
+    defer { finishZenzaiDeadline() }
+    let scores = conv.selectorSentenceScores(""")
 print("zenzai deadline ok")

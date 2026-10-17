@@ -5,7 +5,7 @@
   unlimited  上限なし（人工知能あり）
   noai       人工知能なし
   t10, t1    わざと小さくした上限（10 ミリ秒、1 ミリ秒）
-  load300    計算機を忙しくして、既定の上限（300 ミリ秒）
+  load1000    計算機を忙しくして、既定の上限（1000 ミリ秒）
   loadfree   計算機を忙しくして、上限なし
 
 上限に当たった変換は、人工知能が確かめ終わった結果（unlimited と同じ）か、確かめる前の結果
@@ -40,7 +40,7 @@ def main():
     scope = [it for it in items if it["romaji"] in base]
     print(f"対象 {len(scope)} 文")
     labels = {"unlimited": "上限なし", "noai": "人工知能なし", "t10": "上限 10 ミリ秒", "t1": "上限 1 ミリ秒",
-              "load300": "忙しい計算機で 300 ミリ秒", "loadfree": "忙しい計算機で上限なし",
+              "load1000": "忙しい計算機で 1000 ミリ秒", "loadfree": "忙しい計算機で上限なし",
               "idle300": "空いた計算機で 300 ミリ秒", "idle500": "空いた計算機で 500 ミリ秒",
               "idle1000": "空いた計算機で 1000 ミリ秒", "idlefree": "空いた計算機で上限なし"}
     for name, got in runs.items():
@@ -50,7 +50,7 @@ def main():
     full, none = runs.get("unlimited"), runs.get("noai")
     if full is None or none is None:
         return
-    for name in ("t10", "t1", "load300"):
+    for name in ("t10", "t1", "load1000"):
         got = runs.get(name)
         if got is None:
             continue

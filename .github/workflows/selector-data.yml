@@ -1,0 +1,121 @@
+# 選び手の段階2: 学習の材料集め。Linux test（linux-test.yml）の組み立て（成果物 linux-bin）を使い、
+# 学習用の文と試験の文を変換エンジンに通して、候補・コスト・Zenz の尤度を書き出す（出力は変えない）。
+# linux-test.yml から exp/selector-stage2 の枝のときだけ呼ばれる。
+# 学習用の文はウィキペディア日本語版（CC BY-SA 4.0）の train-00011 から作る（試験に使っていない別のファイル）。
+# 材料は成果物 selector-material に置き、リポジトリには入れない。
+name: Selector data
+
+on:
+  workflow_call:
+    inputs:
+      count:
+        description: 学習用の文の数
+        type: string
+        default: '8000'
+
+permissions:
+  contents: read
+
+jobs:
+  sentences:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - name: 材料（版と SHA256 を固定）
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
+          curl -fsSL -o wiki11.parquet \
+            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00011-of-00015.parquet
+          echo "271165db78420d9286c82c2b9b93ac520925b41187537ef12bc9ff7ec1a1dca4  wiki11.parquet" | sha256sum -c
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+      - name: 学習用の文を作る（試験の文は除く）
+        run: |
+          set -eo pipefail
+          mkdir -p out
+          venv/bin/python tools/wiki_typing_test.py --wiki wiki11.parquet --table romanji-hiragana.tsv \
+            --out out/train.tsv --count ${{ inputs.count }} --seed 20261017
+          # 試験の文（ウィキペディアの打ち込み、前後の文がある試験）と同じ文は除く
+          python3 - out/train.tsv tests/conversion/wiki-typing.tsv tests/conversion/context.tsv <<'PY'
+          import sys
+          seen = set()
+          for p in sys.argv[2:]:
+              for line in open(p, encoding="utf-8"):
+                  if not line.startswith("#"):
+                      parts = line.rstrip("\n").split("\t")
+                      seen.update(parts[:2])
+          rows = open(sys.argv[1], encoding="utf-8").read().splitlines()
+          kept = [r for r in rows if r.startswith("#") or not set(r.split("\t")[:2]) & seen]
+          open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("\n".join(kept) + "\n")
+          print(len(rows) - len(kept), "removed")
+          PY
+          cp romanji-hiragana.tsv out/
+          wc -l out/train.tsv && head -3 out/train.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: selector-sentences
+          path: out/
+          retention-days: 14
+
+  collect:
+    needs: sentences
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [t1, t2, t3, t4, t5, t6, t7, t8, t9, t10, t11, t12, t13, t14, t15, t16,
+                ja400, jaen, w1, w2, w3, w4, w5, w6, x1, x2]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-bin
+          path: bin
+      - uses: actions/download-artifact@v4
+        with:
+          name: selector-sentences
+          path: sentences
+      - name: 材料集め（組 ${{ matrix.group }}）
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          chmod +x $W/bin/engine/session_handler_main
+          # 本線と同じ人工知能 v1（zenz-v3.2-small-ft-v1）。Zenz で採点し直す尤度も取る（段階3の学習用）
+          curl -fsSL -o $W/model.gguf \
+            https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
+          echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
+          SELECTOR_SCORE=1 bash $W/repo/tools/selector_collect.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/material \
+            $W/sentences/train.tsv 16
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: selector-${{ matrix.group }}
+          path: material/
+          if-no-files-found: ignore
+          retention-days: 3
+
+  merge:
+    needs: collect
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: selector-*
+          path: material
+          merge-multiple: true
+      - name: 数える
+        run: |
+          ls material | head -100
+          wc -l material/*.tsv | tail -1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: selector-material
+          path: material/
+          retention-days: 14

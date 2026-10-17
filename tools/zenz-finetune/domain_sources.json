@@ -48,6 +48,15 @@
       "license": "CC BY 4.0（文章のみ。コードは別の条件で、使わない）", "license_url": "https://creativecommons.org/licenses/by/4.0/",
       "attribution": "ethereum.org の貢献者",
       "test_doc_fraction": 0.25, "test_quota": 200
+    },
+    {
+      "name": "tatoeba", "title": "Tatoeba 日本語の文（話し言葉）", "domain": "colloquial", "kind": "external",
+      "comment": "git の文書ではない。tools/colloquial_text.py が 1 つのファイルから文を取り出し、colloquial-train.jsonl を作る。domain_text.py と fetch_domain_sources.py は読み飛ばす。commit の欄はファイルの SHA-256（2026-10-10 の版）。",
+      "repo": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2",
+      "commit": "sha256:ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1",
+      "license": "CC BY 2.0 FR（一部 CC0）", "license_url": "https://tatoeba.org/en/terms_of_use",
+      "attribution": "Tatoeba の投稿者（文ごとの番号 https://tatoeba.org/sentences/show/<番号>）",
+      "test_doc_fraction": 0.1, "test_quota": 300
     }
   ]
 }

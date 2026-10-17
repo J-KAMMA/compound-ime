@@ -36,7 +36,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -77,7 +77,7 @@ std::string Text(std::string_view raw, const Pieces& pieces, bool english) {
 int main() {
   jaen::Lexicon lexicon;
   for (const char* w : {"google", "ogle", "meeting", "set", "sets", "same", "made", "kit", "ok",
-                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore", "base", "lair", "vaio", "vim"}) {
+                        "down", "load", "o'clock", "mail", "and", "ox", "file", "nax", "linux", "song", "remote", "kite", "note", "weekly", "report", "matte", "wade", "woke", "seat", "sea", "two", "git", "test", "tests", "set", "sets", "campus", "lore", "base", "lair", "vaio", "vim", "exe"}) {
     lexicon.Add(w);
   }
   lexicon.Add("youtube", true);
@@ -118,6 +118,9 @@ int main() {
   // A weak sign (x-typed small kana) is outweighed by one word, not by two.
   Expect(english("andoxuore").empty(), "weak sign does not justify two short words");
   Expect(english("fileda") == "file|", "one word explains a weak sign");
+  // 「ねぇ」を nexe と打つ: n と exe に分けて ん + EXE にしない（印のない切り出しは、打った文字の区切りの外では取らない）。
+  Expect(english("nexenadenadeshite").empty(), "弱い印だけの語は、打った文字の途中から始めない（nexe の exe）");
+  Expect(english("kyouhanexedesu").empty(), "弱い印だけの語は、打った文字の途中から始めない（文の途中）");
   Expect(english("naxtu").empty(), "never cut っ typed as xtu (\"nax\" is not taken)");
   Expect(english("necchuushouniki").empty(), "no word ends at the っ of っち (nec in necchuu)");
   Expect(english("chatgptttenani") == "chatgpt|", "a word may end before tte");
@@ -146,6 +149,23 @@ int main() {
   Expect(english("macnoterminal") == "mac|", "a rarer word with a sign (a pending c) is taken");
   Expect(english("sumodesu").empty(), "a rarer word without a sign stays Japanese");
   Expect(english("dogandcat") == "dogandcat|", "plain words win over a rarer word (gand in do|gand|cat)");
+  {
+    // 助詞で始まる語（deform の de）: 直前が日本語の名詞なら助詞と語に分ける。
+    jaen::Lexicon particle;
+    for (const char* w : {"deform", "form", "design", "sign", "default", "fault", "detouring", "touring", "token", "ken"}) {
+      particle.Add(w);
+    }
+    particle.AddCommon("design");
+    const auto split_english = [&](std::string_view raw) {
+      return Text(raw, jaen::SplitEnglish(Parse(raw), particle, Parse), true);
+    };
+    Expect(split_english("kinoudeformwomita") == "form|", "名詞の後の deform は で + form");
+    Expect(split_english("kinoudetouringshita") == "touring|", "名詞の後の detouring は で + touring");
+    Expect(split_english("deformwomita") == "deform|", "文頭の deform はそのまま");
+    Expect(split_english("kinounodeformwomita") == "deform|", "助詞の後の deform はそのまま");
+    Expect(split_english("kinoudesignwomita") == "design|", "よく使う design はそのまま");
+    Expect(split_english("kinoudefaultwomita") == "default|", "default はそのまま");
+  }
   Expect(english("3dpurinnta") == "3d|", "a listed word with digits is one piece (3d|purinnta, not dpu)");
   Expect(jaen::NormalizeWord("3d") == "3d" && jaen::NormalizeWord("123").empty(), "digits need a letter to be a word");
   {

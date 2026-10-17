@@ -194,6 +194,14 @@ jaen200b.json、typo150.json、typo150b.json、reported.json、inputs.txt、vari
 先頭の `#` の行に出典・コミット・利用条件を書き、各行の 3 列目に出典名を入れます。採点は
 `tools/score_wiki_typing.py`（出典別・英字入りの文別の内訳つき）。
 
+**話し言葉（Tatoeba）**: `tools/colloquial_text.py`（手動の流れ `.github/workflows/colloquial-data.yml`）が、Tatoeba の
+日本語の文（CC BY 2.0 FR、`jpn_sentences.tsv.bz2` を SHA-256 で固定）から、(1) 打ち込み試験 `tests/conversion/colloquial.tsv`
+（300 文。終助詞・縮約・くだけた言い方・疑問・感嘆。文の番号の SHA-256 で取り分けた 10% の枠から選ぶ）と、(2) 練習の材料の候補
+`colloquial-train.jsonl`（枠の外の、話し言葉のしるしがある文。`domain_text.py` の `sentences.jsonl` と同じ形で、
+`source` は `tatoeba`）を作ります。練習問題に混ぜるときは `cat out/sentences.jsonl colloquial-train.jsonl > all.jsonl` として
+`--domain-text all.jsonl` に渡します（出典は `domain_sources.json` の `tatoeba`。`kind: external` なので取り出しの道具は
+読み飛ばします）。試験の採点は `tools/score_colloquial.py`（厳しい・記号ゆれ込み・緩いの 3 つと間違いの型）。
+
 **練習問題への混ぜ方**: `--domain-text out/sentences.jsonl`（`--domain-share` が分野の割合。既定 0.5 で、
 `--size` のうち半分が分野、残りがウィキペディアなど）。分野の問題は 4 種類です。
 

@@ -94,6 +94,24 @@
     "github"
    ],
    "note": "2026-10-15 報告: 学習の記録で ぎてゅｂ になった（学習の作り直し）"
+  },
+  {
+   "id": "r012",
+   "category": "reported",
+   "romaji": "konnyatomukarazettaidennwagaaruwa.",
+   "intended": "今夜トムから絶対電話があるわ。",
+   "alternatives": [],
+   "note": "2026-10-17 話し言葉の試験で発見: 文全体がカタカナのまま（コンヤトムカラゼッタイデンワガアルワ。）"
+  },
+  {
+   "id": "r015",
+   "category": "reported",
+   "romaji": "nexe,nadenadeshite.",
+   "intended": "ねぇ、なでなでして。",
+   "alternatives": [
+    "ねえ、なでなでして。"
+   ],
+   "note": "2026-10-17 話し言葉の試験で発見: んEXE、なでなでして。 になった（nexe の exe を英単語と判定）"
   }
  ]
 }
