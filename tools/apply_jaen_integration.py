@@ -3769,6 +3769,73 @@ edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, s
   }
   static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
 
+# 組み直し（ResegmentToWholePhrase）の記録と、文末の記号の扱い。
+# MYIME_RESEGMENT_LOG=<ファイル> のときだけ、組み直しを試すたびに「読み、人工知能の文、人工知能の区切り」と、
+# 断ったときはどの断り方か（関数の中の return false の通し番号）を1行ずつ書き足す（普段は何もしない）。
+# 断りの通し番号は、この節で return false を ResegmentFail(番号, ...) に置き換えて付ける。
+# 文末の記号（？ ！ 。 、）が人工知能の区切りで1文字だけの区画になるとき、「ひらがな一文字の区画は助詞以外断る」
+# の決まりに当たって組み直しが断られていた。ひらがなでもカタカナでもない1文字の区画は、この決まりの対象から外す
+# （MYIME_RESEG_SYMBOL=0 で従来どおり断る）。
+edit("engine/engine.cc", """      if (Util::CharsLen(piece_key) == 1 &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles))
+        return false;
+""", """      if (Util::CharsLen(piece_key) == 1 &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles) &&
+          !(ResegmentSymbolPieces() && Util::GetScriptType(piece_key) != Util::HIRAGANA &&
+            Util::GetScriptType(piece_key) != Util::KATAKANA))
+        return false;
+""")
+edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
+     """  // MYIME_RESEG_SYMBOL=0: a one-character piece that is neither hiragana nor
+  // katakana (a sentence-final ？) is refused like a lone non-particle kana.
+  static bool ResegmentSymbolPieces() {
+    static const bool enabled = [] {
+      const char* value = std::getenv("MYIME_RESEG_SYMBOL");
+      return !value || std::string_view(value) != "0";
+    }();
+    return enabled;
+  }
+  // MYIME_RESEGMENT_LOG=<file>: one line per resegmentation attempt or refusal.
+  static void ResegmentLog(const std::string& line) {
+    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
+    if (!path || !*path) return;
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fputc('\\n', f);
+      std::fclose(f);
+    }
+  }
+  static bool ResegmentFail(int number, std::string_view key, const converter::Candidate& candidate) {
+    ResegmentLog("REFUSED\\t" + std::to_string(number) + "\\t" + std::string(key) + "\\t" + candidate.value);
+    return false;
+  }
+  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
+_engine = (src / "engine/engine.cc").read_text(encoding="utf-8")
+_start = _engine.index("  static bool ResegmentToWholePhrase(")
+_end = _engine.index("  static void PreferWholePhrase(", _start)
+_body = _engine[_start:_end]
+_marker = "                                     Segments* segments) {\n"
+assert _body.count(_marker) == 1
+_log = """    {
+      std::string pieces;
+      size_t at = 0;
+      for (uint32_t encoded : candidate.inner_segment_boundary) {
+        const auto length = converter::DecodeLengths(encoded);
+        if (!pieces.empty()) pieces += '|';
+        pieces += std::string(key.substr(std::min<size_t>(at, key.size()), length.key_len));
+        at += length.key_len;
+      }
+      ResegmentLog("ATTEMPT\\t" + std::string(key) + "\\t" + candidate.value + "\\t" + pieces);
+    }
+"""
+_body = _body.replace(_marker, _marker + _log)
+_parts = _body.split("return false;")
+_body = "".join(part + (f"return ResegmentFail({i}, key, candidate);" if i < len(_parts) - 1 else "")
+                for i, part in enumerate(_parts))
+(src / "engine/engine.cc").write_text(_engine[:_start] + _body + _engine[_end:], encoding="utf-8", newline="")
+
 # 人工知能の時間の上限とメモリ固定: 節: 変換1回あたりの人工知能の時間に上限を付け、重みをメモリに固定する。
 #
 # 利用者の PC でメモリの空きが少ないと、人工知能の重みがメモリから追い出され、
