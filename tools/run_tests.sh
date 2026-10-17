@@ -11,6 +11,7 @@
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
+#   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -181,6 +182,46 @@ for ms in ('1000', '0'):
     python3 $REPO/tools/zenzai_stats.py $OUT --glob "slow-$s.tsv.zstats.*" --label "$s" | tee -a $OUT/slow-stats.txt
   done
   ;;
+j)
+  # 落ちないかの試験。ウィンドウズの変換エンジン（mozc_server.exe、画面だけの処理）には標準エラーがない。
+  # 1.144 では、人工知能の重みを読み込むときに標準エラーへ書こうとして変換エンジンが落ち、打っていた文が
+  # 消えた（Swift の FileHandle.standardError.write は、書けないと中の try! で処理ごと止まる）。
+  # ここでは標準エラーを書けない状態（読み取り専用で開く）にし、実際の打ち込みと同じく後ろの文と
+  # 画面側が付ける実験の印（myime_async_conversion_v1）を付け、前の文は1文おきに付け、先回りの変換が
+  # すぐ動くようにして（MYIME_PREFETCH_DELAY=1）、キーを1つずつ送り続ける。途中で1字消して打ち直す。
+  # 上限は既定の 1000 ミリ秒、1 ミリ秒（計算の途中の打ち切りがほぼ毎回起きる）、それに裏の変換
+  # （MYIME_ASYNC_CONVERSION=1）でも流す。処理が最後まで動き、全部の文が確定することを確かめる。
+  romaji $T/ja400.json | head -40 > $W/stress.txt
+  expected=$(wc -l < $W/stress.txt)
+  fail=0
+  for variant in t1000 t1 async; do
+    case $variant in
+      t1000) limit=1000; async=0 ;;
+      t1) limit=1; async=0 ;;
+      async) limit=1000; async=1 ;;
+    esac
+    { printf 'SET_EXPERIMENTAL_FEATURE\tmyime_async_conversion_v1\nSET_FOLLOWING_TEXT\t。\nSEND_KEY\tON\n'
+      n=0
+      while IFS= read -r r; do
+        n=$((n + 1))
+        if [ $((n % 2)) = 0 ]; then printf 'SET_PRECEDING_TEXT\t今日は良い天気です。\n'; else printf 'SET_PRECEDING_TEXT\n'; fi
+        printf 'SEND_KEYS\t%s\nSEND_KEY\tBackspace\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" "${r: -1}"
+      done < $W/stress.txt; } > $W/stress-$variant.cmd
+    rc=0
+    env MYIME_ZENZAI_TIME_LIMIT_MS=$limit MYIME_PREFETCH_DELAY=1 $([ $async = 1 ] && echo MYIME_ASYNC_CONVERSION=1) \
+      MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR=$E MYIME_AZOOKEY_ZENZAI_WEIGHT=$MODEL MYIME_AZOOKEY_ZENZAI_GPU=0 \
+      TEST_TMPDIR=$W/p-$variant timeout 1800 $E/session_handler_main --input $W/stress-$variant.cmd \
+      --profile $W/p-$variant --dictionary oss < /dev/null > $OUT/stress-$variant.out 2< /dev/null || rc=$?
+    got=$(grep -c '^result {' $OUT/stress-$variant.out || true)
+    if [ $rc != 0 ] || [ "$got" != "$expected" ]; then
+      echo "落ちないかの試験 $variant: 失敗（終了の番号 $rc、確定 $got/$expected）" | tee -a $OUT/stress.txt
+      fail=1
+    else
+      echo "落ちないかの試験 $variant: 最後まで動いた（確定 $got/$expected）" | tee -a $OUT/stress.txt
+    fi
+  done
+  [ $fail = 0 ]
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、x のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、x のどれか" >&2; exit 2 ;;
 esac
