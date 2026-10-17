@@ -9,6 +9,7 @@
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
+#   h: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -107,6 +108,35 @@ f)
     python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with.tsv $OUT/context-without.tsv | tee $OUT/context-score.txt | head -30
   fi
   ;;
+h)
+  # 人工知能の時間の上限の試験（わざと遅くする）。日本語だけの400文の先頭100文を、
+  #   unlimited: 上限なし（人工知能あり）、noai: 人工知能なし（重みのファイルがない）、
+  #   t10, t1: 上限を 10, 1 ミリ秒にして（ほぼ必ず上限に当たる）、
+  #   load300, loadfree: 計算機の全部のコアを空回しで忙しくして、既定の 300 ミリ秒と上限なし
+  # で変換する。上限に当たっても全部の文が変換され（固まらず）、結果が人工知能ありかなしの
+  # どちらかになることを tools/slow_compare.py で確かめる。
+  romaji $T/ja400.json > $W/ja400.txt
+  head -100 $W/ja400.txt > $W/h100.txt
+  MYIME_ZENZAI_TIME_LIMIT_MS=0 $BATCH $W/h100.txt $OUT/slow-unlimited.tsv 4
+  bash $REPO/tools/batch_convert.sh $E/session_handler_main $E $W/no-such-model.gguf $W/h100.txt $OUT/slow-noai.tsv 4 || true
+  t0=$(date +%s.%N)
+  MYIME_ZENZAI_TIME_LIMIT_MS=10 $BATCH $W/h100.txt $OUT/slow-t10.tsv 4
+  MYIME_ZENZAI_TIME_LIMIT_MS=1 $BATCH $W/h100.txt $OUT/slow-t1.tsv 4
+  t1=$(date +%s.%N)
+  python3 -c "import sys; print(f'上限を 10 ミリ秒と 1 ミリ秒にして 100 文ずつ変換: {float(sys.argv[2])-float(sys.argv[1]):.1f} 秒（固まらず終わった）')" $t0 $t1 | tee $OUT/slow-time.txt
+  # 計算機を忙しくする（コアの数の2倍の空回し）
+  for i in $(seq $(( $(nproc) * 2 ))); do ( timeout 900 bash -c 'while :; do :; done' ) & done
+  sleep 2
+  MYIME_ZENZAI_TIME_LIMIT_MS=300 $BATCH $W/h100.txt $OUT/slow-load300.tsv 4
+  MYIME_ZENZAI_TIME_LIMIT_MS=0 $BATCH $W/h100.txt $OUT/slow-loadfree.tsv 4
+  pkill -f 'while :; do :; done' || true
+  python3 $REPO/tools/slow_compare.py $T/ja400.json unlimited=$OUT/slow-unlimited.tsv noai=$OUT/slow-noai.tsv \
+    t10=$OUT/slow-t10.tsv t1=$OUT/slow-t1.tsv load300=$OUT/slow-load300.tsv loadfree=$OUT/slow-loadfree.tsv \
+    | tee $OUT/slow-compare.txt
+  for s in unlimited noai t10 t1 load300 loadfree; do
+    python3 $REPO/tools/zenzai_stats.py $OUT --glob "slow-$s.tsv.zstats.*" --label "$s" | tee -a $OUT/slow-stats.txt
+  done
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h のどれか" >&2; exit 2 ;;
 esac

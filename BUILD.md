@@ -70,6 +70,8 @@ python tools/apply_jaen_integration.py <src> <lex>
 
 日英判定（`native/jaen-detector`）、辞書、変換、製品名の変更（最後に `tools/apply_compound_branding.py`、アイコンは `tools/make_compound_icon.py`、Pillow が必要）をすべて適用します。成功すると `applied` と表示します。
 
+このスクリプトは、変換エンジン（Swift）の `<work>/myime/src` にも `tools/apply_zenzai_deadline.py` で改造を足します（手順 2 のパッチを当ててあること）。変換 1 回あたりの人工知能の時間の上限（既定 300 ミリ秒。環境変数 `MYIME_ZENZAI_TIME_LIMIT_MS`、または設定 `ZenzaiTimeLimitMs`。0 で上限なし）と、人工知能の重みのメモリ固定（既定は有効。`MYIME_ZENZAI_MLOCK=0`、または設定 `ZenzaiMemoryLock=0` でやめる）です。足したあとに変換エンジンを組み立て直してください。
+
 ## 6. azooKey 変換エンジン DLL
 
 llama.cpp（上記の fork、b4846）には、日本語などを含むパスから推論用 DLL を読めるようにする `patches/llama-utf8.patch` を当ててからビルドします。

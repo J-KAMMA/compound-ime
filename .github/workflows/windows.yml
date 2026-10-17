@@ -89,7 +89,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: C:/w/engine-out
-          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
 
       - name: Qt の控えを戻す
         id: qt-cache
@@ -182,7 +182,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: C:/w/engine-out
-          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/swift-Package.resolved') }}-swift6.3.3-v1
 
       - name: Qt 6.9.1
         if: steps.qt-cache.outputs.cache-hit != 'true'

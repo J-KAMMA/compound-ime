@@ -3446,4 +3446,131 @@ edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
   }
   return user_path;""")
 
+# 人工知能の時間の上限とメモリ固定: 節: 変換1回あたりの人工知能の時間に上限を付け、重みをメモリに固定する。
+#
+# 利用者の PC でメモリの空きが少ないと、人工知能の重みがメモリから追い出され、
+# 読み直しで1回の評価が極端に遅くなる。変換エンジンへの呼び出しは同期なので、
+# Mozc の画面側の待ち時間（30 秒）を超えると「変換エンジンプログラムが反応していません」になる。
+# そこで、変換エンジン側（Swift、tools/apply_zenzai_deadline.py）が、人工知能を使い始めてから
+# 上限（既定 300 ミリ秒）を過ぎたら、計算の途中でも打ち切り、人工知能なしの結果を返す。
+# 上限: 環境変数 MYIME_ZENZAI_TIME_LIMIT_MS か、設定の ZenzaiTimeLimitMs（0 で上限なし）。
+# メモリ固定: 既定は有効。MYIME_ZENZAI_MLOCK=0 か、設定の ZenzaiMemoryLock=0 でやめる。
+edit("converter/engine_config.h", """// Returns the fixed Zenzai inference limit.
+int GetZenzaiInferenceLimit();
+""", """// Returns the fixed Zenzai inference limit.
+int GetZenzaiInferenceLimit();
+
+// Milliseconds one conversion may spend on the neural model (0 = no limit,
+// default 300). MYIME_ZENZAI_TIME_LIMIT_MS or the ZenzaiTimeLimitMs setting.
+int GetZenzaiTimeLimitMs();
+
+// Whether the model weights are locked in memory (default true).
+// MYIME_ZENZAI_MLOCK=0 or the ZenzaiMemoryLock=0 setting turns it off.
+bool IsZenzaiMemoryLockEnabled();
+""")
+edit("converter/engine_config.cc", """std::string GetAzooKeyDictionaryPath() { return ""; }""", """int GetZenzaiTimeLimitMs() {
+  static const int limit = [] {
+    if (const char* value = std::getenv("MYIME_ZENZAI_TIME_LIMIT_MS")) {
+      char* end = nullptr;
+      const long parsed = std::strtol(value, &end, 10);
+      if (end != value && *end == '\\0' && parsed >= 0 && parsed <= 60000) {
+        return static_cast<int>(parsed);
+      }
+    }
+    if (const std::optional<uint32_t> stored =
+            internal::ReadHkcuMozcDword(L"ZenzaiTimeLimitMs");
+        stored.has_value() && *stored <= 60000) {
+      return static_cast<int>(*stored);
+    }
+    return 300;
+  }();
+  return limit;
+}
+
+bool IsZenzaiMemoryLockEnabled() {
+  if (const char* value = std::getenv("MYIME_ZENZAI_MLOCK")) {
+    return std::string(value) != "0";
+  }
+  return internal::ReadHkcuMozcDwordAsBool(L"ZenzaiMemoryLock", true);
+}
+
+std::string GetAzooKeyDictionaryPath() { return ""; }""")
+
+A = "converter/azookey_immutable_converter.cc"
+edit(A, """  using SetZenzaiInferenceLimitFunc = void (*)(int);
+""", """  using SetZenzaiInferenceLimitFunc = void (*)(int);
+  // Optional in older azookey-engine.dll versions.
+  using SetZenzaiTimeLimitFunc = void (*)(int);
+  using SetZenzaiMemoryLockFunc = void (*)(bool);
+""")
+edit(A, """  SetZenzaiInferenceLimitFunc SetZenzaiInferenceLimit = nullptr;
+""", """  SetZenzaiInferenceLimitFunc SetZenzaiInferenceLimit = nullptr;
+  SetZenzaiTimeLimitFunc SetZenzaiTimeLimit = nullptr;
+  SetZenzaiMemoryLockFunc SetZenzaiMemoryLock = nullptr;
+""")
+edit(A, """    SetZenzaiInferenceLimit = reinterpret_cast<SetZenzaiInferenceLimitFunc>(
+        GetProcAddress(dll_handle_, "SetZenzaiInferenceLimit"));
+""", """    SetZenzaiInferenceLimit = reinterpret_cast<SetZenzaiInferenceLimitFunc>(
+        GetProcAddress(dll_handle_, "SetZenzaiInferenceLimit"));
+    SetZenzaiTimeLimit = reinterpret_cast<SetZenzaiTimeLimitFunc>(
+        GetProcAddress(dll_handle_, "SetZenzaiTimeLimit"));
+    SetZenzaiMemoryLock = reinterpret_cast<SetZenzaiMemoryLockFunc>(
+        GetProcAddress(dll_handle_, "SetZenzaiMemoryLock"));
+""")
+edit(A, """    MYIME_LOAD(SetZenzaiInferenceLimit);
+""", """    MYIME_LOAD(SetZenzaiInferenceLimit);
+    MYIME_LOAD(SetZenzaiTimeLimit);
+    MYIME_LOAD(SetZenzaiMemoryLock);
+""")
+edit(A, """    SetZenzaiInferenceLimit = nullptr;
+""", """    SetZenzaiInferenceLimit = nullptr;
+    SetZenzaiTimeLimit = nullptr;
+    SetZenzaiMemoryLock = nullptr;
+""")
+# モデルを読む前（Initialize のすぐあと）に、上限とメモリ固定を伝える
+edit(A, """  if (loader.SetZenzaiWeightPath && !config_.zenzai_weight_path.empty()) {""", """  if (loader.SetZenzaiTimeLimit) {
+    loader.SetZenzaiTimeLimit(GetZenzaiTimeLimitMs());
+  }
+
+  if (loader.SetZenzaiMemoryLock) {
+    loader.SetZenzaiMemoryLock(IsZenzaiMemoryLockEnabled());
+  }
+
+  if (loader.SetZenzaiWeightPath && !config_.zenzai_weight_path.empty()) {""")
+# 固定できたかを、記録（Mozc のログ）に1回だけ出す
+edit(A, """  std::optional<bool> enabled;
+};""", """  std::optional<bool> enabled;
+  std::optional<std::string> memory_lock;
+};""")
+edit(A, """  result.enabled = FindAzooKeyJsonBoolField(json, "enabled");
+  return result;""", """  result.enabled = FindAzooKeyJsonBoolField(json, "enabled");
+  result.memory_lock = FindAzooKeyJsonStringField(json, "memoryLock");
+  return result;""")
+edit(A, """void PublishZenzaiStatus(const AzooKeyStatus& status) {
+""", """// The model is read at the first conversion; report once whether its memory
+// could be locked ("locked", "off", or "failed: ..."; a failure is not fatal).
+void LogZenzaiMemoryLockOnce(const AzooKeyStatus& status) {
+  static bool logged = false;
+  if (logged || !status.memory_lock.has_value() || *status.memory_lock == "pending") {
+    return;
+  }
+  logged = true;
+  if (status.memory_lock->rfind("failed", 0) == 0) {
+    LOG(WARNING) << "Zenzai model memory lock: " << *status.memory_lock;
+  } else {
+    LOG(INFO) << "Zenzai model memory lock: " << *status.memory_lock;
+  }
+}
+
+void PublishZenzaiStatus(const AzooKeyStatus& status) {
+  LogZenzaiMemoryLockOnce(status);
+""")
+
+# 変換エンジン（Swift）に時間の上限とメモリ固定を足す（作業ツリーが MyIME の src を持つとき）
+swift_src = src.resolve().parents[1] / "src"
+if (swift_src / "AzooKeyKanaKanjiConverter").is_dir():
+    subprocess.run([sys.executable, str(REPO / "tools/apply_zenzai_deadline.py"), str(swift_src)], check=True)
+else:
+    print("warning: MyIME の src が見つからないので、人工知能の時間の上限（Swift 側）は足していません")
+
 print("applied")
