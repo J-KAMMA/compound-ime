@@ -232,12 +232,6 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     small_start[raw.size() - chunk.raw.size()] = IsKanaForLoanword(chunk);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
-    // 英単語の最後の l か x の直後の ya/yu/yo（html|you の "lyo"）は、小さい ゃゅょ の
-    // 打ち方（lya、xyo）として読まれるが、そう打つ人はほとんどいない。l か x の後ろで切れる。
-    if (small && chunk.raw.size() == 3 && (Lower(chunk.raw[0]) == 'l' || Lower(chunk.raw[0]) == 'x') &&
-        Lower(chunk.raw[1]) == 'y' && IsVowel(chunk.raw[2])) {
-      blocked[raw.size() - chunk.raw.size() + 1] = false;
-    }
     // Chunks the romaji table formed across a word's last letter count their
     // inner edges as chunk edges too:
     const std::string_view r = chunk.raw;

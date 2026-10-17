@@ -36,7 +36,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"lyo", "ょ"}, {"xyo", "ょ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -105,8 +105,6 @@ int main() {
   };
 
   Expect(english("kyouhagoogledekensaku") == "google|", "foreign word between Japanese");
-  Expect(english("mailyouwomita") == "mail|", "a word ending in l before yo is not the small ょ of lyo (mail|you)");
-  Expect(english("linuxyouwomita") == "linux|", "a word ending in x before yo is not the small ょ of xyo (linux|you)");
   Expect(english("meetingwosetshita") == "meeting|set|", "word merged with wo; set before shi");
   Expect(english("downloadshita") == "download|", "adjacent words merge into one piece");
   Expect(english("youtubedemita") == "youtube|", "curated plain word");

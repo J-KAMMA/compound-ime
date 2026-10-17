@@ -31,7 +31,6 @@ indexeddb
 str
 eip
 eval
-sig
 csp
 max
 webxr
@@ -398,7 +397,6 @@ htmlformelement
 itemscope
 localstorage
 medialist
-moveto
 pagehide
 parsefloat
 peerdas
@@ -468,7 +466,6 @@ cycletracker
 devcon
 documentfragment
 dtd
-errno
 filesystem
 gainnode
 gpudevice
@@ -660,7 +657,6 @@ lastindexof
 launchpad
 lst
 luminance
-mariano
 matchall
 maxsize
 mediametadata
@@ -756,7 +752,6 @@ isinstance
 keypath
 keypress
 kubevirt
-lineno
 logrecord
 mediaquerylist
 mediasource
@@ -998,7 +993,6 @@ klog
 kyaml
 langs
 linearrgb
-lineto
 loadstart
 localname
 lookuperror
@@ -1230,7 +1224,6 @@ loadbalancer
 loopend
 lru
 maci
-mailto
 maskunits
 mathvariant
 maxbytelength
@@ -1280,7 +1273,6 @@ rowgroup
 rsbuild
 rtcicecandidate
 sablier
-san
 sct
 selectionstart
 sendbeacon
@@ -1426,7 +1418,6 @@ evt
 fegaussianblur
 femergenode
 femorphology
-fileno
 filereadersync
 filesystemhandle
 finalizer
@@ -1452,7 +1443,6 @@ groupdata
 guido
 horizontalpodautoscaler
 hostprocess
-howto
 htmlareaelement
 httpresponse
 hyperledger
@@ -1583,7 +1573,6 @@ rossum
 rss
 rustfmt
 screenorientation
-scrollto
 seeked
 selectionchange
 semaphore

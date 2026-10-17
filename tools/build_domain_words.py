@@ -44,6 +44,11 @@ CASE_SHARE = 0.8      # 一番多い書き方の割合の下限（同上）
 CASE_COUNT_NEW = 3    # 英単語の一覧にない語（識別子、略語）の下限
 CASE_SHARE_NEW = 0.7
 CASE_MAX_LEVEL = 20   # SCOWL の水準がこれ以下の語は、大文字小文字の対にしない
+SIMPLE_SHARE = 0.9    # 先頭だけ大文字の書き方（Pod、Cache）の割合の下限
+ORDINARY_LEVEL = 60   # SCOWL の水準がこれ以下の語は普通の英単語（cache、web、gallery）
+STRONG_COUNT = 500    # 普通の英単語でも、これだけ多く、ほぼ全部がその書き方なら入れる（Pod）
+STRONG_SHARE = 0.99
+PARTICLES = ("no", "ha", "wo", "ga", "ni", "de", "to", "mo", "he", "ya", "ka", "yo", "ne", "wa")
 BRAND_SHARE = 0.95    # 厳選した製品名の割合の下限
 BRAND_COUNT = 50
 
@@ -130,6 +135,10 @@ def main():
         if total < MIN_COUNT or len(docs[word]) < MIN_DOCS or word in curated or word in exclude:
             continue
         if levels.get(word, 99) > bel_level and len(word) >= MIN_LEN_NEW:
+            # 助詞で終わり、残りが英単語の語（lineno: line + の）は、日本語の文を英語にしてしまう
+            stem = next((word[:-len(p)] for p in PARTICLES if word.endswith(p) and len(word) - len(p) >= 3), None)
+            if stem and (levels.get(stem, 99) <= bel_level or stem in count):
+                continue
             words.append(word)
     header = [
         "# 分野（プログラミング、仮想通貨）の文書に出る英字の語。tools/build_domain_words.py で作る（手で足さない）。",
@@ -142,20 +151,27 @@ def main():
     for name in ("brand-casing.tsv", "digit-words.tsv", "jaen-modern-words.tsv"):
         for key, shown in table_words(data / name).items():
             existing.setdefault(key, shown)
+    keep = {k for k, v in table_words(data / "brand-casing-fixes.tsv").items() if v == "-"}
     pairs = []
     for word, variants in sorted(count.items()):
         total = sum(variants.values())
         top, top_count = max(variants.items(), key=lambda kv: (kv[1], kv[0]))
-        if len(word) < 2 or top == word or word in existing:
+        if len(word) < 2 or top == word or word in existing or word in exclude or word in keep:
             continue
         share = top_count / total
         level = levels.get(word, 99)
+        simple = top == word.capitalize()  # 先頭だけ大文字
         if level > bel_level:  # 英単語の一覧にない語（識別子、略語、製品名）
             ok = total >= CASE_COUNT_NEW and share >= CASE_SHARE_NEW
         elif level > CASE_MAX_LEVEL:  # あまり一般的でない英単語（pod、cargo）
             ok = total >= CASE_COUNT and share >= CASE_SHARE
         else:  # 一般の英単語は、厳選した製品名（react）だけ
             ok = word in brand and share >= BRAND_SHARE and total >= BRAND_COUNT
+        if ok and simple:
+            # 先頭だけ大文字の書き方は、普通の英単語（cache、web）や日常の語（app、crypto）で
+            # 利用者が小文字で打つ語を変えてしまう。割合を高くし、普通の英単語はほぼ全部のときだけ。
+            ok = share >= SIMPLE_SHARE and (level > ORDINARY_LEVEL or word in brand or
+                                            (total >= STRONG_COUNT and share >= STRONG_SHARE))
         if ok:
             pairs.append((word, top))
     header = [
