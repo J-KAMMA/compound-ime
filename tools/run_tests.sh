@@ -130,10 +130,15 @@ h)
   MYIME_ZENZAI_TIME_LIMIT_MS=300 $BATCH $W/h100.txt $OUT/slow-load300.tsv 4
   MYIME_ZENZAI_TIME_LIMIT_MS=0 $BATCH $W/h100.txt $OUT/slow-loadfree.tsv 4
   pkill -f 'while :; do :; done' || true
+  # 計算機が空いているとき（変換の処理を1つだけ）に、上限を 300、500、1000 ミリ秒、なしにした場合
+  for ms in 300 500 1000 0; do
+    MYIME_ZENZAI_TIME_LIMIT_MS=$ms $BATCH $W/h100.txt $OUT/slow-idle$ms.tsv 1
+  done
   python3 $REPO/tools/slow_compare.py $T/ja400.json unlimited=$OUT/slow-unlimited.tsv noai=$OUT/slow-noai.tsv \
     t10=$OUT/slow-t10.tsv t1=$OUT/slow-t1.tsv load300=$OUT/slow-load300.tsv loadfree=$OUT/slow-loadfree.tsv \
+    idle300=$OUT/slow-idle300.tsv idle500=$OUT/slow-idle500.tsv idle1000=$OUT/slow-idle1000.tsv idlefree=$OUT/slow-idle0.tsv \
     | tee $OUT/slow-compare.txt
-  for s in unlimited noai t10 t1 load300 loadfree; do
+  for s in unlimited noai t10 t1 load300 loadfree idle300 idle500 idle1000 idle0; do
     python3 $REPO/tools/zenzai_stats.py $OUT --glob "slow-$s.tsv.zstats.*" --label "$s" | tee -a $OUT/slow-stats.txt
   done
   ;;

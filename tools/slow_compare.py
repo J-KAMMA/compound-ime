@@ -40,7 +40,9 @@ def main():
     scope = [it for it in items if it["romaji"] in base]
     print(f"対象 {len(scope)} 文")
     labels = {"unlimited": "上限なし", "noai": "人工知能なし", "t10": "上限 10 ミリ秒", "t1": "上限 1 ミリ秒",
-              "load300": "忙しい計算機で 300 ミリ秒", "loadfree": "忙しい計算機で上限なし"}
+              "load300": "忙しい計算機で 300 ミリ秒", "loadfree": "忙しい計算機で上限なし",
+              "idle300": "空いた計算機で 300 ミリ秒", "idle500": "空いた計算機で 500 ミリ秒",
+              "idle1000": "空いた計算機で 1000 ミリ秒", "idlefree": "空いた計算機で上限なし"}
     for name, got in runs.items():
         right = sum(correct(it, got.get(it["romaji"])) for it in scope)
         done = sum(it["romaji"] in got for it in scope)
