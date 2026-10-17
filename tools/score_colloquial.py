@@ -8,7 +8,7 @@ results.tsv は batch_convert.sh の出力（入力<TAB>文節<TAB>確定）。�
   緩い: 記号ゆれ込みに加えて、読みが同じで、漢字とかなの書き分けだけが違う場合（私/わたし、有難う/ありがとう、
         下さい/ください）も正解とみなす。別の漢字（同音異義語：橋/箸）は正解にしない。
         読みは SudachiPy で付ける（なければ緩い採点は出さない）。
-間違いの型（記号だけ・かな漢字の揺れ・同音の別の漢字・読みが違う・英字が混じった）に分けて数え、区分ごとの点数と
+間違いの型（記号・かなの文字種だけ・カタカナのまま・かな漢字の揺れ・同音の別の漢字・読みが違う・英字が混じった）に分けて数え、区分ごとの点数と
 間違いの例も出す。
 """
 import re
@@ -16,6 +16,7 @@ import sys
 import unicodedata
 
 LETTER = re.compile(r"[A-Za-zＡ-Ｚａ-ｚ]")
+KATA = re.compile(r"[ァ-ヺ]")
 KANJI = re.compile(r"[一-龯々〆]")
 PUNCT = re.compile(r"[、。！？!?,.\s「」・…]")
 
@@ -49,7 +50,9 @@ def classify_miss(original, out, reading):
     if not LETTER.search(original) and LETTER.search(out):
         return "英字が混じった"
     if squash(original) == squash(out):
-        return "記号だけの違い" if original != out else "同じ"
+        return "記号・かなの文字種だけの違い" if original != out else "同じ"
+    if len(KATA.findall(out)) - len(KATA.findall(original)) >= max(4, len(out) * 0.3):
+        return "カタカナのまま（変換されなかった）"
     if reading is not None:
         if reading(original) == reading(out):
             ko, kp = set(KANJI.findall(original)), set(KANJI.findall(out))
