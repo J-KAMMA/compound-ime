@@ -416,8 +416,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && !word_across(i) && !word_across(j)) {
           cost = kSpanCost - length;
         }
-      } else if (ForeignCost(parse(word)) > 0) {
-        cost = kSpanCost - length;
+      } else if (const int64_t sign = ForeignCost(parse(word)); sign > 0) {
+        // 弱い印（x? で打った小さい仮名など、日本語でも打つ形）だけの語は、打った文字の
+        // 区切りに沿うときだけ英語にする。ねぇ を nexe と打ったとき、ne の途中から
+        // exe を切り出して ん + EXE にしない。強い印（日本語の打ち方にない形）の語は
+        // 今までどおり区切りの途中からも取る（seat|wo の two）。
+        if (sign >= kForeignCost || (boundary[i] && boundary[j])) cost = kSpanCost - length;
       } else if (word.size() >= kMinPlainWordLength &&
                  (lexicon.IsCurated(word) ||
                   // Unvetted words: only on the typed chunk edges.
