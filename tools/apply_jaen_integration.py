@@ -3416,6 +3416,25 @@ edit(T, """  } else if (command == "SET_SELECTION_TEXT") {""", """  } else if (c
     client_->SetPrecedingText(args.size() >= 2 ? args[1] : "");
   } else if (command == "SET_SELECTION_TEXT") {""")
 
+# 落ちないかの試験（tools/run_tests.sh の組 j）: 実際の打ち込みと同じく、入力欄の後ろの文と、
+# 画面側が付ける実験の印（myime_async_conversion_v1）も付けられるようにする。
+# SET_FOLLOWING_TEXT<TAB>文、SET_EXPERIMENTAL_FEATURE<TAB>名前（どちらも引数なしで消える）。
+edit(H, "  void SetPrecedingText(absl::string_view text) { preceding_text_ = std::string(text); }\n",
+     "  void SetPrecedingText(absl::string_view text) { preceding_text_ = std::string(text); }\n"
+     "  void SetFollowingText(absl::string_view text) { following_text_ = std::string(text); }\n"
+     "  void SetExperimentalFeature(absl::string_view name) { experimental_feature_ = std::string(name); }\n")
+edit(H, "  std::string preceding_text_;\n",
+     "  std::string preceding_text_;\n  std::string following_text_;\n  std::string experimental_feature_;\n")
+edit(T, "  if (!preceding_text_.empty()) input->mutable_context()->set_preceding_text(preceding_text_);\n",
+     "  if (!preceding_text_.empty()) input->mutable_context()->set_preceding_text(preceding_text_);\n"
+     "  if (!following_text_.empty()) input->mutable_context()->set_following_text(following_text_);\n"
+     "  if (!experimental_feature_.empty()) input->mutable_context()->add_experimental_features(experimental_feature_);\n")
+edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (command == "SET_FOLLOWING_TEXT") {
+    client_->SetFollowingText(args.size() >= 2 ? args[1] : "");
+  } else if (command == "SET_EXPERIMENTAL_FEATURE") {
+    client_->SetExperimentalFeature(args.size() >= 2 ? args[1] : "");
+  } else if (command == "SET_PRECEDING_TEXT") {""")
+
 # 人工知能を、zenz-v3.2-small を追加学習した ft-v1 に替える（tools/zenz-finetune、配布ページ model-zenz-ft-v1）。
 # ファイル名を変えるので、前の版を入れた人も導入時に新しいほうを取りに行く。取れなかったときは前の名前のファイルを使う。
 FT_URL = ('L"https://github.com/J-KAMMA/compound-ime/releases/download/"\n'

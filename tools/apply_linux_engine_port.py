@@ -32,8 +32,9 @@ t = p.read_text(encoding="utf-8")
 old = """#endif
     fputs(line, stderr)
 }"""
+# FileHandle.standardError.write(_:) は書けないと中の try! で落ちるので、誤りを握りつぶす形で書く
 new = """#endif
-    FileHandle.standardError.write(Data(line.utf8))
+    try? FileHandle.standardError.write(contentsOf: Data(line.utf8))
 }"""
 assert t.count(old) == 1
 p.write_text(t.replace(old, new), encoding="utf-8", newline="")
