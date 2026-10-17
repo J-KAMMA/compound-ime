@@ -277,6 +277,36 @@ USE_ZENZ = True  # --no-zenz で False（Zenz の尤度を使わない、軽い�
 MAX_ALTS = 7  # --max-alts: 1文節で比べる別の表記の数（Zenz で採点する数を減らす）
 ZENZ_SOURCE = "score"  # --zenz-source: score（採点し直した尤度）か trace（Zenzai の計算済みの分布）
 REQUIRE_ZENZ = False  # --require-zenz: Zenz の点のある表記にだけ替える
+GUARD = False  # --guard: 固有名を守る決まり（guard_ok）
+
+
+def is_kata(ch):
+    return "ァ" <= ch <= "ヺ" or ch == "ー"
+
+
+def guard_ok(segs, i, j):
+    """固有名を守る決まり（段階3の C++ の SelectorGuardOk と同じ）。替えてよければ True。
+    1. 1位の文節にカタカナがあれば替えない（カタカナの名前を ひらがな・漢字に分けたり 中黒を足したりしない）。
+    2. 替える先の、1位と違う部分にカタカナがあれば替えない。
+    3. 1位の違う部分が ひらがな1文字だけ（助詞など、か→化）なら替えない。
+    4. 1位に英字・数字があれば替えない（学習の文にない）。
+    ただし文全体にひらがなも漢字もなく（全部カタカナになった失敗）6文字以上なら、1と2は当てない。"""
+    top, alt = segs[i][1][0]["value"], segs[i][1][j]["value"]
+    text = "".join(c[0]["value"] for _, c in segs)
+    fallback = len(text) >= 6 and not any(HIRA.match(ch) or KANJI.match(ch) for ch in text)
+    a, b = 0, 0
+    while a < min(len(top), len(alt)) and top[a] == alt[a]:
+        a += 1
+    while b < min(len(top), len(alt)) - a and top[len(top) - 1 - b] == alt[len(alt) - 1 - b]:
+        b += 1
+    td, ad = top[a:len(top) - b], alt[a:len(alt) - b]
+    if not fallback and (any(is_kata(ch) for ch in top) or any(is_kata(ch) for ch in ad)):
+        return False
+    if len(td) == 1 and HIRA.match(td):
+        return False
+    if any(LATIN.match(ch) or "0" <= ch <= "9" or "０" <= ch <= "９" for ch in top):
+        return False  # 4. 1位に英字・数字があれば替えない（学習の文にない）
+    return True
 GATE = None  # --gate: (Zenz を使わない選び手の確からしさ, 門のしきい値)
 GATE_STATS = {"segments": 0, "scored": 0, "surfaces": 0, "sentences": 0}
 
@@ -361,6 +391,8 @@ def best_alternatives(items, prob):
             continue
         for i in range(len(it["segs"])):
             for j in alternatives(it["segs"], i):
+                if GUARD and not guard_ok(it["segs"], i, j):
+                    continue
                 if REQUIRE_ZENZ:
                     # Zenz の点のない表記には替えない（数字を読みに替えるなど、裏付けのない替え方を防ぐ）
                     z = it["zenz"][i] if it["zenz"] else None
@@ -457,17 +489,19 @@ def main():
     ap.add_argument("--max-alts", type=int, default=7, help="1文節で比べる別の表記の数（既定は全部）")
     ap.add_argument("--zenz-source", default="score", choices=["score", "trace"],
                     help="Zenz の点: score は採点し直した文全体の尤度（段階1）、trace は Zenzai の計算済みの分布（段階2b）")
+    ap.add_argument("--guard", action="store_true", help="固有名を守る決まり（guard_ok）を当てる")
     ap.add_argument("--require-zenz", action="store_true", help="Zenz の点のある表記にだけ替える")
     ap.add_argument("--gate", type=float, help="Zenz を使わない選び手でこの確からしさ以上の文節だけ採点する（見積もり）")
     ap.add_argument("--export-stage3", help="段階3の重み（門と選び手）を書き出すファイル（--gate と --model lr のとき）")
     ap.add_argument("--export-threshold", type=float, default=0.7, help="段階3で1位を替えるしきい値")
     ap.add_argument("--weights-in",help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
     args = ap.parse_args()
-    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ
+    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ, GUARD
     USE_ZENZ = not args.no_zenz
     MAX_ALTS = args.max_alts
     ZENZ_SOURCE = args.zenz_source
     REQUIRE_ZENZ = args.require_zenz
+    GUARD = args.guard
     import numpy as np
     from sklearn.ensemble import GradientBoostingClassifier
     from sklearn.linear_model import LogisticRegression

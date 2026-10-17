@@ -11,6 +11,7 @@ tools/apply_jaen_integration.py（段階1・2の記録を含む）と tools/appl
      1回だけ計算する（新しい入り口 ScoreSentenceSuffixes）。
   3. 学習した選び手（Zenz の点を使う）の確からしさがしきい値（0.7）以上の表記を1位にする。
      判断は全文節で、ほかの文節は替える前の1位のままとして行い、最後にまとめて替える。
+  門と判断には、固有名を守る決まり（SelectorGuardOk、selector_stage2.py の guard_ok）を通る候補だけを使う。
 特徴の作り方は tools/selector_stage2.py の pair_features と同じ。重みは
 tools/data/selector-stage3/weights.json（selector_stage2.py --export-stage3 で作る）。
 """
@@ -335,6 +336,25 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
     for (int b : kBits) f[n++] = (t.attributes >> b) & 1;
     return f;
   }
+  // 固有名を守る決まり（tools/selector_stage2.py の guard_ok と同じ）。替えてよければ true。
+  // 1. 1位の文節にカタカナがあれば替えない。2. 替える先の違う部分にカタカナがあれば替えない。
+  // （文全体にひらがなも漢字もなく6文字以上＝全部カタカナになった失敗のときは、1と2は当てない）
+  // 3. 1位の違う部分がひらがな1文字だけなら替えない。4. 1位に英字・数字があれば替えない。
+  static bool SelectorGuardOk(std::string_view top_s, std::string_view alt_s, bool fallback) {
+    const auto top = SelectorCodepoints(top_s), alt = SelectorCodepoints(alt_s);
+    size_t a = 0, b = 0;
+    while (a < std::min(top.size(), alt.size()) && top[a] == alt[a]) ++a;
+    while (b < std::min(top.size(), alt.size()) - a && top[top.size() - 1 - b] == alt[alt.size() - 1 - b]) ++b;
+    if (!fallback) {
+      for (char32_t c : top) if (SelectorKata(c)) return false;
+      for (size_t k = a; k < alt.size() - b; ++k) if (SelectorKata(alt[k])) return false;
+    }
+    if (top.size() - b - a == 1 && SelectorHira(top[a])) return false;
+    for (char32_t c : top) {
+      if (SelectorLatin(c) || (c >= '0' && c <= '9') || (c >= 0xFF10 && c <= 0xFF19)) return false;
+    }
+    return true;
+  }
   static double SelectorProb(const std::array<double, kSelectorFeatures>& f, const double* mean, const double* scale,
                              const double* coef, double intercept) {
     double z = intercept;
@@ -364,6 +384,17 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
              s.find('\n') == std::string_view::npos;
     };
     if (!clean(reading)) return;
+    // 文全体にひらがなも漢字もなく6文字以上なら、全部カタカナになった失敗とみなす
+    bool fallback = false;
+    {
+      std::string text;
+      for (const auto& f : first) text += f;
+      const auto cps = SelectorCodepoints(text);
+      fallback = cps.size() >= 6;
+      for (char32_t c : cps) {
+        if (SelectorHira(c) || SelectorKanji(c)) fallback = false;
+      }
+    }
     std::vector<std::pair<size_t, size_t>> moves;
     std::string log;
     for (size_t i = 0; i < count; ++i) {
@@ -381,8 +412,14 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
         alts.push_back(j);
       }
       if (alts.empty()) continue;
-      double gate = 0;
+      // 固有名を守る決まりで替えてよい候補だけを門と判断に使う（採点には全部の候補を入れる）
+      std::vector<size_t> allowed;
       for (size_t j : alts) {
+        if (SelectorGuardOk(first[i], seg.candidate(j).value, fallback)) allowed.push_back(j);
+      }
+      if (allowed.empty()) continue;
+      double gate = 0;
+      for (size_t j : allowed) {
         gate = std::max(gate, SelectorProb(SelectorFeatures(*segments, i, j, SelectorZenz{}), kSelectorGateMean,
                                            kSelectorGateScale, kSelectorGateCoef, kSelectorGateIntercept));
       }
@@ -419,6 +456,7 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
       size_t best_j = 0;
       for (size_t a = 0; a < alts.size(); ++a) {
         if (!std::isfinite(values[a + 1])) continue;  // Zenz の点のない表記には替えない
+        if (std::find(allowed.begin(), allowed.end(), alts[a]) == allowed.end()) continue;
         SelectorZenz za = z;
         za.have_alt = true;
         za.alt = values[a + 1];

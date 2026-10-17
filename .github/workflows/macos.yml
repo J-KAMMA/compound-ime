@@ -55,6 +55,9 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+          # 選び手（段階2b の記録と段階3の組み込み、MYIME_SELECTOR=0 で切る）
+          $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
+          $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
 
       - name: 変換エンジン（Swift）
         run: |
@@ -145,6 +148,9 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+          # 選び手（段階2b の記録と段階3の組み込み、MYIME_SELECTOR=0 で切る）
+          $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
+          $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
 
       - name: Qt 6.9.1（Mac 用、設定画面に使う）
         run: |
