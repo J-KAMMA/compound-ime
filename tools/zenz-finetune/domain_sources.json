@@ -50,13 +50,32 @@
       "test_doc_fraction": 0.25, "test_quota": 200
     },
     {
-      "name": "tatoeba", "title": "Tatoeba 日本語の文（話し言葉）", "domain": "colloquial", "kind": "external",
+      "name": "tatoeba", "title": "Tatoeba 日本語の文（話し言葉）", "domain": "colloquial", "kind": "external", "mix": "tatoeba",
+      "counts_file": "colloquial-counts.json",
       "comment": "git の文書ではない。tools/colloquial_text.py が 1 つのファイルから文を取り出し、colloquial-train.jsonl を作る。domain_text.py と fetch_domain_sources.py は読み飛ばす。commit の欄はファイルの SHA-256（2026-10-10 の版）。",
       "repo": "https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2",
       "commit": "sha256:ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1",
       "license": "CC BY 2.0 FR（一部 CC0）", "license_url": "https://tatoeba.org/en/terms_of_use",
       "attribution": "Tatoeba の投稿者（文ごとの番号 https://tatoeba.org/sentences/show/<番号>）",
       "test_doc_fraction": 0.1, "test_quota": 300
+    },
+    {
+      "name": "persona", "title": "RealPersonaChat（日本語の雑談対話）", "domain": "colloquial", "kind": "dialogue", "mix": "persona",
+      "counts_file": "persona-counts.json",
+      "comment": "対話の JSON を git の sparse checkout で取り出し（fetch_domain_sources.py）、persona_text.py が発話を文にする（domain_text.py は読み飛ばす）。Hugging Face の nu-dialogue/real-persona-chat（commit a5be0f51127945cf52edbba40759d04573864438）はデータを持たない読み込み用の台本だけで、データ本体は GitHub のタグ v1.0.0 の一式を取りに行く。その版が下の commit。",
+      "repo": "https://github.com/nu-dialogue/real-persona-chat", "commit": "28d0b6b3865b29cabc26c230a2db37cdf315e937",
+      "huggingface": {"repo": "nu-dialogue/real-persona-chat", "commit": "a5be0f51127945cf52edbba40759d04573864438"},
+      "paths": ["real_persona_chat/dialogues"], "root": "real_persona_chat/dialogues", "glob": "*.json", "format": "dialogue-json",
+      "license": "CC BY-SA 4.0", "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+      "license_note": "GitHub の LICENSE・README と Hugging Face のカードは CC BY-SA 4.0。Hugging Face の読み込み台本（real-persona-chat.py）の _LICENSE だけ CC BY-ND 4.0 と書いてあり食い違う。データ本体の GitHub の表示（CC BY-SA 4.0）に従う。配る前に作者に確かめると安心。",
+      "attribution": "Yamashita et al. 2023, RealPersonaChat（https://github.com/nu-dialogue/real-persona-chat）",
+      "terms": [
+        "本コーパスのデータから個人を特定しようとしない: 使うのは発話の文字だけ。話者ID・ペルソナ・性格特性・属性・時刻は読まず、練習問題にも残さない",
+        "特定の話者へのなりすましに使わない: 話者の口調をまねる用途ではなく、読みから表記を選ぶ練習だけに使う",
+        "話者の属性や性格特性の推定に使わない"
+      ],
+      "use": "発話から取り出した日本語の文（読みは SudachiPy で付ける）。前の発話を左の文脈にする。話者の区別はしない",
+      "test_doc_fraction": 0.05
     }
   ]
 }

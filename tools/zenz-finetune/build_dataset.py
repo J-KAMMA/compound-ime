@@ -29,11 +29,29 @@ expected-windows-139.tsv）の文と、表記または読みが同じか、そ�
 読みの付け方: ウィキペディアの文は SudachiPy（Apache-2.0）と SudachiDict
 （Apache-2.0）で読みを付ける。自作の一覧（tools/data/）は一覧にある読みを使う。
 
-分野の文（--domain-text）: プログラミングと仮想通貨の文書から tools/zenz-finetune/domain_text.py で
-取り出した文（sentences.jsonl の練習用の文だけ）を混ぜる。--size のうち --domain-share（既定 0.5）が分野、
-残りがウィキペディアなど。分野の文の英字の言葉（git、npm、Python など）は確定済みの文節として左右の文脈に入れ、
-日本語の部分を問う。新しい試験のファイルは --extra-test で指定すると、その文も除く。出どころ・版・利用条件・件数は
-manifest.json の domain に残る（tools/zenz-finetune/domain_sources.json）。
+出典の混ぜ方（--mix）: 学習用の問題の数 --size を、出典ごとの割合で分ける。
+  --mix wiki=0.55,tatoeba=0.1,persona=0.15,domain=0.12,synthetic=0.08
+  wiki       ウィキペディア（--wiki に複数の parquet を渡せる）
+  synthetic  自作の一覧（話し言葉・略語・英語の言い回し。tools/data/）
+  domain     プログラミングと仮想通貨の文書（tools/zenz-finetune/domain_text.py の sentences.jsonl）
+  tatoeba    Tatoeba の話し言葉（tools/colloquial_text.py の colloquial-train.jsonl）
+  persona    RealPersonaChat の雑談（tools/zenz-finetune/persona_text.py の persona-train.jsonl）
+  domain・tatoeba・persona は、まとめた文の一覧（--domain-text。cat で連結してよい）の source を、
+  domain_sources.json の mix の欄で振り分ける。英字の言葉（git、npm、Python など）は確定済みの文節として
+  左右の文脈に入れ、日本語の部分を問う。
+  --max-passes で、出典ごとに「同じ文から作る問題の形の数」の上限を決める。材料が足りないときだけ、
+  この回数まで同じ文を別の形（文全体・前の文つき・文の一部）で使い回す。それでも足りない分は、予定より
+  少ないまま manifest.json の mix_result に出る（既定では、ウィキペディアの文全体の問題で埋める。--no-fill-wiki で止める）。
+  --mix を付けないと昔の指定（--domain-share: 分野の割合、残りは wiki と synthetic）。
+
+部品に分けて作る（切れても続けられる。数百万問向け）:
+  --only-source domain tatoeba persona synthetic --part text   ← まず文の一覧からの出典
+  --only-source wiki --slice 0/2 --part wiki0                   ← 次にウィキペディア（足りなかった分を埋める）
+  --only-source wiki --slice 1/2 --part wiki1                   ← 別の工程で並べて動かせる
+  --merge-parts                                                 ← 最後に valid.jsonl と manifest.json を作る
+  できるもの: train-<部品>.jsonl.gz、valid-<部品>.jsonl、part-<部品>.json（目録）。学習用は部品のまま使う
+  （並びは学習の側で混ぜる）。新しい試験のファイルは --extra-test で指定すると、その文も除く。
+  出どころ・版・利用条件・件数は manifest.json の domain と sources に残る。
 """
 from __future__ import annotations
 
@@ -77,6 +95,67 @@ DOMAIN_WEIGHTS = {
 }
 DOMAIN_KINDS = tuple(DOMAIN_WEIGHTS)
 WIKI_KINDS = ("wiki_whole", "wiki_context", "wiki_span", "homophone", "mixed_english")
+
+# ---- 出典の混ぜ方（--mix wiki=0.55,tatoeba=0.2,... の名前）
+# 文の一覧（sentences.jsonl）から作る出典: 問題の形（whole 文全体、context 前の文つき、span 文の一部、
+# english 英字の言葉を含む文の日本語の部分）と、出典の中での割合。形の名前は <出典>_<形>。
+TEXT_SHAPES = {
+    "domain": DOMAIN_WEIGHTS,
+    "tatoeba": {"tatoeba_whole": 0.55, "tatoeba_span": 0.45},   # 1文ずつの短い文で、前の文も英字もない
+    "persona": {"persona_whole": 0.30, "persona_context": 0.40, "persona_span": 0.25, "persona_english": 0.05},
+}
+SOURCE_KINDS = {
+    "wiki": {k: DEFAULT_WEIGHTS[k] for k in WIKI_KINDS},
+    "synthetic": {k: DEFAULT_WEIGHTS[k] for k in SYNTHETIC_KINDS},   # 自作の一覧（話し言葉・略語・言い回し）
+    **TEXT_SHAPES,
+}
+TEXT_SOURCES = tuple(TEXT_SHAPES)
+KIND_SOURCE = {kind: source for source, kinds in SOURCE_KINDS.items() for kind in kinds}
+# 出典ごとの「同じ文から作る問題の形の数」の上限（材料が足りないときだけ、この回数まで文を使い回す）
+DEFAULT_MAX_PASSES = {"wiki": 2, "synthetic": 1, "domain": 3, "tatoeba": 3, "persona": 3}
+# --mix を付けないときの出典の割合（昔の指定: 分野の文があれば --domain-share を分野に、残りを wiki と synthetic に）
+LEGACY_BASE_MIX = {"wiki": 0.86, "synthetic": 0.14}
+
+
+def parse_mix(text: str, args) -> dict:
+    """出典ごとの割合（合計 1 にそろえる）。割合 0 の出典は作らない。"""
+    if text:
+        mix = {}
+        for item in text.split(","):
+            name, value = item.strip().split("=")
+            if name.strip() not in SOURCE_KINDS:
+                raise SystemExit(f"--mix の出典が不明: {name}（使えるのは {', '.join(SOURCE_KINDS)}）")
+            mix[name.strip()] = float(value)
+    elif args.domain_text:
+        share = args.domain_share
+        mix = {name: (1 - share) * value for name, value in LEGACY_BASE_MIX.items()}
+        mix["domain"] = share
+    else:
+        mix = dict(LEGACY_BASE_MIX)
+    total = sum(mix.values())
+    if total <= 0:
+        raise SystemExit("--mix の割合の合計が 0 です")
+    return {name: value / total for name, value in mix.items() if value > 0}
+
+
+def parse_slice(text: str) -> tuple:
+    """"i/n"（0 始まり）を (i, n) にする。"""
+    if not text:
+        return 0, 1
+    index, count = (int(x) for x in text.split("/"))
+    if not 0 <= index < count:
+        raise SystemExit(f"--slice は i/n（0 <= i < n）で指定してください: {text}")
+    return index, count
+
+
+def parse_passes(text: str) -> dict:
+    passes = dict(DEFAULT_MAX_PASSES)
+    for item in (text.split(",") if text else []):
+        name, value = item.strip().split("=")
+        if name.strip() not in passes:
+            raise SystemExit(f"--max-passes の出典が不明: {name}（使えるのは {', '.join(passes)}）")
+        passes[name.strip()] = max(1, int(value))
+    return passes
 
 # ---------------------------------------------------------------- 文字の処理
 
@@ -208,6 +287,14 @@ class TestExclusion:
         self.files = []
         surfaces, readings = set(), set()
 
+        def add_surface(text: str):
+            """試験の文の表記。句点で区切れる複数の文なら、1文ずつも足す
+            （片方だけの文を練習に使うと、試験の文の半分を覚えさせることになるため）。"""
+            surfaces.add(norm_surface(text))
+            pieces = re.split(r"[。！？!?\n]", text)
+            if len(pieces) > 1:
+                surfaces.update(key for key in map(norm_surface, pieces) if len(key) >= self.SURFACE_MIN)
+
         def add_reading(romaji: str, english=()):
             romaji = unicodedata.normalize("NFKC", romaji).lower()
             pieces, used, rest = [], [], romaji
@@ -242,7 +329,7 @@ class TestExclusion:
             for item in items:
                 for text in [item.get("intended", "")] + list(item.get("alternatives", []) or []):
                     if text:
-                        surfaces.add(norm_surface(text))
+                        add_surface(text)
                 english = item.get("english", []) or []
                 for key in ("romaji", "correct_romaji"):
                     if item.get(key):
@@ -270,20 +357,38 @@ class TestExclusion:
                 if typing_test and cols[0]:
                     add_reading(cols[0])  # 打ち込み試験: ローマ字と元の文の両方で除く
                 if len(cols) > column and cols[column]:
-                    surfaces.add(norm_surface(cols[column]))
+                    add_surface(cols[column])
                 if path.name == "variants.tsv" and len(cols) > 4 and cols[4]:
                     for alt in cols[4].split("|"):
-                        surfaces.add(norm_surface(alt))
+                        add_surface(alt)
             self.files.append(path)
         known = {p.name for p in self.files} | set(ignore)
-        for path in sorted(test_dir.iterdir()):
-            if path.is_file() and path.name not in known and path.suffix in (".txt", ".tsv"):
-                # 新しく足された試験のファイルも、1行目の列をローマ字として扱う
-                for line in path.read_text(encoding="utf-8").splitlines():
-                    first = line.split("\t")[0].strip()
-                    if re.fullmatch(r"[a-z\-']+", first or ""):
-                        add_reading(first)
-                self.files.append(path)
+        self.unhandled = []  # 中身を読めなかった（形が分からない）ファイル。manifest に出す
+        japanese_text = re.compile(r"[ぁ-ゖァ-ヺ一-鿿]")
+        for path in sorted(test_dir.rglob("*")):
+            if not path.is_file() or path.name in known or path.name.startswith("."):
+                continue
+            if path.suffix not in (".txt", ".tsv", ".csv", ".jsonl"):
+                self.unhandled.append(path.name)
+                continue
+            # 新しく足された試験のファイル、context.tsv（ローマ字・元の文・前の文）なども、全部の列を調べる:
+            # ローマ字の形の列は読みとして、日本語を含む列は表記（前の文を含む）として、試験の文に数える
+            for line in path.read_text(encoding="utf-8").splitlines():
+                if line.startswith("#"):
+                    continue
+                if path.suffix == ".jsonl":  # 1行 1 つの JSON: 日本語を含む文字列の値を全部、表記として数える
+                    for m in re.findall(r'"([^"]*[ぁ-ゖァ-ヺ一-鿿][^"]*)"', line):
+                        add_surface(m)
+                    continue
+                for col in line.split("," if path.suffix == ".csv" else "\t"):
+                    col = col.strip()
+                    if len(col) < 2:
+                        continue
+                    if re.fullmatch(r"[a-z0-9\-',.?!~]+", col):
+                        add_reading(col)
+                    elif japanese_text.search(col):
+                        add_surface(col)
+            self.files.append(path)
         surfaces.discard("")
         readings.discard("")
         self.surface_exact = surfaces
@@ -299,6 +404,7 @@ class TestExclusion:
         self.surface_index = SubstringIndex(s for s in surfaces if contains_checked(s, self.SURFACE_MIN))
         self.reading_index = SubstringIndex(r for r in readings if contains_checked(r, self.READING_MIN))
         self.stats = {
+            "files_unhandled": self.unhandled,
             "surface_keys": len(surfaces),
             "surface_keys_checked_by_containment": sum(contains_checked(s, self.SURFACE_MIN) for s in surfaces),
             "reading_keys": len(readings),
@@ -461,25 +567,29 @@ def bunsetsu_starts(tokens) -> list[int]:
 # ---------------------------------------------------------------- ウィキペディア
 
 
-def iter_wiki_articles(paths, rng: random.Random):
-    """(題名, 本文) を、seed で決まる順に返す。parquet（wikimedia/wikipedia）か、
-    文章ファイル（空行で記事を区切る。1行目を題名とする）。"""
+def iter_wiki_articles(paths, seed_key: str, part: tuple = (0, 1)):
+    """(題名, 本文) を、seed_key で決まる順に返す（ファイルごとに順番を決める）。
+    part=(i, n) なら、並べ替えたあとの i 番目、i+n 番目… の記事だけ（n 個の工程で分けるとき）。
+    parquet（wikimedia/wikipedia）か、文章ファイル（空行で記事を区切る。1行目を題名とする）。"""
+    index, count = part
     for path in paths:
         path = Path(path)
+        rng = random.Random(f"{seed_key}:{path.name}")
         if path.suffix == ".parquet":
             import pyarrow.parquet as pq
             table = pq.read_table(path, columns=["title", "text"])
             titles = table.column("title").to_pylist()
             texts = table.column("text").to_pylist()
+            del table
             order = list(range(len(titles)))
             rng.shuffle(order)
-            for i in order:
+            for i in order[index::count]:
                 yield titles[i], texts[i]
         else:
             blocks = [b for b in re.split(r"\n\s*\n", path.read_text(encoding="utf-8")) if b.strip()]
             order = list(range(len(blocks)))
             rng.shuffle(order)
-            for i in order:
+            for i in order[index::count]:
                 lines = blocks[i].strip().split("\n")
                 yield f"{path.name}:{lines[0]}", "\n".join(lines[1:]) if len(lines) > 1 else lines[0]
 
@@ -641,35 +751,63 @@ class Builder:
         self.exclusion = TestExclusion(self.repo / "tests" / "conversion",
                                        load_romaji_table(Path(args.romaji_table)), english_to_katakana,
                                        extra_files=args.extra_test, ascii_containment=not args.domain_text)
-        self.weights = dict(DEFAULT_WEIGHTS)
-        for item in (args.mix.split(",") if args.mix else []):
+        # 種類ごとの割合（出典の中での割合）。--kind-weights で上書きできる
+        self.kind_weights = {source: dict(kinds) for source, kinds in SOURCE_KINDS.items()}
+        for item in (args.kind_weights.split(",") if args.kind_weights else []):
             name, value = item.split("=")
-            if name not in self.weights:
-                raise SystemExit(f"--mix の種類が不明: {name}")
-            self.weights[name] = float(value)
-        total = sum(self.weights.values())
-        # 分野の文を使うときは、全体のうち --domain-share を分野に、残りをウィキペディアなどに回す
-        self.domain_enabled = bool(args.domain_text)
-        domain_size = int(round(args.size * args.domain_share)) if self.domain_enabled else 0
-        base_size = args.size - domain_size
-        self.quota = {k: int(round(base_size * v / total)) for k, v in self.weights.items()}
-        if self.domain_enabled:
-            domain_total = sum(DOMAIN_WEIGHTS.values())
-            self.quota.update({k: int(round(domain_size * v / domain_total)) for k, v in DOMAIN_WEIGHTS.items()})
+            if name not in KIND_SOURCE:
+                raise SystemExit(f"--kind-weights の種類が不明: {name}")
+            self.kind_weights[KIND_SOURCE[name]][name] = float(value)
+        self.mix = parse_mix(args.mix, args)
+        self.max_passes = parse_passes(args.max_passes)
+        if args.domain_passes is not None and "domain=" not in (args.max_passes or ""):
+            self.max_passes["domain"] = max(1, args.domain_passes)
+        self.part = parse_slice(args.slice)
+        wanted = list(args.only_source) if args.only_source else list(self.mix)
+        for name in wanted:
+            if name not in self.mix:
+                raise SystemExit(f"--only-source の出典 {name} が --mix にありません（割合 0 か、書かれていない）")
+        self.run_sources = [name for name in SOURCE_KINDS if name in wanted]
+        if self.part[1] > 1 and self.run_sources != ["wiki"]:
+            raise SystemExit("--slice を使えるのは --only-source wiki のときだけです")
+        self.text_groups = [name for name in self.run_sources if name in TEXT_SOURCES]
+        if self.text_groups and not args.domain_text:
+            raise SystemExit(f"{', '.join(self.text_groups)} の問題を作るには --domain-text（文の一覧）が要ります")
+        # 予定の数（全体）と、この実行が受け持つ数
+        self.planned = {}
+        for source, share in self.mix.items():
+            weights = self.kind_weights[source]
+            total = sum(weights.values())
+            size = int(round(args.size * share))
+            for kind, weight in weights.items():
+                self.planned[kind] = int(round(size * weight / total))
+        index, count = self.part
+        self.quota = {k: (v // count + (1 if index < v % count else 0) if KIND_SOURCE[k] == "wiki" else v)
+                      for k, v in self.planned.items() if KIND_SOURCE[k] in self.run_sources}
+        self.valid_cap = -(-args.valid_per_kind // count)
         self.train = {k: [] for k in self.quota}
         self.valid = {k: [] for k in self.quota}
-        self.valid_fraction = {k: (args.domain_valid_fraction if k in DOMAIN_KINDS else args.valid_fraction)
+        self.valid_fraction = {k: (args.domain_valid_fraction if KIND_SOURCE[k] in TEXT_SOURCES else args.valid_fraction)
                                for k in self.quota}
-        self.domain_per_source = {}  # 出典ごとの練習問題・確かめ問題の数
+        self.text_per_source = {}   # 文の一覧の出典ごとの練習問題・確かめ問題の数
+        self.text_items = {}
+        self.text_rejected = {}
+        self.text_passes_used = {}
+        self.shortfall = {}         # 出典ごとの、予定より足りなかった数
+        self.fill_added = 0
+        self.pass_no = 1
         self.seen = set()
         self.excluded = []
         self.excluded_count = 0
         self.rejected = {"wiki_sentence_shape": 0, "wiki_reading": 0}
+        self.wiki_stats = None
+        self.reader_versions = None
         self._reader = None
 
     def reader(self):
         if self._reader is None:
             self._reader = SudachiReader(self.args.sudachi_dict)
+            self.reader_versions = self._reader.versions()
         return self._reader
 
     # 学習用か確かめ用かは、記事・見出し語（group）で決める
@@ -685,7 +823,7 @@ class Builder:
         if key in self.seen:
             return False
         if self.is_valid(group, kind):
-            if len(self.valid[kind]) >= self.args.valid_per_kind:
+            if len(self.valid[kind]) >= self.valid_cap:
                 return False
             self.seen.add(key)
             self.valid[kind].append(record)
@@ -707,7 +845,17 @@ class Builder:
 
     def full(self, kind) -> bool:
         return len(self.train[kind]) >= self.quota[kind] and (
-            len(self.valid[kind]) >= self.args.valid_per_kind or self.valid_fraction[kind] == 0)
+            len(self.valid[kind]) >= self.valid_cap or self.valid_fraction[kind] == 0)
+
+    def is_open(self, kind) -> bool:
+        """まだ問題を足せる種類か。2周目からは練習用だけ見る（確かめ用は1周目で集める）。"""
+        if len(self.train[kind]) < self.quota[kind]:
+            return True
+        return self.pass_no == 1 and self.valid_fraction[kind] > 0 and len(self.valid[kind]) < self.valid_cap
+
+    def note_shortfall(self, source):
+        self.shortfall[source] = sum(max(0, self.quota[k] - len(self.train[k])) for k in SOURCE_KINDS[source]
+                                     if k in self.quota)
 
     # ---- 自作の一覧
     def build_synthetic(self):
@@ -734,51 +882,79 @@ class Builder:
             options = framed_examples(kind, surface, reading, frame, english)
             if options and self.check(options[0][1], options[0][2]):
                 self.add(kind, self.rng.choice(options)[0], group)
+        self.note_shortfall("synthetic")
 
     # ---- ウィキペディア
+    def shortfall_from_parts(self) -> int:
+        """この実行で作っていないほかの出典の、足りなかった数（先に作った部品の目録から読む）。"""
+        total, seen = 0, set(self.shortfall)
+        for path in sorted(Path(self.args.out).glob("part-*.json")):
+            fragment = json.loads(path.read_text(encoding="utf-8"))
+            for source, number in (fragment.get("shortfall") or {}).items():
+                if source != "wiki" and source not in seen:
+                    total += number
+                    seen.add(source)
+        return total
+
+    def apply_fill(self):
+        """ほかの出典で足りなかった分を、ウィキペディアの文全体の問題で埋める（--no-fill-wiki で止める）。"""
+        self.fill_added = 0
+        if self.args.no_fill_wiki:
+            return
+        short = sum(n for s, n in self.shortfall.items() if s != "wiki") + self.shortfall_from_parts()
+        index, count = self.part
+        self.fill_added = short // count + (1 if index < short % count else 0)
+        self.quota["wiki_whole"] += self.fill_added
+
     def build_wiki(self):
         args = self.args
         if not args.wiki:
             return
         reader = self.reader()
-        self.reader_versions = reader.versions()
         kata_map = load_katakana_english(self.data_dir / "katakana-english-common.tsv")
         groups = load_homophone_groups(self.data_dir / "homophone-cues.tsv")
-        # 自作の一覧で埋まらなかった分は文全体の問題で埋める
-        for kind in SYNTHETIC_KINDS:
-            self.quota["wiki_whole"] += max(0, self.quota[kind] - len(self.train[kind]))
-            self.quota[kind] = len(self.train[kind])
-        started, articles, sentences = time.time(), 0, 0
-        for title, text in iter_wiki_articles(args.wiki, self.rng):
+        self.apply_fill()
+        started, articles, sentences, passes_used = time.time(), 0, 0, 0
+        for pass_no in range(1, self.max_passes["wiki"] + 1):
             if all(self.full(k) for k in WIKI_KINDS):
                 break
-            if args.max_articles and articles >= args.max_articles:
-                break
-            articles += 1
-            group = f"wiki:{title}"
-            for paragraph in split_paragraphs(text or ""):
-                previous = ""  # 同じ段落の前の文（検査を通ったものだけ）
-                for sentence in paragraph:
-                    if not sentence_ok(sentence):
-                        self.rejected["wiki_sentence_shape"] += 1
-                        previous = ""
-                        continue
-                    tokens = reader.analyze(sentence)
-                    if not tokens:
-                        self.rejected["wiki_reading"] += 1
-                        previous = ""
-                        continue
-                    reading = "".join(t.reading for t in tokens)
-                    if len(reading) > READING_MAX or not self.check(sentence, [reading]):
-                        previous = ""
-                        continue
-                    sentences += 1
-                    self.wiki_sentence(group, sentence, tokens, reading, previous, kata_map, groups)
-                    previous = sentence
-            if args.progress and articles % args.progress == 0:
-                counts = {k: len(v) for k, v in self.train.items()}
-                print(f"  記事 {articles}  文 {sentences}  {time.time() - started:.0f}秒  {counts}", flush=True)
-        self.wiki_stats = {"articles": articles, "sentences_used": sentences}
+            passes_used = pass_no
+            self.pass_no = pass_no
+            for title, text in iter_wiki_articles(args.wiki, f"{args.seed}:wiki:{pass_no}", self.part):
+                if all(self.full(k) for k in WIKI_KINDS):
+                    break
+                if args.max_articles and articles >= args.max_articles:
+                    break
+                articles += 1
+                group = f"wiki:{title}"
+                for paragraph in split_paragraphs(text or ""):
+                    previous = ""  # 同じ段落の前の文（検査を通ったものだけ）
+                    for sentence in paragraph:
+                        if not sentence_ok(sentence):
+                            self.rejected["wiki_sentence_shape"] += 1
+                            previous = ""
+                            continue
+                        tokens = reader.analyze(sentence)
+                        if not tokens:
+                            self.rejected["wiki_reading"] += 1
+                            previous = ""
+                            continue
+                        reading = "".join(t.reading for t in tokens)
+                        if len(reading) > READING_MAX or not self.check(sentence, [reading]):
+                            previous = ""
+                            continue
+                        if previous and self.exclusion.blocked(previous + sentence):
+                            previous = ""   # 前の文とつなげると試験の文になる（句点を含む複数の文の試験）
+                        sentences += 1
+                        self.wiki_sentence(group, sentence, tokens, reading, previous, kata_map, groups)
+                        previous = sentence
+                if args.progress and articles % args.progress == 0:
+                    counts = {k: len(v) for k, v in self.train.items()}
+                    print(f"  記事 {articles}  文 {sentences}  {time.time() - started:.0f}秒  {counts}", flush=True)
+        self.wiki_stats = {"articles": articles, "sentences_used": sentences, "passes_used": passes_used,
+                           "passes_max": self.max_passes["wiki"], "seconds": round(time.time() - started),
+                           "fill_added": self.fill_added, "slice": list(self.part)}
+        self.note_shortfall("wiki")
 
     def wiki_sentence(self, group, sentence, tokens, reading, previous, kata_map, groups):
         rng = self.rng
@@ -813,18 +989,26 @@ class Builder:
             start, end = random_span(tokens, rng)
             self.add(kind, span_example(kind, tokens, start, end, previous if rng.random() < 0.5 else ""), group)
 
-    # ---- 分野の文書（tools/zenz-finetune/domain_text.py の出力）
-    def load_domain_items(self):
-        """練習用の文を、日本語の部分の読みを付けた形にする。試験の文と重なるものは捨てる。"""
+    # ---- 文の一覧（分野・Tatoeba・RealPersonaChat。domain_text.py などが作る sentences.jsonl と同じ形）
+    def load_text_items(self):
+        """練習用の文を、日本語の部分の読みを付けた形にする。試験の文と重なるものは捨てる。
+        メモリを抑えるため、形態素は持たない（文の一部の問題を作るときに、もう一度解析する）。"""
         sys.path.insert(0, str(Path(__file__).resolve().parent))
         from domain_text import pieces_of
         reader = self.reader()
-        self.reader_versions = reader.versions()
-        items, rejected = [], {"not_train": 0, "pieces": 0, "reading": 0}
-        for line in open(self.args.domain_text, encoding="utf-8"):
+        config = json.loads(Path(self.args.domain_config).read_text(encoding="utf-8"))
+        group_of = {s["name"]: s.get("mix", "domain") for s in config["sources"]}
+        wanted = set(self.text_groups)
+        items, rejected = [], {"not_train": 0, "other_source": 0, "pieces": 0, "reading": 0, "test_overlap": 0}
+        started = time.time()
+        for number, line in enumerate(open(self.args.domain_text, encoding="utf-8"), 1):
             row = json.loads(line)
             if row["split"] != "train":
                 rejected["not_train"] += 1
+                continue
+            group = group_of.get(row["source"], "domain")
+            if group not in wanted:
+                rejected["other_source"] += 1
                 continue
             pieces = pieces_of(row["text"])
             if not pieces:
@@ -833,7 +1017,7 @@ class Builder:
             units, key = [], ""
             for kind, text in pieces:
                 if kind == "en":
-                    units.append({"en": True, "text": text})
+                    units.append({"en": True, "text": text, "reading": ""})
                     key += text
                     continue
                 tokens = reader.analyze(text)
@@ -841,31 +1025,37 @@ class Builder:
                     units = None
                     break
                 reading = "".join(t.reading for t in tokens)
-                units.append({"en": False, "text": text, "tokens": tokens, "reading": reading})
+                units.append({"en": False, "text": text, "reading": reading})
                 key += reading
             if units is None:
                 rejected["reading"] += 1
                 continue
             if not self.check(row["text"], [key]):
+                rejected["test_overlap"] += 1
                 continue
             prev = row.get("prev", "")
             if prev:
                 prev_pieces = pieces_of(prev)
-                if not prev_pieces or not self.check(prev, [""]):
+                if (not prev_pieces or not self.check(prev, [""])
+                        or self.exclusion.blocked(prev + row["text"])):  # つなげると試験の文になる場合も
                     prev = ""
-            items.append({"source": row["source"], "doc": row["doc"], "text": row["text"], "prev": prev,
-                          "units": units, "has_english": any(u["en"] for u in units), "whole_reading": key})
-        self.domain_rejected = rejected
+            items.append({"group": group, "source": row["source"], "doc": row["doc"], "text": row["text"],
+                          "prev": prev, "units": units, "has_english": any(u["en"] for u in units)})
+            if self.args.progress and number % (self.args.progress * 20) == 0:
+                print(f"  文の読み付け {number} 行  使える {len(items)}  {time.time() - started:.0f}秒", flush=True)
+        self.text_rejected = rejected
         return items
 
-    def domain_run_example(self, kind, item, index, span, use_prev):
+    def text_run_example(self, kind, item, index, span, use_prev):
         """日本語の部分（units[index]）を問う問題。ほかの部分（英字を含む）は左右の文脈に入れる。"""
         units = item["units"]
         unit = units[index]
         before = (item["prev"] if use_prev else "") + "".join(u["text"] for u in units[:index])
         after = "".join(u["text"] for u in units[index + 1:])
         if span:
-            tokens = unit["tokens"]
+            tokens = self.reader().analyze(unit["text"])
+            if not tokens:
+                return None
             start, end = random_span(tokens, self.rng)
             left = before + "".join(t.surface for t in tokens[:start])
             right = "".join(t.surface for t in tokens[end:]) + after
@@ -877,82 +1067,100 @@ class Builder:
             return None
         return example(kind, reading, surface, left, right)
 
-    def domain_sentence(self, item):
+    def text_sentence(self, item):
         rng = self.rng
-        group = f"domain:{item['source']}:{item['doc']}"
+        group = item["group"]
         units = item["units"]
-        open_kinds = [k for k in DOMAIN_KINDS if not self.full(k)]
+        english = f"{group}_english"
+        open_kinds = [k for k in SOURCE_KINDS[group] if self.is_open(k)]
         if not open_kinds:
             return
         runs = [i for i, u in enumerate(units) if not u["en"] and re.search(r"[ぁ-ゖァ-ヺ一-鿿]", u["text"])]
         if not runs:
             return
+        used = item.setdefault("used", set())
         if item["has_english"]:
-            if "domain_english" not in open_kinds:
+            if english not in open_kinds:
                 return
-            index = rng.choice(runs)
-            record = self.domain_run_example("domain_english", item, index, rng.random() < 0.3,
-                                             bool(item["prev"]) and rng.random() < 0.3)
-            kind = "domain_english"
+            kind = english
+            record = self.text_run_example(kind, item, rng.choice(runs), rng.random() < 0.3,
+                                           bool(item["prev"]) and rng.random() < 0.3)
         else:
-            kinds = [k for k in open_kinds if k != "domain_english"]
+            # 文全体・前の文つきの問題は、同じ文から2つ作っても同じ問題になるので1回だけ。文の一部は毎回違う所を選ぶ
+            kinds = [k for k in open_kinds if k != english and not (k in used and not k.endswith("_span"))]
             if not kinds:
                 return
             need = [max(1, self.quota[k] - len(self.train[k])) for k in kinds]
             kind = rng.choices(kinds, weights=need)[0]
-            if kind == "domain_context" and not item["prev"]:
-                kind = "domain_whole"
-            record = self.domain_run_example(kind, item, runs[0], kind == "domain_span",
-                                             kind == "domain_context")
-        where = self.add(kind, record, group)
+            if kind.endswith("_context") and not item["prev"]:
+                kind = f"{group}_whole"
+                if kind not in kinds:
+                    return
+            record = self.text_run_example(kind, item, runs[0], kind.endswith("_span"), kind.endswith("_context"))
+        if record is not None:
+            used.add(kind)
+        where = self.add(kind, record, f"{group}:{item['source']}:{item['doc']}")
         if where:
-            counts = self.domain_per_source.setdefault(item["source"], {"train": 0, "valid": 0})
+            counts = self.text_per_source.setdefault(item["source"], {"train": 0, "valid": 0})
             counts[where] += 1
 
-    def build_domain(self):
-        if not self.domain_enabled:
+    def group_open(self, group) -> bool:
+        return any(self.is_open(k) for k in SOURCE_KINDS[group])
+
+    def build_text(self):
+        if not self.text_groups:
             return
         started = time.time()
-        items = self.load_domain_items()
-        print(f"分野の練習用の文 {len(items)}（読み付けと試験の文の検査に {time.time() - started:.0f} 秒）", flush=True)
-        self.domain_items = len(items)
-        passes = 0
-        for passes in range(1, self.args.domain_passes + 1):
+        items = self.load_text_items()
+        self.text_items = {g: sum(1 for it in items if it["group"] == g) for g in self.text_groups}
+        print(f"文の一覧から使える練習用の文 {self.text_items}（読み付けと試験の文の検査に {time.time() - started:.0f} 秒）",
+              flush=True)
+        self.text_passes_used = {g: 0 for g in self.text_groups}
+        for pass_no in range(1, max(self.max_passes[g] for g in self.text_groups) + 1):
+            self.pass_no = pass_no
+            active = [g for g in self.text_groups if pass_no <= self.max_passes[g] and self.group_open(g)]
+            if not active:
+                break
+            for g in active:
+                self.text_passes_used[g] = pass_no
             order = list(range(len(items)))
             self.rng.shuffle(order)
             for i in order:
-                if all(self.full(k) for k in DOMAIN_KINDS):
-                    break
-                self.domain_sentence(items[i])
-            if all(self.full(k) for k in DOMAIN_KINDS):
-                break
-        # 埋まらなかった分は予定より少ないまま（終わりの表示と manifest.json に出る）
-        self.domain_passes_used = passes
+                if items[i]["group"] in active:
+                    self.text_sentence(items[i])
+            print(f"  {pass_no} 周目が終わりました: " +
+                  str({g: sum(len(self.train[k]) for k in SOURCE_KINDS[g]) for g in self.text_groups}), flush=True)
+        for g in self.text_groups:
+            self.note_shortfall(g)
 
-    def write(self):
+    def run(self):
+        if "synthetic" in self.run_sources:
+            self.build_synthetic()
+        self.build_text()
+        if "wiki" in self.run_sources:
+            self.build_wiki()
+
+    # ---- 書き出し
+    def write_files(self, name):
+        """name が None なら train.jsonl・valid.jsonl（昔の形）、あるなら部品 train-<name>.jsonl.gz など。"""
         out = Path(self.args.out)
         out.mkdir(parents=True, exist_ok=True)
         train = [r for kind in self.train for r in self.train[kind]]
         valid = [r for kind in self.valid for r in self.valid[kind]]
         self.rng.shuffle(train)
-        for name, records in (("train.jsonl", train), ("valid.jsonl", valid)):
-            with open(out / name, "w", encoding="utf-8", newline="\n") as handle:
-                for record in records:
-                    handle.write(json.dumps(record, ensure_ascii=False) + "\n")
-        (out / "excluded.txt").write_text("\n".join(self.excluded) + "\n", encoding="utf-8")
-        self.write_manifest(out, len(train), len(valid))
-        return train, valid
+        suffix = "" if name is None else f"-{name}"
+        train_file = write_jsonl(out / ("train.jsonl" if name is None else f"train{suffix}.jsonl.gz"), train)
+        valid_file = write_jsonl(out / f"valid{suffix}.jsonl", valid)
+        (out / f"excluded{suffix}.txt").write_text("\n".join(self.excluded) + "\n", encoding="utf-8")
+        fragment = self.fragment(name or "all", train_file, valid_file)
+        if name is not None:
+            (out / f"part-{name}.json").write_text(json.dumps(fragment, ensure_ascii=False, indent=2) + "\n",
+                                                   encoding="utf-8")
+        return fragment
 
-    def write_manifest(self, out, n_train, n_valid):
+    def fragment(self, name, train_file, valid_file):
+        """この実行で分かったこと（部品の目録）。assemble_manifest が集めて manifest.json にする。"""
         args = self.args
-        script = Path(__file__).resolve()
-        commit = None
-        try:
-            import subprocess
-            commit = subprocess.run(["git", "-C", str(self.repo), "rev-parse", "HEAD"], capture_output=True,
-                                    text=True, check=True).stdout.strip()
-        except Exception:
-            pass
         own = "このリポジトリ（compound-ime）で作成した一覧。MIT ライセンス（リポジトリの LICENSE）。"
         sources = [
             {"name": "tools/data/colloquial.tsv", "use": "話し言葉の語と読み", "license": own},
@@ -962,79 +1170,225 @@ class Builder:
             {"name": "tools/data/homophone-cues.tsv", "use": "同音異義語を含む文を多めに選ぶ目印", "license": own},
         ]
         for source in sources:
-            path = self.repo / source["name"]
-            source["sha256"] = sha256_file(path)
-        for path in args.wiki or []:
+            source["sha256"] = sha256_file(self.repo / source["name"])
+        for path in (args.wiki if "wiki" in self.run_sources else []):
             sources.append({
-                "name": str(path), "sha256": sha256_file(Path(path)),
+                "name": Path(path).name, "sha256": sha256_file(Path(path)),
                 "use": "文と前後の文（読みは SudachiPy で付ける）",
                 "license": "ウィキペディア日本語版の本文。CC BY-SA（記事の著者に帰属）。"
                            "wikimedia/wikipedia のデータセットは CC BY-SA 3.0 と GFDL と表示。"
                            "学習した模型を配る場合は出典（ウィキペディア）を示し、同じ条件で配る。",
             })
         domain = None
-        if self.domain_enabled:
+        if self.text_groups:
             config_path = Path(args.domain_config)
             config = json.loads(config_path.read_text(encoding="utf-8"))
-            counts_path = Path(args.domain_text).with_name("counts.json")
+            sentences_path = Path(args.domain_text)
+            counts_path = sentences_path.with_name("counts.json")
             extraction = json.loads(counts_path.read_text(encoding="utf-8")) if counts_path.exists() else {}
-            domain_sources = []
+            text_sources = []
             for source in config["sources"]:
-                per = self.domain_per_source.get(source["name"], {"train": 0, "valid": 0})
+                group = source.get("mix", "domain")
+                if group not in self.text_groups:
+                    continue
+                per = self.text_per_source.get(source["name"], {"train": 0, "valid": 0})
+                found = (extraction.get("sources") or {}).get(source["name"])
+                if source.get("counts_file") and (sentences_path.with_name(source["counts_file"])).exists():
+                    found = json.loads(sentences_path.with_name(source["counts_file"]).read_text(encoding="utf-8"))
                 entry = {
-                    "name": f"{source['title']}（{source['repo']}）", "id": source["name"], "domain": source["domain"],
-                    "commit": source["commit"], "license": source["license"], "license_url": source["license_url"],
-                    "attribution": source["attribution"],
-                    "use": "文書から取り出した日本語の文（読みは SudachiPy で付ける）。試験用の文書と別の文書だけ",
-                    "extraction": (extraction.get("sources") or {}).get(source["name"]),
-                    "train_examples": per["train"], "valid_examples": per["valid"],
+                    "name": f"{source['title']}（{source['repo']}）", "id": source["name"], "mix": group,
+                    "domain": source.get("domain"), "commit": source["commit"], "license": source["license"],
+                    "license_url": source["license_url"], "attribution": source["attribution"],
+                    "terms": source.get("terms"),
+                    "use": source.get("use", "文書から取り出した日本語の文（読みは SudachiPy で付ける）。試験用の文書と別の文書だけ"),
+                    "extraction": found, "train_examples": per["train"], "valid_examples": per["valid"],
                 }
-                domain_sources.append(entry)
+                text_sources.append(entry)
                 sources.append({k: entry[k] for k in ("name", "commit", "license", "license_url", "use")})
             domain = {
-                "sentences_file": {"name": Path(args.domain_text).name, "sha256": sha256_file(Path(args.domain_text))},
+                "sentences_file": {"name": sentences_path.name, "sha256": sha256_file(sentences_path)},
                 "config": {"name": config_path.name, "sha256": sha256_file(config_path)},
                 "domain_text_sha256": sha256_file(Path(__file__).resolve().with_name("domain_text.py")),
-                "share": args.domain_share, "valid_fraction": args.domain_valid_fraction,
-                "weights": DOMAIN_WEIGHTS, "quota": {k: self.quota[k] for k in DOMAIN_KINDS},
-                "passes_used": getattr(self, "domain_passes_used", 0), "passes_max": args.domain_passes,
-                "train_sentences_usable": getattr(self, "domain_items", 0),
-                "rejected": getattr(self, "domain_rejected", {}),
+                "valid_fraction": args.domain_valid_fraction,
+                "groups": list(self.text_groups),
+                "kind_weights": {g: self.kind_weights[g] for g in self.text_groups},
+                "quota": {k: self.quota[k] for g in self.text_groups for k in SOURCE_KINDS[g]},
+                "passes_used": self.text_passes_used,
+                "passes_max": {g: self.max_passes[g] for g in self.text_groups},
+                "train_sentences_usable": self.text_items,
+                "rejected": self.text_rejected,
                 "extra_test_files": [{"name": str(p), "sha256": sha256_file(Path(p))}
                                      for p in args.extra_test if Path(p).exists()],
-                "sources": domain_sources,
+                "sources": text_sources,
             }
-        sources.append({"name": args.romaji_table, "sha256": sha256_file(Path(args.romaji_table)),
+        sources.append({"name": Path(args.romaji_table).name, "sha256": sha256_file(Path(args.romaji_table)),
                         "use": "試験の文のローマ字をかなにする（除外の検査だけに使う）",
                         "license": "Mozc の romanji-hiragana.tsv（BSD-3-Clause）"})
-        manifest = {
-            "made_by": "tools/zenz-finetune/build_dataset.py",
-            "script_sha256": sha256_file(script),
-            "repo_commit": commit,
+        return {
+            "name": name, "sources_run": list(self.run_sources), "slice": list(self.part),
             "made_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
             "settings": {"size": args.size, "seed": args.seed, "valid_fraction": args.valid_fraction,
-                         "valid_per_kind": args.valid_per_kind, "weights": self.weights, "quota": self.quota,
-                         "sudachi_dict": args.sudachi_dict, "max_articles": args.max_articles},
-            "format": {"prompt": "[U+EE02 左の文脈][U+EE07 右の文脈]U+EE00 読み(カタカナ) U+EE01",
-                       "output": "表記（空白は U+3000）。文の終わりの記号は学習の側で付ける",
-                       "context_max": CONTEXT_MAX, "reading_max": READING_MAX},
-            "reader": getattr(self, "reader_versions", None),
-            "counts": {"train": n_train, "valid": n_valid,
-                       "train_by_kind": {k: len(v) for k, v in self.train.items()},
-                       "valid_by_kind": {k: len(v) for k, v in self.valid.items()}},
-            "wiki": getattr(self, "wiki_stats", None),
-            "domain": domain,
-            "rejected": self.rejected,
-            "test_exclusion": {
-                "rule": "tests/conversion/ の文と、表記または読みが同じか、それを含む文は使わない"
-                        f"（含むの検査は表記{TestExclusion.SURFACE_MIN}文字以上・読み{TestExclusion.READING_MIN}文字以上の文）",
-                "files": [{"name": p.name, "sha256": sha256_file(p)} for p in self.exclusion.files],
-                "keys": self.exclusion.stats,
-                "excluded_sentences": self.excluded_count,
-            },
-            "sources": sources,
+                         "valid_per_kind": args.valid_per_kind, "mix": {k: round(v, 6) for k, v in self.mix.items()},
+                         "kind_weights": self.kind_weights, "max_passes": self.max_passes,
+                         "fill_wiki": not args.no_fill_wiki, "sudachi_dict": args.sudachi_dict,
+                         "max_articles": args.max_articles},
+            "planned": self.planned, "quota_final": self.quota,
+            "train_by_kind": {k: len(v) for k, v in self.train.items()},
+            "valid_by_kind": {k: len(v) for k, v in self.valid.items()},
+            "shortfall": self.shortfall, "fill_added": self.fill_added,
+            "wiki": self.wiki_stats, "domain": domain, "rejected": self.rejected,
+            "excluded_sentences": self.excluded_count, "reader": self.reader_versions,
+            "exclusion": {"files": [{"name": p.name, "sha256": sha256_file(p)} for p in self.exclusion.files],
+                          "keys": self.exclusion.stats},
+            "sources": sources, "files": {"train": train_file, "valid": valid_file},
         }
-        (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+
+
+# ---------------------------------------------------------------- 書き出しの部品と、部品の集め方
+
+
+def write_jsonl(path: Path, records) -> dict:
+    """1行1問で書く（.gz なら同じ中身から同じバイト列ができるよう、時刻を 0 にして圧縮する）。"""
+    path = Path(path)
+    count = 0
+    if path.suffix == ".gz":
+        import gzip
+        import io
+        with open(path, "wb") as raw:
+            with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0, compresslevel=6) as packed:
+                with io.TextIOWrapper(packed, encoding="utf-8", newline="\n") as handle:
+                    for record in records:
+                        handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+                        count += 1
+    else:
+        with open(path, "w", encoding="utf-8", newline="\n") as handle:
+            for record in records:
+                handle.write(json.dumps(record, ensure_ascii=False) + "\n")
+                count += 1
+    return {"name": path.name, "lines": count, "bytes": path.stat().st_size, "sha256": sha256_file(path)}
+
+
+def add_counts(total: dict, part: dict):
+    for key, value in (part or {}).items():
+        if isinstance(value, (int, float)) and not isinstance(value, bool):
+            total[key] = total.get(key, 0) + value
+        elif isinstance(value, dict):
+            add_counts(total.setdefault(key, {}), value)
+    return total
+
+
+def assemble_manifest(fragments: list, repo: Path, script: Path) -> dict:
+    """部品の目録（1つ以上）から manifest.json の中身を作る。"""
+    commit = None
+    try:
+        import subprocess
+        commit = subprocess.run(["git", "-C", str(repo), "rev-parse", "HEAD"], capture_output=True,
+                                text=True, check=True).stdout.strip()
+    except Exception:
+        pass
+    first = fragments[0]
+    train_by_kind, valid_by_kind, planned, rejected = {}, {}, {}, {}
+    wiki, domain, sources = None, None, {}
+    for fragment in fragments:
+        add_counts(train_by_kind, fragment["train_by_kind"])
+        add_counts(valid_by_kind, fragment["valid_by_kind"])
+        planned.update(fragment["planned"])
+        add_counts(rejected, fragment["rejected"])
+        if fragment.get("wiki"):
+            wiki = add_counts(wiki or {}, {k: v for k, v in fragment["wiki"].items() if k != "slice"})
+            wiki.setdefault("slices", []).append(fragment["wiki"]["slice"])
+            wiki["passes_used"] = max(wiki.get("passes_used", 0), fragment["wiki"]["passes_used"])
+            wiki["passes_max"] = fragment["wiki"]["passes_max"]
+        if fragment.get("domain"):
+            if domain is None:
+                domain = fragment["domain"]
+            else:
+                domain["sources"] += fragment["domain"]["sources"]
+        for source in fragment["sources"]:
+            sources.setdefault(source["name"], source)
+    n_train, n_valid = sum(train_by_kind.values()), sum(valid_by_kind.values())
+    fill = sum(f.get("fill_added", 0) for f in fragments)
+    shortfall = {}
+    for fragment in fragments:
+        for source, number in fragment["shortfall"].items():
+            shortfall[source] = shortfall.get(source, 0) + number
+    mix_result = {}
+    for source, share in first["settings"]["mix"].items():
+        want = sum(planned.get(k, 0) for k in SOURCE_KINDS[source])
+        got = sum(train_by_kind.get(k, 0) for k in SOURCE_KINDS[source])
+        mix_result[source] = {
+            "share_planned": share, "train_planned": want, "train": got,
+            "share_actual": round(got / n_train, 4) if n_train else 0,
+            "short": shortfall.get(source, 0) if source != "wiki" else max(0, want + fill - got),
+            "fill_added": fill if source == "wiki" else 0,
+            "built": any(source in f["sources_run"] for f in fragments),
+        }
+    return {
+        "made_by": "tools/zenz-finetune/build_dataset.py",
+        "script_sha256": sha256_file(script),
+        "repo_commit": commit,
+        "made_at": time.strftime("%Y-%m-%dT%H:%M:%S%z"),
+        "settings": first["settings"],
+        "format": {"prompt": "[U+EE02 左の文脈][U+EE07 右の文脈]U+EE00 読み(カタカナ) U+EE01",
+                   "output": "表記（空白は U+3000）。文の終わりの記号は学習の側で付ける",
+                   "context_max": CONTEXT_MAX, "reading_max": READING_MAX},
+        "reader": first["reader"] or next((f["reader"] for f in fragments if f["reader"]), None),
+        "counts": {"train": n_train, "valid": n_valid, "train_by_kind": train_by_kind, "valid_by_kind": valid_by_kind},
+        "mix_result": mix_result,
+        "train_files": [f["files"]["train"] for f in fragments],
+        "valid_files": [f["files"]["valid"] for f in fragments],
+        "wiki": wiki,
+        "domain": domain,
+        "rejected": rejected,
+        "test_exclusion": {
+            "rule": "tests/conversion/ の文と、表記または読みが同じか、それを含む文は使わない"
+                    f"（含むの検査は表記{TestExclusion.SURFACE_MIN}文字以上・読み{TestExclusion.READING_MIN}文字以上の文）",
+            "files": first["exclusion"]["files"],
+            "keys": first["exclusion"]["keys"],
+            "excluded_sentences": sum(f["excluded_sentences"] for f in fragments),
+        },
+        "sources": list(sources.values()),
+    }
+
+
+def merge_parts(out: Path, repo: Path, script: Path) -> dict:
+    """部品（part-*.json）を集めて、valid.jsonl・excluded.txt・manifest.json を作る。学習用は部品のまま使う。"""
+    fragments = [json.loads(p.read_text(encoding="utf-8")) for p in sorted(out.glob("part-*.json"))]
+    if not fragments:
+        raise SystemExit(f"{out} に part-*.json がありません")
+    seen = {}
+    for fragment in fragments:
+        for source in fragment["sources_run"]:
+            if source in seen and source != "wiki":
+                raise SystemExit(f"出典 {source} が部品 {seen[source]} と {fragment['name']} の両方にあります")
+            seen.setdefault(source, fragment["name"])
+    with open(out / "valid.jsonl", "w", encoding="utf-8", newline="\n") as handle:
+        for fragment in fragments:
+            handle.write((out / fragment["files"]["valid"]["name"]).read_text(encoding="utf-8"))
+    with open(out / "excluded.txt", "w", encoding="utf-8", newline="\n") as handle:
+        for fragment in fragments:
+            path = out / f"excluded-{fragment['name']}.txt"
+            if path.exists():
+                handle.write(path.read_text(encoding="utf-8"))
+    manifest = assemble_manifest(fragments, repo, script)
+    manifest["valid_merged"] = {"name": "valid.jsonl", "sha256": sha256_file(out / "valid.jsonl")}
+    (out / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return manifest
+
+
+def print_summary(manifest: dict):
+    counts = manifest["counts"]
+    print(f"学習用 {counts['train']} 問、確かめ用 {counts['valid']} 問、試験と重なり除いた文 "
+          f"{manifest['test_exclusion']['excluded_sentences']}")
+    print("種類ごと（学習用）:", counts["train_by_kind"])
+    for source, row in manifest["mix_result"].items():
+        print(f"  {source}: 予定 {row['share_planned']:.1%}（{row['train_planned']} 問）→ 実際 {row['share_actual']:.1%}"
+              f"（{row['train']} 問）、足りない {row['short']}" + (f"、ほかの出典の不足を {row['fill_added']} 問足した" if row["fill_added"] else ""))
+    if manifest.get("domain"):
+        print("文の一覧の出典ごと（練習用・確かめ用）:",
+              {s["id"]: (s["train_examples"], s["valid_examples"]) for s in manifest["domain"]["sources"]})
+        print("使える練習用の文:", manifest["domain"]["train_sentences_usable"],
+              " 使った周回:", manifest["domain"]["passes_used"])
 
 
 def main(argv=None):
@@ -1042,38 +1396,63 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--out", required=True, help="出力先のフォルダ")
     parser.add_argument("--repo", default=str(here.parent.parent), help="compound-ime のリポジトリ（tools/data と tests/conversion を読む）")
-    parser.add_argument("--romaji-table", required=True, help="Mozc の src/data/preedit/romanji-hiragana.tsv")
-    parser.add_argument("--wiki", nargs="*", default=[], help="wikimedia/wikipedia の parquet か文章ファイル")
-    parser.add_argument("--size", type=int, default=400000, help="学習用の問題の数")
+    parser.add_argument("--romaji-table", default="", help="Mozc の src/data/preedit/romanji-hiragana.tsv（--merge-parts 以外では必要）")
+    parser.add_argument("--wiki", nargs="*", default=[], help="wikimedia/wikipedia の parquet（複数でよい）か文章ファイル")
+    parser.add_argument("--size", type=int, default=400000, help="学習用の問題の数（全部の出典の合計）")
     parser.add_argument("--seed", type=int, default=20261015)
-    parser.add_argument("--mix", default="", help="種類ごとの割合の上書き 例: wiki_whole=0.4,casual=0.05")
+    parser.add_argument("--mix", default="",
+                        help="出典ごとの割合 例: wiki=0.55,tatoeba=0.1,persona=0.15,domain=0.12,synthetic=0.08"
+                             f"（出典は {', '.join(SOURCE_KINDS)}。合計は自動で 1 にそろえる）。付けないと昔の指定（--domain-share）")
+    parser.add_argument("--max-passes", default="",
+                        help="出典ごとに、同じ文から作る問題の形の数の上限 例: wiki=2,tatoeba=3,persona=3,domain=3"
+                             f"（既定 {DEFAULT_MAX_PASSES}）。材料が足りないときだけ、この回数まで文を使い回す")
+    parser.add_argument("--kind-weights", default="", help="出典の中の種類ごとの割合の上書き 例: wiki_whole=0.4,casual=0.05")
+    parser.add_argument("--only-source", nargs="*", default=[], help="この出典だけ作る（部品ごとに作るとき）")
+    parser.add_argument("--part", default="", help="部品の名前。付けると train-<名前>.jsonl.gz などに分けて書く（切れても続けられる）")
+    parser.add_argument("--slice", default="", help="ウィキペディアを n 個の工程で分けるときの i/n（0 始まり。例 0/2 と 1/2）。--only-source wiki だけ")
+    parser.add_argument("--merge-parts", action="store_true", help="--out の部品を集めて valid.jsonl と manifest.json を作る")
+    parser.add_argument("--no-fill-wiki", action="store_true", help="ほかの出典で足りなかった分を、ウィキペディアで埋めない")
     parser.add_argument("--valid-fraction", type=float, default=0.02, help="確かめ用に回す記事・見出し語の割合")
     parser.add_argument("--valid-per-kind", type=int, default=500, help="確かめ用の種類ごとの上限")
     parser.add_argument("--sudachi-dict", default="core", help="SudachiDict の種類（core / small / full）")
     parser.add_argument("--max-articles", type=int, default=0, help="読む記事の上限（0 は上限なし）")
     parser.add_argument("--progress", type=int, default=2000, help="何記事ごとに進み具合を出すか（0 は出さない）")
     parser.add_argument("--show", type=int, default=0, help="終わりに各種類の例をいくつ表示するか")
-    parser.add_argument("--domain-text", default="", help="domain_text.py が作った sentences.jsonl（プログラミング・仮想通貨の文）。付けると分野の問題も作る")
-    parser.add_argument("--domain-share", type=float, default=0.5, help="--size のうち分野の問題にする割合（残りはウィキペディアなど）")
-    parser.add_argument("--domain-valid-fraction", type=float, default=0.05, help="確かめ用に回す分野の文書の割合")
-    parser.add_argument("--domain-passes", type=int, default=3, help="分野の文を何周まで使うか（1周で足りない分は別の形の問題にして足す）")
-    parser.add_argument("--domain-config", default=str(here / "domain_sources.json"), help="分野の出どころ（版・利用条件）の一覧")
+    parser.add_argument("--domain-text", default="", help="文の一覧 sentences.jsonl（分野・Tatoeba・RealPersonaChat の文。出典は domain_sources.json の mix で振り分ける）")
+    parser.add_argument("--domain-share", type=float, default=0.5, help="（--mix なしのとき）--size のうち分野の問題にする割合（残りはウィキペディアなど）")
+    parser.add_argument("--domain-valid-fraction", type=float, default=0.05, help="確かめ用に回す文の一覧の文書の割合")
+    parser.add_argument("--domain-passes", type=int, default=None, help="（古い指定）--max-passes domain=N と同じ")
+    parser.add_argument("--domain-config", default=str(here / "domain_sources.json"), help="文の出どころ（版・利用条件）の一覧")
     parser.add_argument("--extra-test", nargs="*", default=[],
                         help="リポジトリの tests/conversion にまだない試験のファイル（作った直後の domain-*.tsv など）。その文も除く")
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
+    script = Path(__file__).resolve()
 
+    if args.merge_parts:
+        manifest = merge_parts(Path(args.out), Path(args.repo), script)
+        print_summary(manifest)
+        return 0
+    if not args.romaji_table:
+        raise SystemExit("--romaji-table が要ります")
     builder = Builder(args)
     print("試験の文の目印:", builder.exclusion.stats, flush=True)
-    builder.build_synthetic()
-    builder.build_domain()
-    builder.build_wiki()
-    train, valid = builder.write()
-    print(f"学習用 {len(train)} 問、確かめ用 {len(valid)} 問、試験と重なり除いた文 {builder.excluded_count}")
-    print("種類ごと（学習用）:", {k: len(v) for k, v in builder.train.items()})
-    if builder.domain_enabled:
-        print("分野の出典ごと（練習用・確かめ用）:", builder.domain_per_source)
+    print("出典の割合:", {k: round(v, 4) for k, v in builder.mix.items()}, " 作る出典:", builder.run_sources,
+          " 周回の上限:", {k: v for k, v in builder.max_passes.items() if k in builder.run_sources}, flush=True)
+    started = time.time()
+    builder.run()
+    fragment = builder.write_files(args.part or None)
+    print(f"作るのにかかった時間 {time.time() - started:.0f} 秒")
+    if not args.part:
+        manifest = assemble_manifest([fragment], Path(args.repo), script)
+        (Path(args.out) / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n",
+                                                       encoding="utf-8")
+        print_summary(manifest)
+    else:
+        print(f"部品 {args.part}: 学習用 {fragment['files']['train']['lines']} 問、確かめ用 {fragment['files']['valid']['lines']} 問、"
+              f"足りない {fragment['shortfall']}")
+        print("全部の部品がそろったら --merge-parts で集めてください")
     short = {k: q - len(builder.train[k]) for k, q in builder.quota.items() if len(builder.train[k]) < q}
     if short:
         print("予定より少ない種類（材料が足りない）:", short)
