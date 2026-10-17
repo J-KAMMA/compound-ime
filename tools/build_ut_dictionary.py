@@ -34,7 +34,10 @@ POS = {  # lines of data/dictionary_oss/id.def, resolved to ids below
     "neologd": "名詞,固有名詞,一般,*,*,*,*",
     "edict2": "名詞,一般,*,*,*,*,*",
     "sudachidict": "名詞,一般,*,*,*,*,*",
+    "domain": "名詞,一般,*,*,*,*,*",
 }
+# カタカナだけの表記も残す材料（分野の言葉。tools/build_domain_words.py の出力）
+KEEP_KANA = {"domain"}
 READING = re.compile(r"[ぁ-ゖー]+")
 KANA_OR_ASCII = re.compile(r"[ぁ-ゖァ-ヺー・ｦ-ﾟ\x20-\x7e　-〿＀-￯]+")
 MARGIN = 100
@@ -46,6 +49,8 @@ def main():
     parser.add_argument("--ut", type=Path, required=True)
     parser.add_argument("--sources", required=True)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument("--local-source", action="append", default=[], metavar="名前=ファイル",
+                        help="--ut の中でなく、この名前のファイルから読む（例 domain=tools/data/domain-words.tsv）")
     parser.add_argument("--min-reading", type=int, default=3)
     parser.add_argument("--install", action="store_true",
                         help="also copy to data/dictionary_oss/dictionary10.txt and list it in BUILD.bazel")
@@ -74,17 +79,23 @@ def main():
                     best = a + b
         return best
 
+    locals_ = {}
+    for item in args.local_source:
+        name, _, file = item.partition("=")
+        locals_[name] = Path(file)
     entries, counts = {}, {}
     for source in args.sources.split(","):
         pos_id = ids[POS[source]]
         kept = 0
-        for line in (args.ut / f"mozcdic-ut-{source}.txt").read_text(encoding="utf-8").splitlines():
+        source_path = locals_.get(source, args.ut / f"mozcdic-ut-{source}.txt")
+        for line in source_path.read_text(encoding="utf-8").splitlines():
             fields = line.split("\t")
             if len(fields) != 5:
                 continue
             reading, _, _, cost, surface = fields
             if (not READING.fullmatch(reading) or len(reading) < args.min_reading or
-                    KANA_OR_ASCII.fullmatch(surface) or (reading, surface) in pairs or
+                    (KANA_OR_ASCII.fullmatch(surface) and source not in KEEP_KANA) or
+                    (reading, surface) in pairs or
                     "\t" in surface or not surface.strip()):
                 continue
             cost = int(cost)

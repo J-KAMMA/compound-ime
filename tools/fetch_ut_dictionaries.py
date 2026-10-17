@@ -12,7 +12,8 @@ import urllib.request
 from pathlib import Path
 
 TABLE = Path(__file__).with_name("data") / "ut-dictionaries.tsv"
-URL = "https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-{n}/{c}/mozcdic-ut-{n}.txt.bz2"
+LOCAL = {"domain"}  # tools/data/domain-words.tsv（tools/build_domain_words.py の出力）
+URL ="https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-{n}/{c}/mozcdic-ut-{n}.txt.bz2"
 
 
 def main():
@@ -27,6 +28,8 @@ def main():
             pins[name] = (commit, sha256)
     args.out.mkdir(parents=True, exist_ok=True)
     for name in args.names:
+        if name in LOCAL:  # リポジトリの中にある自作の辞書。取り出さない
+            continue
         if name not in pins:
             raise SystemExit(f"{name}: tools/data/ut-dictionaries.tsv にない")
         commit, want = pins[name]
