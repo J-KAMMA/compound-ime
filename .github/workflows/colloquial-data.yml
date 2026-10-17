@@ -1,0 +1,70 @@
+# Tatoeba の日本語の文から、話し言葉の打ち込み試験の文（tests/conversion/colloquial.tsv）と、
+# 学習の材料の候補（colloquial-train.jsonl）を作る。手動で動く。
+# 材料（Tatoeba の書き出し）はリポジトリに入れない。ファイルの SHA-256 を確かめる（Tatoeba は毎週書き出しを入れ替えるので、
+# 古い版は消える。入れ替わったあとは allow_other_dump を true にして、新しい版で作り直す）。
+# 結果は成果物 colloquial-data に残る（tests/colloquial.tsv、colloquial-train.jsonl、colloquial-counts.json）。
+# 試験の tsv は、中身を確かめてからリポジトリに入れる。
+name: Colloquial data
+
+on:
+  # 実験の枝では、この流れのファイルを変えて push したときも動く
+  # （main に入るまで、gh workflow run で呼べないため）
+  push:
+    branches: ['exp/colloquial-test']
+    paths: ['.github/workflows/colloquial-data.yml']
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 試験の文の数
+        default: '300'
+      expect_sha256:
+        description: Tatoeba の jpn_sentences.tsv.bz2 の SHA-256（2026-10-10 の版が既定）
+        default: 'ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1'
+      allow_other_dump:
+        description: SHA-256 が違っても、今の版で作る（true / false）
+        default: 'false'
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: 道具
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"
+      - name: Tatoeba とローマ字表
+        run: |
+          set -eo pipefail
+          curl -fsSL -o jpn_sentences.tsv.bz2 https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2
+          GOT=$(sha256sum jpn_sentences.tsv.bz2 | cut -d' ' -f1)
+          WANT="${{ inputs.expect_sha256 || 'ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1' }}"
+          echo "SHA-256: $GOT（期待 $WANT）"
+          echo "DUMP_SHA=$GOT" >> $GITHUB_ENV
+          if [ "$GOT" != "$WANT" ] && [ "${{ inputs.allow_other_dump }}" != "true" ]; then
+            echo "Tatoeba の書き出しが入れ替わっている。新しい版で作るなら allow_other_dump を true にする" >&2
+            exit 1
+          fi
+          MOD=$(curl -fsSL -I https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2 | grep -i '^last-modified' | cut -d' ' -f2- | tr -d '\r')
+          echo "Last-Modified: $MOD"
+          echo "DUMP_DATE=$(date -u -d "$MOD" +%F)" >> $GITHUB_ENV
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+      - name: 試験の文と練習の材料を作る
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/colloquial_text.py --tatoeba jpn_sentences.tsv.bz2 --table romanji-hiragana.tsv \
+            --out-dir out --count ${{ inputs.count || '300' }} --dump-sha256 "$DUMP_SHA" --dump-date "$DUMP_DATE"
+          head -8 out/tests/colloquial.tsv
+          wc -l out/tests/colloquial.tsv out/colloquial-train.jsonl
+          head -3 out/colloquial-train.jsonl
+      - uses: actions/upload-artifact@v4
+        with:
+          name: colloquial-data
+          path: out/
+          retention-days: 14

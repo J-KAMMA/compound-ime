@@ -6,6 +6,7 @@
 #   b: 日本語だけの400文、予測変換、速さ、候補の並び、利用者が見つけた失敗
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
 #   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
+#   h: 話し言葉の文をローマ字で打ち込む（tests/conversion/colloquial.tsv。tools/colloquial_text.py）
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
@@ -98,6 +99,14 @@ g)
     fi
   done
   ;;
+h)
+  # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
+  # 採点はまとめの段で（tools/score_colloquial.py。厳しい採点と、記号・かな漢字の揺れを許す緩い採点）
+  if [ -f $T/colloquial.tsv ]; then
+    grep -v '^#' $T/colloquial.tsv | cut -f1 > $W/colloquial.txt
+    $BATCH $W/colloquial.txt $OUT/colloquial.tsv 4
+  fi
+  ;;
 f)
   # 前の文を入力欄の前の文として渡したときと渡さないときの正解の数を比べる
   if [ -f $T/context.tsv ]; then
@@ -108,5 +117,5 @@ f)
   fi
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h のどれか" >&2; exit 2 ;;
 esac

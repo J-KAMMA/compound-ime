@@ -48,6 +48,8 @@ def main(argv=None):
     args = ap.parse_args(argv)
     config = json.loads(Path(args.config).read_text(encoding="utf-8"))
     for source in config["sources"]:
+        if source.get("kind") == "external":
+            continue  # git の文書ではない出典（Tatoeba など）
         if not args.only or source["name"] in args.only:
             fetch(source, Path(args.out))
     return 0
