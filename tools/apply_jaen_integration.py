@@ -3446,6 +3446,43 @@ edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
   }
   return user_path;""")
 
+# 文末に ！？。 などの記号が付いたカタカナの読みそのまま（ダレカトムニデンワシテクレナイ？）は、
+# Util::GetScriptType では一つの文字種にならない。そのため「かなだけの文は変換の選びではない」という
+# 上の見張りをすり抜け、Mozc の各文節にあるカタカナの候補をつなげた形で選ばれていた。
+# 記号をはさんでも、カタカナ（とー）と記号だけならカタカナのままの文として扱う。
+edit("engine/engine.cc", """      if (const Util::ScriptType script = Util::GetScriptType(candidate->value);
+          script == Util::KATAKANA || script == Util::HIRAGANA) {
+        if (candidate_index == 0) return;""", """      const auto katakana_with_symbols = [](std::string_view text) {
+        bool katakana = false;
+        for (const char32_t c : Utf8AsChars32(text)) {
+          if ((c >= 0x30A1 && c <= 0x30FA) || c == 0x30FC) { katakana = true; continue; }
+          const bool hiragana = c >= 0x3041 && c <= 0x309F;
+          const bool kanji = (c >= 0x3400 && c <= 0x4DBF) || (c >= 0x4E00 && c <= 0x9FFF) ||
+                             (c >= 0xF900 && c <= 0xFAFF) || c == 0x3005;
+          const bool letter_or_digit = (c >= '0' && c <= '9') || ((c | 0x20) >= 'a' && (c | 0x20) <= 'z') ||
+                                       (c >= 0xFF10 && c <= 0xFF19) || (c >= 0xFF21 && c <= 0xFF3A) ||
+                                       (c >= 0xFF41 && c <= 0xFF5A);
+          if (hiragana || kanji || letter_or_digit) return false;
+        }
+        return katakana;
+      };
+      if (const Util::ScriptType script = Util::GetScriptType(candidate->value);
+          script == Util::KATAKANA || script == Util::HIRAGANA || katakana_with_symbols(candidate->value)) {
+        if (candidate_index == 0) return;""")
+
+# 人工知能の文を Mozc の文節に組み直すとき（ResegmentToWholePhrase）、人工知能の文にカタカナが
+# Mozc の最上位より多いと一律に断っていた（チュブ を 中部 に替えさせないため）。そのため
+# 今夜トムから絶対電話があるわ。 のように人工知能が正しく答えても、トム で断られ、文全体が
+# カタカナのままになる原因になっていた。人工知能のカタカナが多い文でも、そのカタカナの部分が
+# Mozc の候補の一番上か、固有名詞（人名など）の候補で綴れるときだけ通す。
+edit("engine/engine.cc", "    if (katakana(candidate.value) > mozc_katakana) return false;\n",
+     "    const bool extra_katakana = katakana(candidate.value) > mozc_katakana;\n")
+edit("engine/engine.cc", """            (script == Util::HIRAGANA || script == Util::KATAKANA)) return false;
+        segment->move_candidate(indices[i], 0);""", """            (script == Util::HIRAGANA || script == Util::KATAKANA)) return false;
+        if (extra_katakana && indices[i] != 0 && katakana(segment->candidate(indices[i]).value) > 0 &&
+            !pos.IsUniqueNoun(segment->candidate(indices[i]).lid)) return false;
+        segment->move_candidate(indices[i], 0);""")
+
 # 人工知能の候補の書き出し。MYIME_AI_DUMP=<ファイル> のときだけ、文全体を人工知能に尋ねるたびに
 # 読みと候補の上位20を1行（タブ区切り）書き足す。カタカナのままになる不具合の原因調べ用（普段は何もしない）。
 edit("engine/engine.cc", "    if (full.conversion_segments_size() != 1 || full.conversion_segment(0).candidates_size() > 4096) return;\n",
