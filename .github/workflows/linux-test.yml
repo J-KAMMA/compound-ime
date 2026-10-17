@@ -223,7 +223,7 @@ jobs:
           done
           # 人工知能の時間の上限に当たった回数（全部の組の合計。わざと遅くする組 h の slow- は除く）
           python3 repo/tools/zenzai_stats.py results --exclude slow- --label "全部の組" | tee results/zenzai-deadline-stats.txt
-          [ -f results/slow-compare.txt ] && cat results/slow-compare.txt results/slow-stats.txt results/slow-time.txt
+          [ -f results/slow-compare.txt ] && cat results/slow-compare.txt results/slow-ctx.txt results/slow-stats.txt results/slow-time.txt
           ls results
       - uses: actions/upload-artifact@v4
         with:

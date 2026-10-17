@@ -1,14 +1,15 @@
 #!/bin/bash
 # batch_convert.sh <session_handler_main> <engine dir> <model.gguf> <inputs.txt> <out.tsv> [並列数]
 # 1行に1つのローマ字を、空白で変換・Enter で確定し、「入力<TAB>文節|…<TAB>確定」を書く（人工知能の待ち時間は無制限）。
-# 人工知能の時間の上限は、環境変数 MYIME_ZENZAI_TIME_LIMIT_MS で決める。決めなければ 5000 ミリ秒（4つの処理を同じ計算機で
-# 同時に流すので、利用者の PC より何倍も遅く、既定の 300 ミリ秒だと計算機の混み具合を測ることになる。止まりの防止だけ）。
+# 人工知能の時間の上限は、環境変数 MYIME_ZENZAI_TIME_LIMIT_MS で決める。決めなければ 0（上限なし）。4つの処理を同じ計算機で
+# 同時に流すので、利用者の PC より何倍も遅く、上限を付けると（300 でも 5000 でも）計算機の混み具合を測ることになり、正解数が
+# 下がる。上限の試験は組 h（tools/run_tests.sh）で、処理を1つだけにして行う。
 set -e
 EXE=$1; ENGINE=$2; MODEL=$3; IN=$4; OUT=$5; P=${6:-4}
 w=$(mktemp -d); split -l $(( ($(wc -l < "$IN") + P - 1) / P )) "$IN" $w/part.
 for f in $w/part.*; do
   ( { printf 'SEND_KEY\tON\n'; while IFS= read -r r; do printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\nCLEAR_ALL\nRESET_CONTEXT\nSEND_KEY\tON\n' "$r"; done < $f; } > $f.tsv
-    MYIME_ZENZAI_TIME_LIMIT_MS="${MYIME_ZENZAI_TIME_LIMIT_MS:-5000}" MYIME_ZENZAI_STATS_FILE="$OUT.zstats" MYIME_AI_BUDGET_MS=0 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
+    MYIME_ZENZAI_TIME_LIMIT_MS="${MYIME_ZENZAI_TIME_LIMIT_MS:-0}" MYIME_ZENZAI_STATS_FILE="$OUT.zstats" MYIME_AI_BUDGET_MS=0 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
       MYIME_AZOOKEY_ZENZAI_GPU=0 TEST_TMPDIR=$f.prof "$EXE" --input $f.tsv --profile $f.prof --dictionary oss > $f.out 2> $f.err
     awk -v inputs=$f 'BEGIN{while((getline l < inputs)>0) in_[++n]=l}
       /^preedit \{/{p=1; s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; segs=s}

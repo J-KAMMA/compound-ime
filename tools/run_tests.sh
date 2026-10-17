@@ -134,11 +134,24 @@ h)
   for ms in 300 500 1000 0; do
     MYIME_ZENZAI_TIME_LIMIT_MS=$ms $BATCH $W/h100.txt $OUT/slow-idle$ms.tsv 1
   done
+  # 前の文がある変換（人工知能を一番使う）60文を、空いた計算機で、上限 300 ミリ秒と上限なしにした場合
+  grep -v '^#' $T/context.tsv | head -60 > $W/ctx60.tsv
+  for ms in 300 0; do
+    MYIME_ZENZAI_TIME_LIMIT_MS=$ms bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $W/ctx60.tsv $OUT/slow-ctx$ms.tsv with 1
+  done
+  python3 -c "
+import sys
+gold = {l.split('\t')[0]: l.split('\t')[1] for l in open(sys.argv[1], encoding='utf-8') if l.strip()}
+for ms in ('300', '0'):
+    got = [l.rstrip('\n').split('\t') for l in open(sys.argv[2] + '/slow-ctx' + ms + '.tsv', encoding='utf-8')]
+    right = sum(len(f) >= 3 and gold.get(f[0]) == f[2] for f in got)
+    print(f'前の文がある60文、空いた計算機、上限 {ms} ミリ秒（0 は上限なし）: 正解 {right}/{len(got)}')
+" $W/ctx60.tsv $OUT | tee $OUT/slow-ctx.txt
   python3 $REPO/tools/slow_compare.py $T/ja400.json unlimited=$OUT/slow-unlimited.tsv noai=$OUT/slow-noai.tsv \
     t10=$OUT/slow-t10.tsv t1=$OUT/slow-t1.tsv load300=$OUT/slow-load300.tsv loadfree=$OUT/slow-loadfree.tsv \
     idle300=$OUT/slow-idle300.tsv idle500=$OUT/slow-idle500.tsv idle1000=$OUT/slow-idle1000.tsv idlefree=$OUT/slow-idle0.tsv \
     | tee $OUT/slow-compare.txt
-  for s in unlimited noai t10 t1 load300 loadfree idle300 idle500 idle1000 idle0; do
+  for s in unlimited noai t10 t1 load300 loadfree idle300 idle500 idle1000 idle0 ctx300 ctx0; do
     python3 $REPO/tools/zenzai_stats.py $OUT --glob "slow-$s.tsv.zstats.*" --label "$s" | tee -a $OUT/slow-stats.txt
   done
   ;;
