@@ -51,10 +51,16 @@ def main():
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--local-source", action="append", default=[], metavar="名前=ファイル",
                         help="--ut の中でなく、この名前のファイルから読む（例 domain=tools/data/domain-words.tsv）")
+    parser.add_argument("--max-cost", action="append", default=[], metavar="名前=費用",
+                        help="この名前の辞書から、元の費用がこの値以下の言葉だけを足す（例 neologd=8300）")
+    parser.add_argument("--max-reading", type=int, default=99, help="これより長い読みの言葉（長い句）は足さない")
+    parser.add_argument("--skip-composable", default="", metavar="名前,名前",
+                        help="Mozc の2つの項目の連なりで作れる言葉は足さない（その辞書の名前）")
     parser.add_argument("--min-reading", type=int, default=3)
     parser.add_argument("--install", action="store_true",
                         help="also copy to data/dictionary_oss/dictionary10.txt and list it in BUILD.bazel")
     args = parser.parse_args()
+    args.skip_composable = set(args.skip_composable.split(","))
 
     data = args.mozc / "data/dictionary_oss"
     ids = {}
@@ -83,6 +89,10 @@ def main():
     for item in args.local_source:
         name, _, file = item.partition("=")
         locals_[name] = Path(file)
+    cost_limits = {}
+    for item in args.max_cost:
+        name, _, limit = item.partition("=")
+        cost_limits[name] = int(limit)
     entries, counts = {}, {}
     for source in args.sources.split(","):
         pos_id = ids[POS[source]]
@@ -99,6 +109,11 @@ def main():
                     "\t" in surface or not surface.strip()):
                 continue
             cost = int(cost)
+            if cost > cost_limits.get(source, 1 << 30):  # 出る回数の少ない（費用の高い）言葉は足さない
+                continue
+            if len(reading) > args.max_reading or (source in args.skip_composable and
+                                                   composed(reading, surface) is not None):
+                continue
             if reading in max_cost:
                 cost = max(cost, max_cost[reading] + MARGIN)
             key = (reading, surface)
