@@ -36,7 +36,7 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"lyo", "ょ"}, {"xyo", "ょ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -105,6 +105,8 @@ int main() {
   };
 
   Expect(english("kyouhagoogledekensaku") == "google|", "foreign word between Japanese");
+  Expect(english("mailyouwomita") == "mail|", "a word ending in l before yo is not the small ょ of lyo (mail|you)");
+  Expect(english("linuxyouwomita") == "linux|", "a word ending in x before yo is not the small ょ of xyo (linux|you)");
   Expect(english("meetingwosetshita") == "meeting|set|", "word merged with wo; set before shi");
   Expect(english("downloadshita") == "download|", "adjacent words merge into one piece");
   Expect(english("youtubedemita") == "youtube|", "curated plain word");
@@ -193,6 +195,27 @@ int main() {
     Expect(english("atoulorettoga") == "lore|", "without the reading check a small kana is a sign (lore)");
     Expect(unread("atoulorettoga").empty(), "a small kana typed for a Japanese word is no sign (ulo of うぉれっと)");
     Expect(unread("londonheikimasu") == "london|", "a small kana in no reading is still a sign (london)");
+    // 厳選した3文字の語（api、dao）: かなが辞書にないか、辞書にあっても自然な読みでないときだけ英語
+    jaen::Lexicon short_words = lexicon;
+    short_words.Add("dai", true);
+    short_words.Add("tame", false);
+    std::set<std::string> with_dai = readings;
+    with_dai.insert("だい");
+    with_dai.insert("ため");
+    const jaen::ReadingCheck is_dai_reading = [&](std::string_view kana) { return with_dai.contains(std::string(kana)); };
+    const jaen::ReadingCheck unnatural = [](std::string_view) { return false; };
+    const jaen::ReadingCheck natural = [](std::string_view) { return true; };
+    const auto three = [&](std::string_view raw, const jaen::ReadingCheck* check) {
+      std::string out;
+      for (const Piece& p : jaen::SplitEnglish(Parse(raw), short_words, Parse, nullptr, &is_dai_reading, check)) {
+        if (p.english) out += std::string(raw.substr(p.begin, p.end - p.begin)) + "|";
+      }
+      return out;
+    };
+    Expect(three("kyouhadaiwomita", &natural) == "", "a curated 3-letter word with a natural reading stays Japanese (dai: だい)");
+    Expect(three("kyouhadaiwomita", &unnatural) == "dai|", "a curated 3-letter word whose reading is not natural is English");
+    Expect(three("kyouhadaiwomita", nullptr).empty(), "without the naturalness check the reading decides");
+    Expect(three("kyouhatamewomita", &unnatural).empty(), "a 4-letter word that is no curated or common word is not taken by naturalness");
     const auto spaced = jaen::SplitEnglish(Parse("weeklyreportwokaku"), lexicon, Parse);
     Expect(spaced.size() == 2 && spaced[0].english && spaced[0].spaces == std::vector<size_t>{6},
            "a space between two words that are no word together");
