@@ -1,0 +1,9 @@
+# mozcdic-ut-<名前> の取得先の版と SHA256（tools/fetch_ut_dictionaries.py が読む）。
+# 取得先: https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-<名前>/<コミット>/mozcdic-ut-<名前>.txt.bz2
+# 列: 名前 / コミット / bz2 ファイルの SHA256 / 利用条件 / 配布物に入れてよいか（2026-10-17 調べ。根拠は各リポジトリの LICENSE と README）
+sudachidict	c686771bada1d59e9b105c81b29e6ac1a239cb54	d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc	Apache-2.0（SudachiDict）	可（採用済み）
+neologd	d8307abf02b830b185c9320822cffa0d0787c54e	231b9b5e4ad16baa3f79680f4e4615f7060511a41da4aac2149789eace3f2411	Apache-2.0（mecab-ipadic-NEologd。はてなキーワード・郵便番号・駅名・人名の出典表示が要る）	可（表示つき）
+place-names	98cf8e9d7731695a52e5bc72ed633933c71d1913	71a3e28e8acead3793739ec3466826b01adedc168354957661ec57c18688a0a2	パブリックドメイン（日本郵便の郵便番号データ）	可
+personal-names	b557dd4c1548cc7c2164d5f8b14170c40cbb6f81	610e2e52fad15df0edac854960a05451a7e9a62f3df09c3f065db9e1ab6f51f4	Apache-2.0（出所の記載なし）	可（出所は要確認）
+jawiki	57af6adefedab262c295c4bfff71a89902cbe05c	94aa97037c3020d7595e5ca0bc4a63377c5090b13d60a7a09b3f91075360c849	CC BY-SA（ウィキペディアの記事名）	要相談（継承条件）
+edict2	8fe8f7918baf513c3d7e243807dfcda2d5c30139	1e62cb480101cbcc5a84ba981b370909e9f43973c1b7c6063c04a12eccd72530	CC BY-SA 4.0（EDRDG）	要相談（継承条件）
