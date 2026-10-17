@@ -750,7 +750,8 @@ class Builder:
                 english_to_katakana.setdefault(english.lower().replace(" ", ""), katakana)
         self.exclusion = TestExclusion(self.repo / "tests" / "conversion",
                                        load_romaji_table(Path(args.romaji_table)), english_to_katakana,
-                                       extra_files=args.extra_test, ascii_containment=not args.domain_text)
+                                       extra_files=args.extra_test,
+                                       ascii_containment=not (args.domain_text or args.english_only_exact))
         # 種類ごとの割合（出典の中での割合）。--kind-weights で上書きできる
         self.kind_weights = {source: dict(kinds) for source, kinds in SOURCE_KINDS.items()}
         for item in (args.kind_weights.split(",") if args.kind_weights else []):
@@ -1418,6 +1419,9 @@ def main(argv=None):
     parser.add_argument("--max-articles", type=int, default=0, help="読む記事の上限（0 は上限なし）")
     parser.add_argument("--progress", type=int, default=2000, help="何記事ごとに進み具合を出すか（0 は出さない）")
     parser.add_argument("--show", type=int, default=0, help="終わりに各種類の例をいくつ表示するか")
+    parser.add_argument("--english-only-exact", action="store_true",
+                        help="英字だけの試験の語（github など）は「同じ」だけ調べ、「含む」は調べない（--domain-text を付けたときと同じ。"
+                             "文の一覧を渡さないウィキペディアの部品を、ほかの部品と同じ規則にするため）")
     parser.add_argument("--domain-text", default="", help="文の一覧 sentences.jsonl（分野・Tatoeba・RealPersonaChat の文。出典は domain_sources.json の mix で振り分ける）")
     parser.add_argument("--domain-share", type=float, default=0.5, help="（--mix なしのとき）--size のうち分野の問題にする割合（残りはウィキペディアなど）")
     parser.add_argument("--domain-valid-fraction", type=float, default=0.05, help="確かめ用に回す文の一覧の文書の割合")

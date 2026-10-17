@@ -658,6 +658,24 @@ def print_report(base: dict, tuned: dict | None = None):
 # ------------------------------------------------------------------ 取得と llama.cpp の道具
 
 
+def part_done(data_dir, name: str) -> bool:
+    """練習問題の部品 name（text、wiki0of2 …）が作り終わっているか（目録 part-<name>.json は最後に書かれる）。"""
+    return (Path(data_dir) / f"part-{name}.json").exists()
+
+
+def data_ready(data_dir) -> bool:
+    """練習問題が（集め終わって）そろっているか。昔の形（train.jsonl だけ）も読む。"""
+    manifest = Path(data_dir) / "manifest.json"
+    if not manifest.exists():
+        return False
+    try:
+        info = json.loads(manifest.read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    names = [f["name"] for f in info.get("train_files") or [{"name": "train.jsonl"}]] + ["valid.jsonl"]
+    return all((Path(data_dir) / n).exists() for n in names)
+
+
 def download(url: str, path, sha256: str | None = None) -> Path:
     """取ってきて SHA256 を確かめる。すでに正しいものがあれば取り直さない。"""
     import urllib.request
@@ -695,15 +713,33 @@ def llama_simple_answer(binary, model_path, prompt: str, n_predict: int = 48) ->
     return tail
 
 
+def materials_text(manifest: dict) -> str:
+    """manifest.json の出典から、MODEL_CARD.md の「学習の材料」の行を作る（出典・版・利用条件・表示）。"""
+    lines, attribution = [], {}
+    for source in (manifest.get("domain") or {}).get("sources", []):
+        attribution[source["name"]] = source.get("attribution")
+    for source in manifest.get("sources", []):
+        name = source["name"]
+        if name.startswith("tools/data/") or name.endswith(".tsv") and "romanji" in name:
+            continue
+        line = f"  - {name}: {source.get('license', '')}"
+        if source.get("commit"):
+            line += f"（版 {source['commit']}）"
+        if attribution.get(name):
+            line += f"。表示: {attribution[name]}"
+        lines.append(line)
+    return "\n".join(lines)
+
+
 MODEL_CARD = """# {name}
 
 コンパウンドIME の試験用に、zenz-v3.2-small を追加学習したかな漢字変換の模型です（試作品）。
 
 - 元の模型: Miwa-Keita/zenz-v3.2-small-gguf（{base_url}）。zenz は ku-nlp/gpt2-small-japanese-char
   （CC BY-SA 4.0）をもとに Miwa Keita さん（azooKey の作者）が学習した模型です。
-- 学習の材料: ウィキペディア日本語版（CC BY-SA。記事の著者に帰属。データセット wikimedia/wikipedia
-  20231101.ja）、コンパウンドIME のリポジトリの一覧（MIT）。読みは SudachiPy・SudachiDict（Apache-2.0）で付けました。
-  試験の文（tests/conversion/）は学習に入れていません。詳しくは manifest.json。
+- 学習の材料（出典の表示。試験の文 tests/conversion/ は学習に入れていません。詳しくは manifest.json）:
+{materials}
+  読みは SudachiPy・SudachiDict（Apache-2.0）で付けました。コンパウンドIME のリポジトリの一覧は MIT です。
 - 利用条件: CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。配るときは、
   この説明（出典の表示）を付け、同じ条件で配ってください。元の模型の配布ページは Apache-2.0 と表示していますが、
   もとになった模型と材料が CC BY-SA のため、こちらは CC BY-SA 4.0 として扱います。
