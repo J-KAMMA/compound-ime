@@ -3483,6 +3483,15 @@ edit("engine/engine.cc", """            (script == Util::HIRAGANA || script == U
             !pos.IsUniqueNoun(segment->candidate(indices[i]).lid)) return false;
         segment->move_candidate(indices[i], 0);""")
 
+# 組み直しの「一文字だけの仮名で助詞でないものは断る」見張りは、人工知能が文末の ？！ を
+# 別の区切りにしたとき（トムは寝てるの？ の ？）にも働き、組み直しごと断っていた。記号は
+# 仮名ではないので、ひらがなの一文字のときだけ見張る。
+edit("engine/engine.cc", """      if (Util::CharsLen(piece_key) == 1 &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles))
+        return false;""", """      if (Util::CharsLen(piece_key) == 1 && Util::GetScriptType(piece_key) == Util::HIRAGANA &&
+          std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles))
+        return false;""")
+
 # 人工知能の候補の書き出し。MYIME_AI_DUMP=<ファイル> のときだけ、文全体を人工知能に尋ねるたびに
 # 読みと候補の上位20を1行（タブ区切り）書き足す。カタカナのままになる不具合の原因調べ用（普段は何もしない）。
 edit("engine/engine.cc", "    if (full.conversion_segments_size() != 1 || full.conversion_segment(0).candidates_size() > 4096) return;\n",
