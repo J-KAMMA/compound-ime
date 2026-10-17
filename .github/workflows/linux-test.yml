@@ -66,7 +66,7 @@ jobs:
           path: |
             llama.cpp/build
             myime/src/swift-engine/.build
-          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/swift-Package.resolved') }}
+          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/swift-Package.resolved') }}
 
       - name: 生成器と改造の適用
         run: |
@@ -85,6 +85,10 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
+          # 選び手の段階2b: Zenzai の計算済みの分布の記録（MYIME_SELECTOR_FEATURES のときだけ動く）
+          $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
+          # 選び手の段階3: 学習した選び手を組み込む（MYIME_SELECTOR=0 で切る）
+          $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
 
       - name: llama.cpp と変換エンジン
         run: |
@@ -131,9 +135,17 @@ jobs:
           path: lex/
           retention-days: 14
 
+  # 選び手の段階2の材料集め（selector-data.yml）。exp/selector-stage2 の枝のときだけ。
+  selector-data:
+    needs: build
+    if: github.ref_name == 'exp/selector-stage2'
+    uses: ./.github/workflows/selector-data.yml
+
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
+  # 選び手の材料集めの枝では、計算機を材料集めに回すため流さない。
   test:
     needs: build
+    if: github.ref_name != 'exp/selector-stage2'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
@@ -209,6 +221,11 @@ jobs:
                 repo/tests/conversion/$n.json romanji-hiragana.tsv > results/ceiling-$n.txt && head -14 results/ceiling-$n.txt
             done
           fi
+          # 選び手の段階1: Zenz の尤度だけで選べるか（tools/selector_stage1.py）
+          for n in ja400 jaen200b; do
+            [ -f results/score-$n.txt ] && python3 repo/tools/selector_stage1.py results/score-$n.txt results/$n.tsv \
+              repo/tests/conversion/$n.json > results/stage1-$n.txt && head -8 results/stage1-$n.txt
+          done
           if [ -f results/wiki-typing-1.tsv ] && [ -f results/wiki-typing-2.tsv ]; then
             cat results/wiki-typing-1.tsv results/wiki-typing-2.tsv > results/wiki-typing.tsv && rm results/wiki-typing-1.tsv results/wiki-typing-2.tsv
             python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40

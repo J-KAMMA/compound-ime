@@ -15,6 +15,8 @@ GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
 BATCH="bash $REPO/tools/batch_convert.sh $E/session_handler_main $E $MODEL"
 W=$(mktemp -d); mkdir -p "$OUT"
+# 選び手の段階3: 採点し直した文節の判断を組ごとに記録する（読み、文節、門、確からしさ、選んだ候補）
+export MYIME_SELECTOR_LOG=$(cd "$OUT" && pwd)/selector-log-$GROUP.txt
 # 変換エンジンの部品（libggml-cpu.so など）は一式の中から探す。組み立てた計算機の
 # llama.cpp の組み立て先は、ここにはない。
 export LD_LIBRARY_PATH="$E${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
@@ -34,7 +36,9 @@ a1|a2)
 b)
   # 日本語だけの400文（同音異義語、活用、敬語、数、固有名、カタカナ語、話し言葉、長文、助詞、慣用句）
   romaji $T/ja400.json > $W/ja400.txt
-  MYIME_SELECTOR_DUMP=$OUT/dump-ja400.txt $BATCH $W/ja400.txt $OUT/ja400.tsv 4
+  # 選び手の段階3の確かめ: 判断の記録（selector-log）と、選び手を当てる前の候補とコスト（features）
+  MYIME_SELECTOR_LOG=$OUT/selector-log-ja400.txt MYIME_SELECTOR_FEATURES=$OUT/features-ja400.txt \
+    MYIME_SELECTOR_SCORE=$OUT/score-ja400.txt MYIME_SELECTOR_DUMP=$OUT/dump-ja400.txt $BATCH $W/ja400.txt $OUT/ja400.tsv 4
   python3 $REPO/tools/score_categories.py $OUT/ja400.tsv $T/ja400.json | head -12
   # 予測変換: 最初の100文を最後まで打ち、変換キーを押す前の候補の上位3つに正解が出るか
   python3 -c "import json,sys; [print(i['romaji']+'\t'+'\t'.join([i['intended']]+i.get('alternatives',[]))) for i in json.load(open(sys.argv[1]))['items'][:100]]" $T/ja400.json > $W/pred-items.tsv
@@ -65,7 +69,7 @@ b)
 c)
   MYIME_SELECTOR_DUMP=$OUT/dump-jaen270.txt $BATCH $T/jaen270.txt $OUT/jaen270.tsv 4
   romaji $T/jaen200b.json > $W/jaen200b.txt
-  MYIME_SELECTOR_DUMP=$OUT/dump-jaen200b.txt $BATCH $W/jaen200b.txt $OUT/jaen200b.tsv 4
+  MYIME_SELECTOR_SCORE=$OUT/score-jaen200b.txt MYIME_SELECTOR_DUMP=$OUT/dump-jaen200b.txt $BATCH $W/jaen200b.txt $OUT/jaen200b.tsv 4
   romaji $T/typo150.json > $W/typo150.txt
   $BATCH $W/typo150.txt $OUT/typo150.tsv 4
   # 打ち間違いの直しを見ずに作った別の150文: 直しなし（off）と既定の両方

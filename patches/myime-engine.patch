@@ -2,7 +2,7 @@ diff --git a/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/Conv
 index 9bc1f6f..0aa486b 100644
 --- a/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/ConversionAlgorithms/Zenzai/Zenz/Zenz.swift
 +++ b/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/ConversionAlgorithms/Zenzai/Zenz/Zenz.swift
-@@ -1,160 +1,217 @@
+@@ -1,160 +1,232 @@
 -import EfficientNGram
 -package import Foundation
 -import SwiftUtils
@@ -316,6 +316,21 @@ index 9bc1f6f..0aa486b 100644
 +            #endif
 +            guard ratioGate else { return nil }
 +            return winner
++        }
++    }
++
++    // Selector stage 1 (record only): total log-probability of each full-sentence text
++    // under the same prompt Zenzai uses for candidate evaluation. Nothing is ranked here.
++    func selectorSentenceScores(reading: String, texts: [String], contextualMode: ConvertRequestOptions.ZenzaiV3DependentMode) -> [Double?] {
++        self.inferenceLock.withLock { () -> [Double?] in
++            guard !self.useGpu, let context = self.zenzContext else { return texts.map { _ in nil } }
++            let version = ConvertRequestOptions.ZenzaiVersionDependentMode.v3(contextualMode)
++            let katakana = reading.toKatakana()
++            let prompt = ZenzPromptBuilder.candidateEvaluationPrompt(input: katakana, userDictionaryPrompt: "", versionDependentConfig: version)
++            return texts.map { text -> Double? in
++                let evaluated = ZenzCandidateEvaluator.candidateTextForEvaluation(candidateText: text, input: katakana, inputCursorPosition: nil, versionDependentConfig: version)
++                return context.jointLogProbability(prompt: prompt, candidateText: evaluated)
++            }
 +        }
 +    }
 +
@@ -1949,7 +1964,7 @@ diff --git a/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/Conv
 index aa81ebf..c02d171 100644
 --- a/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/ConverterAPI/KanaKanjiConverter.swift
 +++ b/src/AzooKeyKanaKanjiConverter/Sources/KanaKanjiConverterModule/ConverterAPI/KanaKanjiConverter.swift
-@@ -1,1288 +1,1353 @@
+@@ -1,1288 +1,1360 @@
 -//
 -//  KanaKanjiConverter.swift
 -//  AzooKeyKanaKanjiConverter
@@ -4389,6 +4404,13 @@ index aa81ebf..c02d171 100644
 +        return ranked
 +    }
 +
++    /// Selector stage 1 (record only): log-probability of each full-sentence text under the loaded Zenz model.
++    public func selectorSentenceScores(reading: String, texts: [String], leftContext: String, rightContext: String) -> [Double?] {
++        guard let model = self.zenz, !model.useGpu, self.zenzaiModelLoadError == nil else { return texts.map { _ in nil } }
++        let mode = ConvertRequestOptions.ZenzaiV3DependentMode(leftSideContext: leftContext, rightSideContext: rightContext)
++        return model.selectorSentenceScores(reading: reading, texts: texts, contextualMode: mode)
++    }
++
 +    /// 入力からラティスを構築する関数。状況に応じて呼ぶ関数を分ける。
 +    /// - Parameters:
 +    ///   - inputData: 変換対象のInputData。
@@ -4595,7 +4617,7 @@ diff --git a/src/swift-engine/Sources/azookey-engine/AzookeyEngine.swift b/src/s
 index c37750c..c233516 100644
 --- a/src/swift-engine/Sources/azookey-engine/AzookeyEngine.swift
 +++ b/src/swift-engine/Sources/azookey-engine/AzookeyEngine.swift
-@@ -1,576 +1,685 @@
+@@ -1,576 +1,711 @@
 -import Foundation
 -import KanaKanjiConverterModuleWithDefaultDictionary
 -
@@ -5827,6 +5849,32 @@ index c37750c..c233516 100644
 +    }
 +
 +    return UnsafePointer(_strdup(jsonString))
++}
++
++/// Selector stage 1 (record only): texts are joined by U+0001; the result is one
++/// score per text joined by tab ("nan" when the model could not score it).
++@_cdecl("ScoreSentences")
++public func scoreSentences(
++    _ reading: UnsafePointer<CChar>?,
++    _ leftContext: UnsafePointer<CChar>?,
++    _ rightContext: UnsafePointer<CChar>?,
++    _ joinedTexts: UnsafePointer<CChar>?
++) -> UnsafePointer<CChar>? {
++    guard let reading = reading, let joinedTexts = joinedTexts else { return nil }
++
++    engineLock.lock()
++    defer { engineLock.unlock() }
++
++    guard let conv = converter else { return nil }
++    let texts = String(cString: joinedTexts).components(separatedBy: "\u{01}")
++    let left = conversionContext(leftContext.map { String(cString: $0) } ?? "", left: true)
++    let right = conversionContext(rightContext.map { String(cString: $0) } ?? "", left: false)
++    let scores = conv.selectorSentenceScores(reading: String(cString: reading), texts: texts, leftContext: left, rightContext: right)
++    let joined = scores.map { score -> String in
++        if let score = score, score.isFinite { return String(score) }
++        return "nan"
++    }.joined(separator: "\t")
++    return UnsafePointer(_strdup(joined))
 +}
 +
 +@_cdecl("FreeString")
