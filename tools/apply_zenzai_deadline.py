@@ -12,6 +12,8 @@ patches/myime-engine.patch を当てたあとの作業ツリーに、1回だけ�
 2. 重みの読み込みで use_mlock を指定し、メモリに固定する（SetZenzaiMemoryLock、既定は有効）。
    固定できなくても（ウィンドウズの VirtualLock の上限など）読み込みは続く。結果は
    ZenzaiMemoryLock.status と GetZenzaiStatus の memoryLock に出し、標準エラーにも1行書く。
+   標準エラーへは ZenzaiMemoryLock.writeStandardError で書く（標準エラーのない処理でも落ちない）。
+   FileHandle.standardError.write(_:) は使わない（書けないと try! で落ちる。1.144 の不具合）。
 3. 試験用: 環境変数 MYIME_ZENZAI_STATS_FILE があれば、変換のたびに「<値>.<処理番号>」へ
    上限に当たった回数などを書く。
 """
@@ -42,6 +44,9 @@ def write(path, text):
 # --- 1. 時間の上限と、メモリ固定の状態（llama.cpp の型を使わない部分） ---
 write(conv / "ConversionAlgorithms/Zenzai/Zenz/ZenzaiDeadline.swift", '''import Dispatch
 import Foundation
+#if os(Windows)
+import CRT
+#endif
 
 /// 変換1回あたりの人工知能（Zenzai）の時間の上限。
 ///
@@ -160,7 +165,22 @@ public enum ZenzaiMemoryLock {
         } else {
             self.status = "locked"
         }
-        FileHandle.standardError.write(Data("[zenzai] memory lock: \\(self.status) (model \\(megabytes) MB)\\n".utf8))
+        self.writeStandardError("[zenzai] memory lock: \\(self.status) (model \\(megabytes) MB)\\n")
+    }
+
+    /// 標準エラーへ書く。書けなくても何もしない。
+    ///
+    /// ウィンドウズの変換エンジン（mozc_server.exe、画面だけの処理）には標準エラーがない。
+    /// FileHandle.standardError.write(_:) は中で try! を使うので、書けないと処理ごと落ちる
+    /// （1.144 で、人工知能の重みを読み込むたびに変換エンジンが落ち、打っていた文が消えた）。
+    /// ウィンドウズでは llama.cpp の既定の記録と同じく C の関数で書き（1.143 まで落ちなかった書き方）、
+    /// ほかでは書けなかった誤りを握りつぶす。
+    static func writeStandardError(_ text: String) {
+        #if os(Windows)
+        _ = fputs(text, stderr)
+        #else
+        try? FileHandle.standardError.write(contentsOf: Data(text.utf8))
+        #endif
     }
 }
 ''')
@@ -184,8 +204,8 @@ edit(zc, """        var modelParams = llama_model_default_params()
             }
             let message = String(cString: text)
             ZenzaiMemoryLock.observe(message)
-            // 標準の動作（標準エラーへ出す）を保つ
-            FileHandle.standardError.write(Data(message.utf8))
+            // 標準の動作（標準エラーへ出す）を保つ。標準エラーがなくても落ちない書き方で
+            ZenzaiMemoryLock.writeStandardError(message)
         }, nil)
         #endif
         var modelParams = llama_model_default_params()
