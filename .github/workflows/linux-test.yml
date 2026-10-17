@@ -76,7 +76,7 @@ jobs:
           PY=$W/venv/bin/python
           $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
           # 追加の辞書: 版と SHA256 は tools/data/ut-dictionaries.tsv に固定してある
-          UT_SOURCES=sudachidict
+          UT_SOURCES=sudachidict,domain
           $PY $W/repo/tools/fetch_ut_dictionaries.py --out $W/ut ${UT_SOURCES//,/ }
           $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources $UT_SOURCES --local-source domain=$W/repo/tools/data/domain-words.tsv --out $W/dictionary10.txt --install
           cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
