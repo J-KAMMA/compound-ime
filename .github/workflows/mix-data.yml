@@ -27,7 +27,7 @@ on:
         default: '50'
       allow_other_dump:
         description: Tatoeba の書き出しが入れ替わっていても今の版で作る（true / false）
-        default: 'false'
+        default: 'true'
 
 permissions:
   contents: read
@@ -78,7 +78,7 @@ jobs:
           WANT=ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1
           echo "Tatoeba SHA-256: $GOT（期待 $WANT）"
           echo "DUMP_SHA=$GOT" >> $GITHUB_ENV
-          if [ "$GOT" != "$WANT" ] && [ "${{ inputs.allow_other_dump }}" != "true" ]; then
+          if [ "$GOT" != "$WANT" ] && [ "${{ inputs.allow_other_dump || 'true' }}" != "true" ]; then
             echo "Tatoeba の書き出しが入れ替わっている。新しい版で作るなら allow_other_dump を true にする" >&2
             exit 1
           fi
