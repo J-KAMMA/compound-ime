@@ -18,22 +18,29 @@
 |---|---|
 | `finetune.ipynb` | Colab で上から順に押していく手順書（日本語）。①〜⑬のセル |
 | `build_dataset.py` | 練習問題を作る。試験の文を除き、出どころと利用条件の目録（manifest.json）も作る |
-| `zenz_tune.py` | 手順書から呼ぶ部品（GGUF を学習できる形に戻す、学習、途中からの再開、成績、GGUF の確認） |
+| `zenz_tune.py` | 手順書から呼ぶ部品（GGUF を学習できる形に戻す、学習、途中からの再開、成績、GGUF の確認、時間とドライブの容量の見積り） |
 | `domain_text.py`、`fetch_domain_sources.py`、`domain_sources.json` | プログラミング・仮想通貨の文書から文を取り出す（下の「分野の練習問題と試験」） |
+| `persona_text.py` | RealPersonaChat（雑談）の発話から文を取り出す（下の「出典ごとの割合で作る」） |
+| `check_dataset.py` | 練習問題が試験の文を含まないこと、目録に出典・版・利用条件・件数があることを確かめる。試験の文をわざと混ぜる確かめも |
+| `measure_dataset.py` | 練習問題を数字にして、1問の字数・ファイルの大きさ・速さを測る（見積りの根拠） |
+| `../../.github/workflows/mix-data.yml` | 出典ごとの割合で、小さな規模と本番の規模（300万問）を GitHub で試しに作る（手動） |
 
 ## やること（クリックする所）
 
-1. この3つのファイルが GitHub の `main` に入っていることを確かめます（まだなら、Google ドライブに
-   `zenz-finetune/kit` というフォルダを作り、`build_dataset.py` と `zenz_tune.py` を入れておきます）。
+1. ファイル（`build_dataset.py`、`zenz_tune.py`、`domain_sources.json`、`persona_text.py` など）が、①の `REPO_REF`
+   の枝（v4-mix は `exp/finetune-mix`）に入っていることを確かめます（まだなら、Google ドライブに
+   `zenz-finetune/kit` というフォルダを作り、`tools/zenz-finetune` の中身を入れておきます）。
 2. `finetune.ipynb` を Colab で開きます（GitHub の画面から「Open in Colab」、または Colab の
-   「ファイル」→「ノートブックを開く」→「GitHub」で `J-KAMMA/compound-ime` を選ぶ）。
-3. メニューの「ランタイム」→「ランタイムのタイプを変更」で **L4 GPU** を選び、「保存」を押します。
+   「ファイル」→「ノートブックを開く」→「GitHub」で `J-KAMMA/compound-ime` の枝を選ぶ）。
+3. メニューの「ランタイム」→「ランタイムのタイプを変更」で **T4 GPU**（または L4）を選び、「保存」を押します。
+   練習問題作りだけを先に GPU なしで済ませるなら、①の `ONLY_DATA = True` にして CPU のランタイムで⑦まで押します。
 4. セルの左の ▶ を、①から順に1つずつ押します。②で Google ドライブへの接続の許可を求められたら、
-   自分のアカウントを選んで許可します。③で時間とコンピューティング ユニットの見積りが出ます。
+   自分のアカウントを選んで許可します。③で時間・ユニット・ドライブの容量の見積りが出ます。
 5. ⑨（学習）がいちばん長くかかります。**タブは閉じずに開いたままにしてください**（バックグラウンド実行は
    Ultra の契約だけの機能のため、タブを閉じると止まります）。
-6. 途中で接続が切れたら、①から順に押し直します。終わった所は飛ばし、学習は最後のチェックポイント
-   （20分ごとにドライブへ保存）から続きます。
+6. 途中で接続が切れたら、①から順に押し直します。終わった所は飛ばし、練習問題は足りない部品だけ作り直し、
+   学習は最後のチェックポイント（20分ごとにドライブへ保存）から続きます。数百万問は何回かに分かれます。
+   1回の学習時間を決めたいときは、①の `RUN_MINUTES`（分）に入れます。
 7. ⑩で学習の前と後の成績が表で出ます。ふつうの文（wiki_whole など）の成績が下がっていれば注意が出ます。
 8. ⑬が終われば完成です。
 
@@ -43,13 +50,16 @@
 
 | GPU | 計算の精度 | 一度に流す問題 | 学習の見積り | 全体の見積り | ユニットの見積り |
 |---|---|---|---|---|---|
-| L4（おすすめ） | bf16 | 128問 | 約20分 | 約1時間10分 | 約5 |
-| T4 | fp16 | 64問×2回 | 約50分 | 約1時間35分 | 約3 |
+| L4（おすすめ） | bf16 | 64問×2回 | 約20分 | 約1時間10分 | 約5 |
+| T4（無料枠） | fp16 | 16問×8回 | 約85分（実測） | 約2時間 | 約3 |
 | A100 | bf16 | 128問 | 約10分 | 約55分 | 約11 |
 
+上の表は **40万問・2回くり返し・1問平均78字**（v1〜v3）の場合です。**300万問（v4-mix）では T4 で学習が約 9.6 時間**
+（下の「数百万問で学習するとき」）。
+
 - 1時間あたりのユニット: T4 約1.76、L4 約4.82、A100 約11.77（2026-10 時点の目安。Colab の表示が正）。
-- 見積りは、問題40万問・2回くり返し・1問平均70字として、**GPU ごとの速さを仮に置いて**計算したものです。
-  まだ実際に測っていません。⑨が始まると実際の速さで残り時間と残りのユニットを出し直します。
+- T4 は実測（約12,300字/秒）です。L4 と A100 は仮の値で、まだ測っていません。⑨が始まると実際の速さで残り時間と
+  残りのユニットを出し直します。
 - 全体の見積りには、準備・問題作り（GPU を使わず CPU で10〜20分）・成績の比較・GGUF 化を含みます。
 - どの GPU でも1歩あたりの問題数（128問）は同じにしてあるので、学習の結果は GPU によらずほぼ同じです。
 
@@ -65,8 +75,9 @@ Google ドライブの `マイドライブ/zenz-finetune/v1/`（`v1` は①の `
 | `result/MODEL_CARD.md` | 出典と利用条件の表示（配るときに必ず付ける） |
 | `result/manifest.json` | 練習問題の出どころ・件数・除いた試験の文の数 |
 | `result/eval.json` | 学習の前と後の成績 |
-| `data/` | 練習問題（train.jsonl、valid.jsonl）と目録 |
-| `checkpoints/` | 学習の途中の結果（最新の2つ。終われば消してかまいません、約1.1GB ずつ） |
+| `data/` | 練習問題（v4-mix は部品 train-text・train-wiki…of….jsonl.gz と valid.jsonl、昔は train.jsonl）と目録 manifest.json |
+| `train-<終わりの記号の番号>.npz`、`valid-….npz` | 数字にした練習問題（圧縮）。作り直しを避けるための控え |
+| `checkpoints/` | 学習の途中の結果（既定は最新の1つ。保存の最中だけ2つ分。終われば消してかまいません、約1.1GB ずつ） |
 | `base/`、`final/` | 学習できる形の元の模型と、学習後の模型 |
 
 ## しくみ
@@ -223,11 +234,91 @@ jaen200b.json、typo150.json、typo150b.json、reported.json、inputs.txt、vari
 （`train.jsonl`、`valid.jsonl`、`manifest.json`、`excluded.txt`）を置きます。試験の tsv は中身を確かめてから
 `tests/conversion/` に入れます。入れたあとは `linux-test.yml` の組 `g` が、今の人工知能の点数を出します。
 
-**Colab の手順の変更点**: ① の設定に `USE_DOMAIN`（既定 True）と `DOMAIN_SHARE`（既定 0.5）が増えました。⑦ が
-分野の材料を取り出して文にし（CPU で数分〜十数分、追加の操作は不要）、`--domain-text` を付けて練習問題を作ります。
-試験の tsv（`tests/conversion/domain-*.tsv`）が `REPO_REF` の枝に入っていることを確かめてから動かしてください。
-⑩ の成績の表に `domain_*` の行が増えます。ふつうの文（wiki_*）が下がっていないことの確認は今までどおりです。
-`USE_DOMAIN = False` にすると今までと同じ問題になります。
+**Colab の手順の変更点（v3-domain のとき）**: ① の設定に `USE_DOMAIN`・`DOMAIN_SHARE` が増え、⑦ が分野の材料を取り出して
+文にしました。**v4-mix 以降は、これらを `MIX`（出典ごとの割合）に置き換えました**（次の節）。`--domain-share` は
+`--mix` を付けないときの古い指定として残してあります。
+
+## 出典ごとの割合で作る（数百万問、v4-mix）
+
+v3-domain は分野が 50% で、ふつうの文が下がりました（ウィキペディアの打ち込み 1800→1775、前後の文つき 639/622→634/614、
+ja400 379→375）。v4-mix は、分野を 10% に抑え、雑談・話し言葉を足して、全体を 300万問にします。
+
+### 出典と割合（既定）
+
+| 出典（`--mix` の名前） | 割合 | 問題数（300万問） | 中身 | 材料 | 利用条件 |
+|---|---|---|---|---|---|
+| `wiki` | 64.5% | 約 193.5万 | 文全体・前の文つき・文の一部・同音異義語・英単語まじり | ウィキペディア日本語版の 5 分割（00007、00004、00005、00006、00008。**00003 と 00011 は試験・選び手の材料なので除く**。SHA256 固定） | CC BY-SA |
+| `persona` | 22% | 66万 | 雑談の文（前の発話を左の文脈にする） | RealPersonaChat（GitHub の v1.0.0＝コミット 28d0b6b3…。Hugging Face の nu-dialogue/real-persona-chat は読み込みの台本だけで a5be0f51…） | CC BY-SA 4.0（下の注意） |
+| `domain` | 10% | 約 29万〜30万 | プログラミング・仮想通貨の文書の文 | MDN、Python、Kubernetes、React、Rust、ethereum.org（コミット固定） | 出典ごと（下の表） |
+| `tatoeba` | 2.7% | 約 8万 | 話し言葉の短い文 | Tatoeba 日本語（話し言葉のしるしがある文。試験の枠 10% は除く） | CC BY 2.0 FR |
+| `synthetic` | 0.8% | 約 2.4万 | 話し言葉の語・略語・英語の言い回し（自作の一覧） | `tools/data/` | MIT |
+
+- 雑談・話し言葉（persona + tatoeba + synthetic の話し言葉）で 約 25%。
+- **材料の数に上限があります。** 試運転（2026-10-17、300万問の割合、3周まで）で作れた数は、domain 29.4万、tatoeba 8.2万、
+  synthetic 2.4万、persona 54万以上（41.7万文）でした。割合は、この上限に合わせてあります。足りない分は、既定で
+  ウィキペディアの問題で埋めます（`--no-fill-wiki` で止める）。予定と実際は `manifest.json` の `mix_result` と、⑦ の最後の表に出ます。
+- 1問の平均は 71字（ウィキペディアだけなら 78字）です。
+
+### 指定のしかた（`build_dataset.py`）
+
+```
+--mix wiki=0.645,persona=0.22,tatoeba=0.027,domain=0.10,synthetic=0.008   出典ごとの割合（自動で合計 1 にそろえる）
+--max-passes wiki=2,persona=3,tatoeba=3,domain=3,synthetic=1              出典ごとの「同じ文から作る問題の形の数」の上限
+--size 3000000                                                            学習用の問題の合計
+```
+
+- `--max-passes`: 材料が足りないときだけ、同じ文を別の形（文全体・前の文つき・文の一部）で使い回す回数の上限です。
+  文全体と前の文つきは同じ文から 1 つずつ、文の一部は毎回違う所を選びます。上限まで使っても足りない分は埋め草になります。
+- 昔の `--mix`（種類ごとの割合の上書き）は `--kind-weights` に改めました。`--mix` を付けないと、昔の指定（`--domain-share`）です。
+- 文の一覧（domain・tatoeba・persona）は `--domain-text` に 1 つのファイルにまとめて渡します
+  （`cat sentences.jsonl colloquial-train.jsonl persona-train.jsonl > all.jsonl`）。どの出典がどの割合の名前かは、
+  `domain_sources.json` の `mix` の欄で決まります（省略は `domain`）。
+
+**部品に分けて作る**（数百万問のため。切れても足りない部品だけ作り直せ、メモリも抑えられます）:
+
+```
+build_dataset.py … --only-source synthetic domain tatoeba persona --part text      # 文の一覧からの出典（1工程）
+build_dataset.py … --only-source wiki --slice 0/2 --part wiki0of2 --english-only-exact --wiki <5つ>   # 2工程を並べて
+build_dataset.py … --only-source wiki --slice 1/2 --part wiki1of2 --english-only-exact --wiki <5つ>
+build_dataset.py --out data --merge-parts                                          # valid.jsonl と manifest.json
+```
+
+部品は `train-<名前>.jsonl.gz`、`valid-<名前>.jsonl`、目録 `part-<名前>.json` です（目録は最後に書くので、あれば作り終わっています）。
+ウィキペディアの部品は、`text` の足りなかった分を読んで、その分だけ多く作ります（だから `text` を先に）。
+`--english-only-exact` は、文の一覧を渡さない部品でも、英字だけの試験の語を「同じ」だけ調べる規則（`--domain-text` を付けたときと同じ）にします。
+
+### 試験の文との重なりの除外（全部の出典）
+
+`TestExclusion` は、`tests/conversion/` の**全ファイル**を読みます（既知の形のもの＋`.txt`・`.tsv`・`.csv`・`.jsonl` で形が分からないものは
+全部の列を見て、ローマ字の形の列は読みとして、日本語を含む列は表記として数えます。`context.tsv` の元の文と前の文もこれで入ります）。
+
+- 全部の出典（ウィキペディア・自作の一覧・分野・Tatoeba・RealPersonaChat）の文に、同じ検査をします。
+- 句点で複数の文になる試験（「A。B」）は、1文ずつも試験の文に数えます（片方だけ使うと、試験の文の半分を覚えさせるため）。
+- 前の文とつなげると試験の文になる場合は、その前の文を文脈から外します（試運転の確かめで、これで 2 問が見つかり、直しました）。
+- 読めなかったファイルは `manifest.json` の `test_exclusion.keys.files_unhandled` に出ます。
+- 確かめ: `check_dataset.py probe` が、試験の文（13 ファイル・712 文）をわざと各出典の材料に混ぜた入れ物を作り、`check_dataset.py verify` が
+  練習問題の左の文脈＋正解＋右の文脈をつなぎ直して、試験の文と重ならないこと（文全体を問う種類は 0 件）と、混ぜた文が 1 つも
+  残らないことを確かめます。試運転（小さな規模）では、混ぜた 712 文が全部除かれ、残りは 0 でした。
+
+### RealPersonaChat を使うときの守ること
+
+- 作者の注意（個人を特定しようとしない／なりすましに使わない／話者の属性・性格の推定に使わない）に従い、**使うのは発話の文字だけ**です。
+  話者ID・ペルソナ・性格特性・属性・時刻は読まず、練習問題にも残しません（`persona_text.py`）。
+- 発話は句点で文に分け、重複は 1 つにし、絵文字・顔文字・「w」だけの笑いなどを含む文は捨てます。
+  対話の 5% は「試験の枠」として練習に使いません（将来の雑談の試験用）。
+- **利用条件の食い違い**: GitHub の LICENSE・README と Hugging Face のカードは CC BY-SA 4.0 ですが、Hugging Face の読み込み台本
+  `real-persona-chat.py` の `_LICENSE` だけ CC BY-ND 4.0 と書かれています。データ本体の GitHub の表示（CC BY-SA 4.0）に従いますが、
+  模型を配る前に作者に確かめると安心です。
+- 表示: Yamashita et al. 2023, RealPersonaChat（https://github.com/nu-dialogue/real-persona-chat）。`MODEL_CARD.md` に自動で入ります。
+- Tatoeba は毎週書き出しを入れ替え、古い版を消します（2026-10-10 の版は 2026-10-17 には取れませんでした）。そのため版は固定できず、
+  取った版の SHA-256 と日付を `manifest.json` に記録し、Colab ではドライブの `cache/` に控えて以後それを使います。
+  試験の枠は文の番号で決まるので、版が違っても試験とは重なりません。
+
+### 数百万問で学習するとき（時間と容量の見積り）
+
+実測（2026-10-17、GitHub の実行機で 300万問を作って測定）と、T4 の実測（12,300字/秒）から:
+
+TIMING_TABLE_PLACEHOLDER
 
 ## 利用条件と、守ること
 
@@ -240,6 +331,8 @@ jaen200b.json、typo150.json、typo150b.json、reported.json、inputs.txt、vari
 | zenz-v3.2-small（元の模型） | 配布ページの表示は Apache-2.0。ただし元になった ku-nlp/gpt2-small-japanese-char と zenz の以前の版（v1〜v3.1）は CC BY-SA 4.0 | 下の理由で CC BY-SA 4.0 として扱う |
 | ku-nlp/gpt2-small-japanese-char | CC BY-SA 4.0 | 表示・同じ条件 |
 | ウィキペディア日本語版の本文 | CC BY-SA（データセット wikimedia/wikipedia は CC BY-SA 3.0 と GFDL と表示） | 表示・同じ条件 |
+| RealPersonaChat（nu-dialogue/real-persona-chat） | CC BY-SA 4.0（GitHub の LICENSE・README と HF のカード。HF の読み込み台本だけ CC BY-ND 4.0 と書き、食い違う） | 表示・同じ条件。作者の注意（個人を特定しようとしない・なりすましに使わない・属性や性格の推定に使わない）を守る。配る前に作者に確かめる |
+| Tatoeba の日本語の文 | CC BY 2.0 FR（一部 CC0） | 表示（投稿者。文の番号 https://tatoeba.org/sentences/show/<番号>）。版は固定できないので、取った版の SHA-256 と日付を記録 |
 | SudachiPy、SudachiDict | Apache-2.0 | 読みを付けるのに使うだけ（配る物には入らない） |
 | Mozc のローマ字表 | BSD-3-Clause | 試験の文の読みを作るのに使うだけ |
 | tools/data/ の一覧 | このリポジトリの MIT | — |
@@ -291,6 +384,11 @@ GitHub の試験（`.github/workflows/linux-test.yml`）は、模型を決まっ
 
 - **ふつうの変換が悪くなるおそれ**（学び直しで以前の力が崩れること）。学習率を小さく（3e-5）、くり返しを
   2回にし、問題の6割弱をふつうの文にしています。⑩で下がっていれば注意が出ます。最後は試験で判断します。
+  v4-mix は、v3-domain の反省から分野を 10% に抑え、ウィキペディアを 64.5% にしましたが、雑談（RealPersonaChat 22%）は
+  ですます調の短い発話が多く、ウィキペディア・試験の文と文体が違います。300万問・2周は v1 の 7.5 倍の学習量なので、
+  過学習（同じ文の別の形を最大 3 回、さらに 2 周）にも注意してください（確かめ用の損失が上がり始めたら止める）。
+- **作った割合のずれ**。材料が足りない出典の分はウィキペディアで埋まるので、実際の割合は予定と違います（⑦の最後の表と
+  `manifest.json` の `mix_result`）。
 - **量子化のほどき・かけ直しによる変化**。対照の模型で大きさを測れます。
 - **読みの誤り**。Sudachi が付けた読みが打つときの読みと違う文が混ざります（例: 方言・固有名詞）。
   間違った読みを覚えると、その語の変換が崩れることがあります。
@@ -310,4 +408,5 @@ venv/Scripts/python tools/zenz-finetune/build_dataset.py --out out --romaji-tabl
 ```
 
 文章ファイルは、空行で記事を区切り、各記事の1行目を題名とする形です。`romanji-hiragana.tsv` は Mozc の
-`src/data/preedit/romanji-hiragana.tsv` です。
+`src/data/preedit/romanji-hiragana.tsv` です。出典ごとの割合を試すなら、`--mix wiki=0.7,persona=0.3 --domain-text 文の一覧.jsonl`
+のように付けます（`check_dataset.py verify --data out --romaji-table …` で除外と目録を確かめられます）。

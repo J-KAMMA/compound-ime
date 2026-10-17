@@ -113,7 +113,7 @@ def verify(args) -> int:
         probe_index = bd.SubstringIndex(bd.norm_surface(t) for t in probe["texts"] if len(bd.norm_surface(t)) >= 4)
         probe_exact = {bd.norm_surface(t) for t in probe["texts"]}
     files = [data / f["name"] for f in manifest["train_files"]] + [data / "valid.jsonl"]
-    whole_kinds = ("_whole", "_context", "wiki_whole", "wiki_context", "homophone")
+    whole_kinds = ("_whole", "_context")   # homophone・mixed_english は文の一部の問題も含むので除く
     total = hits_whole = hits_other = probe_hits = 0
     examples = []
     per_kind = {}
@@ -122,7 +122,7 @@ def verify(args) -> int:
             total += 1
             per_kind[record["kind"]] = per_kind.get(record["kind"], 0) + 1
             text = rebuild(record)
-            whole = record["kind"].endswith(whole_kinds) or record["kind"] == "homophone"
+            whole = record["kind"].endswith(whole_kinds)
             if probe_index is not None:
                 norm = bd.norm_surface(text)
                 if norm in probe_exact or probe_index.find(norm):
