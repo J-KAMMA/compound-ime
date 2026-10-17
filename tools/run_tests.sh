@@ -13,6 +13,8 @@ GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
 BATCH="bash $REPO/tools/batch_convert.sh $E/session_handler_main $E $MODEL"
 W=$(mktemp -d); mkdir -p "$OUT"
+# 選び手の段階3: 採点し直した文節の判断を組ごとに記録する（読み、文節、門、確からしさ、選んだ候補）
+export MYIME_SELECTOR_LOG=$(cd "$OUT" && pwd)/selector-log-$GROUP.txt
 # 変換エンジンの部品（libggml-cpu.so など）は一式の中から探す。組み立てた計算機の
 # llama.cpp の組み立て先は、ここにはない。
 export LD_LIBRARY_PATH="$E${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
