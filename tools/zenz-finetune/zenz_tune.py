@@ -61,8 +61,8 @@ def gpu_profile(effective_batch: int = 128) -> dict:
     return profile
 
 
-AVG_TOKENS = 78            # 1問の平均の字数（実測の 40万問・2周・約85分・12,300字/秒 から逆算）
-BUILD_PROBLEMS_PER_MIN = 30_000   # 問題作り（CPU 1 つ分）の速さの仮の値。2 つの工程を並べて動かす
+AVG_TOKENS = 71            # 1問の平均の字数。⑦の割合（wiki 64.5%・persona 22%・domain 10% …）で、試運転の種類ごとの実測から出した値（ウィキペディアだけの割合なら 78）。⑧で実際の平均に直す
+BUILD_PROBLEMS_PER_MIN = 60_000   # 問題作り（CPU 1 つ分）の速さ。GitHub Actions の実測は約 20万〜60万問/分で、Colab はその 1/3 ほどと見込む
 BUILD_PROCESSES = 2
 
 
@@ -90,8 +90,8 @@ def estimate(profile: dict, n_train: int, epochs: int, avg_tokens: float = AVG_T
 CHECKPOINT_GB = 1.1        # 模型（fp32）と最適化の状態。実測（README: 約1.1GB ずつ）
 MODEL_GB = 0.37            # 学習できる形の模型（fp32、約9100万個の重み）
 GGUF_GB = 0.075
-JSONL_GZ_BYTES = 95        # 1問あたりの jsonl.gz のバイト数（仮の値。GitHub Actions の試運転で実測して直す）
-NPZ_BYTES_PER_TOKEN = 1.0  # 数字にした練習問題（npz、圧縮）の 1字あたりのバイト数（仮の値。実測して直す）
+JSONL_GZ_BYTES = 70        # 1問あたりの jsonl.gz のバイト数（試運転の実測: 57〜74。この割合で約 66）
+NPZ_BYTES_PER_TOKEN = 0.95  # 数字にした練習問題（npz、圧縮）の 1字あたりのバイト数（試運転の実測: 0.90〜0.97）
 
 
 def drive_plan(n_train: int, keep: int = 1, avg_tokens: float = AVG_TOKENS, data_on_drive: bool = True) -> dict:
