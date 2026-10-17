@@ -107,6 +107,18 @@ h)
     $BATCH $W/colloquial.txt $OUT/colloquial.tsv 4
   fi
   ;;
+x)
+  # 診断（原因調べの間だけ）: 話し言葉の文を、仕組みを一つずつ切って流し、候補の書き出し付きで残す
+  if [ -f $T/colloquial.tsv ]; then
+    grep -v '^#' $T/colloquial.tsv | cut -f1 > $W/colloquial.txt
+    MYIME_SELECTOR_DUMP=$OUT/dump-base.txt MYIME_AI_DUMP=$OUT/ai-base.txt $BATCH $W/colloquial.txt $OUT/base.tsv 4
+    SOLO="bash $REPO/tools/batch_convert.sh $E/session_handler_main $E"
+    MYIME_SELECTOR_DUMP=$OUT/dump-noai.txt $SOLO /nonexistent.gguf $W/colloquial.txt $OUT/noai.tsv 4 || true
+    MYIME_AI_RESEGMENT=0 MYIME_SELECTOR_DUMP=$OUT/dump-nores.txt $BATCH $W/colloquial.txt $OUT/nores.tsv 4
+    MYIME_HOMOPHONE_CUES=0 MYIME_SELECTOR_DUMP=$OUT/dump-nocues.txt $BATCH $W/colloquial.txt $OUT/nocues.tsv 4
+    MYIME_ENGLISH_CONTEXT=0 MYIME_SELECTOR_DUMP=$OUT/dump-noenctx.txt $BATCH $W/colloquial.txt $OUT/noenctx.tsv 4
+  fi
+  ;;
 f)
   # 前の文を入力欄の前の文として渡したときと渡さないときの正解の数を比べる
   if [ -f $T/context.tsv ]; then
@@ -117,5 +129,5 @@ f)
   fi
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、x のどれか" >&2; exit 2 ;;
 esac

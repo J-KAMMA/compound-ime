@@ -3446,4 +3446,30 @@ edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
   }
   return user_path;""")
 
+# 人工知能の候補の書き出し。MYIME_AI_DUMP=<ファイル> のときだけ、文全体を人工知能に尋ねるたびに
+# 読みと候補の上位20を1行（タブ区切り）書き足す。カタカナのままになる不具合の原因調べ用（普段は何もしない）。
+edit("engine/engine.cc", "    if (full.conversion_segments_size() != 1 || full.conversion_segment(0).candidates_size() > 4096) return;\n",
+     "    if (full.conversion_segments_size() != 1 || full.conversion_segment(0).candidates_size() > 4096) return;\n"
+     "    DumpAiCandidates(key, full.conversion_segment(0));\n")
+edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
+     """  // MYIME_AI_DUMP=<file>: one line per whole-sentence AI query, the reading
+  // and then the AI's first 20 candidates, separated by tabs.
+  static void DumpAiCandidates(std::string_view key, const Segment& segment) {
+    static const char* path = std::getenv("MYIME_AI_DUMP");
+    if (!path || !*path) return;
+    static std::mutex mutex;
+    std::string line(key);
+    for (size_t c = 0; c < segment.candidates_size() && c < 20; ++c) {
+      line += '\\t';
+      line += segment.candidate(c).value;
+    }
+    std::lock_guard<std::mutex> lock(mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fputc('\\n', f);
+      std::fclose(f);
+    }
+  }
+  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
+
 print("applied")

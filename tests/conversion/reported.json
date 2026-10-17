@@ -94,6 +94,48 @@
     "github"
    ],
    "note": "2026-10-15 報告: 学習の記録で ぎてゅｂ になった（学習の作り直し）"
+  },
+  {
+   "id": "r011",
+   "category": "reported",
+   "romaji": "darekatomunidennwashitekurenai?",
+   "intended": "誰かトムに電話してくれない？",
+   "alternatives": [],
+   "note": "2026-10-17 話し言葉の試験で発見: 文全体がカタカナのまま（ダレカトムニデンワシテクレナイ？）"
+  },
+  {
+   "id": "r012",
+   "category": "reported",
+   "romaji": "konnyatomukarazettaidennwagaaruwa.",
+   "intended": "今夜トムから絶対電話があるわ。",
+   "alternatives": [],
+   "note": "2026-10-17 話し言葉の試験で発見: 文全体がカタカナのまま（コンヤトムカラゼッタイデンワガアルワ。）"
+  },
+  {
+   "id": "r013",
+   "category": "reported",
+   "romaji": "tomuhaneteruno?",
+   "intended": "トムは寝てるの？",
+   "alternatives": [],
+   "note": "2026-10-17 話し言葉の試験で発見: トムの後がカタカナのまま（トムハネテルノ？）"
+  },
+  {
+   "id": "r014",
+   "category": "reported",
+   "romaji": "kiyokiippyouwo!",
+   "intended": "清き一票を！",
+   "alternatives": [],
+   "note": "2026-10-17 話し言葉の試験で発見: 文全体がカタカナのまま。試験の打ち込みは kiyoshikiichihyouwo!（読みが きよしき になっている）だったので、自然な打ち方に直した形"
+  },
+  {
+   "id": "r015",
+   "category": "reported",
+   "romaji": "nexe,nadenadeshite.",
+   "intended": "ねぇ、なでなでして。",
+   "alternatives": [
+    "ねえ、なでなでして。"
+   ],
+   "note": "2026-10-17 話し言葉の試験で発見: んEXE、なでなでして。 になった（nexe の exe を英単語と判定）"
   }
  ]
 }
