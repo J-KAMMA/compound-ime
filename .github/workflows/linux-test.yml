@@ -154,7 +154,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [h, y]
+        group: [a1, a2, b, c, d1, d2, e1, e2, f, g, h, i, j]
     steps:
       - uses: actions/checkout@v4
         with:
