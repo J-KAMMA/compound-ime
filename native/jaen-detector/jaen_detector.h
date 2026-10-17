@@ -137,6 +137,9 @@ bool IsForeignChunk(const Chunk& chunk);
 // Returns an empty vector when no English piece is chosen.
 inline constexpr size_t kMinPlainWordLength = 5;
 inline constexpr size_t kMinUnreadWordLength = 4;
+// 厳選した語（略語・製品名・分野の用語。api、dao）は、かなが辞書にないか、辞書にあっても
+// 自然な日本語として読めない（あぴ、だお）なら、3文字から英語にする。
+inline constexpr size_t kMinCuratedUnreadWordLength = 3;
 using ReadingCheck = std::function<bool(std::string_view kana)>;
 std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks,
                                 const Lexicon& lexicon,

@@ -431,9 +431,10 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                  !InsideNormalSpelling(raw, i, j, *place)) {
         cost = -length;
       } else if (is_reading && learned == 0 && !place &&
-                 word.size() >= kMinUnreadWordLength && boundary[i] && boundary[j] &&
+                 word.size() >= (lexicon.IsCurated(word) ? kMinCuratedUnreadWordLength : kMinUnreadWordLength) &&
+                 boundary[i] && boundary[j] &&
                  kana_at[j] > kana_at[i] && (!(*is_reading)(kana_text(kana_at[i], kana_at[j])) ||
-                  (reads_naturally && lexicon.IsCommon(word) &&
+                  (reads_naturally && (lexicon.IsCommon(word) || lexicon.IsCurated(word)) &&
                    !(*reads_naturally)(kana_text(kana_at[i], kana_at[j])))) &&
                  !crosses_reading(kana_at[i], kana_at[j]) &&
                  !japanese_grammar(kana_at[i], kana_at[j])) {

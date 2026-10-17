@@ -2480,6 +2480,14 @@ for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-
         if typed not in _cased and shown != typed and '"' not in shown and "\\" not in shown:
             pairs.append([typed, shown])
             _cased.add(typed)
+# 分野の文書で多い書き方（tools/data/domain-casing.tsv。tools/build_domain_words.py で作る。Pod、React、PEP）も足す
+# （上の表を優先）
+for line in (REPO / "tools/data/domain-casing.tsv").read_text(encoding="utf-8").splitlines():
+    if line and not line.startswith("#") and "\t" in line:
+        typed, shown = line.split("\t")[:2]
+        if typed not in _cased and shown != typed and '"' not in shown and "\\" not in shown:
+            pairs.append([typed, shown])
+            _cased.add(typed)
 assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"

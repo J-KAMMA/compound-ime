@@ -3,7 +3,9 @@
 Downloads the pinned SCOWL release (permissive license, notice kept beside the
 output), verifies its SHA-256, and writes one lowercase word per line:
 SCOWL english/american words up to --level plus tools/data/jaen-extra-words.txt
-and tools/data/jaen-brand-words.txt. signal-words.txt holds the rarer words and
+and tools/data/jaen-brand-words.txt, plus tools/data/jaen-domain-words.txt (from
+tools/build_domain_words.py; only its words of 4 letters or fewer are curated).
+signal-words.txt holds the rarer words and
 names up to --signal-level (english/american words, upper-case words and proper
 names, lowercased) that are not in the main list; the detector takes them only
 when what was typed is no plain Japanese romaji (london: lo is ぉ).
@@ -63,6 +65,17 @@ def main():
         lines = (line.strip() for line in extra.read_text(encoding="utf-8").splitlines())
         curated |= {w for w in lines if WORD.fullmatch(w)}
     words |= curated
+    # 分野の文書に出る英字の語（tools/build_domain_words.py）。英単語の一覧に足す。4文字以下の語だけ
+    # 厳選の語（api、dao）として足し、5文字以上は普通の語にする（かなが日本語の読みになる語を
+    # 厳選にすると、日本語の文を英語にしてしまう）。
+    domain_path = Path(__file__).with_name("data") / "jaen-domain-words.txt"
+    if domain_path.exists():
+        for line in domain_path.read_text(encoding="utf-8").splitlines():
+            word = line.strip()
+            if WORD.fullmatch(word):
+                words.add(word)
+                if len(word) <= 4:
+                    curated.add(word)
 
     args.out.mkdir(parents=True, exist_ok=True)
     (args.out / "english-lexicon.txt").write_text("".join(w + "\n" for w in sorted(words)), encoding="ascii")
