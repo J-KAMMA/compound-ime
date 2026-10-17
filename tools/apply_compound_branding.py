@@ -364,4 +364,7 @@ subprocess.run([sys.executable, str(Path(__file__).with_name("make_compound_icon
 for name in ("compound_ime.ico", "compound_ime_langbar.ico", "compound_ime-256.png",
              "compound_ime.svg", "compound_ime_langbar-64.png"):
     (icons / name).unlink()
+
+# 利用者に見せる版の名前（コンパウンドIME 1.N）を、メニュー・題名・「このソフトについて」に出す。
+subprocess.run([sys.executable, str(Path(__file__).with_name("apply_version_display.py")), str(src)], check=True)
 print("branding applied")
