@@ -13,7 +13,7 @@ on:
   # 実験の枝 exp/finetune-mix では、この流れのファイルを変えて push したときも動く
   # （main に入るまで、gh workflow run で呼べないため）
   push:
-    branches: ['exp/finetune-mix']
+    branches: ['exp/finetune-mix', 'exp/finetune-v5']
     paths: ['.github/workflows/mix-data.yml']
   workflow_dispatch:
     inputs:
@@ -31,7 +31,10 @@ permissions:
   contents: read
 
 env:
-  MIX: wiki=0.645,persona=0.22,tatoeba=0.027,domain=0.10,synthetic=0.008
+  MIX: wiki=0.645,persona=0.22,tatoeba=0.027,domain=0.10,synthetic=0.006
+  # v5: 問題の種類の割合と表記をそろえる割合（finetune.ipynb ① の KIND_WEIGHTS・ORTHO_SHARE と同じ）
+  KINDS: wiki_whole=0.54,homophone=0.14,casual=0.24,modern_words=0.32,english_phrases=0.17,business=0.07,counter=0.20
+  ORTHO: '0.8'
   PASSES: wiki=2,persona=3,tatoeba=3,domain=3,synthetic=1
   WIKI_BASE: https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja
   TOKENIZER_BASE: https://huggingface.co/Miwa-Keita/zenz-v3.1-small/resolve/344612e331bf3ba752a9bfef6633c93c6b933ebb
@@ -109,7 +112,7 @@ jobs:
         run: |
           set -eo pipefail
           SIZE=${{ inputs.small_size || '20000' }}
-          COMMON="--out small --romaji-table romanji-hiragana.tsv --domain-text text/all-probe.jsonl --mix $MIX --max-passes $PASSES --size $SIZE --progress 5000"
+          COMMON="--out small --romaji-table romanji-hiragana.tsv --domain-text text/all-probe.jsonl --mix $MIX --max-passes $PASSES --kind-weights $KINDS --ortho-share $ORTHO --size $SIZE --progress 5000"
           WIKI="probe/probe-wiki.txt wiki/train-00007-of-00015.parquet wiki/train-00004-of-00015.parquet"
           time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --only-source synthetic domain tatoeba persona --part text --show 1
           time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --wiki $WIKI --only-source wiki --slice 0/2 --part wiki0 --show 1 & P0=$!
@@ -123,9 +126,9 @@ jobs:
       - name: 2. 本番の規模（Colab と同じ分け方（text と wiki の2工程））
         run: |
           set -eo pipefail
-          SIZE=${{ inputs.full_size || '3000000' }}
+          SIZE=${{ inputs.full_size || (github.event_name == 'push' && '0' || '3000000') }}
           if [ "$SIZE" = "0" ]; then exit 0; fi
-          COMMON="--out full --romaji-table romanji-hiragana.tsv --size $SIZE --seed 20261015 --mix $MIX --max-passes $PASSES --progress 5000"
+          COMMON="--out full --romaji-table romanji-hiragana.tsv --size $SIZE --seed 20261015 --mix $MIX --max-passes $PASSES --kind-weights $KINDS --ortho-share $ORTHO --progress 5000"
           WIKI="wiki/train-00007-of-00015.parquet wiki/train-00004-of-00015.parquet wiki/train-00005-of-00015.parquet wiki/train-00006-of-00015.parquet wiki/train-00008-of-00015.parquet"
           time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --domain-text text/all.jsonl \
             --only-source synthetic domain tatoeba persona --part text
@@ -141,7 +144,7 @@ jobs:
       - name: 2b. 本番の規模の確かめ（除外・目録）と、数字にした大きさと速さ
         run: |
           set -eo pipefail
-          SIZE=${{ inputs.full_size || '3000000' }}
+          SIZE=${{ inputs.full_size || (github.event_name == 'push' && '0' || '3000000') }}
           if [ "$SIZE" = "0" ]; then exit 0; fi
           time venv/bin/python tools/zenz-finetune/check_dataset.py verify --data full --romaji-table romanji-hiragana.tsv \
             --expect-sources wiki,persona,tatoeba,domain,synthetic

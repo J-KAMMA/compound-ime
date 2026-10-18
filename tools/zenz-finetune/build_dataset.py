@@ -43,6 +43,8 @@ expected-windows-139.tsv）の文と、表記または読みが同じか、そ�
   この回数まで同じ文を別の形（文全体・前の文つき・文の一部）で使い回す。それでも足りない分は、予定より
   少ないまま manifest.json の mix_result に出る（既定では、ウィキペディアの文全体の問題で埋める。--no-fill-wiki で止める）。
   --mix を付けないと昔の指定（--domain-share: 分野の割合、残りは wiki と synthetic）。
+  --kind-weights で出典の中の種類の割合を上書きできる（synthetic は casual・modern_words・english_phrases・business・counter）。
+  --ortho-share で、文のその割合について表記を新聞・公用文にそろえる（tools/data/orthography.tsv。0 なら元の表記）。
 
 部品に分けて作る（切れても続けられる。数百万問向け）:
   --only-source domain tatoeba persona synthetic --part text   ← まず文の一覧からの出典
@@ -83,8 +85,10 @@ DEFAULT_WEIGHTS = {
     "casual": 0.08,          # 話し言葉（tools/data/colloquial.tsv）
     "modern_words": 0.04,    # 略語・サービス名を文脈に含む文（jaen-modern-words.tsv）
     "english_phrases": 0.02, # 英語の決まった言い回しを文脈に含む文（english-phrases.txt）
+    "business": 0.06,        # ビジネス文（貴社・拝啓・お取引など。business-phrases.tsv の文を型に入れる）
+    "counter": 0.06,         # 数＋助数詞（一杯・二羽・三日間など。counters.tsv の読みを型に入れる）
 }
-SYNTHETIC_KINDS = ("casual", "modern_words", "english_phrases")
+SYNTHETIC_KINDS = ("casual", "modern_words", "english_phrases", "business", "counter")
 # 分野の文書（プログラミング・仮想通貨。tools/zenz-finetune/domain_text.py で取り出した文）の問題。
 # --domain-text を付けたときだけ作り、全体の --domain-share（既定 0.5）をこの4種類で分ける。
 DOMAIN_WEIGHTS = {
@@ -492,6 +496,63 @@ def homophone_hit(sentence: str, groups) -> bool:
                 return True
     return False
 
+def load_business(path: Path):
+    """ビジネス文・決まった文の一覧（読み<TAB>表記）。読みに「あす」、表記に「明日」があれば「あした」の行も足す。"""
+    pairs = []
+    for line in data_lines(path):
+        cols = line.split("\t")
+        if len(cols) >= 2 and cols[0] and cols[1]:
+            pairs.append((cols[0], cols[1]))
+            if "明日" in cols[1] and "あす" in cols[0]:
+                pairs.append((cols[0].replace("あす", "あした"), cols[1]))
+    return pairs
+
+
+def load_counters(path: Path):
+    """数＋助数詞の型。[(助数詞, [(数の表記, [読み…])], [(前の表記, 前の読み, 後の表記, 後の読み)…])]。"""
+    out = []
+    for line in data_lines(path):
+        cols = line.split("\t")
+        if len(cols) < 3:
+            continue
+        numbers = []
+        for item in cols[1].split(","):
+            number, readings = item.split(":")
+            numbers.append((number, [r for r in readings.split("/") if r]))
+        frames = [tuple(part.split("|")) for part in cols[2].split(";") if part]
+        frames = [f for f in frames if len(f) == 4]
+        out.append((cols[0], numbers, frames))
+    return out
+
+
+def load_orthography(path: Path) -> dict:
+    """表記をそろえる規則。{直す前: [(直した後, 品詞, 品詞の細分)…]}。"""
+    rules = {}
+    for line in data_lines(path):
+        cols = line.split("\t")
+        if len(cols) >= 2 and cols[0] and cols[1]:
+            rules.setdefault(cols[0], []).append((cols[1], cols[2] if len(cols) > 2 else "",
+                                                  cols[3] if len(cols) > 3 else ""))
+    return rules
+
+
+# 業務の連絡文の前置き（文の前に付ける）。読みはひらがな
+BUSINESS_PREFIXES = [("", ""), ("", ""), ("", ""), ("拝啓、", "はいけい、"),
+                     ("お世話になっております。", "おせわになっております。"),
+                     ("いつもありがとうございます。", "いつもありがとうございます。"),
+                     ("お疲れ様です。", "おつかれさまです。"),
+                     ("お忙しいところ恐れ入ります。", "おいそがしいところおそれいります。")]
+
+# 数の前に付ける言葉（数＋助数詞の問題の型）
+COUNTER_ADVERBS = [("約", "やく"), ("およそ", "およそ"), ("合計で", "ごうけいで"), ("たった", "たった"),
+                   ("ちょうど", "ちょうど"), ("全部で", "ぜんぶで")]
+
+# 結び（文の後ろに付ける）。何も付けない形を多めに
+BUSINESS_SUFFIXES = [("", ""), ("", ""), ("", ""),
+                     ("よろしくお願いいたします。", "よろしくおねがいいたします。"),
+                     ("ご確認をお願いいたします。", "ごかくにんをおねがいいたします。"),
+                     ("どうぞよろしくお願い申し上げます。", "どうぞよろしくおねがいもうしあげます。")]
+
 # ---------------------------------------------------------------- 読み（Sudachi）
 
 
@@ -505,17 +566,27 @@ class Token:
 
 # 辞書が改まった読みを選びやすい語を、打つときの読みに直す（よく打つ読みが1つの語だけ）
 READING_OVERRIDE = {
-    "明日": "アシタ", "日本": "ニホン", "今日": "キョウ", "昨日": "キノウ", "一昨日": "オトトイ",
+    "今日": "キョウ", "昨日": "キノウ", "一昨日": "オトトイ",
     "明後日": "アサッテ", "今年": "コトシ", "去年": "キョネン", "一人": "ヒトリ", "二人": "フタリ",
     "大人": "オトナ", "上手": "ジョウズ", "下手": "ヘタ", "眼鏡": "メガネ", "果物": "クダモノ",
     "時計": "トケイ", "今朝": "ケサ", "今夜": "コンヤ",
 }
 
 
+# 打つ読みが2通りある語。文ごとに、決まった割合で片方の読みを選ぶ（同じ文なら同じ読み）。
+# 明日は「あした」だけにすると「あす」と打ったときの変換が崩れる（v4 の反省）ので、「あす」も残す。
+# 日本は「にほん」を主にして、「にっぽん」も残す。割合は新聞・放送の読みと打ち方の実感による目安。
+READING_VARIANTS = {
+    "明日": (("アシタ", 0.65), ("アス", 0.35)),
+    "日本": (("ニホン", 0.85), ("ニッポン", 0.15)),
+}
+
+
 class SudachiReader:
-    def __init__(self, dict_name: str):
+    def __init__(self, dict_name: str, seed: int = 0):
         from sudachipy import Dictionary, SplitMode
         self.dict_name = dict_name
+        self.seed = seed
         self.tokenizer = Dictionary(dict=dict_name).create(SplitMode.C)
 
     def versions(self) -> dict:
@@ -530,17 +601,41 @@ class SudachiReader:
 
     def analyze(self, text: str):
         tokens = []
-        for m in self.tokenizer.tokenize(text):
+        for number, m in enumerate(self.tokenizer.tokenize(text)):
             pos = m.part_of_speech()
             surface = m.surface()
             if pos[0] in ("補助記号", "空白"):
                 reading = surface
+            elif surface in READING_VARIANTS:
+                roll, reading = stable_unit(self.seed, f"reading:{text}|{number}"), None
+                for candidate, share in READING_VARIANTS[surface]:
+                    reading = candidate
+                    roll -= share
+                    if roll < 0:
+                        break
             else:
                 reading = READING_OVERRIDE.get(surface) or to_katakana(m.reading_form())
             if not reading or not READING_OK.match(reading):
                 return None
             tokens.append(Token(surface, reading, pos[0], pos[1]))
         return tokens
+
+
+def normalize_orthography(tokens, rules, share, seed, key, stats):
+    """表記をそろえる。文のうち share の割合（key で決まる）で、規則に当たる語の表記を直す。
+    読みは変えない。直した語の数を stats["<前>→<後>"] に足す。"""
+    if not tokens or not rules or share <= 0 or stable_unit(seed, f"ortho:{key}") >= share:
+        return tokens
+    out = []
+    for token in tokens:
+        new = token
+        for after, pos0, pos1 in rules.get(token.surface, ()):
+            if (not pos0 or pos0 == token.pos0) and (not pos1 or pos1 == token.pos1):
+                new = Token(after, token.reading, token.pos0, token.pos1)
+                stats[f"{token.surface}→{after}"] = stats.get(f"{token.surface}→{after}", 0) + 1
+                break
+        out.append(new)
+    return out
 
 
 CONTENT_POS = {"名詞", "代名詞", "動詞", "形容詞", "形状詞", "副詞", "連体詞", "接続詞", "感動詞", "接頭辞"}
@@ -800,14 +895,18 @@ class Builder:
         self.seen = set()
         self.excluded = []
         self.excluded_count = 0
-        self.rejected = {"wiki_sentence_shape": 0, "wiki_reading": 0}
+        # 表記をそろえる規則（--ortho-share の割合の文に使う。0 なら使わない）
+        self.ortho_share = args.ortho_share
+        self.ortho_rules = load_orthography(self.data_dir / "orthography.tsv") if self.ortho_share > 0 else {}
+        self.ortho_stats = {"sentences_seen": 0, "sentences_changed": 0, "words": {}}
+        self.rejected ={"wiki_sentence_shape": 0, "wiki_reading": 0}
         self.wiki_stats = None
         self.reader_versions = None
         self._reader = None
 
     def reader(self):
         if self._reader is None:
-            self._reader = SudachiReader(self.args.sudachi_dict)
+            self._reader = SudachiReader(self.args.sudachi_dict, self.args.seed)
             self.reader_versions = self._reader.versions()
         return self._reader
 
@@ -834,6 +933,20 @@ class Builder:
         self.seen.add(key)
         self.train[kind].append(record)
         return "train"
+
+    def apply_orthography(self, tokens, text):
+        """表記をそろえた形態素と、その表記の文を返す（規則に当たらなければそのまま）。"""
+        if not self.ortho_rules:
+            return tokens, text
+        self.ortho_stats["sentences_seen"] += 1
+        new = normalize_orthography(tokens, self.ortho_rules, self.ortho_share, self.args.seed, text,
+                                    self.ortho_stats["words"])
+        if new is tokens:
+            return tokens, text
+        joined = "".join(t.surface for t in new)
+        if joined != text:
+            self.ortho_stats["sentences_changed"] += 1
+        return new, joined
 
     def check(self, surface, readings) -> bool:
         reason = self.exclusion.blocked(surface, readings)
@@ -883,7 +996,50 @@ class Builder:
             options = framed_examples(kind, surface, reading, frame, english)
             if options and self.check(options[0][1], options[0][2]):
                 self.add(kind, self.rng.choice(options)[0], group)
+        self.build_notation_sentences()
         self.note_shortfall("synthetic")
+
+    def build_notation_sentences(self):
+        """ビジネス文（business）と数＋助数詞（counter）。読みは一覧にあるものを使う。
+        文の前置きや前後は、文全体に含める形と、左右の文脈にする形をまぜる。"""
+        rng = self.rng
+        jobs = []   # (種類, 振り分けの単位, 問題, 文全体の表記, 文全体の読み)
+        for reading, surface in load_business(self.data_dir / "business-phrases.tsv"):
+            for pre_s, pre_r in BUSINESS_PREFIXES:
+                for post_s, post_r in rng.sample(BUSINESS_SUFFIXES, 2):
+                    # 前置き・結びを、文に含める形と、左右の文脈にする形をまぜる
+                    left, right = (pre_s, post_s) if rng.random() < 0.5 else ("", "")
+                    if left or right:
+                        record = example("business", reading, surface, left, right)
+                    else:
+                        record = example("business", pre_r + reading + post_r, pre_s + surface + post_s)
+                    jobs.append(("business", f"business:{surface}", record, pre_s + surface + post_s,
+                                 pre_r + reading + post_r))
+        for counter, numbers, frames in load_counters(self.data_dir / "counters.tsv"):
+            for number, readings in numbers:
+                for number_reading in readings:
+                    for pre_s, pre_r, post_s, post_r in frames:
+                        # 数の前に付ける言葉（何も付けない形を含めて3つ。型の最後がすでに「約」なら付けない）
+                        adverbs = [("", "")] + (rng.sample(COUNTER_ADVERBS, 2) if not pre_s.endswith("約") else [])
+                        for adverb_s, adverb_r in adverbs:
+                            phrase, phrase_reading = adverb_s + number + counter, adverb_r + number_reading
+                            whole, whole_reading = pre_s + phrase + post_s, pre_r + phrase_reading + post_r
+                            group = f"counter:{counter}:{number}:{pre_s}{post_s}"
+                            # 文全体と、数＋助数詞の部分だけ（左右は文脈）の2つの形を作る
+                            jobs.append(("counter", group, example("counter", whole_reading, whole), whole,
+                                         whole_reading))
+                            if pre_s or post_s:
+                                jobs.append(("counter", group,
+                                             example("counter", phrase_reading, phrase, pre_s, post_s),
+                                             whole, whole_reading))
+        for reading, surface in load_business(self.data_dir / "counter-phrases.tsv"):
+            jobs.append(("counter", f"counter-phrase:{surface}", example("counter", reading, surface), surface, reading))
+        rng.shuffle(jobs)
+        for kind, group, record, whole, whole_reading in jobs:
+            if self.full(kind):
+                continue
+            if self.check(whole, [whole_reading]):
+                self.add(kind, record, group)
 
     # ---- ウィキペディア
     def shortfall_from_parts(self) -> int:
@@ -940,6 +1096,7 @@ class Builder:
                             self.rejected["wiki_reading"] += 1
                             previous = ""
                             continue
+                        tokens, sentence = self.apply_orthography(tokens, sentence)
                         reading = "".join(t.reading for t in tokens)
                         if len(reading) > READING_MAX or not self.check(sentence, [reading]):
                             previous = ""
@@ -1025,13 +1182,15 @@ class Builder:
                 if not tokens:
                     units = None
                     break
+                tokens, text = self.apply_orthography(tokens, text)
                 reading = "".join(t.reading for t in tokens)
                 units.append({"en": False, "text": text, "reading": reading})
                 key += reading
             if units is None:
                 rejected["reading"] += 1
                 continue
-            if not self.check(row["text"], [key]):
+            rewritten = "".join(u["text"] for u in units)
+            if not self.check(row["text"], [key]) or (rewritten != row["text"] and not self.check(rewritten, [key])):
                 rejected["test_overlap"] += 1
                 continue
             prev = row.get("prev", "")
@@ -1169,7 +1328,12 @@ class Builder:
             {"name": "tools/data/jaen-modern-words.tsv", "use": "文脈に入れる略語・サービス名（表示の形）", "license": own},
             {"name": "tools/data/english-phrases.txt", "use": "文脈に入れる英語の言い回し", "license": own},
             {"name": "tools/data/homophone-cues.tsv", "use": "同音異義語を含む文を多めに選ぶ目印", "license": own},
+            {"name": "tools/data/business-phrases.tsv", "use": "ビジネス文（business）の文", "license": own},
+            {"name": "tools/data/counters.tsv", "use": "数＋助数詞（counter）の読みと文の型", "license": own},
+            {"name": "tools/data/counter-phrases.tsv", "use": "数＋助数詞・いっぱいの書き分けの決まった文（counter）", "license": own},
         ]
+        if self.ortho_share > 0:
+            sources.append({"name": "tools/data/orthography.tsv", "use": "表記をそろえる規則（新聞・公用文の表記）", "license": own})
         for source in sources:
             source["sha256"] = sha256_file(self.repo / source["name"])
         for path in (args.wiki if "wiki" in self.run_sources else []):
@@ -1232,12 +1396,13 @@ class Builder:
                          "valid_per_kind": args.valid_per_kind, "mix": {k: round(v, 6) for k, v in self.mix.items()},
                          "kind_weights": self.kind_weights, "max_passes": self.max_passes,
                          "fill_wiki": not args.no_fill_wiki, "sudachi_dict": args.sudachi_dict,
-                         "max_articles": args.max_articles},
+                         "max_articles": args.max_articles, "ortho_share": args.ortho_share},
             "planned": self.planned, "quota_final": self.quota,
             "train_by_kind": {k: len(v) for k, v in self.train.items()},
             "valid_by_kind": {k: len(v) for k, v in self.valid.items()},
             "shortfall": self.shortfall, "fill_added": self.fill_added,
             "wiki": self.wiki_stats, "domain": domain, "rejected": self.rejected,
+            "orthography": {"share": self.ortho_share, **self.ortho_stats} if self.ortho_rules else None,
             "excluded_sentences": self.excluded_count, "reader": self.reader_versions,
             "exclusion": {"files": [{"name": p.name, "sha256": sha256_file(p)} for p in self.exclusion.files],
                           "keys": self.exclusion.stats},
@@ -1289,8 +1454,11 @@ def assemble_manifest(fragments: list, repo: Path, script: Path) -> dict:
         pass
     first = fragments[0]
     train_by_kind, valid_by_kind, planned, rejected = {}, {}, {}, {}
-    wiki, domain, sources = None, None, {}
+    wiki, domain, sources, ortho = None, None, {}, None
     for fragment in fragments:
+        if fragment.get("orthography"):
+            ortho = add_counts(ortho or {}, {k: v for k, v in fragment["orthography"].items() if k != "share"})
+            ortho["share"] = fragment["orthography"]["share"]
         add_counts(train_by_kind, fragment["train_by_kind"])
         add_counts(valid_by_kind, fragment["valid_by_kind"])
         planned.update(fragment["planned"])
@@ -1340,6 +1508,7 @@ def assemble_manifest(fragments: list, repo: Path, script: Path) -> dict:
         "valid_files": [f["files"]["valid"] for f in fragments],
         "wiki": wiki,
         "domain": domain,
+        "orthography": ortho,
         "rejected": rejected,
         "test_exclusion": {
             "rule": "tests/conversion/ の文と、表記または読みが同じか、それを含む文は使わない"
@@ -1385,6 +1554,10 @@ def print_summary(manifest: dict):
     for source, row in manifest["mix_result"].items():
         print(f"  {source}: 予定 {row['share_planned']:.1%}（{row['train_planned']} 問）→ 実際 {row['share_actual']:.1%}"
               f"（{row['train']} 問）、足りない {row['short']}" + (f"、ほかの出典の不足を {row['fill_added']} 問足した" if row["fill_added"] else ""))
+    if manifest.get("orthography"):
+        ortho = manifest["orthography"]
+        print(f"表記をそろえた文: {ortho.get('sentences_changed', 0)} / 見た文 {ortho.get('sentences_seen', 0)}"
+              f"（割合 {ortho['share']}）  直した語:", ortho.get("words", {}))
     if manifest.get("domain"):
         print("文の一覧の出典ごと（練習用・確かめ用）:",
               {s["id"]: (s["train_examples"], s["valid_examples"]) for s in manifest["domain"]["sources"]})
@@ -1408,6 +1581,9 @@ def main(argv=None):
                         help="出典ごとに、同じ文から作る問題の形の数の上限 例: wiki=2,tatoeba=3,persona=3,domain=3"
                              f"（既定 {DEFAULT_MAX_PASSES}）。材料が足りないときだけ、この回数まで文を使い回す")
     parser.add_argument("--kind-weights", default="", help="出典の中の種類ごとの割合の上書き 例: wiki_whole=0.4,casual=0.05")
+    parser.add_argument("--ortho-share", type=float, default=0.0,
+                        help="表記を新聞・公用文にそろえる文の割合（0 はそろえない。規則は tools/data/orthography.tsv、方針は README）。"
+                             "ウィキペディアと文の一覧（雑談・分野・Tatoeba）の文に使う")
     parser.add_argument("--only-source", nargs="*", default=[], help="この出典だけ作る（部品ごとに作るとき）")
     parser.add_argument("--part", default="", help="部品の名前。付けると train-<名前>.jsonl.gz などに分けて書く（切れても続けられる）")
     parser.add_argument("--slice", default="", help="ウィキペディアを n 個の工程で分けるときの i/n（0 始まり。例 0/2 と 1/2）。--only-source wiki だけ")
