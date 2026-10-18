@@ -55,7 +55,7 @@ import Foundation
 /// 変換は engineLock の中で1つずつ行われるが、裏の先回りの変換と重なっても数えられるよう、小さな鍵で守る。
 public enum ZenzaiProfile {
     public enum Stage: Int {
-        case other = 0, allZenzai, contextPrior, selector, typo
+        case other = 0, allZenzai, contextPrior, selector, typo, process
     }
 
     public struct Token {
@@ -70,15 +70,15 @@ public enum ZenzaiProfile {
         return !value.isEmpty
     }()
 
-    private static let names = ["other", "allz", "ctx", "sel", "typo"]
+    private static let names = ["other", "allz", "ctx", "sel", "typo", "proc"]
     private static let lock = NSLock()
     nonisolated(unsafe) private static var current = 0
-    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 5)
-    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 5)
-    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 5)
-    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 5)
-    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 5)
-    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 5)
+    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 6)
     nonisolated(unsafe) private static var callCount = 0
     nonisolated(unsafe) private static var callNanos = 0
     nonisolated(unsafe) private static var callStart: UInt64 = 0
@@ -173,7 +173,7 @@ public enum ZenzaiProfile {
         }
         self.callCount = 0
         self.callNanos = 0
-        for index in 0..<5 {
+        for index in 0..<6 {
             self.stageNanos[index] = 0
             self.stageCalls[index] = 0
             self.decodeCalls[index] = 0
@@ -193,6 +193,10 @@ edit(deadline, "    public static func end() {\n", "    public static func end()
 
 # 全文の変換（all_zenzai）
 kk = conv / "ConverterAPI/KanaKanjiConverter.swift"
+# 候補作り（processResult。前後の文での並べ替えはこの中）
+edit(kk, "        return self.processResult(inputData: inputData, result: result, options: options)\n",
+     "        let profileProcessToken = ZenzaiProfile.enter(.process)\n        defer { ZenzaiProfile.leave(profileProcessToken) }\n"
+     "        return self.processResult(inputData: inputData, result: result, options: options)\n")
 edit(kk, "            let (result, nodes, cache) = self.converter.all_zenzai(\n",
      "            let profileToken = ZenzaiProfile.enter(.allZenzai)\n            let (result, nodes, cache) = self.converter.all_zenzai(\n")
 edit(kk, """            self.updateCurrentSessionState {
@@ -359,7 +363,8 @@ Frame::~Frame() {
   const int64_t total = Start() - start_;
   const std::string engine = TakeEngineProfile();
   std::string line = std::string("kind=") + kind_ + "\tpid=" + std::to_string(static_cast<long>(getpid())) +
-                     "\ttotal_us=" + std::to_string(total) + CounterFields() +
+                     "\ttotal_us=" + std::to_string(total) + "\tt0_us=" + std::to_string(start_) +
+                     "\tt1_us=" + std::to_string(start_ + total) + CounterFields() +
                      "\tkey_chars=" + std::to_string(key_chars_) + "\tleft_chars=" + std::to_string(left_chars_) +
                      "\tright_chars=" + std::to_string(right_chars_);
   line += "\t" + EngineFields(engine) + "\n";
@@ -454,4 +459,12 @@ edit(E, """  bool ConvertWithContext(const ConversionOptions& options, Segments*
 edit(E, "    ApplySelector(segments, left_context, right_context);\n",
      "    {\n      latency_profile::Scope profile_selector(latency_profile::kSelector);\n"
      "      ApplySelector(segments, left_context, right_context);\n    }\n")
+# 試験の道具: TIMED_KEY の始まりと終わりの時計の値（Frame の t0_us/t1_us と同じ時計）も書く
+edit(mozc / "session/session_handler_tool.cc",
+     "    MOZC_ASSERT_TRUE(client_->SendKey(key_event, last_output_.get()));\n    std::cout << \"ELAPSED \"",
+     "    MOZC_ASSERT_TRUE(client_->SendKey(key_event, last_output_.get()));\n"
+     "    std::cout << \"TIMED_US \" << std::chrono::duration_cast<std::chrono::microseconds>(start.time_since_epoch()).count()\n"
+     "              << \" \" << std::chrono::duration_cast<std::chrono::microseconds>(\n"
+     "                     std::chrono::steady_clock::now().time_since_epoch()).count() << std::endl;\n"
+     "    std::cout << \"ELAPSED \"")
 print("latency profile ok")

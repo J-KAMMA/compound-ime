@@ -6,6 +6,7 @@
 # 処理は1つだけ（ほかの処理と同時に流さない）。出力:
 #   <出力の名前>.profile.tsv  段ごとの時間（MYIME_PROFILE。tools/latency_report.py で集計）
 #   <出力の名前>.wall         空白キーの1回ごとの時間（ミリ秒、整数）
+#   <出力の名前>.keyus        空白キーの始まりと終わりの時計の値（マイクロ秒。profile.tsv の t0_us/t1_us と同じ時計）
 # 環境変数:
 #   LAT_REAL=1  利用者の PC と同じ既定の設定で流す（人工知能の時間の上限 1000 ミリ秒、待ちの上限 700 ミリ秒、
 #               打っている間の先回り 120 ミリ秒）。なければ上限なし・先回りなしで、段ごとの本当の時間を測る
@@ -28,5 +29,6 @@ fi
 env $LIMITS MYIME_PROFILE="$OUT.profile.tsv" MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
   MYIME_AZOOKEY_ZENZAI_GPU=0 TEST_TMPDIR=$w/prof "$EXE" --input $w/cmd.tsv --profile $w/prof --dictionary oss > $w/out.txt 2> $w/err.txt
 grep '^ELAPSED ' $w/out.txt | cut -d' ' -f2 > "$OUT.wall"
+grep '^TIMED_US ' $w/out.txt | cut -d' ' -f2,3 > "$OUT.keyus" || true
 if grep -l -i "failed to load\|dlopen error\|unavailable" $w/err.txt; then head -3 $w/err.txt; echo "変換エンジンを読めませんでした"; exit 1; fi
 rm -rf $w
