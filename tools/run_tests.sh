@@ -261,7 +261,26 @@ p)
   LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/latency-real-nopace
   LAT_REAL=1 $LAT $W/lat-h40.tsv $OUT/latency-real-paced 150
   LAT_REAL=1 $LAT $W/lat-h40.tsv $OUT/latency-real-fast 90
+  # llama.cpp のスレッド数を変えて比べる（日本語だけの先頭60文。上限なしの設定で）。計算機は4つ（既定は3スレッド）
+  head -60 $W/lat-ja400.tsv > $W/lat-h60.tsv
+  for n in 1 2 3 4; do
+    MYIME_PROFILE_THREADS=$n $LAT $W/lat-h60.tsv $OUT/latency-threads$n
+  done
   python3 $REPO/tools/latency_report.py $OUT | tee $OUT/latency-report.txt
+  # 空白キーの処理のうち、入り口の外の前の時間（report の「（入り口の外）前」）の正体を、関数ごとの時間で調べる。
+  # perf が入れられなければ飛ばす。前の文のない最初の句50文を流し、変換の処理の中の時間を関数ごとに並べる。
+  { sudo apt-get install -y -qq linux-tools-common linux-tools-$(uname -r) > /dev/null 2>&1 \
+      || sudo apt-get install -y -qq linux-tools-generic > /dev/null 2>&1; } || true
+  PERF=$(find /usr/lib/linux-tools /usr/lib/linux-tools-* /usr/bin -maxdepth 2 -name perf -type f 2> /dev/null | sort | tail -n 1)
+  if [ -n "$PERF" ]; then
+    sudo sysctl -w kernel.perf_event_paranoid=-1 > /dev/null 2>&1 || true
+    cut -f1 $W/lat-clause-without.tsv | awk 'NR<=50 {print $0 "\t"}' > $W/lat-perf.tsv
+    "$PERF" record -F 499 -o $W/perf.data -- $LAT $W/lat-perf.tsv $W/perf-run > $OUT/perf-record.log 2>&1 || true
+    "$PERF" report -i $W/perf.data --stdio --no-children --sort dso,symbol --percent-limit 0.3 > $OUT/perf-flat.txt 2>&1 || true
+    "$PERF" report -i $W/perf.data --stdio --no-children --sort comm,dso --percent-limit 0.5 > $OUT/perf-dso.txt 2>&1 || true
+  else
+    echo "perf を入れられなかった" > $OUT/perf-flat.txt
+  fi
   ;;
 *)
   echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x のどれか" >&2; exit 2 ;;

@@ -10,9 +10,13 @@ MYIME_PROFILE がなければ、時計を読むことも書くこともしない
 1行は「名前=値」を tab で区切った形（読み方は tools/latency_report.py）:
   kind: conv（空白キーの変換）、pred（打っている途中の予測）、other、between（入り口と入り口の間の裏の仕事）
   total_us: 入り口の全体、mozc_us: Mozc の変換、dll_us/dll_n: 人工知能側の変換エンジンの呼び出し（時間と回数）、
-  sel_cpp_us: 選び手（C++ の処理と、その中の人工知能の採点）、key_chars/left_chars/right_chars: 読みと前後の文の字数
+  sel_cpp_us: 選び手（C++ の処理と、その中の人工知能の採点）、key_chars/left_chars/right_chars: 読みと前後の文の字数、
+  segs: Mozc の変換のあとの文節の数、t0_us/t1_us: 入り口の始まりと終わりの時計の値
+  （TIMED_KEY の TIMED_US と同じ時計）
   以下は変換エンジン（Swift）の記録。段は allz（all_zenzai）、ctx（contextPriorWinner）、sel（選び手の採点）、
-  typo（打ち間違いの補正）、other（ほかの人工知能の使い道）。
+  proc（候補作り processResult。ctx を含む）、tpass（打ち間違いの補正の探索。中の段は数えない）、
+  typo（人工知能による打ち間違いの補正）、other（ほかの人工知能の使い道）。
+  MYIME_PROFILE_THREADS=<数> を足すと、llama.cpp のスレッド数をその値にして比べられる。
     call_n/call_us: 変換エンジンの入り口の回数と時間
     <段>_n/<段>_us: その段に入った回数と時間
     <段>_dec_n/<段>_dec_us: そのうち llama.cpp の評価（llama_decode）の回数と時間
@@ -55,13 +59,25 @@ import Foundation
 /// 変換は engineLock の中で1つずつ行われるが、裏の先回りの変換と重なっても数えられるよう、小さな鍵で守る。
 public enum ZenzaiProfile {
     public enum Stage: Int {
-        case other = 0, allZenzai, contextPrior, selector, typo, process
+        case other = 0, allZenzai, contextPrior, selector, typo, process, typoPass
     }
 
     public struct Token {
         let previous: Int
         let start: UInt64
+        let skip: Bool
     }
+
+    /// 試験用: 環境変数 MYIME_PROFILE_THREADS があれば、llama.cpp のスレッド数をその値にする
+    /// （MYIME_PROFILE があるときだけ。測るときの比べ用で、普段は使わない）。
+    public static let threadOverride: Int? = {
+        guard let profile = ProcessInfo.processInfo.environment["MYIME_PROFILE"], !profile.isEmpty,
+              let value = ProcessInfo.processInfo.environment["MYIME_PROFILE_THREADS"],
+              let count = Int(value), (1...64).contains(count) else {
+            return nil
+        }
+        return count
+    }()
 
     static let enabled: Bool = {
         guard let value = ProcessInfo.processInfo.environment["MYIME_PROFILE"] else {
@@ -70,15 +86,15 @@ public enum ZenzaiProfile {
         return !value.isEmpty
     }()
 
-    private static let names = ["other", "allz", "ctx", "sel", "typo", "proc"]
+    private static let names = ["other", "allz", "ctx", "sel", "typo", "proc", "tpass"]
     private static let lock = NSLock()
     nonisolated(unsafe) private static var current = 0
-    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 6)
-    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 6)
-    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 6)
-    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 6)
-    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 6)
-    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 6)
+    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 7)
     nonisolated(unsafe) private static var callCount = 0
     nonisolated(unsafe) private static var callNanos = 0
     nonisolated(unsafe) private static var callStart: UInt64 = 0
@@ -87,19 +103,23 @@ public enum ZenzaiProfile {
         DispatchTime.now().uptimeNanoseconds
     }
 
-    static func enter(_ stage: Stage) -> Token {
+    public static func enter(_ stage: Stage) -> Token {
         guard self.enabled else {
-            return Token(previous: 0, start: 0)
+            return Token(previous: 0, start: 0, skip: true)
         }
         self.lock.lock()
         defer { self.lock.unlock() }
-        let token = Token(previous: self.current, start: self.now())
+        // 打ち間違いの探索（typoPass）の中の段は、探索の時間に含めて数える（二重に数えない）
+        if self.current == Stage.typoPass.rawValue {
+            return Token(previous: 0, start: 0, skip: true)
+        }
+        let token = Token(previous: self.current, start: self.now(), skip: false)
         self.current = stage.rawValue
         return token
     }
 
-    static func leave(_ token: Token) {
-        guard self.enabled, token.start != 0 else {
+    public static func leave(_ token: Token) {
+        guard self.enabled, !token.skip else {
             return
         }
         self.lock.lock()
@@ -173,7 +193,7 @@ public enum ZenzaiProfile {
         }
         self.callCount = 0
         self.callNanos = 0
-        for index in 0..<6 {
+        for index in 0..<7 {
             self.stageNanos[index] = 0
             self.stageCalls[index] = 0
             self.decodeCalls[index] = 0
@@ -231,6 +251,16 @@ edit(Z / "Zenz.swift", "            return ZenzaiTypoCandidateGenerator.generate
 edit(Z / "ZenzContext.swift", "        let decodeStatus = llama_decode(context, self.batch)\n",
      "        let profileDecodeStart = ZenzaiProfile.decodeBegin(newTokens: Int(self.batch.n_tokens), totalTokens: tokens.count)\n"
      "        let decodeStatus = llama_decode(context, self.batch)\n        ZenzaiProfile.decodeEnd(profileDecodeStart)\n")
+
+# 打ち間違いの補正の探索（別の変換器で読みを何通りも変換する。人工知能を使う設定もここに含まれる）
+edit(engine / "TypoCorrectionPass.swift",
+     "func makeTypoCandidates(for key: String, existingCandidates: [Candidate]) -> [TypoCandidate] {\n",
+     "func makeTypoCandidates(for key: String, existingCandidates: [Candidate]) -> [TypoCandidate] {\n"
+     "    let profileToken = ZenzaiProfile.enter(.typoPass)\n    defer { ZenzaiProfile.leave(profileToken) }\n")
+
+# llama.cpp のスレッド数を比べるための上書き（MYIME_PROFILE と MYIME_PROFILE_THREADS の両方があるときだけ）
+edit(Z / "ZenzContext.swift", "        let n_threads = self.inferenceThreadCount\n",
+     "        let n_threads = ZenzaiProfile.threadOverride ?? self.inferenceThreadCount\n")
 
 # 変換エンジンの入り口: 記録の取り出し
 edit(engine / "AzookeyEngine.swift", '@_cdecl("FreeString")\n', '''/// 試験用: 段ごとの時間の記録を取り出して空にする（MYIME_PROFILE がなければ空の文字列）。engineLock は取らない。
@@ -305,6 +335,7 @@ std::string CounterFields() {
   out += "\tdll_us=" + std::to_string(TakeCounter(kDll));
   out += "\tdll_n=" + std::to_string(TakeCounter(kDllCalls));
   out += "\tsel_cpp_us=" + std::to_string(TakeCounter(kSelector));
+  out += "\tsegs=" + std::to_string(TakeCounter(kSegments));
   return out;
 }
 
@@ -323,6 +354,10 @@ std::string EngineFields(const std::string& engine) {
 }  // namespace
 
 bool Enabled() { return ProfilePath() != nullptr; }
+
+void Set(Counter counter, int64_t value) {
+  if (Enabled()) g_counters[counter] = value;
+}
 
 int64_t Start() {
   if (!Enabled()) return 0;
@@ -388,8 +423,10 @@ edit(hdr, "[[nodiscard]] bool SelectorTraceForText(absl::string_view text, std::
      '''// 変換1回の時間を段ごとに測る（試験用）。環境変数 MYIME_PROFILE=<ファイル> のときだけ動き、なければ何もしない。
 // 入り口（Frame）ごとに1行を書く。tools/apply_latency_profile.py の説明を参照。
 namespace latency_profile {
-enum Counter { kMozc = 0, kDll, kDllCalls, kSelector, kCounterCount };
+enum Counter { kMozc = 0, kDll, kDllCalls, kSelector, kSegments, kCounterCount };
 bool Enabled();
+// 値を置く（kSegments: Mozc の変換のあとの文節の数）。
+void Set(Counter counter, int64_t value);
 // 時計の値（マイクロ秒）。MYIME_PROFILE がなければ 0。
 int64_t Start();
 // Start() から今までの時間を加える（start が 0 なら何もしない）。
@@ -455,6 +492,7 @@ edit(E, """  bool ConvertWithContext(const ConversionOptions& options, Segments*
       latency_profile::Scope profile_mozc(latency_profile::kMozc);
       if (!mozc_->Convert(options, segments)) return false;
     }
+    latency_profile::Set(latency_profile::kSegments, segments->conversion_segments_size());
 """)
 edit(E, "    ApplySelector(segments, left_context, right_context);\n",
      "    {\n      latency_profile::Scope profile_selector(latency_profile::kSelector);\n"

@@ -14,8 +14,8 @@ tools/latency_convert.sh が書いた <名前>.profile.tsv（段ごとの時間�
         all_zenzai（格子の構築と全文の評価）: allz_us（うち llama.cpp の評価 allz_dec_us、回数 allz_dec_n）
         候補作り（processResult から並べ替えを除く）: proc_us - ctx_us
         contextPriorWinner（前後の文を使った候補の並べ替え）: ctx_us（うち評価 ctx_dec_us、回数 ctx_dec_n）
-        打ち間違いの補正: typo_us
-        Swift の残り（候補の JSON 作りなど）: call_us - sel_us - allz_us - proc_us - typo_us
+        打ち間違いの補正の探索（辞書側と人工知能。別の変換器で読みを何通りも変換する）: tpass_us と typo_us
+        Swift の残り（候補の JSON 作りなど）: call_us - sel_us - allz_us - proc_us - tpass_us - typo_us
         受け渡し（C++ と Swift の間、鍵待ちなど）: dll_us - (call_us - sel_us)
       選び手: sel_cpp_us（うち人工知能の採点 sel_us）
       その他: total_us から上の3つを引いた残り
@@ -58,7 +58,7 @@ def g(row, key):
 
 
 def breakdown(row):
-    allz, ctx, typo, proc = g(row, "allz_us"), g(row, "ctx_us"), g(row, "typo_us"), g(row, "proc_us")
+    allz, ctx, typo, proc = g(row, "allz_us"), g(row, "ctx_us"), g(row, "typo_us") + g(row, "tpass_us"), g(row, "proc_us")
     dll, call, sel_ai = g(row, "dll_us"), g(row, "call_us"), g(row, "sel_us")
     sel_cpp = g(row, "sel_cpp_us")
     mozc = g(row, "mozc_us")
@@ -91,7 +91,7 @@ ROWS = [
     ("候補作り（並べ替えを除く）", "proc_rest", 2),
     ("contextPriorWinner（前後の文での並べ替え）", "ctx", 2),
     ("うち llama.cpp の評価", "ctx_dec", 3),
-    ("打ち間違いの補正", "typo", 2),
+    ("打ち間違いの補正の探索（辞書側と人工知能）", "typo", 2),
     ("Swift の残り（候補の JSON 作りなど）", "swift_rest", 2),
     ("受け渡し（C++ と Swift の間）", "boundary", 2),
     ("選び手（C++ の処理と採点の合計）", "sel", 1),
@@ -104,9 +104,9 @@ def fit_cost(conv):
     """評価1回の固定費 a と語片1つあたり b を、変換ごとの (回数, 新しい語片, 時間) から最小二乗で求める。"""
     xs = []
     for r in conv:
-        n = sum(g(r, p + "_dec_n") for p in ("allz", "ctx", "sel", "typo", "other"))
-        new = sum(g(r, p + "_new") for p in ("allz", "ctx", "sel", "typo", "other"))
-        us = sum(g(r, p + "_dec_us") for p in ("allz", "ctx", "sel", "typo", "other"))
+        n = sum(g(r, p + "_dec_n") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
+        new = sum(g(r, p + "_new") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
+        us = sum(g(r, p + "_dec_us") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
         if n:
             xs.append((n, new, us / 1000))
     if len(xs) < 20:
@@ -163,7 +163,7 @@ def describe(label, rows, wall, keyus):
     out.append("")
     out.append("| 評価（llama_decode） | 1変換あたりの回数 平均 | 中央値 | 90%点 | 1回の平均 ミリ秒 | 1回に新しく計算した語片 | 渡した語片 | 使い回せた割合 |")
     out.append("|---|---:|---:|---:|---:|---:|---:|---:|")
-    for name, prefix in (("all_zenzai", "allz"), ("contextPriorWinner", "ctx"), ("選び手", "sel"), ("打ち間違い", "typo")):
+    for name, prefix in (("all_zenzai", "allz"), ("contextPriorWinner", "ctx"), ("選び手", "sel"), ("打ち間違いの探索", "tpass"), ("打ち間違い（人工知能）", "typo")):
         counts = [g(r, prefix + "_dec_n") for r in conv]
         n = sum(counts)
         us = sum(g(r, prefix + "_dec_us") for r in conv)
@@ -196,6 +196,46 @@ def describe(label, rows, wall, keyus):
         out.append(f"| {name} | {len(sub)} | {pct(ts, .5):.0f} | {pct(ts, .9):.0f} | {100 * sum(p['allz'] for p in sub) / t:.0f}% | "
                    f"{100 * sum(p['ctx'] for p in sub) / t:.0f}% | {100 * sum(p['sel'] for p in sub) / t:.0f}% | "
                    f"{100 * sum(p['mozc'] for p in sub) / t:.0f}% |")
+    # 文節の数別（Mozc の変換のあと。1文節だと全文の変換の組み直しに入らず、人工知能を呼ばないことが多い）
+    if any("segs" in r for r in conv):
+        out.append("")
+        out.append("Mozc の文節の数別:")
+        out.append("| 文節の数 | 回数 | 人工知能を呼んだ割合 | 中央値 ミリ秒 | 90%点 | 平均 ミリ秒 |")
+        out.append("|---|---:|---:|---:|---:|---:|")
+        for name, lo, hi in (("1", 1, 1), ("2", 2, 2), ("3〜4", 3, 4), ("5〜", 5, 10 ** 9)):
+            idx = [i for i, r in enumerate(conv) if lo <= g(r, "segs") <= hi]
+            if not idx:
+                continue
+            ts = [parts[i]["total"] / 1000 for i in idx]
+            used = sum(1 for i in idx if g(conv[i], "dll_n") > 0)
+            out.append(f"| {name} | {len(idx)} | {100 * used / len(idx):.0f}% | {pct(ts, .5):.0f} | {pct(ts, .9):.0f} | {sum(ts) / len(ts):.0f} |")
+    # 評価の回数を打ち切ったときの見込み（評価1回の平均時間 × 超えた回数）
+    total_ms = sum(p["total"] for p in parts) / 1000
+    n_allz = sum(g(r, "allz_dec_n") for r in conv)
+    if n_allz:
+        ms_allz = sum(g(r, "allz_dec_us") for r in conv) / 1000 / n_allz
+        out.append("")
+        out.append("all_zenzai の評価の回数を L 回までに減らしたときに減る時間の見込み（超えた分の評価をなくした場合。入り口の全体に対する割合）:")
+        line = []
+        for limit in (1, 2, 3, 4, 6):
+            over = sum(max(0, g(r, "allz_dec_n") - limit * max(1, g(r, "allz_n"))) for r in conv)
+            affected = sum(1 for r in conv if g(r, "allz_dec_n") > limit * max(1, g(r, "allz_n")))
+            line.append(f"L={limit}: {100 * over * ms_allz / total_ms:.1f}%（影響を受ける変換 {100 * affected / len(conv):.0f}%）")
+        out.append("　".join(line))
+    n_ctx = sum(g(r, "ctx_dec_n") for r in conv)
+    if n_ctx:
+        ms_ctx = sum(g(r, "ctx_dec_us") for r in conv) / 1000 / n_ctx
+        entered = [r for r in conv if g(r, "ctx_dec_n") > 0]
+        counts = [g(r, "ctx_dec_n") // 2 for r in entered]
+        out.append("")
+        out.append(f"並べ替えの候補の数（評価の回数の半分）: 平均 {sum(counts) / len(counts):.1f}、中央値 {pct(counts, .5):.0f}、90%点 {pct(counts, .9):.0f}、最大 {max(counts)}。"
+                   f"候補を K 個までに絞ったときに減る時間の見込み（入り口の全体に対する割合）:")
+        line = []
+        for k in (2, 3, 4, 6, 8):
+            over = sum(max(0, g(r, "ctx_dec_n") - 2 * k) for r in entered)
+            affected = sum(1 for c in counts if c > k)
+            line.append(f"K={k}: {100 * over * ms_ctx / total_ms:.1f}%（影響を受ける変換 {100 * affected / len(conv):.0f}%）")
+        out.append("　".join(line))
     # 打っている間と裏の仕事
     pred = [r for r in rows if r.get("kind") == "pred"]
     between = [r for r in rows if r.get("kind") == "between"]
