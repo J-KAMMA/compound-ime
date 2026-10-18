@@ -96,6 +96,7 @@ public enum ZenzaiProfile {
     nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 7)
     nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 7)
     nonisolated(unsafe) private static var callCount = 0
+    nonisolated(unsafe) private static var contextChanged = 0
     nonisolated(unsafe) private static var callNanos = 0
     nonisolated(unsafe) private static var callStart: UInt64 = 0
 
@@ -152,6 +153,16 @@ public enum ZenzaiProfile {
         self.decodeNanos[self.current] += Int(self.now() &- start)
     }
 
+    /// 前後の文での並べ替えが、先頭の候補を替えたか（替えなかった並べ替えは、時間だけかかったことになる）。
+    static func noteContextOutcome(changed: Bool) {
+        guard self.enabled, changed else {
+            return
+        }
+        self.lock.lock()
+        defer { self.lock.unlock() }
+        self.contextChanged += 1
+    }
+
     /// 変換エンジンの入り口の始まりと終わり（ZenzaiDeadline.begin/end から呼ぶ）。
     public static func callBegin() {
         guard self.enabled else {
@@ -191,6 +202,8 @@ public enum ZenzaiProfile {
             parts.append("\\(name)_tok=\\(self.tokensAll[index])")
             parts.append("\\(name)_new=\\(self.tokensNew[index])")
         }
+        parts.append("ctx_changed=\\(self.contextChanged)")
+        self.contextChanged = 0
         self.callCount = 0
         self.callNanos = 0
         for index in 0..<7 {
@@ -231,6 +244,15 @@ edit(kk, """            self.updateCurrentSessionState {
             return (result, nodes)""")
 
 Z = conv / "ConversionAlgorithms/Zenzai/Zenz"
+# 前後の文での並べ替えが先頭の候補を替えたかの記録（動きは同じ。winner を一度受けてから同じ条件で判定する）
+edit(kk, """        guard eligible.count > 1,
+              let winner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode),
+              winner > 0, winner < eligible.count else { return candidates }
+""", """        guard eligible.count > 1 else { return candidates }
+        let profileWinner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode)
+        ZenzaiProfile.noteContextOutcome(changed: (profileWinner ?? 0) > 0)
+        guard let winner = profileWinner, winner > 0, winner < eligible.count else { return candidates }
+""")
 # 前後の文を使った候補の並べ替え
 edit(Z / "Zenz.swift", "            guard !self.useGpu, let context = self.zenzContext, (2...16).contains(candidates.count) else { return nil }\n",
      "            guard !self.useGpu, let context = self.zenzContext, (2...16).contains(candidates.count) else { return nil }\n"

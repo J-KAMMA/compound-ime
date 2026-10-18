@@ -230,6 +230,10 @@ def describe(label, rows, wall, keyus):
         out.append("")
         out.append(f"並べ替えの候補の数（評価の回数の半分）: 平均 {sum(counts) / len(counts):.1f}、中央値 {pct(counts, .5):.0f}、90%点 {pct(counts, .9):.0f}、最大 {max(counts)}。"
                    f"候補を K 個までに絞ったときに減る時間の見込み（入り口の全体に対する割合）:")
+        if any("ctx_changed" in r for r in entered):
+            changed = sum(1 for r in entered if g(r, "ctx_changed") > 0)
+            out.append(f"並べ替えが先頭の候補を替えた変換: {changed}/{len(entered)}（{100 * changed / len(entered):.0f}%）。"
+                       f"替えなかった並べ替えの時間は、並べ替えの合計の約 {100 * (1 - changed / len(entered)):.0f}%")
         line = []
         for k in (2, 3, 4, 6, 8):
             over = sum(max(0, g(r, "ctx_dec_n") - 2 * k) for r in entered)
