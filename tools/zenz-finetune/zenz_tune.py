@@ -450,9 +450,9 @@ def train(base_dir, train_ex: Examples, valid_ex: Examples, ckpt_root, final_dir
         optimizer.load_state_dict(extra["optimizer"])
         scheduler.load_state_dict(extra["scheduler"])
         scaler.load_state_dict(extra["scaler"])
-        torch.set_rng_state(extra["rng_cpu"])
+        torch.set_rng_state(extra["rng_cpu"].cpu().to(torch.uint8))
         if device.type == "cuda" and extra.get("rng_cuda") is not None:
-            torch.cuda.set_rng_state(extra["rng_cuda"])
+            torch.cuda.set_rng_state(extra["rng_cuda"].cpu().to(torch.uint8))
         state = json.loads((latest / "state.json").read_text(encoding="utf-8"))
         print(f"続きから始めます: {latest.name}（{state['step']}/{total_steps} 歩、{state['epoch'] + 1} 回目の途中）")
     else:
