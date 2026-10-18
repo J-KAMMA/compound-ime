@@ -1887,7 +1887,7 @@ edit(E, '''  static void PreferWholePhrase(const ConversionOptions& options,
                                      const ImmutableConverterInterface& mozc,
                                      const dictionary::PosMatcher& pos,
                                      const converter::Candidate& candidate, std::string_view key,
-                                     Segments* segments) {
+                                     Segments* segments, bool relaxed = false) {
     static const bool enabled = [] {
       const char* value = std::getenv("MYIME_AI_RESEGMENT");
       return !value || std::string_view(value) != "0";
@@ -3781,7 +3781,7 @@ edit("engine/engine.cc", """      if (Util::CharsLen(piece_key) == 1 &&
         return false;
 """, """      if (Util::CharsLen(piece_key) == 1 &&
           std::find(std::begin(kParticles), std::end(kParticles), piece_key) == std::end(kParticles) &&
-          !(ResegmentSymbolPieces() && Util::GetScriptType(piece_key) != Util::HIRAGANA &&
+          !(relaxed && ResegmentSymbolPieces() && Util::GetScriptType(piece_key) != Util::HIRAGANA &&
             Util::GetScriptType(piece_key) != Util::KATAKANA))
         return false;
 """)
@@ -3837,7 +3837,7 @@ edit("engine/engine.cc", """        if (found == segment.candidates().end()) ret
         synthesize = true;
       }
       if (synthesize) {
-        if (!ResegmentSynthesize()) return false;
+        if (!relaxed || !ResegmentSynthesize()) return false;
         if (katakana(piece_value) > 0 && extra_katakana) {
           bool has_name = false;
           for (const auto& piece_segment : piece.conversion_segments())
@@ -3865,16 +3865,26 @@ edit("engine/engine.cc", """      std::vector<int> indices;
       if (piece.conversion_segments_size() == 1) {""", """      std::vector<int> indices;
       bool synthesize = false;
       if (piece.conversion_segments_size() == 1) {""")
-edit("engine/engine.cc", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))""",
-     """          (!ResegmentGuard() || !MozcTopIsAiAlternative(*segments, full.conversion_segment(0))) &&
-          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))""")
+edit("engine/engine.cc", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))
+        return;
+      if (!selected) continue;""", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments, false))
+        return;
+      if (!selected && candidate_index == 1 && indices.empty() &&
+          !(candidate->attributes & (converter::Attribute::COMMAND_CANDIDATE |
+                                     converter::Attribute::PARTIALLY_KEY_CONSUMED)))
+        fallback.candidate = candidate;
+      if (!selected) continue;
+      fallback.candidate = nullptr;""")
+edit("engine/engine.cc", """    size_t candidate_index = 0;
+    for (const auto* candidate : full.conversion_segment(0).candidates()) {""", """    size_t candidate_index = 0;
+    ResegmentFallback fallback{options, mozc, pos, key, segments};
+    for (const auto* candidate : full.conversion_segment(0).candidates()) {""")
 edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {",
      """  static bool ResegmentEnv(const char* name) {
     const char* value = std::getenv(name);
     return !value || std::string_view(value) != "0";
   }
   static bool ResegmentSynthesize() { static const bool v = ResegmentEnv("MYIME_RESEG_SYNTH"); return v; }
-  static bool ResegmentGuard() { static const bool v = ResegmentEnv("MYIME_RESEG_GUARD"); return v; }
   // ASCII ? ! , . to the full-width marks Mozc uses.
   static std::string NormalizeSymbols(std::string text) {
     static const std::pair<const char*, const char*> kMap[] = {
@@ -3892,26 +3902,27 @@ edit("engine/engine.cc", "  static void ApplyHomophoneCues(Segments* segments, s
   static std::string NormalizeSingleSymbol(std::string_view text) {
     return Util::CharsLen(text) == 1 ? NormalizeSymbols(std::string(text)) : std::string(text);
   }
-  // True when Mozc's current first sentence (not just the reading) is also one
-  // of the AI's first eight sentences.
-  static bool MozcTopIsAiAlternative(const Segments& segments, const Segment& ai) {
-    std::string top, reading;
-    for (const auto& segment : segments.conversion_segments()) {
-      top += segment.candidate(0).value;
-      reading += segment.key();
+  // Runs when PreferWholePhrase ends without choosing any of the AI's sentences:
+  // the AI's first non-kana sentence is tried once more with the relaxed rules
+  // (a sentence-final mark as its own piece, a piece Mozc has no single
+  // candidate for). Not run when a later AI sentence was chosen (藍月のうも ←→ あいつ昨日も).
+  struct ResegmentFallback {
+    const ConversionOptions& options;
+    const ImmutableConverterInterface& mozc;
+    const dictionary::PosMatcher& pos;
+    const std::string& key;
+    Segments* segments;
+    const converter::Candidate* candidate = nullptr;
+    ~ResegmentFallback() {
+      if (candidate) ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments, true);
     }
-    top = NormalizeSymbols(top);
-    if (top == NormalizeSymbols(reading)) return false;
-    for (size_t i = 0; i < ai.candidates_size() && i < 8; ++i)
-      if (NormalizeSymbols(ai.candidate(i).value) == top) return true;
-    return false;
-  }
+  };
   static void ApplyHomophoneCues(Segments* segments, std::string_view left, std::string_view right) {""")
 _engine = (src / "engine/engine.cc").read_text(encoding="utf-8")
 _start = _engine.index("  static bool ResegmentToWholePhrase(")
 _end = _engine.index("  static void PreferWholePhrase(", _start)
 _body = _engine[_start:_end]
-_marker = "                                     Segments* segments) {\n"
+_marker = "                                     Segments* segments, bool relaxed = false) {\n"
 assert _body.count(_marker) == 1
 _log = """    {
       std::string pieces;
