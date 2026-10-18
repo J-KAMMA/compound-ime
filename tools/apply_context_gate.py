@@ -59,7 +59,7 @@ enum ContextPriorGate {
         guard let path = logPath else { return }
         logLock.lock()
         defer { logLock.unlock() }
-        guard let data = (line() + "\n").data(using: .utf8) else { return }
+        guard let data = (line() + "\\n").data(using: .utf8) else { return }
         if let handle = FileHandle(forWritingAtPath: path) {
             handle.seekToEndOfFile()
             handle.write(data)
@@ -82,6 +82,6 @@ edit(kk, """        guard eligible.count > 1,
         let gateGap = abs(Double(candidates[eligible[0]].value) - Double(candidates[eligible[1]].value))
         if let maxGap = ContextPriorGate.maxGap, gateGap > maxGap { return candidates }
         let gateWinner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode)
-        ContextPriorGate.log("ctx\tcount=\(gateCount)\tused=\(eligible.count)\tgap=\(gateGap)\twinner=\(gateWinner.map(String.init) ?? "nil")")
+        ContextPriorGate.log("ctx\\tcount=\\(gateCount)\\tused=\\(eligible.count)\\tgap=\\(gateGap)\\twinner=\\(gateWinner.map { "\\($0)" } ?? "nil")")
         guard let winner = gateWinner, winner > 0, winner < eligible.count else { return candidates }
 """)

@@ -106,7 +106,7 @@ jobs:
           cp $W/repo/tools/swift-Package.resolved Package.resolved
           L=$W/llama.cpp/build/bin
           swift build -c release -Xlinker -L$L -Xlinker -lllama -Xlinker -lggml -Xlinker -lggml-base \
-            -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath 2>&1 | tail -3
+            -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath > $W/swift-build.log 2>&1 || { grep -B3 -A12 "error:" $W/swift-build.log | head -100; tail -5 $W/swift-build.log; exit 1; }; tail -3 $W/swift-build.log
 
       - name: Mozc（試験用ツール）
         run: |
