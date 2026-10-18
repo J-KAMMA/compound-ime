@@ -1577,7 +1577,10 @@
    "category": "japanese-only",
    "romaji": "konbudedashiwotoru",
    "english": [],
-   "intended": "昆布で出汁を取る"
+   "intended": "昆布で出汁を取る",
+   "alternatives": [
+    "昆布で出汁をとる"
+   ]
   },
   {
    "id": "b180",
