@@ -3033,6 +3033,8 @@ edit("converter/converter.cc", """        fixed_any = true;
     }""")
 edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
 edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
+# 読みの費用の記憶（打鍵をまたいで使い回す）に使う
+edit("converter/converter.cc", "#include <tuple>\n", "#include <atomic>\n#include <chrono>\n#include <mutex>\n#include <tuple>\n")
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")

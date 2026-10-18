@@ -71,7 +71,7 @@
 #include "rewriter/rewriter.h"
 #include "rewriter/rewriter_interface.h"
 
-namespace mozc {
+namespace mozc { namespace converter { void InvalidateReadingMemo(); }  // 読みの費用の記憶を捨てる（converter/converter.cc）
 
 static bool HasConfiguredNeuralModel(const AzooKeyConfig& config) {
   return config.zenzai_enabled && !config.zenzai_weight_path.empty() &&
@@ -538,7 +538,7 @@ absl::Status Engine::Init(std::unique_ptr<engine::Modules> modules) {
   return absl::OkStatus();
 }
 
-bool Engine::Reload() {
+bool Engine::Reload() { converter::InvalidateReadingMemo();
   if (async_converter_) async_converter_->Cancel();
   return converter_ && converter_->Reload();
 }
@@ -549,7 +549,7 @@ bool Engine::Wait() { return converter_ && converter_->Wait(); }
 
 bool Engine::ReloadAndWait() { return Reload() && Wait(); }
 
-bool Engine::ClearUserHistory() {
+bool Engine::ClearUserHistory() { converter::InvalidateReadingMemo();
   if (converter_) {
     converter_->rewriter().Clear();
   }
@@ -611,7 +611,7 @@ void Engine::ClearOldSupplementalModels() {
   }
 }
 
-void Engine::ImportUserDictionary(std::string name, std::string tsv) {
+void Engine::ImportUserDictionary(std::string name, std::string tsv) { converter::InvalidateReadingMemo();
   if (async_converter_) async_converter_->Cancel();
   if (async_user_dictionary_importer_) {
     async_user_dictionary_importer_->Import(std::move(name), std::move(tsv));

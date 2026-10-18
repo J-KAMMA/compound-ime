@@ -245,13 +245,9 @@ edit(kk, """            self.updateCurrentSessionState {
 
 Z = conv / "ConversionAlgorithms/Zenzai/Zenz"
 # 前後の文での並べ替えが先頭の候補を替えたかの記録（動きは同じ。winner を一度受けてから同じ条件で判定する）
-edit(kk, """        guard eligible.count > 1,
-              let winner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode),
-              winner > 0, winner < eligible.count else { return candidates }
-""", """        guard eligible.count > 1 else { return candidates }
-        let profileWinner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode)
-        ZenzaiProfile.noteContextOutcome(changed: (profileWinner ?? 0) > 0)
-        guard let winner = profileWinner, winner > 0, winner < eligible.count else { return candidates }
+edit(kk, """        guard let winner = gateWinner, winner > 0, winner < eligible.count else { return candidates }
+""", """        ZenzaiProfile.noteContextOutcome(changed: (gateWinner ?? 0) > 0)
+        guard let winner = gateWinner, winner > 0, winner < eligible.count else { return candidates }
 """)
 # 前後の文を使った候補の並べ替え
 edit(Z / "Zenz.swift", "            guard !self.useGpu, let context = self.zenzContext, (2...16).contains(candidates.count) else { return nil }\n",
