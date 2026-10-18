@@ -254,6 +254,26 @@ void OfferClock(const Text& t, size_t i, std::optional<Match>& best) {
   }
 }
 
+// 日の読み＋かんは日数（ここのかかん -> 9日間、みっかかん -> 3日間）。1、5、7、8日は
+// 除く（いつか、なのか、ようか は日常の言葉: いつかかんがえる）。人工知能が数の部分を
+// かなで書く（ここの日間）ことがあるため、数字の確定済み文節にして防ぐ。
+void OfferDaySpan(const Text& t, size_t i, std::optional<Match>& best) {
+  for (const DayWord& w : kDayWords) {
+    if (w.day == 1 || w.day == 5 || w.day == 7 || w.day == 8) continue;
+    if (!At(t, i, w.reading) || !At(t, i + w.reading.size(), U"かん")) continue;
+    const size_t end = i + w.reading.size() + 2;
+    // 右の切れ目は狭く取る: や（みっかかんやすみ = 三日間休み）、が（かんがえる）、
+    // って は外す。
+    bool boundary = end >= t.size() || t[end] == U'、';
+    for (Piece p : {Piece(U"は"), Piece(U"を"), Piece(U"に"), Piece(U"で"), Piece(U"と"),
+                    Piece(U"の"), Piece(U"も"), Piece(U"へ"), Piece(U"から"), Piece(U"まで"),
+                    Piece(U"より"), Piece(U"です")}) {
+      boundary = boundary || At(t, end, p);
+    }
+    if (boundary) Offer(t, best, end, Join(w.day, "日間"));
+  }
+}
+
 void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
   for (const Cand& c : Numbers(t, i)) {
     for (const Unit& u : kUnits) {
@@ -303,6 +323,7 @@ std::optional<Match> MatchAt(const Text& t, size_t i) {
   OfferDigitString(t, i, best);
   OfferClock(t, i, best);
   if (auto day = DayAt(t, i, false)) Offer(t, best, day->first, Join(day->second, "日"));
+  OfferDaySpan(t, i, best);
   OfferNumbers(t, i, best);
   return best;
 }

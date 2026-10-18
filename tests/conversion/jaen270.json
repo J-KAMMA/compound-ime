@@ -701,7 +701,10 @@
    "english": [
     "chocolate"
    ],
-   "intended": "chocolateを食べすぎた"
+   "intended": "chocolateを食べすぎた",
+   "alternatives": [
+    "chocolateを食べ過ぎた"
+   ]
   },
   {
    "id": "b27",
@@ -1007,7 +1010,10 @@
    "category": "japanese-only",
    "romaji": "sonowakewooshiete",
    "english": [],
-   "intended": "その訳を教えて"
+   "intended": "その訳を教えて",
+   "alternatives": [
+    "そのわけを教えて"
+   ]
   },
   {
    "id": "j11",
@@ -1028,7 +1034,10 @@
    "category": "japanese-only",
    "romaji": "amewonameru",
    "english": [],
-   "intended": "飴を舐める"
+   "intended": "飴を舐める",
+   "alternatives": [
+    "飴をなめる"
+   ]
   },
   {
    "id": "j14",
@@ -2267,7 +2276,10 @@
    "category": "japanese-only",
    "romaji": "sorehadamedesu",
    "english": [],
-   "intended": "それはダメです"
+   "intended": "それはダメです",
+   "alternatives": [
+    "それはだめです"
+   ]
   },
   {
    "id": "jp34",

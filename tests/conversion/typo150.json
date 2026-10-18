@@ -20,7 +20,10 @@
    "category": "typo",
    "romaji": "watashihaeigaawomiru",
    "correct_romaji": "watashihaeigawomiru",
-   "intended": "私は映画を見る"
+   "intended": "私は映画を見る",
+   "alternatives": [
+    "わたしは映画を見る"
+   ]
   },
   {
    "id": "t004",
