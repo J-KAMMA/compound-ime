@@ -549,7 +549,7 @@ bool Engine::Wait() { return converter_ && converter_->Wait(); }
 
 bool Engine::ReloadAndWait() { return Reload() && Wait(); }
 
-bool Engine::ClearUserHistory() { converter::InvalidateReadingMemo();
+bool Engine::ClearUserHistory() {
   if (converter_) {
     converter_->rewriter().Clear();
   }

@@ -415,7 +415,8 @@ edit("engine/engine.cc", """bool Engine::ClearUserHistory() {
   if (converter_) {
     converter_->rewriter().Clear();
   }
-  converter::EnglishChoices().Clear();""")
+  converter::EnglishChoices().Clear();
+  converter::InvalidateReadingMemo();""")
 edit("engine/engine.cc", """#include "converter/engine_config.h"
 """, """#include "converter/engine_config.h"
 #include "converter/english_lexicon.h"
