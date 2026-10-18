@@ -2085,6 +2085,28 @@ edit(E, """  // Rebuilds the conversion segments at the boundaries of the AI's s
       if (pos.IsUniqueNoun(top.lid) && piece_value.find(top.content_value) == std::string::npos) return false;
       mozc_value += top.value;
     }
+    // The AI must not drop characters Mozc reads from the key: a hiragana
+    // ending (行 for 行く) or a particle (維新御三傑 for 維新の三傑).
+    const auto last_char = [](const std::string& text) {
+      size_t at = text.size();
+      while (at > 0 && (static_cast<unsigned char>(text[at - 1]) & 0xC0) == 0x80) --at;
+      return at > 0 ? text.substr(at - 1) : std::string();
+    };
+    const auto is_hiragana = [](const std::string& ch) {
+      return ch.size() == 3 && static_cast<unsigned char>(ch[0]) == 0xE3 &&
+             (static_cast<unsigned char>(ch[1]) == 0x81 ||
+              (static_cast<unsigned char>(ch[1]) == 0x82 && static_cast<unsigned char>(ch[2]) <= 0x9F));
+    };
+    const std::string mozc_last = last_char(mozc_value);
+    if (is_hiragana(mozc_last) && mozc_last != last_char(piece_value)) return false;
+    for (const char* particle : {"の", "を", "が", "は"}) {
+      const auto count = [&](const std::string& text) {
+        size_t n = 0;
+        for (size_t at = text.find(particle); at != std::string::npos; at = text.find(particle, at + 3)) ++n;
+        return n;
+      };
+      if (count(piece_value) < count(mozc_value)) return false;
+    }
     // Every katakana run of the AI's piece must be a name Mozc has as a
     // proper noun, or part of Mozc's own first candidate.
     const auto known = [&](const std::string& run) {

@@ -112,6 +112,30 @@
     "ねえ、なでなでして。"
    ],
    "note": "2026-10-17 話し言葉の試験で発見: んEXE、なでなでして。 になった（nexe の exe を英単語と判定）"
+  },
+  {
+   "id": "r016",
+   "category": "reported",
+   "romaji": "tomuhaneteruno?",
+   "intended": "トムは寝てるの？",
+   "alternatives": [],
+   "note": "2026-10-18 話し言葉の試験で発見: とむはねてるの？ とひらがなのままになった（人工知能は正しく答えたが組み直しが断られた）"
+  },
+  {
+   "id": "r017",
+   "category": "reported",
+   "romaji": "naotoha,gaikenngachichioyaniniteru.",
+   "intended": "直人は、外見が父親に似てる。",
+   "alternatives": [],
+   "note": "2026-10-18 話し言葉の試験で発見: な音は、外見が… になった（人工知能は正しく答えたが組み直しが断られた）"
+  },
+  {
+   "id": "r018",
+   "category": "reported",
+   "romaji": "oppaigaowanngatadeurayamashiinaa.",
+   "intended": "おっぱいがお椀型で羨ましいなあ。",
+   "alternatives": [],
+   "note": "2026-10-18 話し言葉の試験で発見: おっぱいがおわん型で… とひらがなが残った（人工知能は正しく答えたが組み直しが断られた）"
   }
  ]
 }
