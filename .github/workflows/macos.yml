@@ -224,7 +224,7 @@ jobs:
           sudo installer -pkg $W/CompoundIME.pkg -target / | tail -3
           ls -la "/Library/Input Methods/CompoundIME.app/Contents/Resources/"
           ls -la "/Library/Application Support/CompoundIME/models/"
-          shasum -a 256 "/Library/Application Support/CompoundIME/models/ggml-model-Q5_K_M.gguf"
+          shasum -a 256 "/Library/Application Support/CompoundIME/models/zenz-v3.2-small-ft-v1-Q5_K_M.gguf"
           C="/Library/Input Methods/CompoundIME.app/Contents/Resources/CompoundIMEConverter.app/Contents/MacOS/CompoundIMEConverter"
           ( "$C" > $W/converter.out 2>&1 & echo $! > $W/converter.pid ); sleep 20
           kill $(cat $W/converter.pid) 2>/dev/null || true
