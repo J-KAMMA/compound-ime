@@ -251,7 +251,7 @@ p)
   grep -v '^#' $T/wiki-typing.tsv | cut -f1 | awk 'NR%20==1 {print $0 "\t"}' > $W/lat-wiki.tsv
   grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t" $3}' > $W/lat-ctx-with.tsv
   grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t"}' > $W/lat-ctx-without.tsv
-  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%4==1 {n=split($1,a,/[,.]/); if (length(a[1])>=8) print a[1] "\t" $3}' | head -150 > $W/lat-clause-with.tsv
+  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%4==1 {n=split($1,a,/[,.]/); if (length(a[1])>=8 && c<150) {print a[1] "\t" $3; c++}}' > $W/lat-clause-with.tsv
   cut -f1 $W/lat-clause-with.tsv | awk '{print $0 "\t"}' > $W/lat-clause-without.tsv
   for name in ja400 wiki ctx-with ctx-without clause-with clause-without; do
     $LAT $W/lat-$name.tsv $OUT/latency-$name
