@@ -11,6 +11,7 @@
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
+#   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
@@ -232,6 +233,31 @@ j)
   done
   [ $fail = 0 ]
   ;;
+p)
+  # 変換1回の時間を段ごとに測る。ほかの処理と同時に流さない（変換の処理は1つだけ。この組の計算機でも、ほかの作業はない）。
+  # 記録は MYIME_PROFILE（tools/apply_latency_profile.py）。人工知能の時間の上限・待ちの上限・打っている間の先回りは
+  # 外して（上限に打ち切られない本当の時間を測るため）、次の組を流す。
+  #   ja400: 日本語だけの400文（前の文なし）
+  #   wiki: ウィキペディアの文のローマ字入力（長めの文）から約150文
+  #   ctx-with, ctx-without: 前後の文がある試験から約170文を、前の文あり・なしで
+  # そのあと利用者の PC と同じ既定の設定（上限 1000 ミリ秒、待ちの上限 700 ミリ秒、先回り 120 ミリ秒）で、
+  #   real-nopace: 日本語だけの先頭100文を、続けて速く打つ
+  #   real-paced: 先頭40文を、1文字150ミリ秒ずつ打つ（先回りが働く打ち方に近い）
+  { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } > $OUT/latency-env.txt
+  LAT="bash $REPO/tools/latency_convert.sh $E/session_handler_main $E $MODEL"
+  romaji $T/ja400.json | awk '{print $0 "\t"}' > $W/lat-ja400.tsv
+  grep -v '^#' $T/wiki-typing.tsv | cut -f1 | awk 'NR%20==1 {print $0 "\t"}' > $W/lat-wiki.tsv
+  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t" $3}' > $W/lat-ctx-with.tsv
+  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t"}' > $W/lat-ctx-without.tsv
+  for name in ja400 wiki ctx-with ctx-without; do
+    $LAT $W/lat-$name.tsv $OUT/latency-$name
+  done
+  head -100 $W/lat-ja400.tsv > $W/lat-h100.tsv
+  head -40 $W/lat-ja400.tsv > $W/lat-h40.tsv
+  LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/latency-real-nopace
+  LAT_REAL=1 $LAT $W/lat-h40.tsv $OUT/latency-real-paced 150
+  python3 $REPO/tools/latency_report.py $OUT | tee $OUT/latency-report.txt
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、x のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x のどれか" >&2; exit 2 ;;
 esac
