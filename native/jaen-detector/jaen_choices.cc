@@ -6,6 +6,8 @@
 #include <cmath>
 #include <cstdint>
 #include <fstream>
+#include <iomanip>
+#include <locale>
 #include <sstream>
 #include <system_error>
 #include <utility>
@@ -58,10 +60,14 @@ double Decayed(double score, int64_t seconds) {
   return score * std::exp2(-static_cast<double>(seconds) / (ChoiceStore::kHalfLifeDays * 86400.0));
 }
 
+// 小数の from_chars/to_chars は macOS 13.3 より前の libc++ にないので、
+// 地域の設定に左右されない classic の流れで読み書きする。
 bool ParseNumber(const std::string& text, double* out) {
-  const char* end = text.data() + text.size();
-  const auto [ptr, ec] = std::from_chars(text.data(), end, *out);
-  return ec == std::errc() && ptr == end && std::isfinite(*out);
+  if (text.empty()) return false;
+  std::istringstream in(text);
+  in.imbue(std::locale::classic());
+  in >> *out;
+  return in && in.peek() == std::char_traits<char>::eof() && std::isfinite(*out);
 }
 
 bool ParseTime(const std::string& text, int64_t* out) {
@@ -280,11 +286,10 @@ void ChoiceStore::SaveLocked() {
     out << "# v2\n";
     for (const auto& [word, entry] : entries_) {
       if (std::abs(Decayed(entry.score, now - entry.time)) < kForgetBelow) continue;
-      char number[32];
-      const auto result =
-          std::to_chars(number, number + sizeof number, entry.score, std::chars_format::fixed, 4);
-      out << "w\t" << word << '\t' << std::string_view(number, result.ptr - number) << '\t'
-          << entry.time << '\n';
+      std::ostringstream number;
+      number.imbue(std::locale::classic());
+      number << std::fixed << std::setprecision(4) << entry.score;
+      out << "w\t" << word << '\t' << number.str() << '\t' << entry.time << '\n';
     }
     if (!out.flush()) {
       out.close();
