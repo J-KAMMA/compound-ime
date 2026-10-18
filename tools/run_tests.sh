@@ -268,19 +268,55 @@ p)
   done
   python3 $REPO/tools/latency_report.py $OUT | tee $OUT/latency-report.txt
   # 空白キーの処理のうち、入り口の外の前の時間（report の「（入り口の外）前」）の正体を、関数ごとの時間で調べる。
-  # perf が入れられなければ飛ばす。前の文のない最初の句50文を流し、変換の処理の中の時間を関数ごとに並べる。
-  { sudo apt-get install -y -qq linux-tools-common linux-tools-$(uname -r) > /dev/null 2>&1 \
-      || sudo apt-get install -y -qq linux-tools-generic > /dev/null 2>&1; } || true
-  PERF=$(find /usr/lib/linux-tools /usr/lib/linux-tools-* /usr/bin -maxdepth 2 -name perf -type f 2> /dev/null | sort | tail -n 1)
-  if [ -n "$PERF" ]; then
-    sudo sysctl -w kernel.perf_event_paranoid=-1 > /dev/null 2>&1 || true
+  # どれも入れられなければ飛ばす（失敗しても組は失敗にしない）。前の文のない最初の句50文を流す。
+  (
+    set +e
     cut -f1 $W/lat-clause-without.tsv | awk 'NR<=50 {print $0 "\t"}' > $W/lat-perf.tsv
-    "$PERF" record -F 499 -o $W/perf.data -- $LAT $W/lat-perf.tsv $W/perf-run > $OUT/perf-record.log 2>&1 || true
-    "$PERF" report -i $W/perf.data --stdio --no-children --sort dso,symbol --percent-limit 0.3 > $OUT/perf-flat.txt 2>&1 || true
-    "$PERF" report -i $W/perf.data --stdio --no-children --sort comm,dso --percent-limit 0.5 > $OUT/perf-dso.txt 2>&1 || true
-  else
-    echo "perf を入れられなかった" > $OUT/perf-flat.txt
-  fi
+    sudo apt-get install -y -qq linux-tools-common linux-tools-$(uname -r) > /dev/null 2>&1       || sudo apt-get install -y -qq linux-tools-generic > /dev/null 2>&1
+    PERF=$( { find /usr/lib/linux-tools /usr/lib/linux-tools-* /usr/bin -maxdepth 2 -name perf -type f 2> /dev/null || true; } | sort | tail -n 1 )
+    if [ -n "$PERF" ]; then
+      sudo sysctl -w kernel.perf_event_paranoid=-1 > /dev/null 2>&1
+      "$PERF" record -F 499 -o $W/perf.data -- $LAT $W/lat-perf.tsv $W/perf-run > $OUT/perf-record.log 2>&1
+      "$PERF" report -i $W/perf.data --stdio --no-children --sort dso,symbol --percent-limit 0.3 > $OUT/perf-flat.txt 2>&1
+      "$PERF" report -i $W/perf.data --stdio --no-children --sort comm,dso --percent-limit 0.5 > $OUT/perf-dso.txt 2>&1
+    else
+      echo "perf を入れられなかった" > $OUT/perf-flat.txt
+    fi
+    # gdb で変換の処理の呼び出しの列を一定の間隔で取り、どの関数の中にいる時間が長いかを数える
+    sudo apt-get install -y -qq gdb > /dev/null 2>&1
+    if command -v gdb > /dev/null; then
+      $LAT $W/lat-perf.tsv $W/gdb-run > /dev/null 2>&1 &
+      LPID=$!
+      sleep 6
+      : > $OUT/gdb-samples.txt
+      n=0
+      while kill -0 $LPID 2> /dev/null && [ $n -lt 500 ]; do
+        P=$(pgrep -n -f "session_handler_main --input")
+        if [ -n "$P" ]; then
+          sudo timeout 20 gdb -p $P -batch -ex 'set pagination off' -ex 'thread 1' -ex 'bt 16' 2> /dev/null | grep -E '^#' | cut -c1-170 >> $OUT/gdb-samples.txt
+          echo "====" >> $OUT/gdb-samples.txt
+        fi
+        n=$((n + 1))
+      done
+      kill $LPID 2> /dev/null
+      python3 - $OUT/gdb-samples.txt > $OUT/gdb-summary.txt <<'PY'
+import re, sys, collections
+samples, cur = [], []
+for line in open(sys.argv[1], encoding="utf-8", errors="replace"):
+    if line.startswith("===="):
+        if cur: samples.append(cur)
+        cur = []
+    else:
+        m = re.search(r" in ([^ (]+)", line)
+        cur.append(m.group(1) if m else line.split()[-1])
+print("標本", len(samples))
+top = collections.Counter(s[0] for s in samples if s)
+incl = collections.Counter(f for s in samples for f in set(s))
+print("--- いちばん上の関数");  [print(f"{c:5d} {f}") for f, c in top.most_common(25)]
+print("--- 呼び出しの列のどこかにある関数");  [print(f"{c:5d} {f}") for f, c in incl.most_common(60)]
+PY
+    fi
+  ) || true
   ;;
 *)
   echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x のどれか" >&2; exit 2 ;;
