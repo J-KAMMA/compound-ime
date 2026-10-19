@@ -1,0 +1,179 @@
+# 判定専用の模型（Jev のような仕組み）の設計と測定（docs/jev-design.md）。
+# Linux test（linux-test.yml）の組み立て（成果物 linux-bin）を使い、人工知能なし（生成なし）で全部の試験の文を変換して
+# 候補を書き出し（tools/jev_collect.sh）、今の zenz v5 で候補を採点だけしたときの点と時間を測る（tools/jev_score.cpp）。
+# linux-test.yml から exp/jev-design の枝のときだけ呼ばれる。出力は成果物に置き、リポジトリには入れない。
+name: Jev data
+
+on:
+  workflow_call:
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  MODEL_URL: https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+  MODEL_SHA: 2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff
+  # 手元の PC で測った公式の llama.cpp と同じ版
+  LLAMA_TAG: b11327
+
+jobs:
+  collect:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    strategy:
+      fail-fast: false
+      matrix:
+        group: [ja400, jaen, typo, reported, w1, w2, w3, w4, ctxw, ctxo, coll, dom]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-bin
+          path: bin
+      - name: 人工知能なしで候補を書き出す（組 ${{ matrix.group }}）
+        run: |
+          set -eo pipefail
+          chmod +x $GITHUB_WORKSPACE/bin/engine/session_handler_main
+          bash repo/tools/jev_collect.sh ${{ matrix.group }} $GITHUB_WORKSPACE/bin/engine $GITHUB_WORKSPACE/repo $GITHUB_WORKSPACE/material
+          head -c 600 material/whole-*.txt | head -20
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jev-${{ matrix.group }}
+          path: material/
+          retention-days: 14
+
+  # 公式の llama.cpp と採点の道具を組み立てる
+  llama:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: 組み立て
+        run: |
+          set -eo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq cmake ninja-build > /dev/null
+          git init -q llama.cpp && cd llama.cpp && git remote add origin https://github.com/ggml-org/llama.cpp.git
+          git fetch -q --depth 1 origin refs/tags/$LLAMA_TAG && git checkout -q FETCH_HEAD
+          git log -1 --format='%H %cd'
+          # 変換エンジンと同じ命令の組（AVX2、FMA、F16C）
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DGGML_NATIVE=OFF \
+            -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF \
+            -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF > /dev/null
+          cmake --build build --target llama llama-batched-bench llama-bench > /dev/null
+          mkdir -p $GITHUB_WORKSPACE/out
+          g++ -O2 -std=c++17 -I include -I ggml/include $GITHUB_WORKSPACE/repo/tools/jev_score.cpp -o $GITHUB_WORKSPACE/out/jev_score \
+            -L build/bin -lllama -lggml -lggml-base -Wl,-rpath,'$ORIGIN'
+          cp build/bin/*.so* build/bin/llama-batched-bench build/bin/llama-bench $GITHUB_WORKSPACE/out/
+          ls $GITHUB_WORKSPACE/out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-llama
+          path: out/
+          retention-days: 3
+
+  # 採点の材料と時間の比べの材料を作る
+  jobs:
+    needs: collect
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: jev-*
+          path: material
+          merge-multiple: true
+      - name: 本線の結果（人工知能 v5、run 39196977336）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run download 39196977336 -R $GITHUB_REPOSITORY -n linux-results -D base
+      - name: 上限を数え、採点の材料を作る
+        run: |
+          set -eo pipefail
+          rm -f material/*.so* material/jev_score material/llama-*
+          python3 repo/tools/jev_ceiling.py report material repo/tests/conversion base | tee ceiling.txt
+          python3 repo/tools/jev_ceiling.py jobs material repo/tests/conversion base jobs/jobs.tsv jobs
+          cp ceiling.txt jobs/
+          wc -l jobs/*.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-jobs
+          path: jobs/
+          retention-days: 14
+
+  # 今の zenz v5 で候補を採点する（語片の木の方式。点は方式によらず同じ）
+  score:
+    needs: [jobs, llama]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: jev-llama
+          path: llama
+      - uses: actions/download-artifact@v4
+        with:
+          name: jev-jobs
+          path: jobs
+      - name: 採点（組 ${{ matrix.shard }}）
+        run: |
+          set -eo pipefail
+          curl -fsSL -o model.gguf $MODEL_URL && echo "$MODEL_SHA  model.gguf" | sha256sum -c
+          chmod +x llama/jev_score
+          awk -v k=${{ matrix.shard }} '(NR - 1) % 12 == k - 1' jobs/jobs.tsv > mine.tsv
+          mkdir -p out
+          LD_LIBRARY_PATH=llama llama/jev_score model.gguf mine.tsv out/score-${{ matrix.shard }}.tsv 4 trie 64
+          wc -l mine.tsv out/score-${{ matrix.shard }}.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-score-${{ matrix.shard }}
+          path: out/
+          retention-days: 14
+
+  # 時間の比べ（1つの計算機で、ほかの処理を流さずに）
+  bench:
+    needs: [jobs, llama]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: jev-llama
+          path: llama
+      - uses: actions/download-artifact@v4
+        with:
+          name: jev-jobs
+          path: jobs
+      - name: 採点の方式ごとの時間
+        run: |
+          set -eo pipefail
+          curl -fsSL -o model.gguf $MODEL_URL && echo "$MODEL_SHA  model.gguf" | sha256sum -c
+          chmod +x llama/jev_score llama/llama-batched-bench llama/llama-bench
+          mkdir -p out
+          { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } | tee out/env.txt
+          for t in 3 4; do
+            for k in 1 2 4 8 16 32; do
+              LD_LIBRARY_PATH=llama llama/jev_score model.gguf jobs/bench-$k.tsv out/bench-t$t-k$k.tsv $t trie,flat,seq,full 64
+            done
+          done
+          for t in 3 4; do
+            LD_LIBRARY_PATH=llama llama/llama-batched-bench -m model.gguf --override-kv tokenizer.ggml.pre=str:default \
+              -c 8192 -b 4096 -ub 4096 -npp 8,16,24,32,48 -ntg 1 -npl 1,2,4,8,16,32 -t $t -tb $t 2>&1 | grep '^|' | tee out/batched-bench-t$t.txt
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-bench
+          path: out/
+          retention-days: 14
