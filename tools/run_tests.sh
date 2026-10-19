@@ -143,33 +143,19 @@ f)
     t1=$(date +%s.%N)
     $CTX $OUT/context-without.tsv without 4
     python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with.tsv $OUT/context-without.tsv | tee $OUT/context-score.txt | head -30
-    # 前後の文での並べ替えを「迷うときだけ」にする値の比べ（tools/apply_context_gate.py）。同じ試験を、候補を絞る個数（TOPK）と
-    # 先頭と次の候補の点の差の上限（GAP）を変えて流し、前の文ありの正解の数と、全体の時間（4並列）を比べる
-    python3 -c "import sys; print(f'基準（既定の設定）: 前の文あり {sys.argv[1]} 秒')" "$(python3 -c "import sys; print(round(float(sys.argv[2])-float(sys.argv[1]), 1))" $t0 $t1)" | tee $OUT/context-gate.txt
-    for variant in k2:MYIME_CTX_TOPK=2 k3:MYIME_CTX_TOPK=3 g1:MYIME_CTX_GAP=1 g2:MYIME_CTX_GAP=2 g4:MYIME_CTX_GAP=4 k3g2:MYIME_CTX_TOPK=3,MYIME_CTX_GAP=2; do
+    # 前後の文での並べ替えを「迷うときだけ」にする値の比べ（tools/apply_context_gate.py、tools/clause_gate_test.py）。
+    # 文は句読点を含み並べ替えが働かないので、文の最初の句だけを前の文つきで変換し、候補を絞る個数（TOPK）と
+    # 先頭と次の候補の点の差の上限（GAP）を変えて、正解の数・基準との違い・全体の時間（4並列）を比べる
+    python3 $REPO/tools/clause_gate_test.py make $T/context.tsv > $W/clause.tsv
+    echo "句の試験: $(wc -l < $W/clause.tsv) 句" | tee $OUT/context-gate.txt
+    CLAUSE="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $W/clause.tsv"
+    for variant in base: off:MYIME_CTX_GAP=0.000001 k2:MYIME_CTX_TOPK=2 k3:MYIME_CTX_TOPK=3 g1:MYIME_CTX_GAP=1 g2:MYIME_CTX_GAP=2 g4:MYIME_CTX_GAP=4 g8:MYIME_CTX_GAP=8 g16:MYIME_CTX_GAP=16; do
       name=${variant%%:*}; assign=${variant#*:}
       t0=$(date +%s.%N)
-      env ${assign//,/ } $CTX $OUT/context-with-$name.tsv with 4
+      env ${assign//,/ } MYIME_CTX_LOG=$OUT/ctx-gate-log-$name.txt $CLAUSE $OUT/clause-$name.tsv with 4
       t1=$(date +%s.%N)
-      { echo "== $name（$assign）: $(python3 -c "import sys; print(round(float(sys.argv[2])-float(sys.argv[1]), 1))" $t0 $t1) 秒"
-        python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with-$name.tsv $OUT/context-without.tsv | awk 'NR==1'
-        python3 - $OUT/context-with.tsv $OUT/context-with-$name.tsv $T/context.tsv <<'PY'
-import sys
-gold = {}
-for l in open(sys.argv[3], encoding="utf-8"):
-    p = l.rstrip("\n").split("\t")
-    if len(p) >= 3 and not l.startswith("#"):
-        gold[p[0]] = p[1]
-def load(path):
-    return {p[0]: p[2] for p in (l.rstrip("\n").split("\t") for l in open(path, encoding="utf-8")) if len(p) >= 3}
-base, var = load(sys.argv[1]), load(sys.argv[2])
-changed = [r for r in base if r in var and base[r] != var[r]]
-lost = [r for r in changed if base[r] == gold.get(r) and var[r] != gold.get(r)]
-gained = [r for r in changed if var[r] == gold.get(r) and base[r] != gold.get(r)]
-print(f"基準と結果が違う文 {len(changed)}、基準で正解だったのに外れた {len(lost)}、基準で外れていたのに正解になった {len(gained)}")
-for r in lost[:20]:
-    print(f"  失った: {base[r]} → {var[r]}")
-PY
+      { echo "== $name（${assign:-既定}）: $(python3 -c "import sys; print(round(float(sys.argv[2])-float(sys.argv[1]), 1))" $t0 $t1) 秒、並べ替えの呼び出し $(cat $OUT/ctx-gate-log-$name.txt 2> /dev/null | wc -l) 回、先頭を替えた $(grep -vc 'winner=0\|winner=nil' $OUT/ctx-gate-log-$name.txt 2> /dev/null || true) 回"
+        python3 $REPO/tools/clause_gate_test.py score $W/clause.tsv $OUT/clause-base.tsv $OUT/clause-$name.tsv $name
       } | tee -a $OUT/context-gate.txt
     done
   fi
