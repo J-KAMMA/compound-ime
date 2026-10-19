@@ -9,7 +9,7 @@
 | MyIME | コミット `a8486eca5312556ff88fed7f1850a28843b67977` | https://github.com/unok/myime |
 | Mozc（MyIME の submodule `mozc/`） | コミット `2d993fd532c0df849ff3a5f6c7851b3757471ed6` | https://github.com/unok/mozc |
 | llama.cpp（fork） | コミット `10131b23ee0dbd9d03dfc618cec9fe3402919277`（タグ b4846） | https://github.com/fkunn1326/llama.cpp |
-| Zenzai モデル | `zenz-v3.2-small-ft-v1-Q5_K_M.gguf`、SHA-256 `8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f`（zenz-v3.2-small を追加学習、CC BY-SA 4.0） | https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf |
+| Zenzai モデル | `zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf`、SHA-256 `2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff`（zenz-v3.2-small を追加学習、CC BY-SA 4.0） | https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf |
 | Swift | 6.3.3 | https://download.swift.org/swift-6.3.3-release/windows10/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE-windows10.exe |
 | Bazel | 9.0.2（Bazelisk 経由、`USE_BAZEL_VERSION`） | |
 | Qt | 6.9.1 | 下の 4 |

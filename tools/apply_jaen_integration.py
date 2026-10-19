@@ -3437,14 +3437,14 @@ edit(E, """  if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/"
   if (!IsHermeticTestMode()) return "/usr/share/compound-ime/models/";
 #endif  // __APPLE__""")
 
-edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 変換モデル（zenz-v3.2-small を追加学習した ft-v1、約74MB）を配布ページから取得し、SHA-256 を照合する
+edit("mac/installer/postflight_template.sh", "/usr/bin/true", """# 変換モデル（zenz-v3.2-small を追加学習した ft-v5、約74MB）を配布ページから取得し、SHA-256 を照合する
 M="/Library/Application Support/CompoundIME/models"
-MODEL="$M/zenz-v3.2-small-ft-v1-Q5_K_M.gguf"
-SUM=8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f
+MODEL="$M/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf"
+SUM=2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff
 /bin/mkdir -p "$M"
 if ! echo "$SUM  $MODEL" | /usr/bin/shasum -a 256 -c -s 2>/dev/null; then
   /usr/bin/curl -fsL -o "$MODEL.part" \\
-    https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf \\
+    https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf \\
     && echo "$SUM  $MODEL.part" | /usr/bin/shasum -a 256 -c -s && /bin/mv "$MODEL.part" "$MODEL"
   /bin/rm -f "$MODEL.part"
 fi
@@ -3573,12 +3573,12 @@ edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (c
     client_->SetExperimentalFeature(args.size() >= 2 ? args[1] : "");
   } else if (command == "SET_PRECEDING_TEXT") {""")
 
-# 人工知能を、zenz-v3.2-small を追加学習した ft-v1 に替える（tools/zenz-finetune、配布ページ model-zenz-ft-v1）。
+# 人工知能を、zenz-v3.2-small を追加学習した ft-v5 に替える（tools/zenz-finetune、配布ページ model-zenz-ft-v5）。
 # ファイル名を変えるので、前の版を入れた人も導入時に新しいほうを取りに行く。取れなかったときは前の名前のファイルを使う。
 FT_URL = ('L"https://github.com/J-KAMMA/compound-ime/releases/download/"\n'
-          '    L"model-zenz-ft-v1/"\n'
-          '    L"zenz-v3.2-small-ft-v1-Q5_K_M.gguf";')
-FT_SUM = '"8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f";'
+          '    L"model-zenz-ft-v5/"\n'
+          '    L"zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf";')
+FT_SUM = '"2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff";'
 OLD_URL = ('L"https://huggingface.co/Miwa-Keita/zenz-v3.2-small-gguf/resolve/"\n'
            '    L"c67e03e07d215c869f591b274c1631170d3e11fe/"\n'
            '    L"ggml-model-Q5_K_M.gguf";')
@@ -3589,12 +3589,12 @@ for path, size in (("win32/custom_action/custom_action.cc", "kZenzaiModelSize = 
     edit(path, OLD_SUM, FT_SUM)
     edit(path, size, size.replace("73871936", "73871776"))
 edit("win32/custom_action/custom_action.cc", 'kZenzaiModelFileName = L"ggml-model-Q5_K_M.gguf";',
-     'kZenzaiModelFileName = L"zenz-v3.2-small-ft-v1-Q5_K_M.gguf";')
+     'kZenzaiModelFileName = L"zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf";')
 edit("converter/engine_config.h", 'kZenzaiModelName = "ggml-model-Q5_K_M.gguf";',
-     'kZenzaiModelName = "zenz-v3.2-small-ft-v1-Q5_K_M.gguf";\n'
+     'kZenzaiModelName = "zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf";\n'
      'constexpr const char* kZenzaiLegacyModelName = "ggml-model-Q5_K_M.gguf";')
 edit("converter/engine_config.h", 'kZenzaiModelVersion = "zenz-v3.2-small";',
-     'kZenzaiModelVersion = "zenz-v3.2-small-ft-v1";')
+     'kZenzaiModelVersion = "zenz-v3.2-small-ft-v5";')
 edit("converter/engine_config.cc", """  if (FileExists(install_path)) {
     return install_path;
   }

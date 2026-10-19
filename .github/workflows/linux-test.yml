@@ -177,8 +177,8 @@ jobs:
             sha256sum $W/model.gguf
           else
             curl -fsSL -o $W/model.gguf \
-              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
-            echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
+              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+            echo "2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff  $W/model.gguf" | sha256sum -c
           fi
           bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
       - uses: actions/upload-artifact@v4

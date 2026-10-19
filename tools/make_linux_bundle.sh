@@ -63,11 +63,11 @@ mkdir -p /usr/lib/compound-ime
 cp -a "$HERE/lib/." /usr/lib/compound-ime/
 mkdir -p /usr/share/doc/compound-ime
 cp "$HERE/credits_en.html" "$HERE/LICENSE" /usr/share/doc/compound-ime/
-# 変換モデル（zenz-v3.2-small を追加学習した ft-v1）を配布ページから取得し、SHA-256 を照合する
+# 変換モデル（zenz-v3.2-small を追加学習した ft-v5）を配布ページから取得し、SHA-256 を照合する
 M=/usr/share/compound-ime/models; mkdir -p $M
-F=zenz-v3.2-small-ft-v1-Q5_K_M.gguf
-URL=https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/$F
-SUM=8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f
+F=zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+URL=https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/$F
+SUM=2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff
 if ! echo "$SUM  $M/$F" | sha256sum -c --status 2>/dev/null; then
   echo "変換モデル（約74MB）を取得しています..."
   curl -fL -o $M/$F.part "$URL"
