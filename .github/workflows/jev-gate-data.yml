@@ -14,9 +14,17 @@ on:
         type: string
         default: '4000'
       shards:
-        description: 組の数（1つの計算機で数千文まで）
+        description: 組の数（1つの計算機で数千文まで。100万文なら 125 組・1組 8,000 文、1組 約3時間）
         type: string
         default: '2'
+      files:
+        description: 書き出す記録のファイルの数（手で上げる数）
+        type: string
+        default: '10'
+      material:
+        description: まとめの成果物の名前
+        type: string
+        default: 'jevgate-material'
 
 permissions:
   contents: read
@@ -44,9 +52,24 @@ jobs:
         run: |
           set -eo pipefail
           python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
-          curl -fsSL -o wiki11.parquet \
-            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00011-of-00015.parquet
-          echo "271165db78420d9286c82c2b9b93ac520925b41187537ef12bc9ff7ec1a1dca4  wiki11.parquet" | sha256sum -c
+          # 使う分割（番号と SHA256）。試験の元の 00003・00007 は使わない。00011 は 10万文の材料（m1）で使ったので避ける。
+          # 必要な文の数に応じて先頭から必要な数だけ取る（100万文なら 6 つ）。
+          C="${{ inputs.count }}"; [ -n "$C" ] || C=4000
+          N=$(python3 -c "import sys; print(max(1, -(-int(sys.argv[1]) * 12 // 2000000)))" "$C")
+          echo "分割の数 $N"
+          printf '%s\n' \
+            "08 859bb8856808e91d47cbf17f0c1ec5bfaf5ec8fb9f576c2f365bd49bda1daf7b" \
+            "09 296ce0665517bbd706bbf42e97f520aa413870df35a2eab77eca07d70174ed0d" \
+            "10 b13eb0cf6f28099844ba2d651cf429ad000eb1ba90bbb3243e9d22a92bef7eab" \
+            "12 7703f9b833df6292569fb088a92c933650ba2e07b32afa2fe32ddeaed31272f9" \
+            "13 734e0527d693f9867ee58ea66c8e52ef830d10b880b46152bc64931789bde962" \
+            "14 f4b59ae7c4519ec8b1c2aae6ba892f6b406e70e23685123acdc2b34bcf4c84ed" | head -n "$N" > splits.txt
+          [ "$(wc -l < splits.txt)" -eq "$N" ] || { echo "分割が足りません" >&2; exit 1; }
+          while read -r num sha; do
+            curl -fsSL -o wiki$num.parquet \
+              https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-000$num-of-00015.parquet
+            echo "$sha  wiki$num.parquet" | sha256sum -c
+          done < splits.txt
           curl -fsSL -o romanji-hiragana.tsv \
             https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
           echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
@@ -55,8 +78,17 @@ jobs:
           set -eo pipefail
           mkdir -p out
           C="${{ inputs.count }}"; [ -n "$C" ] || C=4000
-          venv/bin/python tools/jev_gate_sentences.py --wiki wiki11.parquet --table romanji-hiragana.tsv \
-            --out out/train.tsv --count "$C" --seed 20261019
+          # 分割ごとに作り（1つあたり約24万文が取れる）、重なりを除いて並べ替え、先頭の C 文を使う
+          N=$(wc -l < splits.txt); Q=$(python3 -c "import sys; print(-(-int(sys.argv[1]) * 11 // (10 * int(sys.argv[2]))))" "$C" "$N")
+          mkdir -p parts; I=0; FILES=""
+          while read -r num sha; do
+            I=$((I + 1))
+            venv/bin/python tools/jev_gate_sentences.py --wiki wiki$num.parquet --table romanji-hiragana.tsv \
+              --out parts/s$num.tsv --count "$Q" --seed $((20261020 + I))
+            FILES="$FILES parts/s$num.tsv"
+          done < splits.txt
+          python3 tools/jev_gate_merge_sentences.py --out out/train.tsv --count "$C" --seed 20261020 $FILES
+          cp splits.txt out/splits.txt
           # 念のため、試験の文（ウィキペディアの打ち込み、前後の文がある試験）と同じ文は除く
           python3 - out/train.tsv tests/conversion/wiki-typing.tsv tests/conversion/context.tsv <<'PY'
           import sys
@@ -166,7 +198,6 @@ jobs:
           name: jevgate-records-${{ matrix.shard }}
           path: |
             out/records-*.jsonl.gz
-            out/v5.tsv
           if-no-files-found: ignore
           retention-days: 60
 
@@ -199,9 +230,10 @@ jobs:
           path: out/
           retention-days: 60
 
+  # 組ごとの記録を 1 つにつなぎ、手で上げやすい数のファイル（records-01.jsonl.gz〜）に分け直す。試験の組の記録も同じ成果物に入れる
   merge:
-    needs: shard
-    if: always()
+    needs: [shard, testrecs]
+    if: always() && needs.testrecs.result == 'success'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
@@ -212,18 +244,34 @@ jobs:
           pattern: jevgate-records-*
           path: parts
           merge-multiple: false
+      - uses: actions/download-artifact@v4
+        with:
+          name: jevgate-test-records
+          path: testrecs
+      - uses: actions/download-artifact@v4
+        with:
+          name: jevgate-sentences
+          path: sentences
       - name: まとめる
         run: |
           set -eo pipefail
           mkdir -p out
-          ls -la parts/*
-          cat parts/*/records-*.jsonl.gz > out/train-records.jsonl.gz
-          cat parts/*/v5.tsv > out/v5-all.tsv || true
-          python3 repo/tools/jev_gate_build.py stats out/train-records.jsonl.gz | tee out/stats.txt
-          rm -f out/v5-all.tsv
-          ls -la out
+          echo "組の数 $(ls -d parts/* | wc -l)"
+          cat parts/*/records-*.jsonl.gz > all.jsonl.gz
+          python3 repo/tools/jev_gate_build.py stats all.jsonl.gz | tee out/stats.txt
+          # 総行数を files（既定 10）で割った行数ごとに分ける（大きさがほぼそろう）
+          T=$(zcat all.jsonl.gz | wc -l); F=${{ inputs.files }}; [ -n "$F" ] || F=10
+          L=$(( (T + F - 1) / F ))
+          zcat all.jsonl.gz | split -l "$L" -d --numeric-suffixes=1 -a 2 --filter='gzip -6 > "$FILE.jsonl.gz"' - out/records-
+          cp testrecs/test-records.jsonl.gz out/
+          cp sentences/splits.txt out/splits.txt
+          echo "総行数 $T、1ファイル $L 行" | tee -a out/stats.txt
+          for f in out/records-*.jsonl.gz; do echo "$f $(zcat $f | wc -l) 行"; done | tee -a out/stats.txt
+          ls -la out | tee -a out/stats.txt
+          # 分けても数が合うこと
+          [ "$(cat out/records-*.jsonl.gz | zcat | wc -l)" -eq "$T" ]
       - uses: actions/upload-artifact@v4
         with:
-          name: jevgate-material
+          name: ${{ inputs.material }}
           path: out/
           retention-days: 60

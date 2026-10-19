@@ -17,7 +17,10 @@ on:
         description: exp/jev-gate の枝だけ。判定の門の学習用の文の数（空なら 4000）
         default: ''
       gate_shards:
-        description: exp/jev-gate の枝だけ。材料集めの組の数（1組あたり 2000〜3000 文。空なら 2）
+        description: exp/jev-gate の枝だけ。材料集めの組の数（1組あたり 2000〜8000 文。空なら 2）
+        default: ''
+      gate_material:
+        description: exp/jev-gate の枝だけ。まとめの成果物の名前（空なら jevgate-material）
         default: ''
 
 permissions:
@@ -179,6 +182,7 @@ jobs:
     with:
       count: ${{ inputs.gate_count || '4000' }}
       shards: ${{ inputs.gate_shards || '2' }}
+      material: ${{ inputs.gate_material || 'jevgate-material' }}
 
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
   # 選び手の材料集めの枝と、判定専用の模型の設計の枝では、計算機を材料集めに回すため流さない。
