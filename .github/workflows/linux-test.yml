@@ -66,7 +66,7 @@ jobs:
           path: |
             llama.cpp/build
             myime/src/swift-engine/.build
-          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/swift-Package.resolved') }}
+          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_latency_profile.py', 'repo/tools/swift-Package.resolved') }}
 
       - name: 生成器と改造の適用
         run: |
@@ -89,6 +89,10 @@ jobs:
           $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
           # 選び手の段階3: 学習した選び手を組み込む（MYIME_SELECTOR=0 で切る）
           $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
+          # 前後の文での並べ替えを迷うときだけにする門（MYIME_CTX_TOPK、MYIME_CTX_GAP で値を比べられる）
+          $PY $W/repo/tools/apply_context_gate.py $W/myime/src
+          # 変換1回の時間を段ごとに測る仕組み（MYIME_PROFILE のときだけ動く。普段の変換結果は変わらない）
+          $PY $W/repo/tools/apply_latency_profile.py $S $W/myime/src
 
       - name: llama.cpp と変換エンジン
         run: |
@@ -102,7 +106,7 @@ jobs:
           cp $W/repo/tools/swift-Package.resolved Package.resolved
           L=$W/llama.cpp/build/bin
           swift build -c release -Xlinker -L$L -Xlinker -lllama -Xlinker -lggml -Xlinker -lggml-base \
-            -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath 2>&1 | tail -3
+            -Xlinker -rpath -Xlinker '$ORIGIN' -Xswiftc -no-toolchain-stdlib-rpath > $W/swift-build.log 2>&1 || { grep -B3 -A12 "error:" $W/swift-build.log | head -100; tail -5 $W/swift-build.log; exit 1; }; tail -3 $W/swift-build.log
 
       - name: Mozc（試験用ツール）
         run: |
@@ -159,7 +163,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        group: [a1, a2, b, c, d1, d2, e1, e2, f, g, h, i, j]
+        group: [a1, a2, b, c, d1, d2, e1, e2, f, g, h, i, j, p]
     steps:
       - uses: actions/checkout@v4
         with:
@@ -182,8 +186,8 @@ jobs:
             sha256sum $W/model.gguf
           else
             curl -fsSL -o $W/model.gguf \
-              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
-            echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
+              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+            echo "2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff  $W/model.gguf" | sha256sum -c
           fi
           bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
       - uses: actions/upload-artifact@v4
