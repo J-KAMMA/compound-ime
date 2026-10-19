@@ -11,6 +11,7 @@
 //   flat  問いを1回評価し、その結果を候補の数の列に写してから、全部の候補の語片を1回の評価で採点する
 //   seq   問いを1回評価し、候補を1つずつ順に評価する（今の選び手の採点 ScoreSentenceSuffixes と同じ形）
 //   full  候補ごとに問いから評価し直す（使い回しなし）
+// 候補の終わりには、zenz の文の終わりの記号 </s> を付けて採点する。
 // out.tsv の1行: 番号<TAB>方式<TAB>問いの語片の数<TAB>評価した語片の数<TAB>ミリ秒<TAB>点<TAB>点…
 #include <algorithm>
 #include <chrono>
@@ -249,7 +250,16 @@ int main(int argc, char** argv) {
   }
   Scorer scorer{ctx, llama_model_get_vocab(model), 0, 0, 4096, static_cast<int>(cp.n_seq_max)};
   scorer.n_vocab = llama_vocab_n_tokens(scorer.vocab);
+  // 文の終わりの記号: zenz は '</s>'（GGUF の eos_token_id の '<s>' ではない。tools/zenz-finetune の end_id=3 と同じ）
   scorer.eos = llama_vocab_eos(scorer.vocab);
+  for (llama_token id = 0; id < scorer.n_vocab; ++id) {
+    const char* text = llama_vocab_get_text(scorer.vocab, id);
+    if (text != nullptr && std::strcmp(text, "</s>") == 0) {
+      scorer.eos = id;
+      break;
+    }
+  }
+  std::fprintf(stderr, "文の終わりの記号: %d\n", scorer.eos);
 
   std::ifstream in(argv[2]);
   std::ofstream out(argv[3]);
