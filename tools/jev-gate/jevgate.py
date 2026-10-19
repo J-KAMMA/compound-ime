@@ -386,7 +386,7 @@ def evaluate(model, samples, device, autocast=None):
         stud_ok = np.zeros(len(samples), dtype=int)
     res["v5_ok"], res["student_ok_all"] = int(v5_ok.sum()), int(stud_ok.sum())
     rows = []
-    for th in (0.5, 0.35, 0.25, 0.15, 0.1, 0.05):
+    for th in (0.5, 0.35, 0.25, 0.2, 0.15, 0.1, 0.05):
         gen = probs[:, 1] >= th
         ok = np.where(gen, v5_ok, stud_ok).sum()
         rows.append({"threshold": th, "gen_share": float(gen.mean()), "correct": int(ok)})
@@ -421,9 +421,12 @@ def latest_checkpoint(out):
 
 
 def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=20261019, limit=None,
-          checkpoint_minutes=10, device=None, log_every=100, valid_share=0.02, max_steps=None, cache_dir=None):
-    """学習する。out の中に ckpt-<歩>.pt（最新の2つ）、final.pt、vocab.json、log.txt を置く。途中から再開できる。
-    特徴の一時ファイルは cache_dir（既定は out。Colab では手元の高速な場所を渡す）"""
+          checkpoint_minutes=10, device=None, log_every=100, valid_share=0.02, max_steps=None, cache_dir=None,
+          eval_every=None, patience=None, metric="need_k"):
+    """学習する。out の中に ckpt-<歩>.pt（最新の2つ）、best.pt、final.pt、vocab.json、log.txt を置く。途中から再開できる。
+    特徴の一時ファイルは cache_dir（既定は out。Colab では手元の高速な場所を渡す）。
+    早めの止め方: eval_every 歩ごと（と周の終わり）に確かめ用の AUC（metric の頭）を測り、いちばん良い結果を best.pt に残す。
+    patience 回つづけて良くならなければ止める。終わるとき（止めたときも、最後まで行ったときも）final.pt はいちばん良い結果"""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
@@ -469,11 +472,38 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
     done0 = step
     model.train()
 
+    best_auc = state.get("best_auc", -1.0) if state else -1.0
+    best_step = state.get("best_step", 0) if state else 0
+    bad = state.get("bad", 0) if state else 0
+    stopped = False
+
     def save(name):
         save_atomic({"model": model.state_dict(), "opt": opt.state_dict(), "step": step, "cfg": cfg,
-                     "vocab": vocab.chars, "total": total}, out / name)
+                     "vocab": vocab.chars, "total": total, "best_auc": best_auc, "best_step": best_step,
+                     "bad": bad}, out / name)
 
-    while step < total:
+    def check(tag):
+        """確かめ用の成績を測って記録し、いちばん良ければ best.pt に残す。止めるなら True"""
+        nonlocal best_auc, best_step, bad
+        res = evaluate(model, valid_s, device, autocast)
+        model.train()
+        cur = res["auc"][metric]
+        if cur > best_auc + 1e-4:
+            best_auc, best_step, bad = cur, step, 0
+            save_atomic({"model": model.state_dict(), "step": step, "cfg": cfg, "vocab": vocab.chars,
+                         "total": total, "best_auc": best_auc, "best_step": best_step}, out / "best.pt")
+            mark = "（最良を更新）"
+        else:
+            bad += 1
+            mark = f"（最良は歩 {best_step} の {best_auc:.4f}、良くならない回数 {bad}" + (f"/{patience}）" if patience else "）")
+        print(f"--- {tag}（歩 {step}）{metric} の AUC {cur:.4f} {mark}")
+        print_eval(res)
+        logf.write(json.dumps({"step": step, "eval": res, "best_auc": best_auc, "best_step": best_step},
+                              ensure_ascii=False) + "\n")
+        logf.flush()
+        return bool(patience) and bad >= patience
+
+    while step < total and not stopped:
         epoch = step // steps_per_epoch
         batches = make_batches(train_s, batch_size, seed, epoch)
         todo = batches[step - epoch * steps_per_epoch:]
@@ -504,15 +534,27 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
                 for old in sorted(out.glob("ckpt-*.pt"), key=lambda p: int(p.stem.split("-")[1]))[:-2]:
                     old.unlink()
                 t_save = time.time()
-        res = evaluate(model, valid_s, device, autocast)
-        model.train()
-        print(f"--- 周 {epoch + 1} 終わり（歩 {step}）")
-        print_eval(res)
-        logf.write(json.dumps({"step": step, "eval": res}, ensure_ascii=False) + "\n")
-        logf.flush()
-        save(f"ckpt-{step}.pt")
-        for old in sorted(out.glob("ckpt-*.pt"), key=lambda p: int(p.stem.split("-")[1]))[:-2]:
-            old.unlink()
+            if eval_every and step % eval_every == 0 and step < total and (step % steps_per_epoch):
+                if check(f"周 {epoch + 1} の途中"):
+                    stopped = True
+                    break
+                save(f"ckpt-{step}.pt")
+                for old in sorted(out.glob("ckpt-*.pt"), key=lambda p: int(p.stem.split("-")[1]))[:-2]:
+                    old.unlink()
+                t_save = time.time()
+        if not stopped:
+            stopped = check(f"周 {epoch + 1} 終わり")
+        if not stopped:
+            save(f"ckpt-{step}.pt")
+            for old in sorted(out.glob("ckpt-*.pt"), key=lambda p: int(p.stem.split("-")[1]))[:-2]:
+                old.unlink()
+    if stopped:
+        print(f"早めに止めます: 歩 {best_step} から {patience} 回つづけて {metric} の AUC が良くなりませんでした")
+    if best_step and (out / "best.pt").exists():
+        best = torch.load(out / "best.pt", map_location="cpu", weights_only=False)
+        model.load_state_dict(best["model"])
+        step = best["step"]
+        print(f"いちばん良い結果（歩 {step}、{metric} の AUC {best_auc:.4f}）を最終の結果にします")
     save("final.pt")
     json.dump({"chars": vocab.chars, "cfg": cfg}, open(out / "vocab.json", "w", encoding="utf-8"), ensure_ascii=False)
     print("学習が終わりました:", out / "final.pt")
@@ -607,6 +649,9 @@ def main():
     t.add_argument("--limit", type=int, default=None)
     t.add_argument("--max-steps", type=int, default=None)
     t.add_argument("--seed", type=int, default=20261019)
+    t.add_argument("--eval-every", type=int, default=None, help="確かめ用を測る歩の間隔（周の終わりにも測る）")
+    t.add_argument("--patience", type=int, default=None, help="確かめ用の AUC がこの回数つづけて良くならなければ止める")
+    t.add_argument("--metric", default="need_k", choices=GATE_NAMES)
     for key in ("k", "d", "layers", "heads", "ffn", "max_vocab", "prev_chars", "read_chars", "cand_chars"):
         t.add_argument("--" + key.replace("_", "-"), type=int, default=None)
     p = sub.add_parser("predict")
@@ -629,7 +674,7 @@ def main():
         cfg = {k: getattr(a, k) for k in ("k", "d", "layers", "heads", "ffn", "max_vocab", "prev_chars", "read_chars",
                                            "cand_chars") if getattr(a, k) is not None}
         train(a.records, a.out, cfg, epochs=a.epochs, batch_size=a.batch, lr=a.lr, seed=a.seed, limit=a.limit,
-              max_steps=a.max_steps)
+              max_steps=a.max_steps, eval_every=a.eval_every, patience=a.patience, metric=a.metric)
     elif a.cmd == "predict":
         predict(a.ckpt, a.records, a.out)
     elif a.cmd == "export":
