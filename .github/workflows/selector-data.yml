@@ -13,7 +13,7 @@ on:
         type: string
         default: '8000'
       model_release:
-        description: 人工知能を差し替えるときの、下書きの配布ページの目印（空なら人工知能 v1）
+        description: 人工知能を差し替えるときの、下書きの配布ページの目印（空なら本線と同じ人工知能 v5）
         type: string
         default: ''
       model_file:
@@ -105,10 +105,10 @@ jobs:
             echo "差し替えた人工知能: ${{ inputs.model_file }}"
             sha256sum $W/model.gguf
           else
-            # 本線と同じ人工知能 v1（zenz-v3.2-small-ft-v1）
+            # 本線と同じ人工知能 v5（zenz-v3.2-small-ft-v5-mix、linux-test.yml の既定と同じ）
             curl -fsSL -o $W/model.gguf \
-              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
-            echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
+              https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+            echo "2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff  $W/model.gguf" | sha256sum -c
           fi
           # 材料は選び手を通す前の変換で取る（段階3の選び手が入った後の組み立てでも同じ材料になるように切る）。
           # Zenz で採点し直す尤度も取る（段階3の学習用）
