@@ -65,7 +65,7 @@
   "t_attr_single_kanji"
  ],
  "max_alts": 2,
- "gate_threshold": 0.05,
+ "gate_threshold": 0.07,
  "threshold": 0.85,
  "gate": {
   "mean": [
