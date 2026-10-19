@@ -140,6 +140,11 @@ jobs:
     needs: build
     if: github.ref_name == 'exp/selector-stage2'
     uses: ./.github/workflows/selector-data.yml
+    permissions:
+      contents: write
+    with:
+      model_release: ${{ inputs.model_release }}
+      model_file: ${{ inputs.model_file }}
 
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
   # 選び手の材料集めの枝では、計算機を材料集めに回すため流さない。
