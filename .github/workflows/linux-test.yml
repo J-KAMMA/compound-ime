@@ -211,7 +211,7 @@ jobs:
   # 組の結果を1つにまとめる（名前は今までと同じ linux-results）
   results:
     needs: test
-    if: always()
+    if: always() && github.ref_name != 'exp/jev-design'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

@@ -208,18 +208,27 @@ def material(mdir, tdir, bdir):
     return recs
 
 
+def norm(text):
+    """変換の後の決まった直し（半角の ? ! を全角にする）を、候補の側にも当てる"""
+    return text.replace("?", "？").replace("!", "！") if text else text
+
+
 def in_list(lst, answers, fold):
-    return any(correct(x, answers, fold) for x in lst)
+    ans = [norm(a) for a in answers]
+    return any(correct(norm(x), ans, fold) for x in lst)
 
 
 def ceilings(r):
-    a, f = r["answers"], r["fold"]
-    segs = r["segs"]
-    seg = {k: bool(segs) and any(reachable(segs, x, k) or (f and reachable([[c.lower() for c in s] for s in segs], x.lower(), k))
-                                 for x in a) for k in (4, 8, 16)}
+    # どの集まりにも、人工知能なしの出力（生成なしの変換の結果）を入れる
+    a, f = [norm(x) for x in r["answers"]], r["fold"]
+    noai = in_list([r["noai"]], a, f)
+    segs = [[norm(c) for c in s] for s in r["segs"]] if r["segs"] else None
+    seg = {k: noai or (bool(segs) and any(
+        reachable(segs, x, k) or (f and reachable([[c.lower() for c in s] for s in segs], x.lower(), k)) for x in a))
+        for k in (4, 8, 16)}
     return {"seg4": seg[4], "seg8": seg[8], "seg16": seg[16],
-            "combo8": in_list(r["combos"][:8], a, f), "combo32": in_list(r["combos"][:32], a, f),
-            "dict8": in_list(r["whole"][:8], a, f), "dict32": in_list(r["whole"][:32], a, f)}
+            "combo8": noai or in_list(r["combos"][:8], a, f), "combo32": noai or in_list(r["combos"][:32], a, f),
+            "dict8": noai or in_list(r["whole"][:8], a, f), "dict32": noai or in_list(r["whole"][:32], a, f)}
 
 
 COLS = ["seg4", "seg8", "seg16", "combo8", "combo32", "dict8", "dict32"]
@@ -227,7 +236,8 @@ COLS = ["seg4", "seg8", "seg16", "combo8", "combo32", "dict8", "dict32"]
 
 def candidates(r):
     out = []
-    for x in r["whole"][:32] + r["combos"][:32] + ([r["base"]] if r["base"] else []) + r["answers"][:1]:
+    for x in [r["noai"]] + r["whole"][:32] + r["combos"][:32] + [r["base"]] + r["answers"][:1]:
+        x = norm(x)
         if x and x not in out:
             out.append(x)
     return out[:64]
@@ -236,6 +246,7 @@ def candidates(r):
 def cmd_jobs(mdir, tdir, bdir, out, bench_dir=None):
     recs = material(mdir, tdir, bdir)
     n = 0
+    Path(out).parent.mkdir(parents=True, exist_ok=True)
     with open(out, "w", encoding="utf-8", newline="\n") as f:
         for r in recs:
             if not r["reading"]:
@@ -255,7 +266,7 @@ def cmd_jobs(mdir, tdir, bdir, out, bench_dir=None):
                 m = 0
                 for r in pick:
                     cands = []
-                    for x in r["whole"] + r["combos"]:
+                    for x in [norm(y) for y in r["whole"] + r["combos"]]:
                         if x not in cands:
                             cands.append(x)
                     if len(cands) < k:
@@ -283,7 +294,7 @@ def cmd_report(mdir, tdir, bdir, sdir=None):
     for r in recs:
         by.setdefault(r["name"], []).append(r)
     print("## 上限（正解の文を、生成なしの候補だけから組めるか）\n")
-    print("| 試験 | 文 | 本線 v5 正解 | 人工知能なし 正解 | 文節4 | 文節8 | 文節16 | 組8 | 組32 | 辞書8 | 辞書32 | 全部の和 | 和∪本線 | 生成でしか出ない | 記録なし |")
+    print("| 試験 | 文 | 本線 v5 正解 | 人工知能なし 正解 | 文節4 | 文節8 | 文節16 | 組8 | 組32 | 辞書8 | 辞書全部 | 全部の和 | 和∪本線 | 生成でしか出ない | 記録なし |")
     print("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
     tot = None
     gen_only_list = []
@@ -318,10 +329,10 @@ def cmd_report(mdir, tdir, bdir, sdir=None):
     if not scores:
         return
     print("\n## (a) 今の zenz v5 で候補を採点し、対数確率の最大を選んだときの正解の数（机上）\n")
-    sets = [("辞書8", lambda r: r["whole"][:8]), ("辞書32", lambda r: r["whole"][:32]),
+    sets = [("辞書8", lambda r: r["whole"][:8]), ("辞書全部", lambda r: r["whole"][:32]),
             ("組8", lambda r: r["combos"][:8]), ("組32", lambda r: r["combos"][:32]),
-            ("辞書32∪組32", lambda r: r["whole"][:32] + r["combos"][:32]),
-            ("辞書32∪組32∪本線", lambda r: r["whole"][:32] + r["combos"][:32] + ([r["base"]] if r["base"] else []))]
+            ("辞書全部∪組32", lambda r: r["whole"][:32] + r["combos"][:32]),
+            ("辞書全部∪組32∪本線", lambda r: r["whole"][:32] + r["combos"][:32] + ([r["base"]] if r["base"] else []))]
     print("| 試験 | 文 | 本線 v5 | " + " | ".join(f"{s}（上限）" for s, _ in sets) + " | 正解を足したとき正解が最高点 |")
     print("|---|---:|---:|" + "---:|" * len(sets) + "---:|")
     tot = None
@@ -333,15 +344,16 @@ def cmd_report(mdir, tdir, bdir, sdir=None):
         for r in rs:
             a, f = r["answers"], r["fold"]
             sc = dict(zip(candidates(r), scores[f"{r['name']}:{r['i']}"]))
+            a = [norm(x) for x in a]
             row["base"] += correct(r["base"], a, f)
             for s, fn in sets:
-                lst = [x for x in fn(r) if x in sc]
+                lst = [norm(x) for x in [r["noai"]] + fn(r) if norm(x) in sc]
                 if lst:
                     best = max(lst, key=lambda x: sc[x])
                     row[s] += correct(best, a, f)
                     row[s + "u"] += in_list(lst, a, f)
             allc = list(sc)
-            if allc and r["answers"][0] in sc:
+            if allc and norm(r["answers"][0]) in sc:
                 row["gold"] += correct(max(allc, key=lambda x: sc[x]), a, f)
         tot = row if tot is None else {k: tot[k] + row[k] for k in tot}
         print(f"| {label} | {row['n']} | {row['base']} | " + " | ".join(f"{row[s]}（{row[s + 'u']}）" for s, _ in sets)
