@@ -146,7 +146,7 @@ jobs:
   bench:
     needs: [jobs, llama]
     runs-on: ubuntu-24.04
-    timeout-minutes: 120
+    timeout-minutes: 240
     steps:
       - uses: actions/download-artifact@v4
         with:
@@ -162,17 +162,23 @@ jobs:
           curl -fsSL -o model.gguf $MODEL_URL && echo "$MODEL_SHA  model.gguf" | sha256sum -c
           chmod +x llama/jev_score llama/llama-batched-bench llama/llama-bench
           mkdir -p out
+          # 計算機の時間の上限に収めるため、各 K の先頭100文（日本語だけの400文から）だけ
+          for k in 1 2 4 8 16 32; do head -100 jobs/bench-$k.tsv > jobs/b100-$k.tsv; done
           { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } | tee out/env.txt
-          for t in 3 4; do
-            for k in 1 2 4 8 16 32; do
-              LD_LIBRARY_PATH=llama llama/jev_score model.gguf jobs/bench-$k.tsv out/bench-t$t-k$k.tsv $t trie,flat,seq,full 64
-            done
+          # 変換エンジンと同じ3スレッドで全部の方式。使い回しなし（full）は遅いので候補8つまで。4スレッドは語片の木だけ
+          for k in 1 2 4 8 16 32; do
+            modes=trie,flat,seq; [ $k -le 8 ] && modes=$modes,full
+            LD_LIBRARY_PATH=llama llama/jev_score model.gguf jobs/b100-$k.tsv out/bench-t3-k$k.tsv 3 $modes 64
+          done
+          for k in 1 2 4 8 16 32; do
+            LD_LIBRARY_PATH=llama llama/jev_score model.gguf jobs/b100-$k.tsv out/bench-t4-k$k.tsv 4 trie 64
           done
           for t in 3 4; do
             LD_LIBRARY_PATH=llama llama/llama-batched-bench -m model.gguf --override-kv tokenizer.ggml.pre=str:default \
               -c 8192 -b 4096 -ub 4096 -npp 8,16,24,32,48 -ntg 1 -npl 1,2,4,8,16,32 -t $t -tb $t 2>&1 | grep '^|' | tee out/batched-bench-t$t.txt
           done
       - uses: actions/upload-artifact@v4
+        if: always()
         with:
           name: jev-bench
           path: out/

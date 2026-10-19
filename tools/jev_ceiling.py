@@ -362,9 +362,38 @@ def cmd_report(mdir, tdir, bdir, sdir=None):
           + f" | {tot['gold']} |")
 
 
+def cmd_bench(bdir):
+    """tools/jev_score.cpp の bench-t<スレッド>-k<候補の数>.tsv から、方式ごとの時間の表"""
+    rows = {}
+    for p in Path(bdir).glob("bench-t*-k*.tsv"):
+        m = re.match(r"bench-t(\d+)-k(\d+)\.tsv", p.name)
+        t, k = int(m.group(1)), int(m.group(2))
+        for line in open(p, encoding="utf-8"):
+            f = line.rstrip("\n").split("\t")
+            if len(f) >= 5 and int(f[3]) > 0:
+                rows.setdefault((t, k, f[1]), []).append((float(f[4]), int(f[3]), int(f[2])))
+    modes = ["trie", "flat", "seq", "full"]
+    print("| スレッド | 候補 K | 文 | 問いの語片 平均 | " + " | ".join(f"{m} 平均 ms（中央値、90%点、評価した語片）" for m in modes) + " |")
+    print("|---:|---:|---:|---:|" + "---|" * len(modes))
+    for t, k in sorted({(t, k) for t, k, _ in rows}):
+        cells = []
+        n = p0 = 0
+        for m in modes:
+            v = sorted(rows.get((t, k, m), []))
+            if not v:
+                cells.append("-")
+                continue
+            ms = sorted(x[0] for x in v)
+            n, p0 = len(v), sum(x[2] for x in v) / len(v)
+            cells.append(f"{sum(ms) / len(ms):.1f}（{ms[len(ms) // 2]:.1f}、{ms[int(len(ms) * 0.9)]:.1f}、{sum(x[1] for x in v) / len(v):.0f}）")
+        print(f"| {t} | {k} | {n} | {p0:.1f} | " + " | ".join(cells) + " |")
+
+
 def main():
     cmd = sys.argv[1]
-    if cmd == "jobs":
+    if cmd == "bench":
+        cmd_bench(sys.argv[2])
+    elif cmd == "jobs":
         cmd_jobs(*sys.argv[2:6], *(sys.argv[6:7] or [None]))
     elif cmd == "report":
         cmd_report(*sys.argv[2:5], *(sys.argv[5:6] or [None]))

@@ -296,7 +296,7 @@ int main(int argc, char** argv) {
       }
       out << '\n';
     }
-    if (++done % 200 == 0) {
+    if (++done % 50 == 0) {
       std::fprintf(stderr, "%d 行\n", done);
       out.flush();
     }
