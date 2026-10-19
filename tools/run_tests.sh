@@ -149,13 +149,13 @@ f)
     python3 $REPO/tools/clause_gate_test.py make $T/context.tsv > $W/clause.tsv
     echo "句の試験: $(wc -l < $W/clause.tsv) 句" | tee $OUT/context-gate.txt
     CLAUSE="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $W/clause.tsv"
-    for variant in base: off:MYIME_CTX_GAP=0.000001 k2:MYIME_CTX_TOPK=2 k3:MYIME_CTX_TOPK=3 g1:MYIME_CTX_GAP=1 g2:MYIME_CTX_GAP=2 g4:MYIME_CTX_GAP=4 g8:MYIME_CTX_GAP=8 g16:MYIME_CTX_GAP=16; do
+    for variant in ref:MYIME_CTX_TOPK=0,MYIME_CTX_GAP=0 new: off:MYIME_CTX_GAP=0.000001 g8:MYIME_CTX_TOPK=0,MYIME_CTX_GAP=8 k2g8:MYIME_CTX_TOPK=2,MYIME_CTX_GAP=8 k3g16:MYIME_CTX_TOPK=3,MYIME_CTX_GAP=16; do
       name=${variant%%:*}; assign=${variant#*:}
       t0=$(date +%s.%N)
       env ${assign//,/ } MYIME_CTX_LOG=$OUT/ctx-gate-log-$name.txt $CLAUSE $OUT/clause-$name.tsv with 4
       t1=$(date +%s.%N)
       { echo "== $name（${assign:-既定}）: $(python3 -c "import sys; print(round(float(sys.argv[2])-float(sys.argv[1]), 1))" $t0 $t1) 秒、並べ替えの呼び出し $(cat $OUT/ctx-gate-log-$name.txt 2> /dev/null | wc -l) 回、先頭を替えた $(grep -vc 'winner=0\|winner=nil' $OUT/ctx-gate-log-$name.txt 2> /dev/null || true) 回"
-        python3 $REPO/tools/clause_gate_test.py score $W/clause.tsv $OUT/clause-base.tsv $OUT/clause-$name.tsv $name
+        python3 $REPO/tools/clause_gate_test.py score $W/clause.tsv $OUT/clause-ref.tsv $OUT/clause-$name.tsv $name
       } | tee -a $OUT/context-gate.txt
     done
   fi

@@ -8,7 +8,7 @@ tools/apply_latency_profile.py より前に、1回だけ動かす。
   MYIME_CTX_TOPK=<数>: 並べ替える候補を先頭からこの個数までにする（0 なら絞らない）
   MYIME_CTX_GAP=<数>: 先頭と次の候補の点（value）の差がこの値より大きいときは並べ替えない（0 なら門なし）
   MYIME_CTX_LOG=<ファイル>: 並べ替えのたびに、候補の数・点の差・選んだ番号を1行ずつ書き足す（試験用）
-既定値は ContextPriorGate.swift の defaultTopK、defaultGap。
+既定値は ContextPriorGate.swift の defaultTopK（3）、defaultGap（8）。従来の動きに戻すには MYIME_CTX_TOPK=0 MYIME_CTX_GAP=0。
 """
 import sys
 from pathlib import Path
@@ -33,9 +33,11 @@ def edit(path, old, new, count=1):
 /// 前後の文での候補の並べ替えを「迷うときだけ」にする門（tools/apply_context_gate.py）。
 enum ContextPriorGate {
     /// 並べ替える候補を先頭からこの個数までにする。nil なら絞らない。
-    static let defaultTopK: Int? = nil
+    /// 句の試験（tools/clause_gate_test.py、932 句）では 3 でも正解の数は変わらず、先頭を替える 15 回も残る。
+    static let defaultTopK: Int? = 3
     /// 先頭と次の候補の点の差がこの値より大きいときは並べ替えない。nil なら門なし。
-    static let defaultGap: Double? = nil
+    /// 句の試験では 8 で並べ替えの呼び出しが 55% に減り、正解の数は変わらず、先頭を替えて正解になった句も残る（4 では 1 句を失う）。
+    static let defaultGap: Double? = 8
 
     static let topK: Int? = {
         guard let text = ProcessInfo.processInfo.environment["MYIME_CTX_TOPK"], let value = Int(text) else { return defaultTopK }
