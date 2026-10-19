@@ -284,6 +284,19 @@ p)
     MYIME_PROFILE_THREADS=$n $LAT $W/lat-h60.tsv $OUT/latency-threads$n
   done
   python3 $REPO/tools/latency_report.py $OUT | tee $OUT/latency-report.txt
+  # 一括採点（tools/apply_batch_score.py）を切って、順の採点に戻した同じ試験。同じ計算機・同じ時間帯の前後比べに使う
+  # （MYIME_BATCH_SCORE=0。名前の頭は seqscore-。上の報告には入らない）
+  for name in ja400 wiki ctx-with clause-with; do
+    MYIME_BATCH_SCORE=0 $LAT $W/lat-$name.tsv $OUT/seqscore-$name
+  done
+  MYIME_BATCH_SCORE=0 LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/seqscore-real-nopace
+  python3 $REPO/tools/latency_report.py $OUT seqscore- | tee $OUT/latency-report-seqscore.txt
+  # 一括採点が実際に使われたか、順に戻ったかの記録（前の文あり・なしの句の試験と、日本語だけの先頭100文）
+  MYIME_CTX_LOG=$OUT/batch-log-clause.txt $LAT $W/lat-clause-with.tsv $OUT/logrun-clause
+  MYIME_CTX_LOG=$OUT/batch-log-ja400.txt $LAT $W/lat-h100.tsv $OUT/logrun-ja400
+  for f in batch-log-clause batch-log-ja400; do
+    echo "$f: 評価の結果の数"; { grep '^batch' $OUT/$f.txt 2> /dev/null || true; } | sed 's/.*result=//' | sort | uniq -c
+  done | tee $OUT/batch-log-summary.txt
   # 空白キーの処理のうち、入り口の外の前の時間（report の「（入り口の外）前」）の正体を、関数ごとの時間で調べる。
   # どれも入れられなければ飛ばす（失敗しても組は失敗にしない）。前の文のない最初の句50文を流す。
   (

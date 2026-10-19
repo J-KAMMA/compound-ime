@@ -269,6 +269,10 @@ edit(Z / "Zenz.swift", "            return ZenzaiTypoCandidateGenerator.generate
 edit(Z / "ZenzContext.swift", "        let decodeStatus = llama_decode(context, self.batch)\n",
      "        let profileDecodeStart = ZenzaiProfile.decodeBegin(newTokens: Int(self.batch.n_tokens), totalTokens: tokens.count)\n"
      "        let decodeStatus = llama_decode(context, self.batch)\n        ZenzaiProfile.decodeEnd(profileDecodeStart)\n")
+# 候補をまとめた1回の評価（tools/apply_batch_score.py。この台本より前に動かす）
+edit(Z / "ZenzContext.swift", "        let treeDecodeStatus = llama_decode(context, self.treeBatch)\n",
+     "        let profileTreeStart = ZenzaiProfile.decodeBegin(newTokens: Int(self.treeBatch.n_tokens), totalTokens: promptCount + nodes.count)\n"
+     "        let treeDecodeStatus = llama_decode(context, self.treeBatch)\n        ZenzaiProfile.decodeEnd(profileTreeStart)\n")
 
 # 打ち間違いの補正の探索（別の変換器で読みを何通りも変換する。人工知能を使う設定もここに含まれる）
 edit(engine / "TypoCorrectionPass.swift",

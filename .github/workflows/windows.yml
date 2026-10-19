@@ -89,7 +89,7 @@ jobs:
         uses: actions/cache/restore@v4
         with:
           path: C:/w/engine-out
-          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_zenzai_deadline.py') }}-swift6.3.3-v1
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_batch_score.py', 'repo/tools/apply_zenzai_deadline.py') }}-swift6.3.3-v1
 
       - name: Qt の控えを戻す
         id: qt-cache
@@ -130,6 +130,7 @@ jobs:
           python $R/tools/apply_selector_trace.py $W/myime/src
           python $R/tools/apply_selector_stage3.py $S $W/myime/src
           python $R/tools/apply_context_gate.py $W/myime/src
+          python $R/tools/apply_batch_score.py $W/myime/src
           # 版の番号は version.bzl に書く（--action_env だと全部の組み立て結果の鍵が変わり、控えが効かない）
           IFS=. read -r MA MI BU RE <<< "$VERSION"
           sed -i -e "s/^BUILD_OSS = .*/BUILD_OSS = $BU/" -e "s/^REVISION = .*/REVISION = $RE/" $S/version.bzl
@@ -186,7 +187,7 @@ jobs:
         uses: actions/cache/save@v4
         with:
           path: C:/w/engine-out
-          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_zenzai_deadline.py') }}-swift6.3.3-v1
+          key: win-engine-${{ hashFiles('repo/patches/myime-engine.patch', 'repo/patches/llama-utf8.patch', 'repo/tools/swift-Package.resolved', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_batch_score.py', 'repo/tools/apply_zenzai_deadline.py') }}-swift6.3.3-v1
 
       - name: Qt 6.9.1
         if: steps.qt-cache.outputs.cache-hit != 'true'

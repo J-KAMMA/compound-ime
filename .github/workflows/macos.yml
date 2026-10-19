@@ -59,6 +59,8 @@ jobs:
           $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
           $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
           $PY $W/repo/tools/apply_context_gate.py $W/myime/src
+          # 候補の採点を、候補を全部まとめた1回の評価にする（MYIME_BATCH_SCORE=0 で順の採点に戻せる）
+          $PY $W/repo/tools/apply_batch_score.py $W/myime/src
 
       - name: 変換エンジン（Swift）
         run: |
@@ -153,6 +155,8 @@ jobs:
           $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
           $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
           $PY $W/repo/tools/apply_context_gate.py $W/myime/src
+          # 候補の採点を、候補を全部まとめた1回の評価にする（MYIME_BATCH_SCORE=0 で順の採点に戻せる）
+          $PY $W/repo/tools/apply_batch_score.py $W/myime/src
           # 版の番号を version.bzl に書く（設定の画面などに出す「1.<通し番号>」の元になる）
           $PY $W/repo/tools/apply_version_number.py $S "${{ inputs.version || '3.34.6239.0' }}"
 

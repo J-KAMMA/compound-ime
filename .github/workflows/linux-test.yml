@@ -66,7 +66,7 @@ jobs:
           path: |
             llama.cpp/build
             myime/src/swift-engine/.build
-          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_latency_profile.py', 'repo/tools/swift-Package.resolved') }}
+          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_batch_score.py', 'repo/tools/apply_latency_profile.py', 'repo/tools/swift-Package.resolved') }}
 
       - name: 生成器と改造の適用
         run: |
@@ -91,6 +91,8 @@ jobs:
           $PY $W/repo/tools/apply_selector_stage3.py $S $W/myime/src
           # 前後の文での並べ替えを迷うときだけにする門（MYIME_CTX_TOPK、MYIME_CTX_GAP で値を比べられる）
           $PY $W/repo/tools/apply_context_gate.py $W/myime/src
+          # 候補の採点を、候補を全部まとめた1回の評価にする（MYIME_BATCH_SCORE=0 で順の採点に戻せる）
+          $PY $W/repo/tools/apply_batch_score.py $W/myime/src
           # 変換1回の時間を段ごとに測る仕組み（MYIME_PROFILE のときだけ動く。普段の変換結果は変わらない）
           $PY $W/repo/tools/apply_latency_profile.py $S $W/myime/src
 
