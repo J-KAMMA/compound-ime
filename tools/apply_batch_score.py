@@ -94,7 +94,8 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
         candidates: [[llama_token]],
         common: Int,
         eos: llama_token,
-        vocab: Int
+        vocab: Int,
+        useEvalSequence: Bool
     ) -> [[Double]]? {
         let count = candidates.count
         guard Self.batchScoreEnabled, (2...Self.treeMaxCandidates).contains(count), !promptTokens.isEmpty,
@@ -130,36 +131,50 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
             }
             paths.append(path)
         }
-        // 列 0 に残っている問いの前半は使い回す（最後の語片は、確率の元になるので計算し直す）
+        // 列 0 に残っている前半は使い回す。使い回せるのは、確率の元になる行（共通の前半の最後の語片。
+        // 共通の前半がなければ問いの最後の語片）より前まで（その行は計算し直す）。
+        // useEvalSequence が false のときは、列 0 に触れず、何も使い回さない（問いの前半が違う採点用）。
         let previous = self.prevInputBySeq[self.evalSeqId] ?? []
-        let reuse = min(previous.commonPrefix(with: promptTokens).count, promptCount - 1)
-        let newTokenCount = promptCount - reuse + nodes.count
+        var reuse = 0
+        if useEvalSequence {
+            let shared = promptTokens + candidates[0].prefix(common)
+            reuse = min(previous.commonPrefix(with: shared).count, promptCount + common - 1)
+        }
+        var newTokenCount = max(promptCount - reuse, 0)
+        for node in nodes where promptCount + node.depth >= reuse { newTokenCount += 1 }
+        let logPrefix = "batch\tcandidates=\(count)\tprompt=\(promptCount)\tcommon=\(common)\treuse=\(reuse)\tnew=\(newTokenCount)\tshare=\(useEvalSequence)"
         guard newTokenCount <= Self.treeMaxNewTokens else {
-            ContextPriorGate.log("batch\tcandidates=\(count)\tprompt=\(promptCount)\treuse=\(reuse)\tnodes=\(nodes.count)\tresult=too_many_tokens")
+            ContextPriorGate.log(logPrefix + "\tresult=too_many_tokens")
             return nil
         }
         let treeSequences: [llama_seq_id] = (0..<count).map { llama_seq_id(Self.treeSequenceBase + $0) }
         defer {
             for sequence in treeSequences { llama_kv_cache_seq_rm(self.context, sequence, 0, -1) }
         }
-        // 列 0 を問いの共通の前半までにして、候補の列へ写す（KV は共有されるので、コピーは起きない）
-        llama_kv_cache_seq_rm(self.context, self.evalSeqId, llama_pos(reuse), -1)
-        self.prevInputBySeq[self.evalSeqId] = Array(previous.prefix(reuse))
-        self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
-        for sequence in treeSequences { llama_kv_cache_seq_cp(self.context, self.evalSeqId, sequence, 0, llama_pos(reuse)) }
+        if useEvalSequence {
+            // 列 0 を使い回す前半までにして、候補の列へ写す（KV は共有されるので、コピーは起きない）
+            llama_kv_cache_seq_rm(self.context, self.evalSeqId, llama_pos(reuse), -1)
+            self.prevInputBySeq[self.evalSeqId] = Array(previous.prefix(reuse))
+            self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+            for sequence in treeSequences { llama_kv_cache_seq_cp(self.context, self.evalSeqId, sequence, 0, llama_pos(reuse)) }
+        }
 
         self.treeBatch.n_tokens = 0
-        let promptSequences = [self.evalSeqId] + treeSequences
-        for index in reuse..<promptCount {
-            self.llama_batch_add(&self.treeBatch, promptTokens[index], Int32(index), promptSequences, logits: common == 0 && index == promptCount - 1)
+        let promptSequences = useEvalSequence ? [self.evalSeqId] + treeSequences : treeSequences
+        if reuse < promptCount {
+            for index in reuse..<promptCount {
+                self.llama_batch_add(&self.treeBatch, promptTokens[index], Int32(index), promptSequences, logits: common == 0 && index == promptCount - 1)
+            }
         }
-        let base = Int(self.treeBatch.n_tokens)
-        for node in nodes {
-            self.llama_batch_add(
-                &self.treeBatch, node.token, Int32(promptCount + node.depth),
-                node.candidates.map { treeSequences[$0] },
-                logits: node.depth >= common - 1
-            )
+        // 問いの最後の語片と、各節の、この評価の中での番号（使い回した語片は評価に入れないので -1）
+        let promptLastIndex = common == 0 ? promptCount - 1 - reuse : -1
+        var batchIndex = [Int](repeating: -1, count: nodes.count)
+        for (id, node) in nodes.enumerated() where promptCount + node.depth >= reuse {
+            var sequences = node.candidates.map { treeSequences[$0] }
+            // 最初の候補の語片は、列 0 にも残す（次の採点が、共通の前半を使い回せる）
+            if useEvalSequence && node.candidates.contains(0) { sequences.append(self.evalSeqId) }
+            batchIndex[id] = Int(self.treeBatch.n_tokens)
+            self.llama_batch_add(&self.treeBatch, node.token, Int32(promptCount + node.depth), sequences, logits: node.depth >= common - 1)
         }
         let treeDecodeStatus = llama_decode(context, self.treeBatch)
         guard treeDecodeStatus == 0 else {
@@ -167,11 +182,13 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
                 // 上限で計算を打ち切った
                 ZenzaiDeadline.noteAbort()
             }
-            ContextPriorGate.log("batch\tcandidates=\(count)\tprompt=\(promptCount)\treuse=\(reuse)\tnodes=\(nodes.count)\tresult=decode_\(treeDecodeStatus)")
-            // 途中までの計算を残さない
-            llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
-            self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
-            self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+            ContextPriorGate.log(logPrefix + "\tresult=decode_\(treeDecodeStatus)")
+            if useEvalSequence {
+                // 途中までの計算を残さない
+                llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
+                self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
+                self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+            }
             return nil
         }
 
@@ -210,7 +227,8 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
                     continue
                 }
                 let parent = nodes[id].parent
-                guard let parentRow = row(at: parent < 0 ? base - 1 : base + parent) else { failed = true; break }
+                let parentIndex = parent < 0 ? promptLastIndex : batchIndex[parent]
+                guard parentIndex >= 0, let parentRow = row(at: parentIndex) else { failed = true; break }
                 let value = Double(parentRow.pointer[Int(tokens[depth])]) - parentRow.maxValue - parentRow.logSumExp
                 guard value.isFinite else { failed = true; break }
                 nodeValues[id] = value
@@ -221,7 +239,7 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
             if let cached = endValues[last] {
                 values.append(cached)
             } else {
-                guard let lastRow = row(at: base + last) else { failed = true; break }
+                guard batchIndex[last] >= 0, let lastRow = row(at: batchIndex[last]) else { failed = true; break }
                 let value = Double(lastRow.pointer[Int(eos)]) - lastRow.maxValue - lastRow.logSumExp
                 guard value.isFinite else { failed = true; break }
                 endValues[last] = value
@@ -230,22 +248,27 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
             results.append(values)
         }
         guard !failed else {
-            ContextPriorGate.log("batch\tcandidates=\(count)\tprompt=\(promptCount)\treuse=\(reuse)\tnodes=\(nodes.count)\tresult=bad_logits")
-            llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
-            self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
-            self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+            ContextPriorGate.log(logPrefix + "\tresult=bad_logits")
+            if useEvalSequence {
+                llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
+                self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
+                self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+            }
             return nil
         }
-        // 列 0 には問いだけが残る（問いの後ろの語片の列は、defer で空にする）
-        self.prevInputBySeq[self.evalSeqId] = promptTokens
-        ContextPriorGate.log("batch\tcandidates=\(count)\tprompt=\(promptCount)\treuse=\(reuse)\tnodes=\(nodes.count)\tresult=ok")
+        if useEvalSequence {
+            // 列 0 には、問いと最初の候補が残る（ほかの候補の列は、defer で空にする）
+            self.prevInputBySeq[self.evalSeqId] = promptTokens + candidates[0]
+        }
+        ContextPriorGate.log(logPrefix + "\tresult=ok")
         return results
     }
 
     /// contextPriorWinner 用: 同じ問いの下の複数の候補の、文全体の対数確率（文の終わりを含む）。
     /// 一括で評価できないときは、今まで通り候補を順に評価する。どれかが評価できなければ nil。
-    func jointLogProbabilities(prompt: String, candidateTexts: [String]) -> [Double]? {
-        if let batched = self.batchedJointLogProbabilities(prompt: prompt, candidateTexts: candidateTexts) {
+    /// useEvalSequence が false のときは、列 0（ふつうの評価の前半の記憶）に触れずに採点する。
+    func jointLogProbabilities(prompt: String, candidateTexts: [String], useEvalSequence: Bool = true) -> [Double]? {
+        if let batched = self.batchedJointLogProbabilities(prompt: prompt, candidateTexts: candidateTexts, useEvalSequence: useEvalSequence) {
             return batched
         }
         var results: [Double] = []
@@ -256,7 +279,7 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
         return results
     }
 
-    private func batchedJointLogProbabilities(prompt: String, candidateTexts: [String]) -> [Double]? {
+    private func batchedJointLogProbabilities(prompt: String, candidateTexts: [String], useEvalSequence: Bool) -> [Double]? {
         guard Self.batchScoreEnabled, (2...Self.treeMaxCandidates).contains(candidateTexts.count) else { return nil }
         let normalizedPrompt = self.normalizeForModel(prompt)
         let vocab = self.vocabSize
@@ -272,16 +295,18 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
             candidates.append(tokens)
         }
         guard let logProbabilities = self.treeLogProbabilities(
-            promptTokens: promptTokens, candidates: candidates, common: 0, eos: eos, vocab: vocab
+            promptTokens: promptTokens, candidates: candidates, common: 0, eos: eos, vocab: vocab, useEvalSequence: useEvalSequence
         ) else { return nil }
         var totals: [Double] = []
         for values in logProbabilities {
             var total = 0.0
             for value in values { total += value }
             guard total.isFinite else {
-                llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
-                self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
-                self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+                if useEvalSequence {
+                    llama_kv_cache_seq_rm(self.context, self.evalSeqId, 0, -1)
+                    self.prevInputBySeq.removeValue(forKey: self.evalSeqId)
+                    self.prevPromptBySeq.removeValue(forKey: self.evalSeqId)
+                }
                 return nil
             }
             totals.append(total)
@@ -295,7 +320,7 @@ edit(ctxfile, "    func decodeTokens(_ tokens: [llama_token]) -> String {\n", r'
 
 # --- 3. 選び手の採点（suffixLogProbabilities）を一括にする ---
 edit(ctxfile, "        var results: [Double?] = []\n        for tokens in candidates {\n", r'''        if let logProbabilities = self.treeLogProbabilities(
-            promptTokens: promptTokens, candidates: candidates, common: common, eos: eos, vocab: vocab
+            promptTokens: promptTokens, candidates: candidates, common: common, eos: eos, vocab: vocab, useEvalSequence: true
         ) {
             self.setPreviousEvaluationPrompt(normalizedPrompt)
             return logProbabilities.map { values -> Double? in
@@ -320,7 +345,7 @@ edit(Z / "Zenz.swift", """            var contextual: [Double] = []
                 prior.append(score)
             }
 """, """            guard let contextual = context.jointLogProbabilities(prompt: contextualPrompt, candidateTexts: texts),
-                  let prior = context.jointLogProbabilities(prompt: priorPrompt, candidateTexts: texts) else { return nil }
+                  let prior = context.jointLogProbabilities(prompt: priorPrompt, candidateTexts: texts, useEvalSequence: false) else { return nil }
 """)
 
 # --- 5. 人工知能なしの組み立て（llama.cpp の見せかけ）の追加分 ---
