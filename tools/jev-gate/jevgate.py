@@ -204,6 +204,30 @@ def collate(batch, k, device="cpu"):
                 Lp=Lp, Lc=Lc)
 
 
+def to_device(b, device):
+    return {k: (v.to(device, non_blocking=True) if torch.is_tensor(v) else v) for k, v in b.items()}
+
+
+def prefetch(items, fn, depth=6):
+    """束ねる仕事を別の流れで先に進める（GPU を待たせない）"""
+    import queue
+    import threading
+    q = queue.Queue(depth)
+    end = object()
+
+    def work():
+        for it in items:
+            q.put(fn(it))
+        q.put(end)
+
+    threading.Thread(target=work, daemon=True).start()
+    while True:
+        x = q.get()
+        if x is end:
+            return
+        yield x
+
+
 def make_batches(samples, batch_size, seed, epoch):
     """長さの近い文を同じ束にする（束の順は seed と epoch で決まる）"""
     rng = random.Random(seed * 1000003 + epoch)
@@ -397,8 +421,9 @@ def latest_checkpoint(out):
 
 
 def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=20261019, limit=None,
-          checkpoint_minutes=10, device=None, log_every=100, valid_share=0.02, max_steps=None):
-    """学習する。out の中に ckpt-<歩>.pt（最新の2つ）、final.pt、vocab.json、log.txt を置く。途中から再開できる"""
+          checkpoint_minutes=10, device=None, log_every=100, valid_share=0.02, max_steps=None, cache_dir=None):
+    """学習する。out の中に ckpt-<歩>.pt（最新の2つ）、final.pt、vocab.json、log.txt を置く。途中から再開できる。
+    特徴の一時ファイルは cache_dir（既定は out。Colab では手元の高速な場所を渡す）"""
     out = Path(out)
     out.mkdir(parents=True, exist_ok=True)
     device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
@@ -411,7 +436,9 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
         print("続きから始めます:", ckpt.name, "歩", state["step"])
     else:
         vocab = build_vocab(records, cfg, limit=limit or 200000)
-    cache = out / f"features-k{cfg['k']}.pkl"
+    cache_root = Path(cache_dir) if cache_dir else out
+    cache_root.mkdir(parents=True, exist_ok=True)
+    cache = cache_root / f"features-k{cfg['k']}-{limit or 'all'}.pkl"
     if cache.exists():
         samples = pickle.load(open(cache, "rb"))
         print("特徴を読みました:", len(samples))
@@ -449,12 +476,13 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
     while step < total:
         epoch = step // steps_per_epoch
         batches = make_batches(train_s, batch_size, seed, epoch)
-        for bi in range(step - epoch * steps_per_epoch, len(batches)):
+        todo = batches[step - epoch * steps_per_epoch:]
+        for b_cpu in prefetch(todo, lambda idx: collate([train_s[i] for i in idx], model.k, "cpu")):
             if step >= total:
                 break
             for g in opt.param_groups:
                 g["lr"] = lr_at(step, total, min(500, total // 10), lr)
-            b = collate([train_s[i] for i in batches[bi]], model.k, device)
+            b = to_device(b_cpu, device)
             with torch.autocast(device_type=device.type, dtype=autocast, enabled=autocast is not None):
                 outp = model(b)
             loss, parts = loss_fn(outp, b)

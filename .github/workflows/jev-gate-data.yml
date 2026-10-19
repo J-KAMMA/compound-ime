@@ -142,14 +142,23 @@ jobs:
           # 1. 人工知能なしの候補（文節ごとの上位16、組、辞書の文全体）
           JEV_GATE_LIST=$W/shard.tsv JEV_GATE_NAME=g$K bash repo/tools/jev_collect.sh gate $E $W/repo $W/material
           # 2. v5（生成あり）の出力。前の文は文ごとに渡す（空なら渡さない）。試験の本線と同じ設定
-          bash repo/tools/context_convert.sh $E/session_handler_main $E model.gguf shard.tsv out/v5.tsv with 4
+          export LD_LIBRARY_PATH=$E
+          bash repo/tools/context_convert.sh $E/session_handler_main $E $W/model.gguf shard.tsv out/v5.tsv with 4
           wc -l out/v5.tsv
           # 3. 採点の材料を作り、zenz v5 で点を付ける
           python3 repo/tools/jev_gate_build.py jobs material shard.tsv out/v5.tsv g$K out/jobs.tsv out/pre.jsonl
           LD_LIBRARY_PATH=llama llama/jev_score model.gguf out/jobs.tsv out/score.tsv 4 trie 64
           # 4. 記録
           python3 repo/tools/jev_gate_build.py records out/pre.jsonl out/score.tsv out/records-$K.jsonl.gz
-          python3 repo/tools/jev_gate_build.py stats out/records-$K.jsonl.gz
+          python3 repo/tools/jev_gate_build.py stats out/records-$K.jsonl.gz | tee out/stats-$K.txt
+          # v5 が人工知能なしの出力とほとんど同じなら、人工知能が動いていない（材料として使えない）
+          python3 - out/stats-$K.txt <<'PY'
+          import re, sys
+          m = re.search(r"人工知能なしの出力 ≠ v5 の出力 \d+（([\d.]+)%）", open(sys.argv[1], encoding="utf-8").read())
+          share = float(m.group(1)) if m else 0.0
+          print("v5 と人工知能なしが違う割合", share)
+          sys.exit(0 if share >= 15 else "v5 の出力に人工知能が効いていません")
+          PY
           rm -f out/pre.jsonl out/jobs.tsv
       - uses: actions/upload-artifact@v4
         if: always()
