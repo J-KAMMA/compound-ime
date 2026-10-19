@@ -5,7 +5,7 @@
 tools/apply_jaen_integration.py（段階1・2の記録を含む）と tools/apply_selector_trace.py の後に動かす。
 変換の最後に、文節ごとに次を行う（MYIME_SELECTOR=0 で切る）。
   1. Zenz を使わない軽い選び手（門）で、1位と違う表記の候補（上位8つのうち先の2つまで）を見る。
-     確からしさの最大が門のしきい値（0.05、weights.json の gate_threshold）未満の文節は何もしない。
+     確からしさの最大が門のしきい値（0.07、weights.json の gate_threshold）未満の文節は何もしない。
   2. 門を通った文節だけ、1位と2つの表記で文全体を作り（ほかの文節は1位のまま）、Zenz で採点し直す。
      採点は文どうしの差だけを見るので、全部の文に共通する前半（プロンプトを含む）は KV を使い回して
      1回だけ計算する（新しい入り口 ScoreSentenceSuffixes）。
