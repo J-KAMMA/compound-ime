@@ -362,14 +362,19 @@ def cmd_report(mdir, tdir, bdir, sdir=None):
           + f" | {tot['gold']} |")
 
 
-def cmd_bench(bdir):
-    """tools/jev_score.cpp の bench-t<スレッド>-k<候補の数>.tsv から、方式ごとの時間の表"""
+def cmd_bench(bdir, first=None):
+    """tools/jev_score.cpp の bench-t<スレッド>-k<候補の数>.tsv から、方式ごとの時間の表（first: 先頭の文の数だけ）"""
     rows = {}
     for p in Path(bdir).glob("bench-t*-k*.tsv"):
         m = re.match(r"bench-t(\d+)-k(\d+)\.tsv", p.name)
         t, k = int(m.group(1)), int(m.group(2))
+        ids = []
         for line in open(p, encoding="utf-8"):
             f = line.rstrip("\n").split("\t")
+            if f[0] not in ids:
+                ids.append(f[0])
+            if first and len(ids) > int(first):
+                break
             if len(f) >= 5 and int(f[3]) > 0:
                 rows.setdefault((t, k, f[1]), []).append((float(f[4]), int(f[3]), int(f[2])))
     modes = ["trie", "flat", "seq", "full"]
@@ -392,7 +397,7 @@ def cmd_bench(bdir):
 def main():
     cmd = sys.argv[1]
     if cmd == "bench":
-        cmd_bench(sys.argv[2])
+        cmd_bench(sys.argv[2], *(sys.argv[3:4] or [None]))
     elif cmd == "jobs":
         cmd_jobs(*sys.argv[2:6], *(sys.argv[6:7] or [None]))
     elif cmd == "report":
