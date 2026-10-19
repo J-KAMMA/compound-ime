@@ -1,0 +1,41 @@
+# 判定の門の模型の推論（tools/jev-gate/jevgate_infer.cpp）の1回の時間を、乱数の重みで同じ形の模型を作って測る。
+# 手動か、推論の道具を変えて exp/jev-gate に push したときに動く。結果は成果物 jev-gate-bench（docs/jev-gate.md）。
+name: Jev gate bench
+
+on:
+  workflow_dispatch:
+  push:
+    branches: ['exp/jev-gate']
+    paths:
+      - 'tools/jev-gate/jevgate_infer.cpp'
+      - '.github/workflows/jev-gate-bench.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  bench:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - name: 組み立てと測定
+        run: |
+          set -eo pipefail
+          g++ -O3 -std=c++17 -mavx2 -mfma -fopenmp tools/jev-gate/jevgate_infer.cpp -o jevgate_infer
+          mkdir -p out
+          { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } | tee out/env.txt
+          ./jevgate_infer selftest | tee out/selftest.txt
+          # 形の違い × 候補の数 × スレッド数（変換エンジンの zenz と同じ 3 を含む）
+          for cfg in "--d 256 --layers 4 --ffn 1024" "--d 256 --layers 3 --ffn 768" "--d 192 --layers 4 --ffn 768" "--d 192 --layers 3 --ffn 768" "--d 128 --layers 4 --ffn 512"; do
+            for k in 0 1 2 4 8; do
+              for t in 1 3 4; do
+                ./jevgate_infer bench $cfg --gate-hidden 128 --k $k --threads $t --iters 300 | tee -a out/bench.txt
+              done
+            done
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-gate-bench
+          path: out/
+          retention-days: 30

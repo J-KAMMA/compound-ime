@@ -66,5 +66,10 @@ coll) grep -v '^#' $T/colloquial.tsv | awk -F'\t' '{print $1 "\t"}' > $W/l.tsv; 
 dom)
   grep -v '^#' $T/domain-prog.tsv | awk -F'\t' '{print $1 "\t"}' > $W/a.tsv; run prog $W/a.tsv without
   grep -v '^#' $T/domain-crypto.tsv | awk -F'\t' '{print $1 "\t"}' > $W/b.tsv; run crypto $W/b.tsv without ;;
-*) echo "組は ja400、jaen、typo、reported、w1〜w4、ctxw、ctxo、coll、dom のどれか" >&2; exit 2 ;;
+gate)
+  # 判定の門の学習用の文（tools/jev_gate_sentences.py の出力の一部。環境変数 JEV_GATE_LIST、名前は JEV_GATE_NAME）。
+  # ローマ字<TAB>元の文<TAB>前の文 から、ローマ字<TAB>前の文 の一覧を作る（前の文は空でもよい。with は前の文を渡す）
+  awk -F'\t' -v OFS='\t' '!/^#/ {print $1, $3}' "$JEV_GATE_LIST" > $W/l.tsv
+  run "${JEV_GATE_NAME:-gate}" $W/l.tsv with ;;
+*) echo "組は ja400、jaen、typo、reported、w1〜w4、ctxw、ctxo、coll、dom、gate のどれか" >&2; exit 2 ;;
 esac

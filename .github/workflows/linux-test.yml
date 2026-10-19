@@ -13,6 +13,12 @@ on:
       model_file:
         description: その配布ページのファイル名（例 zenz-v3.2-small-ft-v1-Q5_K_M.gguf）
         default: ''
+      gate_count:
+        description: exp/jev-gate の枝だけ。判定の門の学習用の文の数（空なら 4000）
+        default: ''
+      gate_shards:
+        description: exp/jev-gate の枝だけ。材料集めの組の数（1組あたり 2000〜3000 文。空なら 2）
+        default: ''
 
 permissions:
   contents: read
@@ -161,11 +167,24 @@ jobs:
       contents: read
       actions: read
 
+  # 判定の門の学習の材料集め（jev-gate-data.yml、docs/jev-gate.md）。exp/jev-gate の枝のときだけ。
+  # push のときは小さな規模（4,000 文）。大きな規模は手動で gate_count、gate_shards を決めて流す。
+  jev-gate-data:
+    needs: build
+    if: github.ref_name == 'exp/jev-gate'
+    uses: ./.github/workflows/jev-gate-data.yml
+    permissions:
+      contents: read
+      actions: read
+    with:
+      count: ${{ inputs.gate_count || '4000' }}
+      shards: ${{ inputs.gate_shards || '2' }}
+
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
   # 選び手の材料集めの枝と、判定専用の模型の設計の枝では、計算機を材料集めに回すため流さない。
   test:
     needs: build
-    if: github.ref_name != 'exp/selector-stage2' && github.ref_name != 'exp/jev-design'
+    if: github.ref_name != 'exp/selector-stage2' && github.ref_name != 'exp/jev-design' && github.ref_name != 'exp/jev-gate'
     runs-on: ubuntu-24.04
     timeout-minutes: 180
     # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
@@ -211,7 +230,7 @@ jobs:
   # 組の結果を1つにまとめる（名前は今までと同じ linux-results）
   results:
     needs: test
-    if: always() && github.ref_name != 'exp/jev-design'
+    if: always() && github.ref_name != 'exp/jev-design' && github.ref_name != 'exp/jev-gate'
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

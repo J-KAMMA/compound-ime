@@ -1,0 +1,220 @@
+# 判定の門（「この変換で人工知能の生成が要るか」を決める小さな模型）の学習の材料集め（docs/jev-gate.md）。
+# Linux test（linux-test.yml）の組み立て（成果物 linux-bin）を使い、
+#   1. 学習用の文を作る（試験に使っていないウィキペディアの分割 train-00011 から。試験の文は除く）
+#   2. 組ごとに: 人工知能なし（生成なし）の候補を書き出し、v5（生成あり）の出力を取り、zenz v5 が候補に点を付ける
+#   3. 全部を記録（1文1行の JSON）にまとめ、ラベルの割合を数える。試験の組（run 39249431055）の記録も作る
+# linux-test.yml から exp/jev-gate の枝のときだけ呼ばれる。材料は成果物に置き、リポジトリには入れない。
+name: Jev gate data
+
+on:
+  workflow_call:
+    inputs:
+      count:
+        description: 学習用の文の数
+        type: string
+        default: '4000'
+      shards:
+        description: 組の数（1つの計算機で数千文まで）
+        type: string
+        default: '2'
+
+permissions:
+  contents: read
+  actions: read
+
+env:
+  MODEL_URL: https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+  MODEL_SHA: 2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff
+  LLAMA_TAG: b11327
+
+jobs:
+  sentences:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 120
+    outputs:
+      matrix: ${{ steps.m.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 組の一覧
+        id: m
+        run: |
+          S="${{ inputs.shards }}"; [ -n "$S" ] || S=2
+          echo "matrix=$(python3 -c "import sys; print(list(range(1, int(sys.argv[1]) + 1)))" "$S")" >> "$GITHUB_OUTPUT"
+      - name: 材料（版と SHA256 を固定）
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
+          curl -fsSL -o wiki11.parquet \
+            https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00011-of-00015.parquet
+          echo "271165db78420d9286c82c2b9b93ac520925b41187537ef12bc9ff7ec1a1dca4  wiki11.parquet" | sha256sum -c
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+      - name: 学習用の文を作る（試験の文は除く）
+        run: |
+          set -eo pipefail
+          mkdir -p out
+          C="${{ inputs.count }}"; [ -n "$C" ] || C=4000
+          venv/bin/python tools/jev_gate_sentences.py --wiki wiki11.parquet --table romanji-hiragana.tsv \
+            --out out/train.tsv --count "$C" --seed 20261019
+          # 念のため、試験の文（ウィキペディアの打ち込み、前後の文がある試験）と同じ文は除く
+          python3 - out/train.tsv tests/conversion/wiki-typing.tsv tests/conversion/context.tsv <<'PY'
+          import sys
+          seen = set()
+          for p in sys.argv[2:]:
+              for line in open(p, encoding="utf-8"):
+                  if not line.startswith("#"):
+                      seen.update(line.rstrip("\n").split("\t")[:2])
+          rows = open(sys.argv[1], encoding="utf-8").read().splitlines()
+          kept = [r for r in rows if r.startswith("#") or not set(r.split("\t")[:2]) & seen]
+          open(sys.argv[1], "w", encoding="utf-8", newline="\n").write("\n".join(kept) + "\n")
+          print(len(rows) - len(kept), "removed")
+          PY
+          wc -l out/train.tsv && head -4 out/train.tsv
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jevgate-sentences
+          path: out/
+          retention-days: 14
+
+  # 公式の llama.cpp と採点の道具（tools/jev_score.cpp）を組み立てる
+  llama:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: 組み立て
+        run: |
+          set -eo pipefail
+          sudo apt-get update -qq && sudo apt-get install -y -qq cmake ninja-build > /dev/null
+          git init -q llama.cpp && cd llama.cpp && git remote add origin https://github.com/ggml-org/llama.cpp.git
+          git fetch -q --depth 1 origin refs/tags/$LLAMA_TAG && git checkout -q FETCH_HEAD
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON -DGGML_NATIVE=OFF \
+            -DGGML_AVX2=ON -DGGML_FMA=ON -DGGML_F16C=ON -DLLAMA_CURL=OFF -DLLAMA_BUILD_TESTS=OFF \
+            -DLLAMA_BUILD_EXAMPLES=OFF -DLLAMA_BUILD_SERVER=OFF > /dev/null
+          cmake --build build --target llama > /dev/null
+          mkdir -p $GITHUB_WORKSPACE/out
+          g++ -O2 -std=c++17 -I include -I ggml/include $GITHUB_WORKSPACE/repo/tools/jev_score.cpp -o $GITHUB_WORKSPACE/out/jev_score \
+            -L build/bin -lllama -lggml -lggml-base -Wl,-rpath,'$ORIGIN'
+          cp build/bin/*.so* $GITHUB_WORKSPACE/out/
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jevgate-llama
+          path: out/
+          retention-days: 3
+
+  # 組ごとに、候補の書き出し → v5 の出力 → zenz の採点 → 記録
+  shard:
+    needs: [sentences, llama]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: ${{ fromJSON(needs.sentences.outputs.matrix) }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-bin
+          path: bin
+      - uses: actions/download-artifact@v4
+        with:
+          name: jevgate-sentences
+          path: sentences
+      - uses: actions/download-artifact@v4
+        with:
+          name: jevgate-llama
+          path: llama
+      - name: 組 ${{ matrix.shard }}（材料集め）
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; E=$W/bin/engine; K=${{ matrix.shard }}; S=${{ strategy.job-total }}
+          chmod +x $E/session_handler_main llama/jev_score
+          curl -fsSL -o model.gguf $MODEL_URL && echo "$MODEL_SHA  model.gguf" | sha256sum -c
+          mkdir -p out material
+          awk -v n=$S -v k=$K '!/^#/ { c++; if ((c - 1) % n == k - 1) print }' sentences/train.tsv > shard.tsv
+          echo "組 $K: $(wc -l < shard.tsv) 文"
+          # 1. 人工知能なしの候補（文節ごとの上位16、組、辞書の文全体）
+          JEV_GATE_LIST=$W/shard.tsv JEV_GATE_NAME=g$K bash repo/tools/jev_collect.sh gate $E $W/repo $W/material
+          # 2. v5（生成あり）の出力。前の文は文ごとに渡す（空なら渡さない）。試験の本線と同じ設定
+          bash repo/tools/context_convert.sh $E/session_handler_main $E model.gguf shard.tsv out/v5.tsv with 4
+          wc -l out/v5.tsv
+          # 3. 採点の材料を作り、zenz v5 で点を付ける
+          python3 repo/tools/jev_gate_build.py jobs material shard.tsv out/v5.tsv g$K out/jobs.tsv out/pre.jsonl
+          LD_LIBRARY_PATH=llama llama/jev_score model.gguf out/jobs.tsv out/score.tsv 4 trie 64
+          # 4. 記録
+          python3 repo/tools/jev_gate_build.py records out/pre.jsonl out/score.tsv out/records-$K.jsonl.gz
+          python3 repo/tools/jev_gate_build.py stats out/records-$K.jsonl.gz
+          rm -f out/pre.jsonl out/jobs.tsv
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: jevgate-records-${{ matrix.shard }}
+          path: |
+            out/records-*.jsonl.gz
+            out/v5.tsv
+          if-no-files-found: ignore
+          retention-days: 60
+
+  # 試験の組の記録（机上の評価用。run 39249431055 の材料と run 39196977336 の本線の結果から）
+  testrecs:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - name: 材料を取ってきて記録にする
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eo pipefail
+          mkdir -p material scores base out
+          for n in ja400 jaen typo reported w1 w2 w3 w4 ctxw ctxo coll dom; do
+            gh run download 39249431055 -R $GITHUB_REPOSITORY -n jev-$n -D material
+          done
+          for i in 1 2 3 4 5 6 7 8 9 10 11 12; do
+            gh run download 39249431055 -R $GITHUB_REPOSITORY -n jev-score-$i -D scores
+          done
+          gh run download 39196977336 -R $GITHUB_REPOSITORY -n linux-results -D base
+          python3 repo/tools/jev_gate_build.py test material repo/tests/conversion base scores out/test-records.jsonl.gz
+          python3 repo/tools/jev_gate_build.py stats out/test-records.jsonl.gz
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jevgate-test-records
+          path: out/
+          retention-days: 60
+
+  merge:
+    needs: shard
+    if: always()
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: jevgate-records-*
+          path: parts
+          merge-multiple: false
+      - name: まとめる
+        run: |
+          set -eo pipefail
+          mkdir -p out
+          ls -la parts/*
+          cat parts/*/records-*.jsonl.gz > out/train-records.jsonl.gz
+          cat parts/*/v5.tsv > out/v5-all.tsv || true
+          python3 repo/tools/jev_gate_build.py stats out/train-records.jsonl.gz | tee out/stats.txt
+          rm -f out/v5-all.tsv
+          ls -la out
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jevgate-material
+          path: out/
+          retention-days: 60
