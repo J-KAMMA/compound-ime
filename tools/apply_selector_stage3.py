@@ -340,8 +340,9 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
   }
   // 固有名を守る決まり（tools/selector_stage2.py の guard_ok と同じ）。替えてよければ true。
   // 1. 1位の文節にカタカナがあれば替えない。2. 替える先の違う部分にカタカナがあれば替えない。
-  // （文全体にひらがなも漢字もなく6文字以上＝全部カタカナになった失敗のときは、1と2は当てない）
+  // （文全体にひらがなも漢字もなく6文字以上＝全部カタカナになった失敗のときは、1と2と5は当てない）
   // 3. 1位の違う部分がひらがな1文字だけなら替えない。4. 1位に英字・数字があれば替えない。
+  // 5. 1位と替える先の違う部分の、片方だけに漢字があれば替えない（漢字とかなの書き分け）。
   static bool SelectorGuardOk(std::string_view top_s, std::string_view alt_s, bool fallback) {
     const auto top = SelectorCodepoints(top_s), alt = SelectorCodepoints(alt_s);
     size_t a = 0, b = 0;
@@ -354,6 +355,12 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
     if (top.size() - b - a == 1 && SelectorHira(top[a])) return false;
     for (char32_t c : top) {
       if (SelectorLatin(c) || (c >= '0' && c <= '9') || (c >= 0xFF10 && c <= 0xFF19)) return false;
+    }
+    if (!fallback) {
+      bool top_kanji = false, alt_kanji = false;
+      for (size_t k = a; k < top.size() - b; ++k) top_kanji = top_kanji || SelectorKanji(top[k]);
+      for (size_t k = a; k < alt.size() - b; ++k) alt_kanji = alt_kanji || SelectorKanji(alt[k]);
+      if (top_kanji != alt_kanji) return false;
     }
     return true;
   }

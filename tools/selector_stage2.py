@@ -290,7 +290,9 @@ def guard_ok(segs, i, j):
     2. 替える先の、1位と違う部分にカタカナがあれば替えない。
     3. 1位の違う部分が ひらがな1文字だけ（助詞など、か→化）なら替えない。
     4. 1位に英字・数字があれば替えない（学習の文にない）。
-    ただし文全体にひらがなも漢字もなく（全部カタカナになった失敗）6文字以上なら、1と2は当てない。"""
+    5. 1位と替える先の違う部分の、片方だけに漢字があれば替えない（会った→あった、七転び八起き→ななころびやおき
+       などの書き分け。人工知能 v5 の採点は読みのままのかなや別の書き分けを好み、試験の正解を壊すため）。
+    ただし文全体にひらがなも漢字もなく（全部カタカナになった失敗）6文字以上なら、1と2と5は当てない。"""
     top, alt = segs[i][1][0]["value"], segs[i][1][j]["value"]
     text = "".join(c[0]["value"] for _, c in segs)
     fallback = len(text) >= 6 and not any(HIRA.match(ch) or KANJI.match(ch) for ch in text)
@@ -306,7 +308,10 @@ def guard_ok(segs, i, j):
         return False
     if any(LATIN.match(ch) or "0" <= ch <= "9" or "０" <= ch <= "９" for ch in top):
         return False  # 4. 1位に英字・数字があれば替えない（学習の文にない）
+    if GUARD_SCRIPT and not fallback and (any(KANJI.match(ch) for ch in td) != any(KANJI.match(ch) for ch in ad)):
+        return False  # 5. 違う部分の片方だけに漢字がある（漢字とかなの書き分け）なら替えない
     return True
+GUARD_SCRIPT = True  # --no-guard-script で決まり5を外す（比べるとき）
 GATE = None  # --gate: (Zenz を使わない選び手の確からしさ, 門のしきい値)
 GATE_STATS = {"segments": 0, "scored": 0, "surfaces": 0, "sentences": 0}
 
@@ -490,14 +495,17 @@ def main():
     ap.add_argument("--zenz-source", default="score", choices=["score", "trace"],
                     help="Zenz の点: score は採点し直した文全体の尤度（段階1）、trace は Zenzai の計算済みの分布（段階2b）")
     ap.add_argument("--guard", action="store_true", help="固有名を守る決まり（guard_ok）を当てる")
+    ap.add_argument("--no-guard-script", action="store_true",
+                    help="守りの決まり5（違う部分の片方だけに漢字があれば替えない）を外す（比べるとき）")
     ap.add_argument("--require-zenz", action="store_true", help="Zenz の点のある表記にだけ替える")
     ap.add_argument("--gate", type=float, help="Zenz を使わない選び手でこの確からしさ以上の文節だけ採点する（見積もり）")
     ap.add_argument("--export-stage3", help="段階3の重み（門と選び手）を書き出すファイル（--gate と --model lr のとき）")
     ap.add_argument("--export-threshold", type=float, default=0.7, help="段階3で1位を替えるしきい値")
     ap.add_argument("--weights-in",help="学習し直さずに使うロジスティック回帰の重み（--weights で書いたもの）")
     args = ap.parse_args()
-    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ, GUARD
+    global USE_ZENZ, MAX_ALTS, ZENZ_SOURCE, GATE, REQUIRE_ZENZ, GUARD, GUARD_SCRIPT
     USE_ZENZ = not args.no_zenz
+    GUARD_SCRIPT = not args.no_guard_script
     MAX_ALTS = args.max_alts
     ZENZ_SOURCE = args.zenz_source
     REQUIRE_ZENZ = args.require_zenz
