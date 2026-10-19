@@ -292,6 +292,8 @@ def guard_ok(segs, i, j):
     4. 1位に英字・数字があれば替えない（学習の文にない）。
     5. 1位と替える先の違う部分の、片方だけに漢字があれば替えない（会った→あった、七転び八起き→ななころびやおき
        などの書き分け。人工知能 v5 の採点は読みのままのかなや別の書き分けを好み、試験の正解を壊すため）。
+    6. 文のどこかに英字があれば替えない（英単語まじりの文は、材料では大文字と小文字の違いで机上の確かめから
+       外れていて、実際の試験で 見た→観た、聴く→聞く などを多く壊したため）。
     ただし文全体にひらがなも漢字もなく（全部カタカナになった失敗）6文字以上なら、1と2と5は当てない。"""
     top, alt = segs[i][1][0]["value"], segs[i][1][j]["value"]
     text = "".join(c[0]["value"] for _, c in segs)
@@ -310,6 +312,8 @@ def guard_ok(segs, i, j):
         return False  # 4. 1位に英字・数字があれば替えない（学習の文にない）
     if GUARD_SCRIPT and not fallback and (any(KANJI.match(ch) for ch in td) != any(KANJI.match(ch) for ch in ad)):
         return False  # 5. 違う部分の片方だけに漢字がある（漢字とかなの書き分け）なら替えない
+    if any(LATIN.match(ch) for ch in text):
+        return False  # 6. 文のどこかに英字があれば替えない
     return True
 GUARD_SCRIPT = True  # --no-guard-script で決まり5を外す（比べるとき）
 GATE = None  # --gate: (Zenz を使わない選び手の確からしさ, 門のしきい値)
@@ -583,7 +587,7 @@ def main():
                 "threshold": args.export_threshold, "gate": pack(gscaler, gclf), "main": pack(scaler, clf)},
                 ensure_ascii=False, indent=1) + "\n", encoding="utf-8", newline="\n")
 
-    thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95]
+    thresholds = [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95]
     sets = [("確かめ（学習用の残り2割）", val_items),
             ("ja400", data.get("ja400", [])), ("jaen（270+200b）", data.get("jaen", [])),
             ("wiki-typing", [it for g in groups if g.startswith("w") for it in data[g]]),

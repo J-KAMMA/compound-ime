@@ -343,6 +343,7 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
   // （文全体にひらがなも漢字もなく6文字以上＝全部カタカナになった失敗のときは、1と2と5は当てない）
   // 3. 1位の違う部分がひらがな1文字だけなら替えない。4. 1位に英字・数字があれば替えない。
   // 5. 1位と替える先の違う部分の、片方だけに漢字があれば替えない（漢字とかなの書き分け）。
+  // 6. 文のどこかに英字があれば替えない（ApplySelector の頭で見る）。
   static bool SelectorGuardOk(std::string_view top_s, std::string_view alt_s, bool fallback) {
     const auto top = SelectorCodepoints(top_s), alt = SelectorCodepoints(alt_s);
     size_t a = 0, b = 0;
@@ -402,6 +403,8 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
       fallback = cps.size() >= 6;
       for (char32_t c : cps) {
         if (SelectorHira(c) || SelectorKanji(c)) fallback = false;
+        // 守りの決まり6: 文のどこかに英字があれば替えない（guard_ok の6と同じ。採点もしない）
+        if (SelectorLatin(c)) return;
       }
     }
     std::vector<std::pair<size_t, size_t>> moves;
