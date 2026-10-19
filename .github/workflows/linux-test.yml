@@ -185,7 +185,7 @@ jobs:
               https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v1/zenz-v3.2-small-ft-v1-Q5_K_M.gguf
             echo "8e957561ce050f69fe89b68d106078b60ee9728a4b9a8260915944429f7a204f  $W/model.gguf" | sha256sum -c
           fi
-          MYIME_SELECTOR=0 bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
+          bash $W/repo/tools/run_tests.sh ${{ matrix.group }} $W/bin/engine $W/model.gguf $W/repo $W/results
       - uses: actions/upload-artifact@v4
         if: always()
         with:
