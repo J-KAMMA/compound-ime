@@ -13,6 +13,27 @@ on:
       model_file:
         description: その配布ページのファイル名（例 zenz-v3.2-small-ft-v1-Q5_K_M.gguf）
         default: ''
+      jev_gate_apply:
+        description: 判定の門（tools/apply_jev_gate.py）を組み込むか。false なら門を足さない（本線と同じ）変換エンジンを組み立てる。出力が同じかの比べ用
+        default: 'true'
+      test_groups:
+        description: 流す組の JSON の配列（例 ["ka","c","e1"]）。空なら全部の組（a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p）
+        default: ''
+      jev_gate_configs:
+        description: 判定の門の設定の JSON の配列（例 ["off","0.15","0.2","0.25"]。off は門なし）。決めると門の試験になる（ka、c、e1、e2、g、h、kd、ke と時間の kp を流し、jev_gate_report でまとめる）
+        default: ''
+      jev_model_release:
+        description: 門の模型を置いた下書きの配布ページの目印（門の試験のとき。公開しない）
+        default: ''
+      jev_model_file:
+        description: その配布ページの重みの表のファイル名（例 jevgate-fp16.bin）。隣に <名前>.vocab.json も置く
+        default: ''
+      jev_gate_select:
+        description: 門が要らないと当てたときの選び方（zenz か student。空なら zenz）
+        default: ''
+      jev_gate_reps:
+        description: 時間の試験（kp）の繰り返しの回数（空なら 3）
+        default: ''
 
 permissions:
   contents: read
@@ -66,7 +87,7 @@ jobs:
           path: |
             llama.cpp/build
             myime/src/swift-engine/.build
-          key: linux-engine-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_batch_score.py', 'repo/tools/apply_latency_profile.py', 'repo/tools/swift-Package.resolved') }}
+          key: linux-engine-gate${{ inputs.jev_gate_apply != 'false' && '1' || '0' }}-${{ hashFiles('repo/patches/llama-utf8.patch', 'repo/patches/myime-engine.patch', 'repo/tools/apply_linux_engine_port.py', 'repo/tools/apply_selector_trace.py', 'repo/tools/apply_selector_stage3.py', 'repo/tools/apply_zenzai_deadline.py', 'repo/tools/apply_context_gate.py', 'repo/tools/apply_batch_score.py', 'repo/tools/apply_latency_profile.py', 'repo/tools/apply_jev_gate.py', 'repo/tools/jev-gate/jev_gate.cc', 'repo/tools/jev-gate/jev_gate.h', 'repo/tools/jev-gate/jevgate_core.h', 'repo/tools/jev-gate/engine_gate.inc', 'repo/tools/jev-gate/engine_gate_config.inc', 'repo/tools/swift-Package.resolved') }}
 
       - name: 生成器と改造の適用
         run: |
@@ -95,6 +116,8 @@ jobs:
           $PY $W/repo/tools/apply_batch_score.py $W/myime/src
           # 変換1回の時間を段ごとに測る仕組み（MYIME_PROFILE のときだけ動く。普段の変換結果は変わらない）
           $PY $W/repo/tools/apply_latency_profile.py $S $W/myime/src
+          # 判定の門を変換の流れに組み込む（MYIME_JEV_GATE と MYIME_JEV_GATE_MODEL がそろったときだけ動く。なければ今までと同じ）
+          if [ "${{ inputs.jev_gate_apply }}" != "false" ]; then $PY $W/repo/tools/apply_jev_gate.py $S $W/myime/src $W/repo; fi
 
       - name: llama.cpp と変換エンジン
         run: |
@@ -164,8 +187,12 @@ jobs:
       contents: write
     strategy:
       fail-fast: false
+      # 同時に流す数は 15（時間の試験 1 と合わせて 16 以内）
+      max-parallel: 15
       matrix:
-        group: [a1, a2, b, c, d1, d2, e1, e2, f, g, h, i, j, p]
+        # 門の試験（jev_gate_configs）のときは、設定 × 正解を数える組（時間の kp は別の仕事 jev-gate-timing）
+        group: ${{ fromJSON(inputs.test_groups || (inputs.jev_gate_configs && '["ka","c","e1","e2","g","h","kd","ke"]') || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","p"]') }}
+        gate: ${{ fromJSON(inputs.jev_gate_configs || '["none"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -174,12 +201,23 @@ jobs:
         with:
           name: linux-bin
           path: bin
-      - name: 変換の試験（組 ${{ matrix.group }}）
+      - name: 変換の試験（組 ${{ matrix.group }}${{ inputs.jev_gate_configs && format('、門 {0}', matrix.gate) || '' }}）
         env:
           GH_TOKEN: ${{ github.token }}
+          JEV_GATE: ${{ matrix.gate }}
+          JEV_GATE_SELECT: ${{ inputs.jev_gate_select }}
         run: |
           set -eo pipefail
           W=$GITHUB_WORKSPACE
+          # 門の試験でないとき（門 none）は、門の環境を何も足さない
+          if [ "$JEV_GATE" = none ]; then unset JEV_GATE JEV_GATE_SELECT; fi
+          if [ -n "${JEV_GATE:-}" ] && [ "$JEV_GATE" != off ]; then
+            mkdir -p $W/gate
+            gh release download "${{ inputs.jev_model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.jev_model_file }}" -O $W/gate/jevgate.bin
+            gh release download "${{ inputs.jev_model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.jev_model_file }}.vocab.json" -O $W/gate/jevgate.bin.vocab.json
+            sha256sum $W/gate/jevgate.bin
+            export JEV_GATE_MODEL=$W/gate/jevgate.bin
+          fi
           chmod +x $W/bin/engine/session_handler_main
           if [ -n "${{ inputs.model_release }}" ]; then
             # 比べるための人工知能（公開しない下書きの配布ページから）
@@ -195,14 +233,84 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: results-${{ matrix.group }}
+          name: ${{ inputs.jev_gate_configs && format('results-{0}-{1}', matrix.gate, matrix.group) || format('results-{0}', matrix.group) }}
           path: results/
+          if-no-files-found: ignore
+
+  # 判定の門の時間の試験（組 kp）。設定を入れ替えながら同じ計算機で繰り返す。処理は1つだけ（tools/run_tests.sh）
+  jev-gate-timing:
+    needs: build
+    if: inputs.jev_gate_configs
+    runs-on: ubuntu-24.04
+    timeout-minutes: 240
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-bin
+          path: bin
+      - name: 時間の試験（組 kp）
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          chmod +x $W/bin/engine/session_handler_main
+          curl -fsSL -o $W/model.gguf \
+            https://github.com/J-KAMMA/compound-ime/releases/download/model-zenz-ft-v5/zenz-v3.2-small-ft-v5-mix-Q5_K_M.gguf
+          echo "2f9d9d9679dbd3b38ebd48f402369cc1c66f709bfcf83d70d87ca3353e541fff  $W/model.gguf" | sha256sum -c
+          mkdir -p $W/gate
+          gh release download "${{ inputs.jev_model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.jev_model_file }}" -O $W/gate/jevgate.bin
+          gh release download "${{ inputs.jev_model_release }}" -R "$GITHUB_REPOSITORY" -p "${{ inputs.jev_model_file }}.vocab.json" -O $W/gate/jevgate.bin.vocab.json
+          sha256sum $W/gate/jevgate.bin
+          export JEV_GATE_MODEL=$W/gate/jevgate.bin JEV_GATE=off JEV_GATE_SELECT="${{ inputs.jev_gate_select }}" JEV_GATE_REPS="${{ inputs.jev_gate_reps || '3' }}"
+          export JEV_GATE_CONFIGS="$(python3 -c 'import json,sys; print(" ".join(json.loads(sys.argv[1])))' '${{ inputs.jev_gate_configs }}')"
+          bash $W/repo/tools/run_tests.sh kp $W/bin/engine $W/model.gguf $W/repo $W/results
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: results-timing
+          path: results/
+          if-no-files-found: ignore
+
+  # 判定の門の試験のまとめ（tools/jev_gate_report.py）: 正解の数、門の判断、時間
+  jev-gate-report:
+    needs: [test, jev-gate-timing]
+    if: always() && inputs.jev_gate_configs
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+      - uses: actions/download-artifact@v4
+        with:
+          path: art
+      - name: まとめる
+        run: |
+          set -eo pipefail
+          ls art
+          args=""
+          for c in $(python3 -c 'import json,sys; print(" ".join(json.loads(sys.argv[1])))' '${{ inputs.jev_gate_configs }}'); do
+            mkdir -p res/$c
+            for d in art/results-$c-*; do cp -r $d/. res/$c/; done
+            args="$args $c=res/$c"
+          done
+          mkdir -p res/timing && [ -d art/results-timing ] && cp -r art/results-timing/. res/timing/ || true
+          python3 repo/tools/jev_gate_report.py --tests repo/tests/conversion --acc $args --time timing=res/timing --out report.md
+      - uses: actions/upload-artifact@v4
+        with:
+          name: jev-gate-report
+          path: report.md
           if-no-files-found: ignore
 
   # 組の結果を1つにまとめる（名前は今までと同じ linux-results）
   results:
     needs: test
-    if: always()
+    if: always() && !inputs.jev_gate_configs
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4

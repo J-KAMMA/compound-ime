@@ -29,6 +29,17 @@ run_one() {  # one input through the server; prints the output protocol text
     $E/session_handler_main --input "$1" --profile $W/p --dictionary oss < /dev/null 2>/dev/null
 }
 
+# 判定の門（tools/apply_jev_gate.py）。環境変数 JEV_GATE にしきい値（0.2 など）か off を決めたときだけ、
+# 門の判断の記録（MYIME_JEV_GATE_LOG）を組ごとに書く。しきい値のときは JEV_GATE_MODEL（jevgate.bin）も渡す。
+# JEV_GATE を決めなければ何もしない（今までの動き）。
+if [ -n "${JEV_GATE:-}" ]; then
+  export MYIME_JEV_GATE_LOG=$(cd "$OUT" && pwd)/jevgate-log-$GROUP.txt
+  if [ "$JEV_GATE" != off ]; then
+    export MYIME_JEV_GATE=$JEV_GATE MYIME_JEV_GATE_MODEL=$JEV_GATE_MODEL
+    [ -n "${JEV_GATE_SELECT:-}" ] && export MYIME_JEV_GATE_SELECT=$JEV_GATE_SELECT
+  fi
+fi
+
 case $GROUP in
 a1|a2)
   # 1,298文を前半と後半に分ける（まとめの段で inputs.tsv にする）
@@ -348,6 +359,44 @@ PY
     fi
   ) || true
   ;;
+ka)
+  # 判定の門の試験用: 日本語だけの400文と、利用者が見つけた失敗（b の正解を数える部分だけ。採点は tools/jev_gate_report.py）
+  romaji $T/ja400.json > $W/ja400.txt
+  $BATCH $W/ja400.txt $OUT/ja400.tsv 4
+  romaji $T/reported.json > $W/reported.txt
+  $BATCH $W/reported.txt $OUT/reported.tsv 1
+  ;;
+kd|ke)
+  # 判定の門の試験用: 前後の文がある試験の、前の文あり（kd）・なし（ke）。f の clause 試験は流さない
+  if [ -f $T/context.tsv ]; then
+    CTX="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/context.tsv"
+    if [ "$GROUP" = kd ]; then $CTX $OUT/context-with.tsv with 4; else $CTX $OUT/context-without.tsv without 4; fi
+  fi
+  ;;
+kp)
+  # 判定の門の時間の試験: 同じ計算機・同じ条件で、設定（JEV_GATE_CONFIGS。既定は off 0.15 0.2 0.25）を順に入れ替えながら
+  # JEV_GATE_REPS 回（既定3）繰り返し、変換1回の時間を測る。処理は1つだけ（ほかの処理と同時に流さない）。
+  # 人工知能の時間の上限・待ちの上限・先回りは外す（tools/latency_convert.sh の既定）。門が有効なとき先回りは元から止まる。
+  { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } > $OUT/jevgate-env.txt
+  LAT="bash $REPO/tools/latency_convert.sh $E/session_handler_main $E $MODEL"
+  romaji $T/ja400.json | awk '{print $0 "\t"}' > $W/lat-ja400.tsv
+  grep -v '^#' $T/wiki-typing.tsv | cut -f1 | awk 'NR%20==1 {print $0 "\t"}' > $W/lat-wiki.tsv
+  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t" $3}' > $W/lat-ctx-with.tsv
+  grep -v '^#' $T/context.tsv | awk -F'\t' 'NR%6==1 {print $1 "\t"}' > $W/lat-ctx-without.tsv
+  cat $W/lat-ja400.tsv $W/lat-wiki.tsv $W/lat-ctx-with.tsv $W/lat-ctx-without.tsv > $W/lat-all.tsv
+  for rep in $(seq 1 ${JEV_GATE_REPS:-3}); do
+    for cfg in ${JEV_GATE_CONFIGS:-off 0.15 0.2 0.25}; do
+      name=$OUT/lat-$cfg-r$rep
+      rm -f $name.gatelog
+      if [ "$cfg" = off ]; then
+        env -u MYIME_JEV_GATE -u MYIME_JEV_GATE_MODEL MYIME_JEV_GATE_LOG=$name.gatelog $LAT $W/lat-all.tsv $name
+      else
+        env MYIME_JEV_GATE=$cfg MYIME_JEV_GATE_MODEL=$JEV_GATE_MODEL MYIME_JEV_GATE_LOG=$name.gatelog $LAT $W/lat-all.tsv $name
+      fi
+      echo "lat $cfg r$rep: $(wc -l < $name.wall) 変換"
+    done
+  done
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x、ka、kd、ke、kp のどれか" >&2; exit 2 ;;
 esac
