@@ -55,6 +55,8 @@ python tools/build_ut_dictionary.py --mozc <src> --ut <ut-dir> --sources sudachi
 
 任意（`tools/data` の作り直し）: `build_brand_casing.py`（`--ut` に上記 txt）、`build_hepburn_names.py`、`build_loanword_pairs.py`（`--cmudict`、`--lexicon`）。
 
+大文字を含む英字の固有名詞（`tools/data/proper-nouns.tsv`、Wikidata の CC0 データ）の作り直し: `fetch_wikidata_names.py --out <dir>`（Wikidata の問い合わせサービスと Wikimedia の API から取得。約1時間）、続けて `build_proper_nouns.py`（`--wikidata <dir>` ほか。詳しくは冒頭の説明。英語の検出器の試し用 `native/jaen-detector/jaen_trial.cc` が要る）。日本語だけの文のローマ字と英単語まじりの文は `make_japanese_romaji_corpus.py` で作る。
+
 ## 4. precision117 エンジンを重ねる
 
 ```

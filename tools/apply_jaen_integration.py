@@ -1736,6 +1736,13 @@ subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py
                 "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
 
+# 大文字を含む英字の固有名詞（dictionary14.txt）: ぐーぐる の候補に Google、にゅーよーく に New York など
+# （tools/data/proper-nouns.tsv。カタカナの語があればその次、なければ既存の語より後ろ）。
+subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.py"), "--mozc", str(src),
+                "--names", str(REPO / "tools/data/proper-nouns.tsv"),
+                "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
+(src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
@@ -2627,16 +2634,35 @@ for line in (REPO / "tools/data/domain-casing.tsv").read_text(encoding="utf-8").
         if typed not in _cased and shown != typed and '"' not in shown and "\\" not in shown:
             pairs.append([typed, shown])
             _cased.add(typed)
-assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs)
+# 大文字を含む英字の固有名詞（tools/data/proper-nouns.tsv。tools/build_proper_nouns.py で作る。Wikidata CC0）の
+# 表示の形も足す（上の表を優先）。普通の英単語でもある名前（印 s: china、shell）は、打った形を先に、
+# 固有名詞を2番目に出す表（kBrandCasingSecond）に入れる。打つ形が2語（new york）の名前は、英語の言い回しの
+# 一覧にも入れる（下の kPhrases）。
+second_pairs = []
+proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.tsv").read_text(encoding="utf-8").splitlines()
+                if line and not line.startswith("#")]
+for row in proper_nouns:
+    shown, typed_form = row[0], row[1]
+    if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
+        (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
+        _cased.add(typed_form)
+assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs + second_pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"
     "inline constexpr const char* kBrandCasing[][2] = {\n" +
-    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(pairs)) + "};\n",
+    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(pairs)) + "};\n"
+    "// Names that are also common English words: the word as typed first, the name second.\n"
+    "// (An empty first entry keeps the array from being empty.)\n"
+    "inline constexpr const char* kBrandCasingSecond[][2] = {\n    {\"\", \"\"},\n" +
+    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(second_pairs)) + "};\n",
     encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.h", """// Kana trigram model of Mozc's dictionary readings, for jaen::FixTypo.""",
      """// The official spelling of a brand or service name typed in lowercase
 // ("youtube" -> "YouTube"), or empty (tools/data/brand-casing.tsv).
 std::string_view BrandCasing(std::string_view typed);
+
+// A name that is also a common English word ("china" -> "China"): shown after the word as typed.
+std::string_view BrandCasingSecond(std::string_view typed);
 
 // Kana trigram model of Mozc's dictionary readings, for jaen::FixTypo.""")
 edit("converter/english_lexicon.h", """#include "converter/correction_log.h"
@@ -2658,6 +2684,17 @@ edit("converter/english_lexicon.cc", """jaen::ChoiceStore& EnglishChoices() {"""
                                                           : std::string_view();
 }
 
+std::string_view BrandCasingSecond(std::string_view typed) {
+  const auto* end = std::end(kBrandCasingSecond);
+  const auto* it = std::lower_bound(std::begin(kBrandCasingSecond), end, typed,
+                                    [](const auto& entry, std::string_view key) {
+                                      return std::string_view(entry[0]) < key;
+                                    });
+  return it != end && std::string_view((*it)[0]) == typed && !typed.empty()
+             ? std::string_view((*it)[1])
+             : std::string_view();
+}
+
 jaen::ChoiceStore& EnglishChoices() {""")
 t = (src / "converter/english_lexicon.cc").read_text(encoding="utf-8")
 if "#include <algorithm>" not in t:
@@ -2675,6 +2712,12 @@ edit("converter/converter.cc", """      PutTypedValueFirst((next++)->second, &se
       if (const std::string_view official = BrandCasing(typed);
           !official.empty() && !EnglishLexicon().FindPlace(typed)) {
         PutTypedValueFirst(official, &segment);
+      } else if (const std::string_view second = BrandCasingSecond(typed);
+                 !second.empty() && !EnglishLexicon().FindPlace(typed)) {
+        // A name that is also a common word (china, shell): the word as typed
+        // stays first, the name is second.
+        PutTypedValueFirst(second, &segment);
+        PutTypedValueFirst(typed, &segment);
       }
       AddPlaceKanji(&segment);""")
 
@@ -2981,6 +3024,8 @@ signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
 # 略語・IT・サービス名（tools/data/jaen-modern-words.tsv、約6,000語）も、強い印のときだけ使う語に足す
 signal += [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
            if line and not line.startswith("#") and "\t" in line]
+# 大文字を含む英字の固有名詞（tools/data/proper-nouns.tsv）のうち、英語として取れる名前（打つ形が空でないもの）
+signal += [row[1] for row in proper_nouns if row[1] and " " not in row[1]]
 inc = src / "converter/english_lexicon_data.inc"
 inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
@@ -2992,6 +3037,7 @@ edit("converter/english_lexicon.cc",
 # 続けて打った言い回しは、かなの切れ目の上なら1つの英語の文節にし、空白を入れて表示する。
 phrases = [line.strip() for line in (REPO / "tools/data/english-phrases.txt").read_text(encoding="utf-8").splitlines()
            if line.strip() and not line.startswith("#")]
+phrases += [row[1] for row in proper_nouns if " " in row[1]]  # new york、los angeles など2語以上の名前
 inc = src / "converter/english_lexicon_data.inc"
 inc.write_text(inc.read_text(encoding="utf-8") + array("kPhrases", phrases), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
