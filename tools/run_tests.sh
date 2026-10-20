@@ -32,12 +32,25 @@ run_one() {  # one input through the server; prints the output protocol text
 # 判定の門（tools/apply_jev_gate.py）。環境変数 JEV_GATE にしきい値（0.2 など）か off を決めたときだけ、
 # 門の判断の記録（MYIME_JEV_GATE_LOG）を組ごとに書く。しきい値のときは JEV_GATE_MODEL（jevgate.bin）も渡す。
 # JEV_GATE を決めなければ何もしない（今までの動き）。
+# 設定の名前: off（門なし）、<しきい値>（zenz で採点して選ぶ）、<しきい値>_student（模型自身の点で選ぶ）、
+# <しきい値>_zenz<数>（zenz で上位<数>個だけ採点して選ぶ）。環境変数を決める（子の処理に渡す）。
+jev_gate_env() {
+  local cfg=$1 th=${1%%_*} rest=""
+  [ "$cfg" != "$th" ] && rest=${cfg#*_}
+  unset MYIME_JEV_GATE MYIME_JEV_GATE_MODEL MYIME_JEV_GATE_SELECT MYIME_JEV_GATE_SCORE_N
+  [ "$cfg" = off ] && return 0
+  export MYIME_JEV_GATE=$th MYIME_JEV_GATE_MODEL=$JEV_GATE_MODEL
+  case $rest in
+    student) export MYIME_JEV_GATE_SELECT=student ;;
+    zenz*) [ -n "${rest#zenz}" ] && export MYIME_JEV_GATE_SCORE_N=${rest#zenz} ;;
+  esac
+  return 0
+}
 if [ -n "${JEV_GATE:-}" ]; then
   export MYIME_JEV_GATE_LOG=$(cd "$OUT" && pwd)/jevgate-log-$GROUP.txt
-  if [ "$JEV_GATE" != off ]; then
-    export MYIME_JEV_GATE=$JEV_GATE MYIME_JEV_GATE_MODEL=$JEV_GATE_MODEL
-    [ -n "${JEV_GATE_SELECT:-}" ] && export MYIME_JEV_GATE_SELECT=$JEV_GATE_SELECT
-  fi
+  jev_gate_env "$JEV_GATE"
+  [ -n "${JEV_GATE_SELECT:-}" ] && [ "$JEV_GATE" != off ] && export MYIME_JEV_GATE_SELECT=$JEV_GATE_SELECT
+  true
 fi
 
 case $GROUP in
@@ -388,11 +401,7 @@ kp)
     for cfg in ${JEV_GATE_CONFIGS:-off 0.15 0.2 0.25}; do
       name=$OUT/lat-$cfg-r$rep
       rm -f $name.gatelog
-      if [ "$cfg" = off ]; then
-        env -u MYIME_JEV_GATE -u MYIME_JEV_GATE_MODEL MYIME_JEV_GATE_LOG=$name.gatelog $LAT $W/lat-all.tsv $name
-      else
-        env MYIME_JEV_GATE=$cfg MYIME_JEV_GATE_MODEL=$JEV_GATE_MODEL MYIME_JEV_GATE_LOG=$name.gatelog $LAT $W/lat-all.tsv $name
-      fi
+      ( jev_gate_env "$cfg"; MYIME_JEV_GATE_LOG=$name.gatelog $LAT $W/lat-all.tsv $name )
       echo "lat $cfg r$rep: $(wc -l < $name.wall) 変換"
     done
   done

@@ -240,9 +240,9 @@ jobs:
   # 判定の門の時間の試験（組 kp）。設定を入れ替えながら同じ計算機で繰り返す。処理は1つだけ（tools/run_tests.sh）
   jev-gate-timing:
     needs: build
-    if: inputs.jev_gate_configs
+    if: inputs.jev_gate_configs && inputs.jev_gate_apply != 'false'
     runs-on: ubuntu-24.04
-    timeout-minutes: 240
+    timeout-minutes: 330
     permissions:
       contents: write
     steps:
