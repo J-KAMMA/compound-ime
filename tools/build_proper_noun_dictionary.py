@@ -6,8 +6,10 @@
 For each line of tools/data/proper-nouns.tsv (shown<TAB>typed<TAB>flags<TAB>readings<TAB>...), the
 spelling (Google, New York, Elon Musk) becomes a candidate of each reading (ぐーぐる, にゅーよーく).
 It never takes the first place from what Mozc already has:
-- the same katakana word is in Mozc's dictionary with that reading: the name takes its part of speech
-  and cost plus --penalty, so it comes right after the katakana word (グーグル, then Google);
+- the same katakana word is in Mozc's dictionary with that reading and is the cheapest entry of the
+  reading: the name takes its part of speech and cost plus --penalty, so it comes right after the
+  katakana word (グーグル, then Google). When another word is cheaper (たいら: 平), the name costs --margin
+  more than every entry of the reading (it never beat the Japanese words in a sentence: Tyla);
 - the reading is in Mozc's dictionary otherwise: the name costs --margin more than every entry of that
   reading;
 - a reading Mozc does not have (4 kana or more): a proper-noun entry at --default-cost, high enough that
@@ -57,7 +59,7 @@ def main():
         ids.setdefault(pos, number)
     existing = set()
     katakana_entries = {}  # (reading, katakana) -> (lid, rid, cost)
-    max_cost = {}
+    max_cost, min_cost = {}, {}
     for path in sorted(data.glob("dictionary*.txt")):
         if path.name == "dictionary14.txt":
             continue
@@ -68,6 +70,7 @@ def main():
             reading, lid, rid, cost, surface = f[0], int(f[1]), int(f[2]), int(f[3]), f[4]
             existing.add((reading, surface))
             max_cost[reading] = max(max_cost.get(reading, 0), cost)
+            min_cost[reading] = min(min_cost.get(reading, 1 << 30), cost)
             if surface == katakana(reading):  # the reading written in katakana, as the name is usually written
                 old = katakana_entries.get((reading, surface))
                 if old is None or cost < old[2]:
@@ -83,8 +86,10 @@ def main():
             if not HIRAGANA.fullmatch(reading) or len(reading) < 3 or (reading, shown) in existing:
                 continue
             kata = katakana_entries.get((reading, katakana(reading)))
-            if kata:
+            if kata and kata[2] <= min_cost[reading]:  # the katakana word is Mozc's first choice for the reading
                 lid, rid, cost = kata[0], kata[1], kata[2] + args.penalty
+            elif kata:  # also a Japanese word (たいら: 平, Tyla is タイラ): the name stays behind all of them
+                lid, rid, cost = kata[0], kata[1], max_cost[reading] + args.margin
             else:
                 if reading not in max_cost and len(reading) < 4:
                     continue  # a short reading no word has: the name could win over kana of other words
