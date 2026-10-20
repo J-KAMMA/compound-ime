@@ -1,0 +1,1165 @@
+# 固有名詞の試験（文）。tools/proper_noun_test.py で作成。列: ローマ字<TAB>期待する文<TAB>分野<TAB>名前<TAB>由来（hand: 手で書いた名前、sample: tools/data/proper-nouns.tsv からの無作為の標本）
+googlehasekaijuudeshirareteimasu.	Googleは世界中で知られています。	company	Google	hand
+kinou,googlenonyu-suwomimashita.	昨日、Googleのニュースを見ました。	company	Google	hand
+kinou,microsoftnonyu-suwomimashita.	昨日、Microsoftのニュースを見ました。	company	Microsoft	hand
+microsoftnokotowokanngaerutotanoshikunarimasu.	Microsoftのことを考えると楽しくなります。	company	Microsoft	hand
+imoutohaamazonnofanndesu.	妹はAmazonのファンです。	company	Amazon	hand
+kyouhaamazonnitsuiteshirabemashita.	今日はAmazonについて調べました。	company	Amazon	hand
+konohonnhafacebooknitsuitekakareteimasu.	この本はFacebookについて書かれています。	company	Facebook	hand
+watakushihafacebookgasukidesu.	私はFacebookが好きです。	company	Facebook	hand
+netflixnokotowokanngaerutotanoshikunarimasu.	Netflixのことを考えると楽しくなります。	company	Netflix	hand
+imoutohanetflixnofanndesu.	妹はNetflixのファンです。	company	Netflix	hand
+teslanokotowokanngaerutotanoshikunarimasu.	Teslaのことを考えると楽しくなります。	company	Tesla	hand
+kaigideteslanojireiwoshoukaishimashita.	会議でTeslaの事例を紹介しました。	company	Tesla	hand
+kyouhanvidianitsuiteshirabemashita.	今日はNvidiaについて調べました。	company	Nvidia	hand
+konohonnhanvidianitsuitekakareteimasu.	この本はNvidiaについて書かれています。	company	Nvidia	hand
+karehaintelnikuwashiidesu.	彼はIntelに詳しいです。	company	Intel	hand
+konohonnhaintelnitsuitekakareteimasu.	この本はIntelについて書かれています。	company	Intel	hand
+konohonnhasamsungnitsuitekakareteimasu.	この本はSamsungについて書かれています。	company	Samsung	hand
+anohitohasamsungdehataraiteimasu.	あの人はSamsungで働いています。	company	Samsung	hand
+kinou,huaweinonyu-suwomimashita.	昨日、Huaweiのニュースを見ました。	company	Huawei	hand
+anohitohahuaweidehataraiteimasu.	あの人はHuaweiで働いています。	company	Huawei	hand
+kodomonokorokaraxiaominiakogareteimashita.	子供のころからXiaomiに憧れていました。	company	Xiaomi	hand
+xiaominokotowokanngaerutotanoshikunarimasu.	Xiaomiのことを考えると楽しくなります。	company	Xiaomi	hand
+konohonnhadisneynitsuitekakareteimasu.	この本はDisneyについて書かれています。	company	Disney	hand
+kaigidedisneynojireiwoshoukaishimashita.	会議でDisneyの事例を紹介しました。	company	Disney	hand
+anohitohawalmartdehataraiteimasu.	あの人はWalmartで働いています。	company	Walmart	hand
+karehawalmartnikuwashiidesu.	彼はWalmartに詳しいです。	company	Walmart	hand
+kinou,starbucksnonyu-suwomimashita.	昨日、Starbucksのニュースを見ました。	company	Starbucks	hand
+anohitohastarbucksdehataraiteimasu.	あの人はStarbucksで働いています。	company	Starbucks	hand
+imoutohamcdonaldsnofanndesu.	妹はMcDonald'sのファンです。	company	McDonald's	hand
+kaigidemcdonaldsnojireiwoshoukaishimashita.	会議でMcDonald'sの事例を紹介しました。	company	McDonald's	hand
+kinou,cocacolanonyu-suwomimashita.	昨日、Coca-Colaのニュースを見ました。	company	Coca-Cola	hand
+konohonnhacocacolanitsuitekakareteimasu.	この本はCoca-Colaについて書かれています。	company	Coca-Cola	hand
+anohitohapepsidehataraiteimasu.	あの人はPepsiで働いています。	company	Pepsi	hand
+pepsinokotowokanngaerutotanoshikunarimasu.	Pepsiのことを考えると楽しくなります。	company	Pepsi	hand
+nikehasekaijuudeshirareteimasu.	Nikeは世界中で知られています。	company	Nike	hand
+ekidenikenokoukokuwomitsukemashita.	駅でNikeの広告を見つけました。	company	Nike	hand
+kyouhaadidasnitsuiteshirabemashita.	今日はAdidasについて調べました。	company	Adidas	hand
+kinou,adidasnonyu-suwomimashita.	昨日、Adidasのニュースを見ました。	company	Adidas	hand
+kyouhapumanitsuiteshirabemashita.	今日はPumaについて調べました。	company	Puma	hand
+karehapumanikuwashiidesu.	彼はPumaに詳しいです。	company	Puma	hand
+toyotanokotowokanngaerutotanoshikunarimasu.	Toyotaのことを考えると楽しくなります。	company	Toyota	hand
+toyotahasekaijuudeshirareteimasu.	Toyotaは世界中で知られています。	company	Toyota	hand
+anohitohahondadehataraiteimasu.	あの人はHondaで働いています。	company	Honda	hand
+sennshuu,hondanohanashiwoshimashita.	先週、Hondaの話をしました。	company	Honda	hand
+karehanissannikuwashiidesu.	彼はNissanに詳しいです。	company	Nissan	hand
+kodomonokorokaranissanniakogareteimashita.	子供のころからNissanに憧れていました。	company	Nissan	hand
+ekidesonynokoukokuwomitsukemashita.	駅でSonyの広告を見つけました。	company	Sony	hand
+sennshuu,sonynohanashiwoshimashita.	先週、Sonyの話をしました。	company	Sony	hand
+ekidepanasonicnokoukokuwomitsukemashita.	駅でPanasonicの広告を見つけました。	company	Panasonic	hand
+kaigidepanasonicnojireiwoshoukaishimashita.	会議でPanasonicの事例を紹介しました。	company	Panasonic	hand
+nintendohasekaijuudeshirareteimasu.	Nintendoは世界中で知られています。	company	Nintendo	hand
+kyouhanintendonitsuiteshirabemashita.	今日はNintendoについて調べました。	company	Nintendo	hand
+uniqlohasekaijuudeshirareteimasu.	Uniqloは世界中で知られています。	company	Uniqlo	hand
+uniqlonokoushikisaitowokakuninnshitekudasai.	Uniqloの公式サイトを確認してください。	company	Uniqlo	hand
+rakutenhasekaijuudeshirareteimasu.	Rakutenは世界中で知られています。	company	Rakuten	hand
+kyouharakutennitsuiteshirabemashita.	今日はRakutenについて調べました。	company	Rakuten	hand
+yahoonokotowokanngaerutotanoshikunarimasu.	Yahooのことを考えると楽しくなります。	company	Yahoo	hand
+kinou,yahoononyu-suwomimashita.	昨日、Yahooのニュースを見ました。	company	Yahoo	hand
+oraclehasekaijuudeshirareteimasu.	Oracleは世界中で知られています。	company	Oracle	hand
+ekideoraclenokoukokuwomitsukemashita.	駅でOracleの広告を見つけました。	company	Oracle	hand
+imoutohaadobenofanndesu.	妹はAdobeのファンです。	company	Adobe	hand
+konohonnhaadobenitsuitekakareteimasu.	この本はAdobeについて書かれています。	company	Adobe	hand
+salesforcenokotowokanngaerutotanoshikunarimasu.	Salesforceのことを考えると楽しくなります。	company	Salesforce	hand
+salesforcenokoushikisaitowokakuninnshitekudasai.	Salesforceの公式サイトを確認してください。	company	Salesforce	hand
+spotifynokoushikisaitowokakuninnshitekudasai.	Spotifyの公式サイトを確認してください。	company	Spotify	hand
+ekidespotifynokoukokuwomitsukemashita.	駅でSpotifyの広告を見つけました。	company	Spotify	hand
+karehaubernikuwashiidesu.	彼はUberに詳しいです。	company	Uber	hand
+kodomonokorokarauberniakogareteimashita.	子供のころからUberに憧れていました。	company	Uber	hand
+airbnbnokoushikisaitowokakuninnshitekudasai.	Airbnbの公式サイトを確認してください。	company	Airbnb	hand
+airbnbhasekaijuudeshirareteimasu.	Airbnbは世界中で知られています。	company	Airbnb	hand
+paypalnokoushikisaitowokakuninnshitekudasai.	PayPalの公式サイトを確認してください。	company	PayPal	hand
+karehapaypalnikuwashiidesu.	彼はPayPalに詳しいです。	company	PayPal	hand
+watakushihavisagasukidesu.	私はVisaが好きです。	company	Visa	hand
+karehavisanikuwashiidesu.	彼はVisaに詳しいです。	company	Visa	hand
+kodomonokorokaramastercardniakogareteimashita.	子供のころからMastercardに憧れていました。	company	Mastercard	hand
+kinou,mastercardnonyu-suwomimashita.	昨日、Mastercardのニュースを見ました。	company	Mastercard	hand
+kodomonokorokaraboeingniakogareteimashita.	子供のころからBoeingに憧れていました。	company	Boeing	hand
+karehaboeingnikuwashiidesu.	彼はBoeingに詳しいです。	company	Boeing	hand
+ekideairbusnokoukokuwomitsukemashita.	駅でAirbusの広告を見つけました。	company	Airbus	hand
+sennshuu,airbusnohanashiwoshimashita.	先週、Airbusの話をしました。	company	Airbus	hand
+karehaferrarinikuwashiidesu.	彼はFerrariに詳しいです。	company	Ferrari	hand
+ferrarinokoushikisaitowokakuninnshitekudasai.	Ferrariの公式サイトを確認してください。	company	Ferrari	hand
+kodomonokorokaraporscheniakogareteimashita.	子供のころからPorscheに憧れていました。	company	Porsche	hand
+imoutohaporschenofanndesu.	妹はPorscheのファンです。	company	Porsche	hand
+imoutohavolkswagennofanndesu.	妹はVolkswagenのファンです。	company	Volkswagen	hand
+volkswagennokoushikisaitowokakuninnshitekudasai.	Volkswagenの公式サイトを確認してください。	company	Volkswagen	hand
+ekidemercedesbenznokoukokuwomitsukemashita.	駅でMercedes-Benzの広告を見つけました。	company	Mercedes-Benz	hand
+mercedesbenznokoushikisaitowokakuninnshitekudasai.	Mercedes-Benzの公式サイトを確認してください。	company	Mercedes-Benz	hand
+anohitohabmwdehataraiteimasu.	あの人はBMWで働いています。	company	BMW	hand
+kaigidebmwnojireiwoshoukaishimashita.	会議でBMWの事例を紹介しました。	company	BMW	hand
+karehaibmnikuwashiidesu.	彼はIBMに詳しいです。	company	IBM	hand
+ibmnokotowokanngaerutotanoshikunarimasu.	IBMのことを考えると楽しくなります。	company	IBM	hand
+qualcommhasekaijuudeshirareteimasu.	Qualcommは世界中で知られています。	company	Qualcomm	hand
+qualcommnokoushikisaitowokakuninnshitekudasai.	Qualcommの公式サイトを確認してください。	company	Qualcomm	hand
+konohonnhacisconitsuitekakareteimasu.	この本はCiscoについて書かれています。	company	Cisco	hand
+sennshuu,cisconohanashiwoshimashita.	先週、Ciscoの話をしました。	company	Cisco	hand
+kodomonokorokaradellniakogareteimashita.	子供のころからDellに憧れていました。	company	Dell	hand
+anohitohadelldehataraiteimasu.	あの人はDellで働いています。	company	Dell	hand
+sennshuu,lenovonohanashiwoshimashita.	先週、Lenovoの話をしました。	company	Lenovo	hand
+kyouhalenovonitsuiteshirabemashita.	今日はLenovoについて調べました。	company	Lenovo	hand
+anohitohaasusdehataraiteimasu.	あの人はAsusで働いています。	company	Asus	hand
+ekideasusnokoukokuwomitsukemashita.	駅でAsusの広告を見つけました。	company	Asus	hand
+kodomonokorokaralogitechniakogareteimashita.	子供のころからLogitechに憧れていました。	company	Logitech	hand
+logitechnokotowokanngaerutotanoshikunarimasu.	Logitechのことを考えると楽しくなります。	company	Logitech	hand
+kyouhanestlenitsuiteshirabemashita.	今日はNestleについて調べました。	company	Nestle	hand
+kodomonokorokaranestleniakogareteimashita.	子供のころからNestleに憧れていました。	company	Nestle	hand
+konohonnhaunilevernitsuitekakareteimasu.	この本はUnileverについて書かれています。	company	Unilever	hand
+kinou,unilevernonyu-suwomimashita.	昨日、Unileverのニュースを見ました。	company	Unilever	hand
+ikeahasekaijuudeshirareteimasu.	Ikeaは世界中で知られています。	company	Ikea	hand
+konohonnhaikeanitsuitekakareteimasu.	この本はIkeaについて書かれています。	company	Ikea	hand
+karehazaranikuwashiidesu.	彼はZaraに詳しいです。	company	Zara	hand
+kaigidezaranojireiwoshoukaishimashita.	会議でZaraの事例を紹介しました。	company	Zara	hand
+guccinokotowokanngaerutotanoshikunarimasu.	Gucciのことを考えると楽しくなります。	company	Gucci	hand
+kyouhaguccinitsuiteshirabemashita.	今日はGucciについて調べました。	company	Gucci	hand
+imoutohalouisvuittonnofanndesu.	妹はLouis Vuittonのファンです。	company	Louis Vuitton	hand
+anohitohalouisvuittondehataraiteimasu.	あの人はLouis Vuittonで働いています。	company	Louis Vuitton	hand
+anohitohachaneldehataraiteimasu.	あの人はChanelで働いています。	company	Chanel	hand
+chanelnokotowokanngaerutotanoshikunarimasu.	Chanelのことを考えると楽しくなります。	company	Chanel	hand
+watakushiharolexgasukidesu.	私はRolexが好きです。	company	Rolex	hand
+imoutoharolexnofanndesu.	妹はRolexのファンです。	company	Rolex	hand
+karehaopenainikuwashiidesu.	彼はOpenAIに詳しいです。	company	OpenAI	hand
+kinou,openainonyu-suwomimashita.	昨日、OpenAIのニュースを見ました。	company	OpenAI	hand
+anohitohaanthropicdehataraiteimasu.	あの人はAnthropicで働いています。	company	Anthropic	hand
+kodomonokorokaraanthropicniakogareteimashita.	子供のころからAnthropicに憧れていました。	company	Anthropic	hand
+sennshuu,iphonenohanashiwoshimashita.	先週、iPhoneの話をしました。	product	iPhone	hand
+tomodachigaiphonewotsukatteimasu.	友達がiPhoneを使っています。	product	iPhone	hand
+karehaipadnikuwashiidesu.	彼はiPadに詳しいです。	product	iPad	hand
+mainichiipadwotsukatteshigotowoshiteimasu.	毎日iPadを使って仕事をしています。	product	iPad	hand
+sennshuu,macbooknohanashiwoshimashita.	先週、MacBookの話をしました。	product	MacBook	hand
+tomodachigamacbookwotsukatteimasu.	友達がMacBookを使っています。	product	MacBook	hand
+karehaairpodsnikuwashiidesu.	彼はAirPodsに詳しいです。	product	AirPods	hand
+kaigideairpodsnojireiwoshoukaishimashita.	会議でAirPodsの事例を紹介しました。	product	AirPods	hand
+atarashiiplaystationnokinouwotameshimashita.	新しいPlayStationの機能を試しました。	product	PlayStation	hand
+imoutohaplaystationnofanndesu.	妹はPlayStationのファンです。	product	PlayStation	hand
+sennshuu,xboxnohanashiwoshimashita.	先週、Xboxの話をしました。	product	Xbox	hand
+xboxnokoushikisaitowokakuninnshitekudasai.	Xboxの公式サイトを確認してください。	product	Xbox	hand
+sennshuu,youtubenohanashiwoshimashita.	先週、YouTubeの話をしました。	product	YouTube	hand
+youtubenokoushikisaitowokakuninnshitekudasai.	YouTubeの公式サイトを確認してください。	product	YouTube	hand
+instagramnokoushikisaitowokakuninnshitekudasai.	Instagramの公式サイトを確認してください。	product	Instagram	hand
+instagramhasekaijuudeshirareteimasu.	Instagramは世界中で知られています。	product	Instagram	hand
+twitternokoushikisaitowokakuninnshitekudasai.	Twitterの公式サイトを確認してください。	product	Twitter	hand
+ekidetwitternokoukokuwomitsukemashita.	駅でTwitterの広告を見つけました。	product	Twitter	hand
+kinou,tiktoknonyu-suwomimashita.	昨日、TikTokのニュースを見ました。	product	TikTok	hand
+ekidetiktoknokoukokuwomitsukemashita.	駅でTikTokの広告を見つけました。	product	TikTok	hand
+mainichilinkedinwotsukatteshigotowoshiteimasu.	毎日LinkedInを使って仕事をしています。	product	LinkedIn	hand
+linkedinhasekaijuudeshirareteimasu.	LinkedInは世界中で知られています。	product	LinkedIn	hand
+kyouhawhatsappnitsuiteshirabemashita.	今日はWhatsAppについて調べました。	product	WhatsApp	hand
+ekidewhatsappnokoukokuwomitsukemashita.	駅でWhatsAppの広告を見つけました。	product	WhatsApp	hand
+kyouhasnapchatnitsuiteshirabemashita.	今日はSnapchatについて調べました。	product	Snapchat	hand
+imoutohasnapchatnofanndesu.	妹はSnapchatのファンです。	product	Snapchat	hand
+sennshuu,pinterestnohanashiwoshimashita.	先週、Pinterestの話をしました。	product	Pinterest	hand
+konohonnhapinterestnitsuitekakareteimasu.	この本はPinterestについて書かれています。	product	Pinterest	hand
+imoutoharedditnofanndesu.	妹はRedditのファンです。	product	Reddit	hand
+kareharedditnikuwashiidesu.	彼はRedditに詳しいです。	product	Reddit	hand
+karehawikipedianikuwashiidesu.	彼はWikipediaに詳しいです。	product	Wikipedia	hand
+wikipedianokotowokanngaerutotanoshikunarimasu.	Wikipediaのことを考えると楽しくなります。	product	Wikipedia	hand
+dropboxnokoushikisaitowokakuninnshitekudasai.	Dropboxの公式サイトを確認してください。	product	Dropbox	hand
+kyouhadropboxnitsuiteshirabemashita.	今日はDropboxについて調べました。	product	Dropbox	hand
+kaigideevernotenojireiwoshoukaishimashita.	会議でEvernoteの事例を紹介しました。	product	Evernote	hand
+karehaevernotenikuwashiidesu.	彼はEvernoteに詳しいです。	product	Evernote	hand
+skypenokotowokanngaerutotanoshikunarimasu.	Skypeのことを考えると楽しくなります。	product	Skype	hand
+sennshuu,skypenohanashiwoshimashita.	先週、Skypeの話をしました。	product	Skype	hand
+imoutohazoomnofanndesu.	妹はZoomのファンです。	product	Zoom	hand-ambiguous
+atarashiizoomnokinouwotameshimashita.	新しいZoomの機能を試しました。	product	Zoom	hand-ambiguous
+kyouhaslacknitsuiteshirabemashita.	今日はSlackについて調べました。	product	Slack	hand
+atarashiislacknokinouwotameshimashita.	新しいSlackの機能を試しました。	product	Slack	hand
+discordnokotowokanngaerutotanoshikunarimasu.	Discordのことを考えると楽しくなります。	product	Discord	hand
+mainichidiscordwotsukatteshigotowoshiteimasu.	毎日Discordを使って仕事をしています。	product	Discord	hand
+imoutohatwitchnofanndesu.	妹はTwitchのファンです。	product	Twitch	hand
+tomodachigatwitchwotsukatteimasu.	友達がTwitchを使っています。	product	Twitch	hand
+steamnokoushikisaitowokakuninnshitekudasai.	Steamの公式サイトを確認してください。	product	Steam	hand-ambiguous
+mainichisteamwotsukatteshigotowoshiteimasu.	毎日Steamを使って仕事をしています。	product	Steam	hand-ambiguous
+tomodachigakindlewotsukatteimasu.	友達がKindleを使っています。	product	Kindle	hand
+atarashiikindlenokinouwotameshimashita.	新しいKindleの機能を試しました。	product	Kindle	hand
+alexanokoushikisaitowokakuninnshitekudasai.	Alexaの公式サイトを確認してください。	product	Alexa	hand
+watakushihaalexagasukidesu.	私はAlexaが好きです。	product	Alexa	hand
+konohonnhasirinitsuitekakareteimasu.	この本はSiriについて書かれています。	product	Siri	hand
+imoutohasirinofanndesu.	妹はSiriのファンです。	product	Siri	hand
+imoutohagmailnofanndesu.	妹はGmailのファンです。	product	Gmail	hand
+sennshuu,gmailnohanashiwoshimashita.	先週、Gmailの話をしました。	product	Gmail	hand
+atarashiichromenokinouwotameshimashita.	新しいChromeの機能を試しました。	product	Chrome	hand
+kyouhachromenitsuiteshirabemashita.	今日はChromeについて調べました。	product	Chrome	hand
+kyouhafirefoxnitsuiteshirabemashita.	今日はFirefoxについて調べました。	product	Firefox	hand
+imoutohafirefoxnofanndesu.	妹はFirefoxのファンです。	product	Firefox	hand
+atarashiisafarinokinouwotameshimashita.	新しいSafariの機能を試しました。	product	Safari	hand
+kaigidesafarinojireiwoshoukaishimashita.	会議でSafariの事例を紹介しました。	product	Safari	hand
+tomodachigaandroidwotsukatteimasu.	友達がAndroidを使っています。	product	Android	hand
+sennshuu,androidnohanashiwoshimashita.	先週、Androidの話をしました。	product	Android	hand
+imoutohawindowsnofanndesu.	妹はWindowsのファンです。	product	Windows	hand-ambiguous
+sennshuu,windowsnohanashiwoshimashita.	先週、Windowsの話をしました。	product	Windows	hand-ambiguous
+kaigidephotoshopnojireiwoshoukaishimashita.	会議でPhotoshopの事例を紹介しました。	product	Photoshop	hand
+watakushihaphotoshopgasukidesu.	私はPhotoshopが好きです。	product	Photoshop	hand
+excelnokotowokanngaerutotanoshikunarimasu.	Excelのことを考えると楽しくなります。	product	Excel	hand
+mainichiexcelwotsukatteshigotowoshiteimasu.	毎日Excelを使って仕事をしています。	product	Excel	hand
+karehapowerpointnikuwashiidesu.	彼はPowerPointに詳しいです。	product	PowerPoint	hand
+atarashiipowerpointnokinouwotameshimashita.	新しいPowerPointの機能を試しました。	product	PowerPoint	hand
+kinou,notionnonyu-suwomimashita.	昨日、Notionのニュースを見ました。	product	Notion	hand-ambiguous
+imoutohanotionnofanndesu.	妹はNotionのファンです。	product	Notion	hand-ambiguous
+watakushinoanihagithubwobennkyoushiteimasu.	私の兄はGitHubを勉強しています。	software	GitHub	hand
+mainichigithubwotsukatteshigotowoshiteimasu.	毎日GitHubを使って仕事をしています。	software	GitHub	hand
+mainichigitlabwotsukatteshigotowoshiteimasu.	毎日GitLabを使って仕事をしています。	software	GitLab	hand
+gitlabnokotowokanngaerutotanoshikunarimasu.	GitLabのことを考えると楽しくなります。	software	GitLab	hand
+watakushinoanihapythonwobennkyoushiteimasu.	私の兄はPythonを勉強しています。	software	Python	hand-ambiguous
+kyouhapythonnitsuiteshirabemashita.	今日はPythonについて調べました。	software	Python	hand-ambiguous
+kyouhajavascriptnitsuiteshirabemashita.	今日はJavaScriptについて調べました。	software	JavaScript	hand
+atarashiijavascriptnokinouwotameshimashita.	新しいJavaScriptの機能を試しました。	software	JavaScript	hand
+atarashiitypescriptnokinouwotameshimashita.	新しいTypeScriptの機能を試しました。	software	TypeScript	hand
+typescripthasekaijuudeshirareteimasu.	TypeScriptは世界中で知られています。	software	TypeScript	hand
+tomodachigakuberneteswotsukatteimasu.	友達がKubernetesを使っています。	software	Kubernetes	hand
+sennshuu,kubernetesnohanashiwoshimashita.	先週、Kubernetesの話をしました。	software	Kubernetes	hand
+kaigidedockernojireiwoshoukaishimashita.	会議でDockerの事例を紹介しました。	software	Docker	hand
+watakushihadockergasukidesu.	私はDockerが好きです。	software	Docker	hand
+linuxnokotowokanngaerutotanoshikunarimasu.	Linuxのことを考えると楽しくなります。	software	Linux	hand
+linuxnokoushikisaitowokakuninnshitekudasai.	Linuxの公式サイトを確認してください。	software	Linux	hand
+karehaubuntunikuwashiidesu.	彼はUbuntuに詳しいです。	software	Ubuntu	hand
+ubuntuhasekaijuudeshirareteimasu.	Ubuntuは世界中で知られています。	software	Ubuntu	hand
+watakushihadebiangasukidesu.	私はDebianが好きです。	software	Debian	hand
+karehadebiannikuwashiidesu.	彼はDebianに詳しいです。	software	Debian	hand
+kinou,redisnonyu-suwomimashita.	昨日、Redisのニュースを見ました。	software	Redis	hand
+sennshuu,redisnohanashiwoshimashita.	先週、Redisの話をしました。	software	Redis	hand
+mongodbhasekaijuudeshirareteimasu.	MongoDBは世界中で知られています。	software	MongoDB	hand
+kinou,mongodbnonyu-suwomimashita.	昨日、MongoDBのニュースを見ました。	software	MongoDB	hand
+karehapostgresqlnikuwashiidesu.	彼はPostgreSQLに詳しいです。	software	PostgreSQL	hand
+sennshuu,postgresqlnohanashiwoshimashita.	先週、PostgreSQLの話をしました。	software	PostgreSQL	hand
+watakushinoanihamysqlwobennkyoushiteimasu.	私の兄はMySQLを勉強しています。	software	MySQL	hand
+mysqlhasekaijuudeshirareteimasu.	MySQLは世界中で知られています。	software	MySQL	hand
+sennshuu,nodejsnohanashiwoshimashita.	先週、Node.jsの話をしました。	software	Node.js	hand
+atarashiinodejsnokinouwotameshimashita.	新しいNode.jsの機能を試しました。	software	Node.js	hand
+reacthasekaijuudeshirareteimasu.	Reactは世界中で知られています。	software	React	hand-ambiguous
+kyouhareactnitsuiteshirabemashita.	今日はReactについて調べました。	software	React	hand-ambiguous
+atarashiivuenokinouwotameshimashita.	新しいVueの機能を試しました。	software	Vue	hand
+konohonnhavuenitsuitekakareteimasu.	この本はVueについて書かれています。	software	Vue	hand
+angularnokotowokanngaerutotanoshikunarimasu.	Angularのことを考えると楽しくなります。	software	Angular	hand
+mainichiangularwotsukatteshigotowoshiteimasu.	毎日Angularを使って仕事をしています。	software	Angular	hand
+atarashiitensorflownokinouwotameshimashita.	新しいTensorFlowの機能を試しました。	software	TensorFlow	hand
+mainichitensorflowwotsukatteshigotowoshiteimasu.	毎日TensorFlowを使って仕事をしています。	software	TensorFlow	hand
+tomodachigapytorchwotsukatteimasu.	友達がPyTorchを使っています。	software	PyTorch	hand
+kinou,pytorchnonyu-suwomimashita.	昨日、PyTorchのニュースを見ました。	software	PyTorch	hand
+jupyterhasekaijuudeshirareteimasu.	Jupyterは世界中で知られています。	software	Jupyter	hand
+atarashiijupyternokinouwotameshimashita.	新しいJupyterの機能を試しました。	software	Jupyter	hand
+kotlinnokotowokanngaerutotanoshikunarimasu.	Kotlinのことを考えると楽しくなります。	software	Kotlin	hand
+tomodachigakotlinwotsukatteimasu.	友達がKotlinを使っています。	software	Kotlin	hand
+watakushinoaniharustwobennkyoushiteimasu.	私の兄はRustを勉強しています。	software	Rust	hand
+konohonnharustnitsuitekakareteimasu.	この本はRustについて書かれています。	software	Rust	hand
+atarashiiswiftnokinouwotameshimashita.	新しいSwiftの機能を試しました。	software	Swift	hand
+swifthasekaijuudeshirareteimasu.	Swiftは世界中で知られています。	software	Swift	hand
+kinou,rubynonyu-suwomimashita.	昨日、Rubyのニュースを見ました。	software	Ruby	hand
+tomodachigarubywotsukatteimasu.	友達がRubyを使っています。	software	Ruby	hand
+haskellnokoushikisaitowokakuninnshitekudasai.	Haskellの公式サイトを確認してください。	software	Haskell	hand
+haskellnokotowokanngaerutotanoshikunarimasu.	Haskellのことを考えると楽しくなります。	software	Haskell	hand
+mainichiterraformwotsukatteshigotowoshiteimasu.	毎日Terraformを使って仕事をしています。	software	Terraform	hand
+kyouhaterraformnitsuiteshirabemashita.	今日はTerraformについて調べました。	software	Terraform	hand
+karehaansiblenikuwashiidesu.	彼はAnsibleに詳しいです。	software	Ansible	hand
+tomodachigaansiblewotsukatteimasu.	友達がAnsibleを使っています。	software	Ansible	hand
+mainichijenkinswotsukatteshigotowoshiteimasu.	毎日Jenkinsを使って仕事をしています。	software	Jenkins	hand
+konohonnhajenkinsnitsuitekakareteimasu.	この本はJenkinsについて書かれています。	software	Jenkins	hand
+watakushihaelasticsearchgasukidesu.	私はElasticsearchが好きです。	software	Elasticsearch	hand
+tomodachigaelasticsearchwotsukatteimasu.	友達がElasticsearchを使っています。	software	Elasticsearch	hand
+watakushihabitcoingasukidesu.	私はBitcoinが好きです。	software	Bitcoin	hand
+bitcoinnokotowokanngaerutotanoshikunarimasu.	Bitcoinのことを考えると楽しくなります。	software	Bitcoin	hand
+ethereumnokoushikisaitowokakuninnshitekudasai.	Ethereumの公式サイトを確認してください。	software	Ethereum	hand
+kaigideethereumnojireiwoshoukaishimashita.	会議でEthereumの事例を紹介しました。	software	Ethereum	hand
+sennshuu,solananohanashiwoshimashita.	先週、Solanaの話をしました。	software	Solana	hand
+solananokoushikisaitowokakuninnshitekudasai.	Solanaの公式サイトを確認してください。	software	Solana	hand
+konohonnhabinancenitsuitekakareteimasu.	この本はBinanceについて書かれています。	software	Binance	hand
+atarashiibinancenokinouwotameshimashita.	新しいBinanceの機能を試しました。	software	Binance	hand
+watakushinoanihacoinbasewobennkyoushiteimasu.	私の兄はCoinbaseを勉強しています。	software	Coinbase	hand
+coinbasenokoushikisaitowokakuninnshitekudasai.	Coinbaseの公式サイトを確認してください。	software	Coinbase	hand
+kinou,tokyononyu-suwomimashita.	昨日、Tokyoのニュースを見ました。	place	Tokyo	hand
+watakushihatokyogasukidesu.	私はTokyoが好きです。	place	Tokyo	hand
+newyorkhasekaijuudeshirareteimasu.	New Yorkは世界中で知られています。	place	New York	hand
+watakushihanewyorkgasukidesu.	私はNew Yorkが好きです。	place	New York	hand
+raigetsulosangelesniikuyoteidesu.	来月Los Angelesに行く予定です。	place	Los Angeles	hand
+kodomonokorokaralosangelesniakogareteimashita.	子供のころからLos Angelesに憧れていました。	place	Los Angeles	hand
+raigetsusanfrancisconiikuyoteidesu.	来月San Franciscoに行く予定です。	place	San Francisco	hand
+karehasanfrancisconikuwashiidesu.	彼はSan Franciscoに詳しいです。	place	San Francisco	hand
+kodomonokorokaralasvegasniakogareteimashita.	子供のころからLas Vegasに憧れていました。	place	Las Vegas	hand
+watakushihalasvegasgasukidesu.	私はLas Vegasが好きです。	place	Las Vegas	hand
+kodomonokorokaralondonniakogareteimashita.	子供のころからLondonに憧れていました。	place	London	hand
+karehalondonnikuwashiidesu.	彼はLondonに詳しいです。	place	London	hand
+shuumatsuhaparisdesugoshimashita.	週末はParisで過ごしました。	place	Paris	hand
+kinou,parisnonyu-suwomimashita.	昨日、Parisのニュースを見ました。	place	Paris	hand
+berlinnokotowokanngaerutotanoshikunarimasu.	Berlinのことを考えると楽しくなります。	place	Berlin	hand
+shuumatsuhaberlindesugoshimashita.	週末はBerlinで過ごしました。	place	Berlin	hand
+madridhasekaijuudeshirareteimasu.	Madridは世界中で知られています。	place	Madrid	hand
+madridnokotowokanngaerutotanoshikunarimasu.	Madridのことを考えると楽しくなります。	place	Madrid	hand
+watakushihabarcelonagasukidesu.	私はBarcelonaが好きです。	place	Barcelona	hand
+karehabarcelonanikuwashiidesu.	彼はBarcelonaに詳しいです。	place	Barcelona	hand
+romehasekaijuudeshirareteimasu.	Romeは世界中で知られています。	place	Rome	hand
+watakushiharomegasukidesu.	私はRomeが好きです。	place	Rome	hand
+kinou,milannonyu-suwomimashita.	昨日、Milanのニュースを見ました。	place	Milan	hand
+shuumatsuhamilandesugoshimashita.	週末はMilanで過ごしました。	place	Milan	hand
+sennshuu,amsterdamnohanashiwoshimashita.	先週、Amsterdamの話をしました。	place	Amsterdam	hand
+watakushihaamsterdamgasukidesu.	私はAmsterdamが好きです。	place	Amsterdam	hand
+raigetsuviennaniikuyoteidesu.	来月Viennaに行く予定です。	place	Vienna	hand
+karehaviennanikuwashiidesu.	彼はViennaに詳しいです。	place	Vienna	hand
+shuumatsuhapraguedesugoshimashita.	週末はPragueで過ごしました。	place	Prague	hand
+raigetsupragueniikuyoteidesu.	来月Pragueに行く予定です。	place	Prague	hand
+kodomonokorokaramoscowniakogareteimashita.	子供のころからMoscowに憧れていました。	place	Moscow	hand
+kinou,moscownonyu-suwomimashita.	昨日、Moscowのニュースを見ました。	place	Moscow	hand
+kinou,istanbulnonyu-suwomimashita.	昨日、Istanbulのニュースを見ました。	place	Istanbul	hand
+shuumatsuhaistanbuldesugoshimashita.	週末はIstanbulで過ごしました。	place	Istanbul	hand
+konohonnhadubainitsuitekakareteimasu.	この本はDubaiについて書かれています。	place	Dubai	hand
+raigetsudubainiikuyoteidesu.	来月Dubaiに行く予定です。	place	Dubai	hand
+watakushihasingaporegasukidesu.	私はSingaporeが好きです。	place	Singapore	hand
+konohonnhasingaporenitsuitekakareteimasu.	この本はSingaporeについて書かれています。	place	Singapore	hand
+sennshuu,bangkoknohanashiwoshimashita.	先週、Bangkokの話をしました。	place	Bangkok	hand
+kodomonokorokarabangkokniakogareteimashita.	子供のころからBangkokに憧れていました。	place	Bangkok	hand
+kinou,seoulnonyu-suwomimashita.	昨日、Seoulのニュースを見ました。	place	Seoul	hand
+kyouhaseoulnitsuiteshirabemashita.	今日はSeoulについて調べました。	place	Seoul	hand
+shuumatsuhabeijingdesugoshimashita.	週末はBeijingで過ごしました。	place	Beijing	hand
+beijingnokotowokanngaerutotanoshikunarimasu.	Beijingのことを考えると楽しくなります。	place	Beijing	hand
+konohonnhashanghainitsuitekakareteimasu.	この本はShanghaiについて書かれています。	place	Shanghai	hand
+kinou,shanghainonyu-suwomimashita.	昨日、Shanghaiのニュースを見ました。	place	Shanghai	hand
+sennshuu,hongkongnohanashiwoshimashita.	先週、Hong Kongの話をしました。	place	Hong Kong	hand
+hongkongnokotowokanngaerutotanoshikunarimasu.	Hong Kongのことを考えると楽しくなります。	place	Hong Kong	hand
+raigetsusydneyniikuyoteidesu.	来月Sydneyに行く予定です。	place	Sydney	hand
+watakushihasydneygasukidesu.	私はSydneyが好きです。	place	Sydney	hand
+melbournehasekaijuudeshirareteimasu.	Melbourneは世界中で知られています。	place	Melbourne	hand
+raigetsumelbourneniikuyoteidesu.	来月Melbourneに行く予定です。	place	Melbourne	hand
+torontohasekaijuudeshirareteimasu.	Torontoは世界中で知られています。	place	Toronto	hand
+kinou,torontononyu-suwomimashita.	昨日、Torontoのニュースを見ました。	place	Toronto	hand
+watakushihavancouvergasukidesu.	私はVancouverが好きです。	place	Vancouver	hand
+vancouverhasekaijuudeshirareteimasu.	Vancouverは世界中で知られています。	place	Vancouver	hand
+karehachicagonikuwashiidesu.	彼はChicagoに詳しいです。	place	Chicago	hand
+sennshuu,chicagonohanashiwoshimashita.	先週、Chicagoの話をしました。	place	Chicago	hand
+bostonnokotowokanngaerutotanoshikunarimasu.	Bostonのことを考えると楽しくなります。	place	Boston	hand
+bostonhasekaijuudeshirareteimasu.	Bostonは世界中で知られています。	place	Boston	hand
+watakushihaseattlegasukidesu.	私はSeattleが好きです。	place	Seattle	hand
+kinou,seattlenonyu-suwomimashita.	昨日、Seattleのニュースを見ました。	place	Seattle	hand
+karehahawaiinikuwashiidesu.	彼はHawaiiに詳しいです。	place	Hawaii	hand
+watakushihahawaiigasukidesu.	私はHawaiiが好きです。	place	Hawaii	hand
+kodomonokorokaracalifornianiakogareteimashita.	子供のころからCaliforniaに憧れていました。	place	California	hand
+kyouhacalifornianitsuiteshirabemashita.	今日はCaliforniaについて調べました。	place	California	hand
+kodomonokorokaratexasniakogareteimashita.	子供のころからTexasに憧れていました。	place	Texas	hand
+kinou,texasnonyu-suwomimashita.	昨日、Texasのニュースを見ました。	place	Texas	hand
+kinou,floridanonyu-suwomimashita.	昨日、Floridaのニュースを見ました。	place	Florida	hand
+konohonnhafloridanitsuitekakareteimasu.	この本はFloridaについて書かれています。	place	Florida	hand
+sennshuu,brazilnohanashiwoshimashita.	先週、Brazilの話をしました。	place	Brazil	hand
+kodomonokorokarabrazilniakogareteimashita.	子供のころからBrazilに憧れていました。	place	Brazil	hand
+kodomonokorokaramexiconiakogareteimashita.	子供のころからMexicoに憧れていました。	place	Mexico	hand
+kinou,mexicononyu-suwomimashita.	昨日、Mexicoのニュースを見ました。	place	Mexico	hand
+raigetsuargentinaniikuyoteidesu.	来月Argentinaに行く予定です。	place	Argentina	hand
+kinou,argentinanonyu-suwomimashita.	昨日、Argentinaのニュースを見ました。	place	Argentina	hand
+kodomonokorokaraegyptniakogareteimashita.	子供のころからEgyptに憧れていました。	place	Egypt	hand
+egyptnokotowokanngaerutotanoshikunarimasu.	Egyptのことを考えると楽しくなります。	place	Egypt	hand
+kenyahasekaijuudeshirareteimasu.	Kenyaは世界中で知られています。	place	Kenya	hand
+konohonnhakenyanitsuitekakareteimasu.	この本はKenyaについて書かれています。	place	Kenya	hand
+shuumatsuhaswitzerlanddesugoshimashita.	週末はSwitzerlandで過ごしました。	place	Switzerland	hand
+konohonnhaswitzerlandnitsuitekakareteimasu.	この本はSwitzerlandについて書かれています。	place	Switzerland	hand
+kodomonokorokaraswedenniakogareteimashita.	子供のころからSwedenに憧れていました。	place	Sweden	hand
+karehaswedennikuwashiidesu.	彼はSwedenに詳しいです。	place	Sweden	hand
+watakushihanorwaygasukidesu.	私はNorwayが好きです。	place	Norway	hand
+shuumatsuhanorwaydesugoshimashita.	週末はNorwayで過ごしました。	place	Norway	hand
+kinou,finlandnonyu-suwomimashita.	昨日、Finlandのニュースを見ました。	place	Finland	hand
+finlandnokotowokanngaerutotanoshikunarimasu.	Finlandのことを考えると楽しくなります。	place	Finland	hand
+vietnamnokotowokanngaerutotanoshikunarimasu.	Vietnamのことを考えると楽しくなります。	place	Vietnam	hand
+konohonnhavietnamnitsuitekakareteimasu.	この本はVietnamについて書かれています。	place	Vietnam	hand
+indonesianokotowokanngaerutotanoshikunarimasu.	Indonesiaのことを考えると楽しくなります。	place	Indonesia	hand
+konohonnhaindonesianitsuitekakareteimasu.	この本はIndonesiaについて書かれています。	place	Indonesia	hand
+karehaphilippinesnikuwashiidesu.	彼はPhilippinesに詳しいです。	place	Philippines	hand
+konohonnhaphilippinesnitsuitekakareteimasu.	この本はPhilippinesについて書かれています。	place	Philippines	hand
+kodomonokorokarathailandniakogareteimashita.	子供のころからThailandに憧れていました。	place	Thailand	hand
+sennshuu,thailandnohanashiwoshimashita.	先週、Thailandの話をしました。	place	Thailand	hand
+konohonnhamounteverestnitsuitekakareteimasu.	この本はMount Everestについて書かれています。	place	Mount Everest	hand
+kinou,mounteverestnonyu-suwomimashita.	昨日、Mount Everestのニュースを見ました。	place	Mount Everest	hand
+kodomonokorokarahimalayasniakogareteimashita.	子供のころからHimalayasに憧れていました。	place	Himalayas	hand
+sennshuu,himalayasnohanashiwoshimashita.	先週、Himalayasの話をしました。	place	Himalayas	hand
+elonmusknokotowokanngaerutotanoshikunarimasu.	Elon Muskのことを考えると楽しくなります。	person	Elon Musk	hand
+sennshuu,elonmusknohanashiwoshimashita.	先週、Elon Muskの話をしました。	person	Elon Musk	hand
+konohonnhabillgatesnitsuitekakareteimasu.	この本はBill Gatesについて書かれています。	person	Bill Gates	hand
+watakushihabillgatesgasukidesu.	私はBill Gatesが好きです。	person	Bill Gates	hand
+kinou,stevejobsnonyu-suwomimashita.	昨日、Steve Jobsのニュースを見ました。	person	Steve Jobs	hand
+konohonnhastevejobsnitsuitekakareteimasu.	この本はSteve Jobsについて書かれています。	person	Steve Jobs	hand
+sennshuu,markzuckerbergnohanashiwoshimashita.	先週、Mark Zuckerbergの話をしました。	person	Mark Zuckerberg	hand
+markzuckerberghasekaijuudeshirareteimasu.	Mark Zuckerbergは世界中で知られています。	person	Mark Zuckerberg	hand
+kyouhajeffbezosnitsuiteshirabemashita.	今日はJeff Bezosについて調べました。	person	Jeff Bezos	hand
+sennshuu,jeffbezosnohanashiwoshimashita.	先週、Jeff Bezosの話をしました。	person	Jeff Bezos	hand
+konohonnhatimcooknitsuitekakareteimasu.	この本はTim Cookについて書かれています。	person	Tim Cook	hand
+imoutohatimcooknofanndesu.	妹はTim Cookのファンです。	person	Tim Cook	hand
+watakushihataylorswiftgasukidesu.	私はTaylor Swiftが好きです。	person	Taylor Swift	hand
+kinou,taylorswiftnonyu-suwomimashita.	昨日、Taylor Swiftのニュースを見ました。	person	Taylor Swift	hand
+kyouhaladygaganitsuiteshirabemashita.	今日はLady Gagaについて調べました。	person	Lady Gaga	hand
+karehaladygaganikuwashiidesu.	彼はLady Gagaに詳しいです。	person	Lady Gaga	hand
+sennshuu,michaeljacksonnohanashiwoshimashita.	先週、Michael Jacksonの話をしました。	person	Michael Jackson	hand
+watakushihamichaeljacksongasukidesu.	私はMichael Jacksonが好きです。	person	Michael Jackson	hand
+imoutohaalberteinsteinnofanndesu.	妹はAlbert Einsteinのファンです。	person	Albert Einstein	hand
+karehaalberteinsteinnikuwashiidesu.	彼はAlbert Einsteinに詳しいです。	person	Albert Einstein	hand
+sennshuu,isaacnewtonnohanashiwoshimashita.	先週、Isaac Newtonの話をしました。	person	Isaac Newton	hand
+isaacnewtonhasekaijuudeshirareteimasu.	Isaac Newtonは世界中で知られています。	person	Isaac Newton	hand
+kyouhabarackobamanitsuiteshirabemashita.	今日はBarack Obamaについて調べました。	person	Barack Obama	hand
+watakushihabarackobamagasukidesu.	私はBarack Obamaが好きです。	person	Barack Obama	hand
+kinou,donaldtrumpnonyu-suwomimashita.	昨日、Donald Trumpのニュースを見ました。	person	Donald Trump	hand
+konohonnhadonaldtrumpnitsuitekakareteimasu.	この本はDonald Trumpについて書かれています。	person	Donald Trump	hand
+kinou,lionelmessinonyu-suwomimashita.	昨日、Lionel Messiのニュースを見ました。	person	Lionel Messi	hand
+sennshuu,lionelmessinohanashiwoshimashita.	先週、Lionel Messiの話をしました。	person	Lionel Messi	hand
+cristianoronaldohasekaijuudeshirareteimasu.	Cristiano Ronaldoは世界中で知られています。	person	Cristiano Ronaldo	hand
+kyouhacristianoronaldonitsuiteshirabemashita.	今日はCristiano Ronaldoについて調べました。	person	Cristiano Ronaldo	hand
+konohonnhatomcruisenitsuitekakareteimasu.	この本はTom Cruiseについて書かれています。	person	Tom Cruise	hand
+sennshuu,tomcruisenohanashiwoshimashita.	先週、Tom Cruiseの話をしました。	person	Tom Cruise	hand
+karehaleonardodicaprionikuwashiidesu.	彼はLeonardo DiCaprioに詳しいです。	person	Leonardo DiCaprio	hand
+watakushihaleonardodicapriogasukidesu.	私はLeonardo DiCaprioが好きです。	person	Leonardo DiCaprio	hand
+karehabradpittnikuwashiidesu.	彼はBrad Pittに詳しいです。	person	Brad Pitt	hand
+bradpitthasekaijuudeshirareteimasu.	Brad Pittは世界中で知られています。	person	Brad Pitt	hand
+imoutohaharrypotternofanndesu.	妹はHarry Potterのファンです。	work	Harry Potter	hand
+kodomonokorokaraharrypotterniakogareteimashita.	子供のころからHarry Potterに憧れていました。	work	Harry Potter	hand
+kyouhastarwarsnitsuiteshirabemashita.	今日はStar Warsについて調べました。	work	Star Wars	hand
+kinou,starwarsnonyu-suwomimashita.	昨日、Star Warsのニュースを見ました。	work	Star Wars	hand
+watakushihaavatargasukidesu.	私はAvatarが好きです。	work	Avatar	hand
+ekideavatarnokoukokuwomitsukemashita.	駅でAvatarの広告を見つけました。	work	Avatar	hand
+watakushihatitanicgasukidesu.	私はTitanicが好きです。	work	Titanic	hand
+kyouhatitanicnitsuiteshirabemashita.	今日はTitanicについて調べました。	work	Titanic	hand
+sennshuu,minecraftnohanashiwoshimashita.	先週、Minecraftの話をしました。	work	Minecraft	hand
+watakushihaminecraftgasukidesu.	私はMinecraftが好きです。	work	Minecraft	hand
+fortnitenokoushikisaitowokakuninnshitekudasai.	Fortniteの公式サイトを確認してください。	work	Fortnite	hand
+kodomonokorokarafortniteniakogareteimashita.	子供のころからFortniteに憧れていました。	work	Fortnite	hand
+karehapokemonnikuwashiidesu.	彼はPokemonに詳しいです。	work	Pokemon	hand
+imoutohapokemonnofanndesu.	妹はPokemonのファンです。	work	Pokemon	hand
+watakushihasupermariogasukidesu.	私はSuper Marioが好きです。	work	Super Mario	hand
+supermarionokotowokanngaerutotanoshikunarimasu.	Super Marioのことを考えると楽しくなります。	work	Super Mario	hand
+kyouhathebeatlesnitsuiteshirabemashita.	今日はThe Beatlesについて調べました。	work	The Beatles	hand
+thebeatleshasekaijuudeshirareteimasu.	The Beatlesは世界中で知られています。	work	The Beatles	hand
+queennokoushikisaitowokakuninnshitekudasai.	Queenの公式サイトを確認してください。	work	Queen	hand-ambiguous
+watakushihaqueengasukidesu.	私はQueenが好きです。	work	Queen	hand-ambiguous
+kyouhacoldplaynitsuiteshirabemashita.	今日はColdplayについて調べました。	work	Coldplay	hand
+coldplaynokoushikisaitowokakuninnshitekudasai.	Coldplayの公式サイトを確認してください。	work	Coldplay	hand
+watakushiharadioheadgasukidesu.	私はRadioheadが好きです。	work	Radiohead	hand
+radioheadnokoushikisaitowokakuninnshitekudasai.	Radioheadの公式サイトを確認してください。	work	Radiohead	hand
+nirvananokoushikisaitowokakuninnshitekudasai.	Nirvanaの公式サイトを確認してください。	work	Nirvana	hand
+nirvananokotowokanngaerutotanoshikunarimasu.	Nirvanaのことを考えると楽しくなります。	work	Nirvana	hand
+karehaoasisnikuwashiidesu.	彼はOasisに詳しいです。	work	Oasis	hand
+kyouhaoasisnitsuiteshirabemashita.	今日はOasisについて調べました。	work	Oasis	hand
+marvelnokoushikisaitowokakuninnshitekudasai.	Marvelの公式サイトを確認してください。	work	Marvel	hand
+karehamarvelnikuwashiidesu.	彼はMarvelに詳しいです。	work	Marvel	hand
+karehabatmannikuwashiidesu.	彼はBatmanに詳しいです。	work	Batman	hand
+konohonnhabatmannitsuitekakareteimasu.	この本はBatmanについて書かれています。	work	Batman	hand
+sennshuu,spidermannohanashiwoshimashita.	先週、Spider-Manの話をしました。	work	Spider-Man	hand
+konohonnhaspidermannitsuitekakareteimasu.	この本はSpider-Manについて書かれています。	work	Spider-Man	hand
+watakushihamickeymousegasukidesu.	私はMickey Mouseが好きです。	work	Mickey Mouse	hand
+mickeymousenokoushikisaitowokakuninnshitekudasai.	Mickey Mouseの公式サイトを確認してください。	work	Mickey Mouse	hand
+hellokittynokoushikisaitowokakuninnshitekudasai.	Hello Kittyの公式サイトを確認してください。	work	Hello Kitty	hand
+watakushihahellokittygasukidesu.	私はHello Kittyが好きです。	work	Hello Kitty	hand
+kyouhaapplenitsuiteshirabemashita.	今日はAppleについて調べました。	company	Apple	hand-ambiguous
+kodomonokorokaraappleniakogareteimashita.	子供のころからAppleに憧れていました。	company	Apple	hand-ambiguous
+kyouhametanitsuiteshirabemashita.	今日はMetaについて調べました。	company	Meta	hand
+watakushihametagasukidesu.	私はMetaが好きです。	company	Meta	hand
+alphabetnokoushikisaitowokakuninnshitekudasai.	Alphabetの公式サイトを確認してください。	company	Alphabet	hand-ambiguous
+alphabethasekaijuudeshirareteimasu.	Alphabetは世界中で知られています。	company	Alphabet	hand-ambiguous
+cloudflarenokoushikisaitowokakuninnshitekudasai.	Cloudflareの公式サイトを確認してください。	company	Cloudflare	hand
+kodomonokorokaracloudflareniakogareteimashita.	子供のころからCloudflareに憧れていました。	company	Cloudflare	hand
+twiliohasekaijuudeshirareteimasu.	Twilioは世界中で知られています。	company	Twilio	hand
+watakushihatwiliogasukidesu.	私はTwilioが好きです。	company	Twilio	hand
+imoutohashopifynofanndesu.	妹はShopifyのファンです。	company	Shopify	hand
+ekideshopifynokoukokuwomitsukemashita.	駅でShopifyの広告を見つけました。	company	Shopify	hand
+ekidestripenokoukokuwomitsukemashita.	駅でStripeの広告を見つけました。	company	Stripe	hand
+imoutohastripenofanndesu.	妹はStripeのファンです。	company	Stripe	hand
+ekidesnowflakenokoukokuwomitsukemashita.	駅でSnowflakeの広告を見つけました。	company	Snowflake	hand
+snowflakenokotowokanngaerutotanoshikunarimasu.	Snowflakeのことを考えると楽しくなります。	company	Snowflake	hand
+kinou,palantirnonyu-suwomimashita.	昨日、Palantirのニュースを見ました。	company	Palantir	hand
+kodomonokorokarapalantirniakogareteimashita.	子供のころからPalantirに憧れていました。	company	Palantir	hand
+watakushihazendeskgasukidesu.	私はZendeskが好きです。	company	Zendesk	hand
+imoutohazendesknofanndesu.	妹はZendeskのファンです。	company	Zendesk	hand
+atlassiannokotowokanngaerutotanoshikunarimasu.	Atlassianのことを考えると楽しくなります。	company	Atlassian	hand
+ekideatlassiannokoukokuwomitsukemashita.	駅でAtlassianの広告を見つけました。	company	Atlassian	hand
+kaigidehyundainojireiwoshoukaishimashita.	会議でHyundaiの事例を紹介しました。	company	Hyundai	hand
+hyundaihasekaijuudeshirareteimasu.	Hyundaiは世界中で知られています。	company	Hyundai	hand
+lamborghinihasekaijuudeshirareteimasu.	Lamborghiniは世界中で知られています。	company	Lamborghini	hand
+imoutohalamborghininofanndesu.	妹はLamborghiniのファンです。	company	Lamborghini	hand
+kyouhamaseratinitsuiteshirabemashita.	今日はMaseratiについて調べました。	company	Maserati	hand
+maseratinokotowokanngaerutotanoshikunarimasu.	Maseratiのことを考えると楽しくなります。	company	Maserati	hand
+bentleynokotowokanngaerutotanoshikunarimasu.	Bentleyのことを考えると楽しくなります。	company	Bentley	hand
+kyouhabentleynitsuiteshirabemashita.	今日はBentleyについて調べました。	company	Bentley	hand
+karehavolvonikuwashiidesu.	彼はVolvoに詳しいです。	company	Volvo	hand
+ekidevolvonokoukokuwomitsukemashita.	駅でVolvoの広告を見つけました。	company	Volvo	hand
+kodomonokorokarasubaruniakogareteimashita.	子供のころからSubaruに憧れていました。	company	Subaru	hand
+karehasubarunikuwashiidesu.	彼はSubaruに詳しいです。	company	Subaru	hand
+kaigidemazdanojireiwoshoukaishimashita.	会議でMazdaの事例を紹介しました。	company	Mazda	hand
+konohonnhamazdanitsuitekakareteimasu.	この本はMazdaについて書かれています。	company	Mazda	hand
+kyouhakawasakinitsuiteshirabemashita.	今日はKawasakiについて調べました。	company	Kawasaki	hand
+kinou,kawasakinonyu-suwomimashita.	昨日、Kawasakiのニュースを見ました。	company	Kawasaki	hand
+kaigideyamahanojireiwoshoukaishimashita.	会議でYamahaの事例を紹介しました。	company	Yamaha	hand
+yamahanokoushikisaitowokakuninnshitekudasai.	Yamahaの公式サイトを確認してください。	company	Yamaha	hand
+canonnokoushikisaitowokakuninnshitekudasai.	Canonの公式サイトを確認してください。	company	Canon	hand
+konohonnhacanonnitsuitekakareteimasu.	この本はCanonについて書かれています。	company	Canon	hand
+nikonnokotowokanngaerutotanoshikunarimasu.	Nikonのことを考えると楽しくなります。	company	Nikon	hand
+nikonnokoushikisaitowokakuninnshitekudasai.	Nikonの公式サイトを確認してください。	company	Nikon	hand
+fujifilmnokotowokanngaerutotanoshikunarimasu.	Fujifilmのことを考えると楽しくなります。	company	Fujifilm	hand
+imoutohafujifilmnofanndesu.	妹はFujifilmのファンです。	company	Fujifilm	hand
+kinou,toshibanonyu-suwomimashita.	昨日、Toshibaのニュースを見ました。	company	Toshiba	hand
+konohonnhatoshibanitsuitekakareteimasu.	この本はToshibaについて書かれています。	company	Toshiba	hand
+sennshuu,hitachinohanashiwoshimashita.	先週、Hitachiの話をしました。	company	Hitachi	hand
+karehahitachinikuwashiidesu.	彼はHitachiに詳しいです。	company	Hitachi	hand
+karehasharpnikuwashiidesu.	彼はSharpに詳しいです。	company	Sharp	hand-ambiguous
+imoutohasharpnofanndesu.	妹はSharpのファンです。	company	Sharp	hand-ambiguous
+ekidecasionokoukokuwomitsukemashita.	駅でCasioの広告を見つけました。	company	Casio	hand
+anohitohacasiodehataraiteimasu.	あの人はCasioで働いています。	company	Casio	hand
+sennshuu,seikonohanashiwoshimashita.	先週、Seikoの話をしました。	company	Seiko	hand
+konohonnhaseikonitsuitekakareteimasu.	この本はSeikoについて書かれています。	company	Seiko	hand
+karehamujinikuwashiidesu.	彼はMujiに詳しいです。	company	Muji	hand
+mujinokotowokanngaerutotanoshikunarimasu.	Mujiのことを考えると楽しくなります。	company	Muji	hand
+lawsonnokoushikisaitowokakuninnshitekudasai.	Lawsonの公式サイトを確認してください。	company	Lawson	hand
+lawsonhasekaijuudeshirareteimasu.	Lawsonは世界中で知られています。	company	Lawson	hand
+kfcnokoushikisaitowokakuninnshitekudasai.	KFCの公式サイトを確認してください。	company	KFC	hand
+kaigidekfcnojireiwoshoukaishimashita.	会議でKFCの事例を紹介しました。	company	KFC	hand
+kodomonokorokarasubwayniakogareteimashita.	子供のころからSubwayに憧れていました。	company	Subway	hand-ambiguous
+subwaynokoushikisaitowokakuninnshitekudasai.	Subwayの公式サイトを確認してください。	company	Subway	hand-ambiguous
+burgerkinghasekaijuudeshirareteimasu.	Burger Kingは世界中で知られています。	company	Burger King	hand
+ekideburgerkingnokoukokuwomitsukemashita.	駅でBurger Kingの広告を見つけました。	company	Burger King	hand
+imoutohadominosnofanndesu.	妹はDomino'sのファンです。	company	Domino's	hand
+dominosnokotowokanngaerutotanoshikunarimasu.	Domino'sのことを考えると楽しくなります。	company	Domino's	hand
+konohonnhaheinznitsuitekakareteimasu.	この本はHeinzについて書かれています。	company	Heinz	hand
+karehaheinznikuwashiidesu.	彼はHeinzに詳しいです。	company	Heinz	hand
+karehakelloggsnikuwashiidesu.	彼はKellogg'sに詳しいです。	company	Kellogg's	hand
+kelloggsnokotowokanngaerutotanoshikunarimasu.	Kellogg'sのことを考えると楽しくなります。	company	Kellogg's	hand
+karehanutellanikuwashiidesu.	彼はNutellaに詳しいです。	product	Nutella	hand
+nutellanokoushikisaitowokakuninnshitekudasai.	Nutellaの公式サイトを確認してください。	product	Nutella	hand
+redbullnokotowokanngaerutotanoshikunarimasu.	Red Bullのことを考えると楽しくなります。	product	Red Bull	hand
+kyouharedbullnitsuiteshirabemashita.	今日はRed Bullについて調べました。	product	Red Bull	hand
+sennshuu,monsterenergynohanashiwoshimashita.	先週、Monster Energyの話をしました。	product	Monster Energy	hand
+ekidemonsterenergynokoukokuwomitsukemashita.	駅でMonster Energyの広告を見つけました。	product	Monster Energy	hand
+kinou,fantanonyu-suwomimashita.	昨日、Fantaのニュースを見ました。	product	Fanta	hand
+kyouhafantanitsuiteshirabemashita.	今日はFantaについて調べました。	product	Fanta	hand
+sennshuu,spritenohanashiwoshimashita.	先週、Spriteの話をしました。	product	Sprite	hand
+karehaspritenikuwashiidesu.	彼はSpriteに詳しいです。	product	Sprite	hand
+kaigidegatoradenojireiwoshoukaishimashita.	会議でGatoradeの事例を紹介しました。	product	Gatorade	hand
+karehagatoradenikuwashiidesu.	彼はGatoradeに詳しいです。	product	Gatorade	hand
+mainichikitkatwotsukatteshigotowoshiteimasu.	毎日Kit Katを使って仕事をしています。	product	Kit Kat	hand
+konohonnhakitkatnitsuitekakareteimasu.	この本はKit Katについて書かれています。	product	Kit Kat	hand
+oreonokotowokanngaerutotanoshikunarimasu.	Oreoのことを考えると楽しくなります。	product	Oreo	hand
+ekideoreonokoukokuwomitsukemashita.	駅でOreoの広告を見つけました。	product	Oreo	hand
+konohonnhapringlesnitsuitekakareteimasu.	この本はPringlesについて書かれています。	product	Pringles	hand
+pringlesnokoushikisaitowokakuninnshitekudasai.	Pringlesの公式サイトを確認してください。	product	Pringles	hand
+atarashiipriusnokinouwotameshimashita.	新しいPriusの機能を試しました。	product	Prius	hand
+watakushihapriusgasukidesu.	私はPriusが好きです。	product	Prius	hand
+mustanghasekaijuudeshirareteimasu.	Mustangは世界中で知られています。	product	Mustang	hand
+mainichimustangwotsukatteshigotowoshiteimasu.	毎日Mustangを使って仕事をしています。	product	Mustang	hand
+cybertruckhasekaijuudeshirareteimasu.	Cybertruckは世界中で知られています。	product	Cybertruck	hand
+watakushihacybertruckgasukidesu.	私はCybertruckが好きです。	product	Cybertruck	hand
+karehagalaxynikuwashiidesu.	彼はGalaxyに詳しいです。	product	Galaxy	hand-ambiguous
+ekidegalaxynokoukokuwomitsukemashita.	駅でGalaxyの広告を見つけました。	product	Galaxy	hand-ambiguous
+pixelnokoushikisaitowokakuninnshitekudasai.	Pixelの公式サイトを確認してください。	product	Pixel	hand
+imoutohapixelnofanndesu.	妹はPixelのファンです。	product	Pixel	hand
+surfacenokoushikisaitowokakuninnshitekudasai.	Surfaceの公式サイトを確認してください。	product	Surface	hand-ambiguous
+karehasurfacenikuwashiidesu.	彼はSurfaceに詳しいです。	product	Surface	hand-ambiguous
+kyouhathinkpadnitsuiteshirabemashita.	今日はThinkPadについて調べました。	product	ThinkPad	hand
+kaigidethinkpadnojireiwoshoukaishimashita.	会議でThinkPadの事例を紹介しました。	product	ThinkPad	hand
+kinou,raspberrypinonyu-suwomimashita.	昨日、Raspberry Piのニュースを見ました。	product	Raspberry Pi	hand
+atarashiiraspberrypinokinouwotameshimashita.	新しいRaspberry Piの機能を試しました。	product	Raspberry Pi	hand
+imoutohaarduinonofanndesu.	妹はArduinoのファンです。	product	Arduino	hand
+konohonnhaarduinonitsuitekakareteimasu.	この本はArduinoについて書かれています。	product	Arduino	hand
+oculusnokoushikisaitowokakuninnshitekudasai.	Oculusの公式サイトを確認してください。	product	Oculus	hand
+ekideoculusnokoukokuwomitsukemashita.	駅でOculusの広告を見つけました。	product	Oculus	hand
+gopronokotowokanngaerutotanoshikunarimasu.	GoProのことを考えると楽しくなります。	product	GoPro	hand
+kinou,goprononyu-suwomimashita.	昨日、GoProのニュースを見ました。	product	GoPro	hand
+sennshuu,fitbitnohanashiwoshimashita.	先週、Fitbitの話をしました。	product	Fitbit	hand
+tomodachigafitbitwotsukatteimasu.	友達がFitbitを使っています。	product	Fitbit	hand
+kareharoombanikuwashiidesu.	彼はRoombaに詳しいです。	product	Roomba	hand
+kyouharoombanitsuiteshirabemashita.	今日はRoombaについて調べました。	product	Roomba	hand
+watakushihadysongasukidesu.	私はDysonが好きです。	company	Dyson	hand
+imoutohadysonnofanndesu.	妹はDysonのファンです。	company	Dyson	hand
+bosehasekaijuudeshirareteimasu.	Boseは世界中で知られています。	company	Bose	hand
+bosenokoushikisaitowokakuninnshitekudasai.	Boseの公式サイトを確認してください。	company	Bose	hand
+ekidesennheisernokoukokuwomitsukemashita.	駅でSennheiserの広告を見つけました。	company	Sennheiser	hand
+kinou,sennheisernonyu-suwomimashita.	昨日、Sennheiserのニュースを見ました。	company	Sennheiser	hand
+watakushihaspotifypremiumgasukidesu.	私はSpotify Premiumが好きです。	product	Spotify Premium	hand
+spotifypremiumnokotowokanngaerutotanoshikunarimasu.	Spotify Premiumのことを考えると楽しくなります。	product	Spotify Premium	hand
+kaigidegooglemapsnojireiwoshoukaishimashita.	会議でGoogle Mapsの事例を紹介しました。	product	Google Maps	hand
+watakushihagooglemapsgasukidesu.	私はGoogle Mapsが好きです。	product	Google Maps	hand
+kaigidegoogledrivenojireiwoshoukaishimashita.	会議でGoogle Driveの事例を紹介しました。	product	Google Drive	hand
+ekidegoogledrivenokoukokuwomitsukemashita.	駅でGoogle Driveの広告を見つけました。	product	Google Drive	hand
+atarashiigoogledocsnokinouwotameshimashita.	新しいGoogle Docsの機能を試しました。	product	Google Docs	hand
+imoutohagoogledocsnofanndesu.	妹はGoogle Docsのファンです。	product	Google Docs	hand
+sennshuu,googlechromenohanashiwoshimashita.	先週、Google Chromeの話をしました。	product	Google Chrome	hand
+imoutohagooglechromenofanndesu.	妹はGoogle Chromeのファンです。	product	Google Chrome	hand
+konohonnhamicrosoftteamsnitsuitekakareteimasu.	この本はMicrosoft Teamsについて書かれています。	product	Microsoft Teams	hand
+atarashiimicrosoftteamsnokinouwotameshimashita.	新しいMicrosoft Teamsの機能を試しました。	product	Microsoft Teams	hand
+kaigidemicrosoftofficenojireiwoshoukaishimashita.	会議でMicrosoft Officeの事例を紹介しました。	product	Microsoft Office	hand
+tomodachigamicrosoftofficewotsukatteimasu.	友達がMicrosoft Officeを使っています。	product	Microsoft Office	hand
+kinou,visualstudiononyu-suwomimashita.	昨日、Visual Studioのニュースを見ました。	software	Visual Studio	hand
+konohonnhavisualstudionitsuitekakareteimasu.	この本はVisual Studioについて書かれています。	software	Visual Studio	hand
+mainichivisualstudiocodewotsukatteshigotowoshiteimasu.	毎日Visual Studio Codeを使って仕事をしています。	software	Visual Studio Code	hand
+karehavisualstudiocodenikuwashiidesu.	彼はVisual Studio Codeに詳しいです。	software	Visual Studio Code	hand
+karehaintellijideanikuwashiidesu.	彼はIntelliJ IDEAに詳しいです。	software	IntelliJ IDEA	hand
+konohonnhaintellijideanitsuitekakareteimasu.	この本はIntelliJ IDEAについて書かれています。	software	IntelliJ IDEA	hand
+karehaeclipsenikuwashiidesu.	彼はEclipseに詳しいです。	software	Eclipse	hand
+watakushihaeclipsegasukidesu.	私はEclipseが好きです。	software	Eclipse	hand
+watakushihavimgasukidesu.	私はVimが好きです。	software	Vim	hand
+karehavimnikuwashiidesu.	彼はVimに詳しいです。	software	Vim	hand
+atarashiiemacsnokinouwotameshimashita.	新しいEmacsの機能を試しました。	software	Emacs	hand
+kyouhaemacsnitsuiteshirabemashita.	今日はEmacsについて調べました。	software	Emacs	hand
+sennshuu,homebrewnohanashiwoshimashita.	先週、Homebrewの話をしました。	software	Homebrew	hand
+watakushihahomebrewgasukidesu.	私はHomebrewが好きです。	software	Homebrew	hand
+npmnokotowokanngaerutotanoshikunarimasu.	npmのことを考えると楽しくなります。	software	npm	hand
+npmnokoushikisaitowokakuninnshitekudasai.	npmの公式サイトを確認してください。	software	npm	hand
+tomodachigawebpackwotsukatteimasu.	友達がWebpackを使っています。	software	Webpack	hand
+mainichiwebpackwotsukatteshigotowoshiteimasu.	毎日Webpackを使って仕事をしています。	software	Webpack	hand
+sennshuu,vitenohanashiwoshimashita.	先週、Viteの話をしました。	software	Vite	hand
+kinou,vitenonyu-suwomimashita.	昨日、Viteのニュースを見ました。	software	Vite	hand
+nextjsnokoushikisaitowokakuninnshitekudasai.	Next.jsの公式サイトを確認してください。	software	Next.js	hand
+watakushinoanihanextjswobennkyoushiteimasu.	私の兄はNext.jsを勉強しています。	software	Next.js	hand
+watakushihadjangogasukidesu.	私はDjangoが好きです。	software	Django	hand
+karehadjangonikuwashiidesu.	彼はDjangoに詳しいです。	software	Django	hand
+watakushinoanihaflaskwobennkyoushiteimasu.	私の兄はFlaskを勉強しています。	software	Flask	hand
+flaskhasekaijuudeshirareteimasu.	Flaskは世界中で知られています。	software	Flask	hand
+karehalaravelnikuwashiidesu.	彼はLaravelに詳しいです。	software	Laravel	hand
+laravelnokoushikisaitowokakuninnshitekudasai.	Laravelの公式サイトを確認してください。	software	Laravel	hand
+springboothasekaijuudeshirareteimasu.	Spring Bootは世界中で知られています。	software	Spring Boot	hand
+konohonnhaspringbootnitsuitekakareteimasu.	この本はSpring Bootについて書かれています。	software	Spring Boot	hand
+atarashiigraphqlnokinouwotameshimashita.	新しいGraphQLの機能を試しました。	software	GraphQL	hand
+sennshuu,graphqlnohanashiwoshimashita.	先週、GraphQLの話をしました。	software	GraphQL	hand
+sennshuu,prometheusnohanashiwoshimashita.	先週、Prometheusの話をしました。	software	Prometheus	hand
+kyouhaprometheusnitsuiteshirabemashita.	今日はPrometheusについて調べました。	software	Prometheus	hand
+watakushinoanihagrafanawobennkyoushiteimasu.	私の兄はGrafanaを勉強しています。	software	Grafana	hand
+kaigidegrafananojireiwoshoukaishimashita.	会議でGrafanaの事例を紹介しました。	software	Grafana	hand
+kinou,nginxnonyu-suwomimashita.	昨日、Nginxのニュースを見ました。	software	Nginx	hand
+watakushihanginxgasukidesu.	私はNginxが好きです。	software	Nginx	hand
+atarashiiapachenokinouwotameshimashita.	新しいApacheの機能を試しました。	software	Apache	hand
+kaigideapachenojireiwoshoukaishimashita.	会議でApacheの事例を紹介しました。	software	Apache	hand
+kinou,kafkanonyu-suwomimashita.	昨日、Kafkaのニュースを見ました。	software	Kafka	hand
+kaigidekafkanojireiwoshoukaishimashita.	会議でKafkaの事例を紹介しました。	software	Kafka	hand
+tomodachigarabbitmqwotsukatteimasu.	友達がRabbitMQを使っています。	software	RabbitMQ	hand
+kaigiderabbitmqnojireiwoshoukaishimashita.	会議でRabbitMQの事例を紹介しました。	software	RabbitMQ	hand
+konohonnhafigmanitsuitekakareteimasu.	この本はFigmaについて書かれています。	software	Figma	hand
+sennshuu,figmanohanashiwoshimashita.	先週、Figmaの話をしました。	software	Figma	hand
+sketchnokotowokanngaerutotanoshikunarimasu.	Sketchのことを考えると楽しくなります。	software	Sketch	hand-ambiguous
+sketchnokoushikisaitowokakuninnshitekudasai.	Sketchの公式サイトを確認してください。	software	Sketch	hand-ambiguous
+kaigideblendernojireiwoshoukaishimashita.	会議でBlenderの事例を紹介しました。	software	Blender	hand
+sennshuu,blendernohanashiwoshimashita.	先週、Blenderの話をしました。	software	Blender	hand
+kinou,unitynonyu-suwomimashita.	昨日、Unityのニュースを見ました。	software	Unity	hand-ambiguous
+watakushihaunitygasukidesu.	私はUnityが好きです。	software	Unity	hand-ambiguous
+unrealenginehasekaijuudeshirareteimasu.	Unreal Engineは世界中で知られています。	software	Unreal Engine	hand
+kinou,unrealenginenonyu-suwomimashita.	昨日、Unreal Engineのニュースを見ました。	software	Unreal Engine	hand
+sennshuu,godotnohanashiwoshimashita.	先週、Godotの話をしました。	software	Godot	hand
+kaigidegodotnojireiwoshoukaishimashita.	会議でGodotの事例を紹介しました。	software	Godot	hand
+kaigidearchlinuxnojireiwoshoukaishimashita.	会議でArch Linuxの事例を紹介しました。	software	Arch Linux	hand
+archlinuxhasekaijuudeshirareteimasu.	Arch Linuxは世界中で知られています。	software	Arch Linux	hand
+kareharedhatnikuwashiidesu.	彼はRed Hatに詳しいです。	software	Red Hat	hand
+redhatnokoushikisaitowokakuninnshitekudasai.	Red Hatの公式サイトを確認してください。	software	Red Hat	hand
+watakushihachromiumgasukidesu.	私はChromiumが好きです。	software	Chromium	hand
+kinou,chromiumnonyu-suwomimashita.	昨日、Chromiumのニュースを見ました。	software	Chromium	hand
+konohonnhaoperanitsuitekakareteimasu.	この本はOperaについて書かれています。	software	Opera	hand-ambiguous
+tomodachigaoperawotsukatteimasu.	友達がOperaを使っています。	software	Opera	hand-ambiguous
+konohonnhabravenitsuitekakareteimasu.	この本はBraveについて書かれています。	software	Brave	hand-ambiguous
+tomodachigabravewotsukatteimasu.	友達がBraveを使っています。	software	Brave	hand-ambiguous
+torhasekaijuudeshirareteimasu.	Torは世界中で知られています。	software	Tor	hand
+watakushinoanihatorwobennkyoushiteimasu.	私の兄はTorを勉強しています。	software	Tor	hand
+kinou,dogecoinnonyu-suwomimashita.	昨日、Dogecoinのニュースを見ました。	software	Dogecoin	hand
+kaigidedogecoinnojireiwoshoukaishimashita.	会議でDogecoinの事例を紹介しました。	software	Dogecoin	hand
+kareharipplenikuwashiidesu.	彼はRippleに詳しいです。	software	Ripple	hand
+ripplenokotowokanngaerutotanoshikunarimasu.	Rippleのことを考えると楽しくなります。	software	Ripple	hand
+atarashiicardanonokinouwotameshimashita.	新しいCardanoの機能を試しました。	software	Cardano	hand
+watakushihacardanogasukidesu.	私はCardanoが好きです。	software	Cardano	hand
+polkadothasekaijuudeshirareteimasu.	Polkadotは世界中で知られています。	software	Polkadot	hand
+mainichipolkadotwotsukatteshigotowoshiteimasu.	毎日Polkadotを使って仕事をしています。	software	Polkadot	hand
+tomodachigachainlinkwotsukatteimasu.	友達がChainlinkを使っています。	software	Chainlink	hand
+chainlinkhasekaijuudeshirareteimasu.	Chainlinkは世界中で知られています。	software	Chainlink	hand
+watakushinoanihauniswapwobennkyoushiteimasu.	私の兄はUniswapを勉強しています。	software	Uniswap	hand
+uniswaphasekaijuudeshirareteimasu.	Uniswapは世界中で知られています。	software	Uniswap	hand
+watakushinoanihametamaskwobennkyoushiteimasu.	私の兄はMetaMaskを勉強しています。	software	MetaMask	hand
+mainichimetamaskwotsukatteshigotowoshiteimasu.	毎日MetaMaskを使って仕事をしています。	software	MetaMask	hand
+ledgernokotowokanngaerutotanoshikunarimasu.	Ledgerのことを考えると楽しくなります。	software	Ledger	hand
+kyouhaledgernitsuiteshirabemashita.	今日はLedgerについて調べました。	software	Ledger	hand
+washingtonnokotowokanngaerutotanoshikunarimasu.	Washingtonのことを考えると楽しくなります。	place	Washington	hand
+watakushihawashingtongasukidesu.	私はWashingtonが好きです。	place	Washington	hand
+philadelphianokotowokanngaerutotanoshikunarimasu.	Philadelphiaのことを考えると楽しくなります。	place	Philadelphia	hand
+kyouhaphiladelphianitsuiteshirabemashita.	今日はPhiladelphiaについて調べました。	place	Philadelphia	hand
+miaminokotowokanngaerutotanoshikunarimasu.	Miamiのことを考えると楽しくなります。	place	Miami	hand
+shuumatsuhamiamidesugoshimashita.	週末はMiamiで過ごしました。	place	Miami	hand
+denverhasekaijuudeshirareteimasu.	Denverは世界中で知られています。	place	Denver	hand
+kyouhadenvernitsuiteshirabemashita.	今日はDenverについて調べました。	place	Denver	hand
+raigetsuhoustonniikuyoteidesu.	来月Houstonに行く予定です。	place	Houston	hand
+karehahoustonnikuwashiidesu.	彼はHoustonに詳しいです。	place	Houston	hand
+raigetsudetroitniikuyoteidesu.	来月Detroitに行く予定です。	place	Detroit	hand
+karehadetroitnikuwashiidesu.	彼はDetroitに詳しいです。	place	Detroit	hand
+manchesterhasekaijuudeshirareteimasu.	Manchesterは世界中で知られています。	place	Manchester	hand
+watakushihamanchestergasukidesu.	私はManchesterが好きです。	place	Manchester	hand
+liverpoolnokotowokanngaerutotanoshikunarimasu.	Liverpoolのことを考えると楽しくなります。	place	Liverpool	hand
+kinou,liverpoolnonyu-suwomimashita.	昨日、Liverpoolのニュースを見ました。	place	Liverpool	hand
+konohonnhaedinburghnitsuitekakareteimasu.	この本はEdinburghについて書かれています。	place	Edinburgh	hand
+sennshuu,edinburghnohanashiwoshimashita.	先週、Edinburghの話をしました。	place	Edinburgh	hand
+karehadublinnikuwashiidesu.	彼はDublinに詳しいです。	place	Dublin	hand
+sennshuu,dublinnohanashiwoshimashita.	先週、Dublinの話をしました。	place	Dublin	hand
+lisbonnokotowokanngaerutotanoshikunarimasu.	Lisbonのことを考えると楽しくなります。	place	Lisbon	hand
+lisbonhasekaijuudeshirareteimasu.	Lisbonは世界中で知られています。	place	Lisbon	hand
+konohonnhavenicenitsuitekakareteimasu.	この本はVeniceについて書かれています。	place	Venice	hand
+sennshuu,venicenohanashiwoshimashita.	先週、Veniceの話をしました。	place	Venice	hand
+shuumatsuhaflorencedesugoshimashita.	週末はFlorenceで過ごしました。	place	Florence	hand
+kyouhaflorencenitsuiteshirabemashita.	今日はFlorenceについて調べました。	place	Florence	hand
+watakushihanaplesgasukidesu.	私はNaplesが好きです。	place	Naples	hand
+shuumatsuhanaplesdesugoshimashita.	週末はNaplesで過ごしました。	place	Naples	hand
+munichnokotowokanngaerutotanoshikunarimasu.	Munichのことを考えると楽しくなります。	place	Munich	hand
+watakushihamunichgasukidesu.	私はMunichが好きです。	place	Munich	hand
+hamburghasekaijuudeshirareteimasu.	Hamburgは世界中で知られています。	place	Hamburg	hand
+kyouhahamburgnitsuiteshirabemashita.	今日はHamburgについて調べました。	place	Hamburg	hand
+kinou,frankfurtnonyu-suwomimashita.	昨日、Frankfurtのニュースを見ました。	place	Frankfurt	hand
+karehafrankfurtnikuwashiidesu.	彼はFrankfurtに詳しいです。	place	Frankfurt	hand
+shuumatsuhazurichdesugoshimashita.	週末はZurichで過ごしました。	place	Zurich	hand
+kyouhazurichnitsuiteshirabemashita.	今日はZurichについて調べました。	place	Zurich	hand
+karehagenevanikuwashiidesu.	彼はGenevaに詳しいです。	place	Geneva	hand
+kyouhagenevanitsuiteshirabemashita.	今日はGenevaについて調べました。	place	Geneva	hand
+konohonnhabrusselsnitsuitekakareteimasu.	この本はBrusselsについて書かれています。	place	Brussels	hand
+kodomonokorokarabrusselsniakogareteimashita.	子供のころからBrusselsに憧れていました。	place	Brussels	hand
+kinou,copenhagennonyu-suwomimashita.	昨日、Copenhagenのニュースを見ました。	place	Copenhagen	hand
+sennshuu,copenhagennohanashiwoshimashita.	先週、Copenhagenの話をしました。	place	Copenhagen	hand
+watakushihastockholmgasukidesu.	私はStockholmが好きです。	place	Stockholm	hand
+karehastockholmnikuwashiidesu.	彼はStockholmに詳しいです。	place	Stockholm	hand
+karehaoslonikuwashiidesu.	彼はOsloに詳しいです。	place	Oslo	hand
+watakushihaoslogasukidesu.	私はOsloが好きです。	place	Oslo	hand
+kodomonokorokarahelsinkiniakogareteimashita.	子供のころからHelsinkiに憧れていました。	place	Helsinki	hand
+sennshuu,helsinkinohanashiwoshimashita.	先週、Helsinkiの話をしました。	place	Helsinki	hand
+warsawhasekaijuudeshirareteimasu.	Warsawは世界中で知られています。	place	Warsaw	hand
+konohonnhawarsawnitsuitekakareteimasu.	この本はWarsawについて書かれています。	place	Warsaw	hand
+raigetsubudapestniikuyoteidesu.	来月Budapestに行く予定です。	place	Budapest	hand
+kinou,budapestnonyu-suwomimashita.	昨日、Budapestのニュースを見ました。	place	Budapest	hand
+athensnokotowokanngaerutotanoshikunarimasu.	Athensのことを考えると楽しくなります。	place	Athens	hand
+raigetsuathensniikuyoteidesu.	来月Athensに行く予定です。	place	Athens	hand
+kodomonokorokaracaironiakogareteimashita.	子供のころからCairoに憧れていました。	place	Cairo	hand
+cairohasekaijuudeshirareteimasu.	Cairoは世界中で知られています。	place	Cairo	hand
+kyouhanairobinitsuiteshirabemashita.	今日はNairobiについて調べました。	place	Nairobi	hand
+karehanairobinikuwashiidesu.	彼はNairobiに詳しいです。	place	Nairobi	hand
+sennshuu,mumbainohanashiwoshimashita.	先週、Mumbaiの話をしました。	place	Mumbai	hand
+shuumatsuhamumbaidesugoshimashita.	週末はMumbaiで過ごしました。	place	Mumbai	hand
+sennshuu,delhinohanashiwoshimashita.	先週、Delhiの話をしました。	place	Delhi	hand
+karehadelhinikuwashiidesu.	彼はDelhiに詳しいです。	place	Delhi	hand
+shuumatsuhakathmandudesugoshimashita.	週末はKathmanduで過ごしました。	place	Kathmandu	hand
+kathmanduhasekaijuudeshirareteimasu.	Kathmanduは世界中で知られています。	place	Kathmandu	hand
+shuumatsuhahanoidesugoshimashita.	週末はHanoiで過ごしました。	place	Hanoi	hand
+kodomonokorokarahanoiniakogareteimashita.	子供のころからHanoiに憧れていました。	place	Hanoi	hand
+raigetsumanilaniikuyoteidesu.	来月Manilaに行く予定です。	place	Manila	hand
+kyouhamanilanitsuiteshirabemashita.	今日はManilaについて調べました。	place	Manila	hand
+jakartahasekaijuudeshirareteimasu.	Jakartaは世界中で知られています。	place	Jakarta	hand
+shuumatsuhajakartadesugoshimashita.	週末はJakartaで過ごしました。	place	Jakarta	hand
+karehataipeinikuwashiidesu.	彼はTaipeiに詳しいです。	place	Taipei	hand
+konohonnhataipeinitsuitekakareteimasu.	この本はTaipeiについて書かれています。	place	Taipei	hand
+konohonnhakualalumpurnitsuitekakareteimasu.	この本はKuala Lumpurについて書かれています。	place	Kuala Lumpur	hand
+kualalumpurnokotowokanngaerutotanoshikunarimasu.	Kuala Lumpurのことを考えると楽しくなります。	place	Kuala Lumpur	hand
+watakushihaaucklandgasukidesu.	私はAucklandが好きです。	place	Auckland	hand
+sennshuu,aucklandnohanashiwoshimashita.	先週、Aucklandの話をしました。	place	Auckland	hand
+shuumatsuhasantiagodesugoshimashita.	週末はSantiagoで過ごしました。	place	Santiago	hand
+santiagohasekaijuudeshirareteimasu.	Santiagoは世界中で知られています。	place	Santiago	hand
+karehalimanikuwashiidesu.	彼はLimaに詳しいです。	place	Lima	hand
+watakushihalimagasukidesu.	私はLimaが好きです。	place	Lima	hand
+havananokotowokanngaerutotanoshikunarimasu.	Havanaのことを考えると楽しくなります。	place	Havana	hand
+kyouhahavananitsuiteshirabemashita.	今日はHavanaについて調べました。	place	Havana	hand
+konohonnhajamaicanitsuitekakareteimasu.	この本はJamaicaについて書かれています。	place	Jamaica	hand
+jamaicahasekaijuudeshirareteimasu.	Jamaicaは世界中で知られています。	place	Jamaica	hand
+sennshuu,icelandnohanashiwoshimashita.	先週、Icelandの話をしました。	place	Iceland	hand
+icelandnokotowokanngaerutotanoshikunarimasu.	Icelandのことを考えると楽しくなります。	place	Iceland	hand
+kinou,irelandnonyu-suwomimashita.	昨日、Irelandのニュースを見ました。	place	Ireland	hand
+kodomonokorokarairelandniakogareteimashita.	子供のころからIrelandに憧れていました。	place	Ireland	hand
+raigetsuportugalniikuyoteidesu.	来月Portugalに行く予定です。	place	Portugal	hand
+sennshuu,portugalnohanashiwoshimashita.	先週、Portugalの話をしました。	place	Portugal	hand
+greecenokotowokanngaerutotanoshikunarimasu.	Greeceのことを考えると楽しくなります。	place	Greece	hand
+watakushihagreecegasukidesu.	私はGreeceが好きです。	place	Greece	hand
+karehaturkeynikuwashiidesu.	彼はTurkeyに詳しいです。	place	Turkey	hand
+kyouhaturkeynitsuiteshirabemashita.	今日はTurkeyについて調べました。	place	Turkey	hand
+konohonnhamorocconitsuitekakareteimasu.	この本はMoroccoについて書かれています。	place	Morocco	hand
+sennshuu,morocconohanashiwoshimashita.	先週、Moroccoの話をしました。	place	Morocco	hand
+alaskahasekaijuudeshirareteimasu.	Alaskaは世界中で知られています。	place	Alaska	hand
+kyouhaalaskanitsuiteshirabemashita.	今日はAlaskaについて調べました。	place	Alaska	hand
+watakushihacoloradogasukidesu.	私はColoradoが好きです。	place	Colorado	hand
+karehacoloradonikuwashiidesu.	彼はColoradoに詳しいです。	place	Colorado	hand
+shuumatsuhaarizonadesugoshimashita.	週末はArizonaで過ごしました。	place	Arizona	hand
+arizonanokotowokanngaerutotanoshikunarimasu.	Arizonaのことを考えると楽しくなります。	place	Arizona	hand
+kinou,kilimanjarononyu-suwomimashita.	昨日、Kilimanjaroのニュースを見ました。	place	Kilimanjaro	hand
+kodomonokorokarakilimanjaroniakogareteimashita.	子供のころからKilimanjaroに憧れていました。	place	Kilimanjaro	hand
+raigetsusaharaniikuyoteidesu.	来月Saharaに行く予定です。	place	Sahara	hand
+watakushihasaharagasukidesu.	私はSaharaが好きです。	place	Sahara	hand
+kodomonokorokarayellowstoneniakogareteimashita.	子供のころからYellowstoneに憧れていました。	place	Yellowstone	hand
+raigetsuyellowstoneniikuyoteidesu.	来月Yellowstoneに行く予定です。	place	Yellowstone	hand
+watakushihamarktwaingasukidesu.	私はMark Twainが好きです。	person	Mark Twain	hand
+karehamarktwainnikuwashiidesu.	彼はMark Twainに詳しいです。	person	Mark Twain	hand
+kodomonokorokaraernesthemingwayniakogareteimashita.	子供のころからErnest Hemingwayに憧れていました。	person	Ernest Hemingway	hand
+karehaernesthemingwaynikuwashiidesu.	彼はErnest Hemingwayに詳しいです。	person	Ernest Hemingway	hand
+agathachristiehasekaijuudeshirareteimasu.	Agatha Christieは世界中で知られています。	person	Agatha Christie	hand
+kyouhaagathachristienitsuiteshirabemashita.	今日はAgatha Christieについて調べました。	person	Agatha Christie	hand
+watakushihastephenkinggasukidesu.	私はStephen Kingが好きです。	person	Stephen King	hand
+sennshuu,stephenkingnohanashiwoshimashita.	先週、Stephen Kingの話をしました。	person	Stephen King	hand
+sennshuu,pablopicassonohanashiwoshimashita.	先週、Pablo Picassoの話をしました。	person	Pablo Picasso	hand
+kodomonokorokarapablopicassoniakogareteimashita.	子供のころからPablo Picassoに憧れていました。	person	Pablo Picasso	hand
+watakushihavincentvangoghgasukidesu.	私はVincent van Goghが好きです。	person	Vincent van Gogh	hand
+kinou,vincentvangoghnonyu-suwomimashita.	昨日、Vincent van Goghのニュースを見ました。	person	Vincent van Gogh	hand
+kinou,leonardodavincinonyu-suwomimashita.	昨日、Leonardo da Vinciのニュースを見ました。	person	Leonardo da Vinci	hand
+kodomonokorokaraleonardodavinciniakogareteimashita.	子供のころからLeonardo da Vinciに憧れていました。	person	Leonardo da Vinci	hand
+konohonnhawolfgangamadeusmozartnitsuitekakareteimasu.	この本はWolfgang Amadeus Mozartについて書かれています。	person	Wolfgang Amadeus Mozart	hand
+wolfgangamadeusmozartnokotowokanngaerutotanoshikunarimasu.	Wolfgang Amadeus Mozartのことを考えると楽しくなります。	person	Wolfgang Amadeus Mozart	hand
+ludwigvanbeethovennokotowokanngaerutotanoshikunarimasu.	Ludwig van Beethovenのことを考えると楽しくなります。	person	Ludwig van Beethoven	hand
+karehaludwigvanbeethovennikuwashiidesu.	彼はLudwig van Beethovenに詳しいです。	person	Ludwig van Beethoven	hand
+kyouhamariecurienitsuiteshirabemashita.	今日はMarie Curieについて調べました。	person	Marie Curie	hand
+karehamariecurienikuwashiidesu.	彼はMarie Curieに詳しいです。	person	Marie Curie	hand
+konohonnhanikolateslanitsuitekakareteimasu.	この本はNikola Teslaについて書かれています。	person	Nikola Tesla	hand
+kyouhanikolateslanitsuiteshirabemashita.	今日はNikola Teslaについて調べました。	person	Nikola Tesla	hand
+stephenhawkingnokotowokanngaerutotanoshikunarimasu.	Stephen Hawkingのことを考えると楽しくなります。	person	Stephen Hawking	hand
+karehastephenhawkingnikuwashiidesu.	彼はStephen Hawkingに詳しいです。	person	Stephen Hawking	hand
+kyouhaalanturingnitsuiteshirabemashita.	今日はAlan Turingについて調べました。	person	Alan Turing	hand
+imoutohaalanturingnofanndesu.	妹はAlan Turingのファンです。	person	Alan Turing	hand
+sennshuu,linustorvaldsnohanashiwoshimashita.	先週、Linus Torvaldsの話をしました。	person	Linus Torvalds	hand
+kinou,linustorvaldsnonyu-suwomimashita.	昨日、Linus Torvaldsのニュースを見ました。	person	Linus Torvalds	hand
+kyouhaguidovanrossumnitsuiteshirabemashita.	今日はGuido van Rossumについて調べました。	person	Guido van Rossum	hand
+guidovanrossumhasekaijuudeshirareteimasu.	Guido van Rossumは世界中で知られています。	person	Guido van Rossum	hand
+kyouhasatoshinakamotonitsuiteshirabemashita.	今日はSatoshi Nakamotoについて調べました。	person	Satoshi Nakamoto	hand
+kinou,satoshinakamotononyu-suwomimashita.	昨日、Satoshi Nakamotoのニュースを見ました。	person	Satoshi Nakamoto	hand
+karehavitalikbuterinnikuwashiidesu.	彼はVitalik Buterinに詳しいです。	person	Vitalik Buterin	hand
+imoutohavitalikbuterinnofanndesu.	妹はVitalik Buterinのファンです。	person	Vitalik Buterin	hand
+karehasamaltmannikuwashiidesu.	彼はSam Altmanに詳しいです。	person	Sam Altman	hand
+samaltmanhasekaijuudeshirareteimasu.	Sam Altmanは世界中で知られています。	person	Sam Altman	hand
+jensenhuangnokotowokanngaerutotanoshikunarimasu.	Jensen Huangのことを考えると楽しくなります。	person	Jensen Huang	hand
+jensenhuanghasekaijuudeshirareteimasu.	Jensen Huangは世界中で知られています。	person	Jensen Huang	hand
+imoutohawarrenbuffettnofanndesu.	妹はWarren Buffettのファンです。	person	Warren Buffett	hand
+karehawarrenbuffettnikuwashiidesu.	彼はWarren Buffettに詳しいです。	person	Warren Buffett	hand
+kinou,oprahwinfreynonyu-suwomimashita.	昨日、Oprah Winfreyのニュースを見ました。	person	Oprah Winfrey	hand
+oprahwinfreyhasekaijuudeshirareteimasu.	Oprah Winfreyは世界中で知られています。	person	Oprah Winfrey	hand
+beyoncenokotowokanngaerutotanoshikunarimasu.	Beyonceのことを考えると楽しくなります。	person	Beyonce	hand
+kinou,beyoncenonyu-suwomimashita.	昨日、Beyonceのニュースを見ました。	person	Beyonce	hand
+watakushiharihannagasukidesu.	私はRihannaが好きです。	person	Rihanna	hand
+rihannanokotowokanngaerutotanoshikunarimasu.	Rihannaのことを考えると楽しくなります。	person	Rihanna	hand
+imoutohaedsheerannofanndesu.	妹はEd Sheeranのファンです。	person	Ed Sheeran	hand
+konohonnhaedsheerannitsuitekakareteimasu.	この本はEd Sheeranについて書かれています。	person	Ed Sheeran	hand
+karehajustinbiebernikuwashiidesu.	彼はJustin Bieberに詳しいです。	person	Justin Bieber	hand
+justinbieberhasekaijuudeshirareteimasu.	Justin Bieberは世界中で知られています。	person	Justin Bieber	hand
+watakushihaarianagrandegasukidesu.	私はAriana Grandeが好きです。	person	Ariana Grande	hand
+konohonnhaarianagrandenitsuitekakareteimasu.	この本はAriana Grandeについて書かれています。	person	Ariana Grande	hand
+konohonnhabillieeilishnitsuitekakareteimasu.	この本はBillie Eilishについて書かれています。	person	Billie Eilish	hand
+kinou,billieeilishnonyu-suwomimashita.	昨日、Billie Eilishのニュースを見ました。	person	Billie Eilish	hand
+sennshuu,brunomarsnohanashiwoshimashita.	先週、Bruno Marsの話をしました。	person	Bruno Mars	hand
+watakushihabrunomarsgasukidesu.	私はBruno Marsが好きです。	person	Bruno Mars	hand
+imoutohaadelenofanndesu.	妹はAdeleのファンです。	person	Adele	hand
+kinou,adelenonyu-suwomimashita.	昨日、Adeleのニュースを見ました。	person	Adele	hand
+kyouhaeminemnitsuiteshirabemashita.	今日はEminemについて調べました。	person	Eminem	hand
+konohonnhaeminemnitsuitekakareteimasu.	この本はEminemについて書かれています。	person	Eminem	hand
+madonnanokotowokanngaerutotanoshikunarimasu.	Madonnaのことを考えると楽しくなります。	person	Madonna	hand
+watakushihamadonnagasukidesu.	私はMadonnaが好きです。	person	Madonna	hand
+keanureeveshasekaijuudeshirareteimasu.	Keanu Reevesは世界中で知られています。	person	Keanu Reeves	hand
+kinou,keanureevesnonyu-suwomimashita.	昨日、Keanu Reevesのニュースを見ました。	person	Keanu Reeves	hand
+imoutohajohnnydeppnofanndesu.	妹はJohnny Deppのファンです。	person	Johnny Depp	hand
+karehajohnnydeppnikuwashiidesu.	彼はJohnny Deppに詳しいです。	person	Johnny Depp	hand
+scarlettjohanssonnokotowokanngaerutotanoshikunarimasu.	Scarlett Johanssonのことを考えると楽しくなります。	person	Scarlett Johansson	hand
+konohonnhascarlettjohanssonnitsuitekakareteimasu.	この本はScarlett Johanssonについて書かれています。	person	Scarlett Johansson	hand
+kyouhaemmawatsonnitsuiteshirabemashita.	今日はEmma Watsonについて調べました。	person	Emma Watson	hand
+imoutohaemmawatsonnofanndesu.	妹はEmma Watsonのファンです。	person	Emma Watson	hand
+kyouhaserenawilliamsnitsuiteshirabemashita.	今日はSerena Williamsについて調べました。	person	Serena Williams	hand
+sennshuu,serenawilliamsnohanashiwoshimashita.	先週、Serena Williamsの話をしました。	person	Serena Williams	hand
+rogerfederernokotowokanngaerutotanoshikunarimasu.	Roger Federerのことを考えると楽しくなります。	person	Roger Federer	hand
+imoutoharogerfederernofanndesu.	妹はRoger Federerのファンです。	person	Roger Federer	hand
+sennshuu,rafaelnadalnohanashiwoshimashita.	先週、Rafael Nadalの話をしました。	person	Rafael Nadal	hand
+kyouharafaelnadalnitsuiteshirabemashita.	今日はRafael Nadalについて調べました。	person	Rafael Nadal	hand
+novakdjokovichasekaijuudeshirareteimasu.	Novak Djokovicは世界中で知られています。	person	Novak Djokovic	hand
+imoutohanovakdjokovicnofanndesu.	妹はNovak Djokovicのファンです。	person	Novak Djokovic	hand
+imoutohamichaeljordannofanndesu.	妹はMichael Jordanのファンです。	person	Michael Jordan	hand
+kyouhamichaeljordannitsuiteshirabemashita.	今日はMichael Jordanについて調べました。	person	Michael Jordan	hand
+imoutohalebronjamesnofanndesu.	妹はLeBron Jamesのファンです。	person	LeBron James	hand
+konohonnhalebronjamesnitsuitekakareteimasu.	この本はLeBron Jamesについて書かれています。	person	LeBron James	hand
+kodomonokorokarakobebryantniakogareteimashita.	子供のころからKobe Bryantに憧れていました。	person	Kobe Bryant	hand
+sennshuu,kobebryantnohanashiwoshimashita.	先週、Kobe Bryantの話をしました。	person	Kobe Bryant	hand
+imoutohausainboltnofanndesu.	妹はUsain Boltのファンです。	person	Usain Bolt	hand
+kyouhausainboltnitsuiteshirabemashita.	今日はUsain Boltについて調べました。	person	Usain Bolt	hand
+watakushihaneymargasukidesu.	私はNeymarが好きです。	person	Neymar	hand
+imoutohaneymarnofanndesu.	妹はNeymarのファンです。	person	Neymar	hand
+kodomonokorokarakylianmbappeniakogareteimashita.	子供のころからKylian Mbappeに憧れていました。	person	Kylian Mbappe	hand
+kylianmbappehasekaijuudeshirareteimasu.	Kylian Mbappeは世界中で知られています。	person	Kylian Mbappe	hand
+kyouhajurassicparknitsuiteshirabemashita.	今日はJurassic Parkについて調べました。	work	Jurassic Park	hand
+imoutohajurassicparknofanndesu.	妹はJurassic Parkのファンです。	work	Jurassic Park	hand
+kinou,thelordoftheringsnonyu-suwomimashita.	昨日、The Lord of the Ringsのニュースを見ました。	work	The Lord of the Rings	hand
+imoutohathelordoftheringsnofanndesu.	妹はThe Lord of the Ringsのファンです。	work	The Lord of the Rings	hand
+sennshuu,thematrixnohanashiwoshimashita.	先週、The Matrixの話をしました。	work	The Matrix	hand
+karehathematrixnikuwashiidesu.	彼はThe Matrixに詳しいです。	work	The Matrix	hand
+inceptionnokoushikisaitowokakuninnshitekudasai.	Inceptionの公式サイトを確認してください。	work	Inception	hand
+inceptionhasekaijuudeshirareteimasu.	Inceptionは世界中で知られています。	work	Inception	hand
+kyouhainterstellarnitsuiteshirabemashita.	今日はInterstellarについて調べました。	work	Interstellar	hand
+konohonnhainterstellarnitsuitekakareteimasu.	この本はInterstellarについて書かれています。	work	Interstellar	hand
+kinou,toystorynonyu-suwomimashita.	昨日、Toy Storyのニュースを見ました。	work	Toy Story	hand
+ekidetoystorynokoukokuwomitsukemashita.	駅でToy Storyの広告を見つけました。	work	Toy Story	hand
+ekidefindingnemonokoukokuwomitsukemashita.	駅でFinding Nemoの広告を見つけました。	work	Finding Nemo	hand
+imoutohafindingnemonofanndesu.	妹はFinding Nemoのファンです。	work	Finding Nemo	hand
+sennshuu,thelionkingnohanashiwoshimashita.	先週、The Lion Kingの話をしました。	work	The Lion King	hand
+karehathelionkingnikuwashiidesu.	彼はThe Lion Kingに詳しいです。	work	The Lion King	hand
+gameofthroneshasekaijuudeshirareteimasu.	Game of Thronesは世界中で知られています。	work	Game of Thrones	hand
+ekidegameofthronesnokoukokuwomitsukemashita.	駅でGame of Thronesの広告を見つけました。	work	Game of Thrones	hand
+breakingbadnokotowokanngaerutotanoshikunarimasu.	Breaking Badのことを考えると楽しくなります。	work	Breaking Bad	hand
+karehabreakingbadnikuwashiidesu.	彼はBreaking Badに詳しいです。	work	Breaking Bad	hand
+strangerthingsnokotowokanngaerutotanoshikunarimasu.	Stranger Thingsのことを考えると楽しくなります。	work	Stranger Things	hand
+watakushihastrangerthingsgasukidesu.	私はStranger Thingsが好きです。	work	Stranger Things	hand
+thesimpsonshasekaijuudeshirareteimasu.	The Simpsonsは世界中で知られています。	work	The Simpsons	hand
+sennshuu,thesimpsonsnohanashiwoshimashita.	先週、The Simpsonsの話をしました。	work	The Simpsons	hand
+kinou,zeldanonyu-suwomimashita.	昨日、Zeldaのニュースを見ました。	work	Zelda	hand
+zeldanokoushikisaitowokakuninnshitekudasai.	Zeldaの公式サイトを確認してください。	work	Zelda	hand
+tetrisnokoushikisaitowokakuninnshitekudasai.	Tetrisの公式サイトを確認してください。	work	Tetris	hand
+tetrishasekaijuudeshirareteimasu.	Tetrisは世界中で知られています。	work	Tetris	hand
+karehapacmannikuwashiidesu.	彼はPac-Manに詳しいです。	work	Pac-Man	hand
+watakushihapacmangasukidesu.	私はPac-Manが好きです。	work	Pac-Man	hand
+kodomonokorokarasonicniakogareteimashita.	子供のころからSonicに憧れていました。	work	Sonic	hand
+kyouhasonicnitsuiteshirabemashita.	今日はSonicについて調べました。	work	Sonic	hand
+sennshuu,callofdutynohanashiwoshimashita.	先週、Call of Dutyの話をしました。	work	Call of Duty	hand
+ekidecallofdutynokoukokuwomitsukemashita.	駅でCall of Dutyの広告を見つけました。	work	Call of Duty	hand
+grandtheftautohasekaijuudeshirareteimasu.	Grand Theft Autoは世界中で知られています。	work	Grand Theft Auto	hand
+imoutohagrandtheftautonofanndesu.	妹はGrand Theft Autoのファンです。	work	Grand Theft Auto	hand
+kyouhaleagueoflegendsnitsuiteshirabemashita.	今日はLeague of Legendsについて調べました。	work	League of Legends	hand
+karehaleagueoflegendsnikuwashiidesu.	彼はLeague of Legendsに詳しいです。	work	League of Legends	hand
+overwatchhasekaijuudeshirareteimasu.	Overwatchは世界中で知られています。	work	Overwatch	hand
+sennshuu,overwatchnohanashiwoshimashita.	先週、Overwatchの話をしました。	work	Overwatch	hand
+watakushihaeldenringgasukidesu.	私はElden Ringが好きです。	work	Elden Ring	hand
+imoutohaeldenringnofanndesu.	妹はElden Ringのファンです。	work	Elden Ring	hand
+konohonnhagenshinimpactnitsuitekakareteimasu.	この本はGenshin Impactについて書かれています。	work	Genshin Impact	hand
+genshinimpactnokotowokanngaerutotanoshikunarimasu.	Genshin Impactのことを考えると楽しくなります。	work	Genshin Impact	hand
+ledzeppelinnokotowokanngaerutotanoshikunarimasu.	Led Zeppelinのことを考えると楽しくなります。	work	Led Zeppelin	hand
+watakushihaledzeppelingasukidesu.	私はLed Zeppelinが好きです。	work	Led Zeppelin	hand
+pinkfloydhasekaijuudeshirareteimasu.	Pink Floydは世界中で知られています。	work	Pink Floyd	hand
+kinou,pinkfloydnonyu-suwomimashita.	昨日、Pink Floydのニュースを見ました。	work	Pink Floyd	hand
+konohonnhatherollingstonesnitsuitekakareteimasu.	この本はThe Rolling Stonesについて書かれています。	work	The Rolling Stones	hand
+watakushihatherollingstonesgasukidesu.	私はThe Rolling Stonesが好きです。	work	The Rolling Stones	hand
+watakushihametallicagasukidesu.	私はMetallicaが好きです。	work	Metallica	hand
+konohonnhametallicanitsuitekakareteimasu.	この本はMetallicaについて書かれています。	work	Metallica	hand
+kyouhalinkinparknitsuiteshirabemashita.	今日はLinkin Parkについて調べました。	work	Linkin Park	hand
+kodomonokorokaralinkinparkniakogareteimashita.	子供のころからLinkin Parkに憧れていました。	work	Linkin Park	hand
+ekidegreendaynokoukokuwomitsukemashita.	駅でGreen Dayの広告を見つけました。	work	Green Day	hand
+greendaynokotowokanngaerutotanoshikunarimasu.	Green Dayのことを考えると楽しくなります。	work	Green Day	hand
+ekideimaginedragonsnokoukokuwomitsukemashita.	駅でImagine Dragonsの広告を見つけました。	work	Imagine Dragons	hand
+konohonnhaimaginedragonsnitsuitekakareteimasu.	この本はImagine Dragonsについて書かれています。	work	Imagine Dragons	hand
+kinou,btsnonyu-suwomimashita.	昨日、BTSのニュースを見ました。	work	BTS	hand
+kyouhabtsnitsuiteshirabemashita.	今日はBTSについて調べました。	work	BTS	hand
+watakushihablackpinkgasukidesu.	私はBlackpinkが好きです。	work	Blackpink	hand
+kinou,blackpinknonyu-suwomimashita.	昨日、Blackpinkのニュースを見ました。	work	Blackpink	hand
+kyouhapixarnitsuiteshirabemashita.	今日はPixarについて調べました。	work	Pixar	hand
+pixarnokoushikisaitowokakuninnshitekudasai.	Pixarの公式サイトを確認してください。	work	Pixar	hand
+kyouharossislandnitsuiteshirabemashita.	今日はRoss Islandについて調べました。	place	Ross Island	sample
+karpacznokotowokanngaerutotanoshikunarimasu.	Karpaczのことを考えると楽しくなります。	place	Karpacz	sample
+shuumatsuhasalisburydesugoshimashita.	週末はSalisburyで過ごしました。	place	Salisbury	sample
+sennshuu,pristinanohanashiwoshimashita.	先週、Pristinaの話をしました。	place	Pristina	sample
+raigetsuestonianiikuyoteidesu.	来月Estoniaに行く予定です。	place	Estonia	sample
+shuumatsuhasouthtangerangdesugoshimashita.	週末はSouth Tangerangで過ごしました。	place	South Tangerang	sample
+shuumatsuhaeldoretdesugoshimashita.	週末はEldoretで過ごしました。	place	Eldoret	sample
+kinou,liechtensteinnonyu-suwomimashita.	昨日、Liechtensteinのニュースを見ました。	place	Liechtenstein	sample
+konohonnhahitzackernitsuitekakareteimasu.	この本はHitzackerについて書かれています。	place	Hitzacker	sample
+kodomonokorokarasharmelsheikhniakogareteimashita.	子供のころからSharm el-Sheikhに憧れていました。	place	Sharm el-Sheikh	sample
+kinou,briellenonyu-suwomimashita.	昨日、Brielleのニュースを見ました。	place	Brielle	sample
+sennshuu,camaiorenohanashiwoshimashita.	先週、Camaioreの話をしました。	place	Camaiore	sample
+konohonnhapurusrivernitsuitekakareteimasu.	この本はPurus Riverについて書かれています。	place	Purus River	sample
+raigetsukhabarovskniikuyoteidesu.	来月Khabarovskに行く予定です。	place	Khabarovsk	sample
+konohonnhageesthachtnitsuitekakareteimasu.	この本はGeesthachtについて書かれています。	place	Geesthacht	sample
+konohonnhaakhaltsikhenitsuitekakareteimasu.	この本はAkhaltsikheについて書かれています。	place	Akhaltsikhe	sample
+watakushihakaarstgasukidesu.	私はKaarstが好きです。	place	Kaarst	sample
+watakushihakhorughgasukidesu.	私はKhorughが好きです。	place	Khorugh	sample
+kyouhajhangnitsuiteshirabemashita.	今日はJhangについて調べました。	place	Jhang	sample
+shuumatsuhaucayaliriverdesugoshimashita.	週末はUcayali Riverで過ごしました。	place	Ucayali River	sample
+sennshuu,metromanilanohanashiwoshimashita.	先週、Metro Manilaの話をしました。	place	Metro Manila	sample
+kodomonokorokaranarewniakogareteimashita.	子供のころからNarewに憧れていました。	place	Narew	sample
+konohonnhadrobetaturnuseverinnitsuitekakareteimasu.	この本はDrobeta-Turnu Severinについて書かれています。	place	Drobeta-Turnu Severin	sample
+nazarethhasekaijuudeshirareteimasu.	Nazarethは世界中で知られています。	place	Nazareth	sample
+everettnokotowokanngaerutotanoshikunarimasu.	Everettのことを考えると楽しくなります。	place	Everett	sample
+karehaschellenbergnikuwashiidesu.	彼はSchellenbergに詳しいです。	place	Schellenberg	sample
+raigetsugryficeniikuyoteidesu.	来月Gryficeに行く予定です。	place	Gryfice	sample
+raigetsulommelniikuyoteidesu.	来月Lommelに行く予定です。	place	Lommel	sample
+kyouharichmondnitsuiteshirabemashita.	今日はRichmondについて調べました。	place	Richmond	sample
+raigetsushreveportniikuyoteidesu.	来月Shreveportに行く予定です。	place	Shreveport	sample
+kodomonokorokarapohangniakogareteimashita.	子供のころからPohangに憧れていました。	place	Pohang	sample
+kodomonokorokaraurgenchniakogareteimashita.	子供のころからUrgenchに憧れていました。	place	Urgench	sample
+raigetsuhohnsteinniikuyoteidesu.	来月Hohnsteinに行く予定です。	place	Hohnstein	sample
+kodomonokorokarascheibenhardniakogareteimashita.	子供のころからScheibenhardに憧れていました。	place	Scheibenhard	sample
+mallorcahasekaijuudeshirareteimasu.	Mallorcaは世界中で知られています。	place	Mallorca	sample
+sennshuu,bitburgnohanashiwoshimashita.	先週、Bitburgの話をしました。	place	Bitburg	sample
+karehatepicnikuwashiidesu.	彼はTepicに詳しいです。	place	Tepic	sample
+karehatrelewnikuwashiidesu.	彼はTrelewに詳しいです。	place	Trelew	sample
+kinou,firuzkohnonyu-suwomimashita.	昨日、Firuzkohのニュースを見ました。	place	Firuzkoh	sample
+kinou,jejuairnonyu-suwomimashita.	昨日、Jeju Airのニュースを見ました。	company	Jeju Air	sample
+kaigidesantamonicastudionojireiwoshoukaishimashita.	会議でSanta Monica Studioの事例を紹介しました。	company	Santa Monica Studio	sample
+americaninternationalhasekaijuudeshirareteimasu.	American Internationalは世界中で知られています。	company	American International	sample
+kinou,airserbianonyu-suwomimashita.	昨日、Air Serbiaのニュースを見ました。	company	Air Serbia	sample
+imoutohaopelnofanndesu.	妹はOpelのファンです。	company	Opel	sample
+ekidefairchildnokoukokuwomitsukemashita.	駅でFairchildの広告を見つけました。	company	Fairchild	sample
+irizarnokotowokanngaerutotanoshikunarimasu.	Irizarのことを考えると楽しくなります。	company	Irizar	sample
+karehadaimlerbenznikuwashiidesu.	彼はDaimler-Benzに詳しいです。	company	Daimler-Benz	sample
+ekidewhiskasnokoukokuwomitsukemashita.	駅でWhiskasの広告を見つけました。	company	Whiskas	sample
+watakushihacyrixgasukidesu.	私はCyrixが好きです。	company	Cyrix	sample
+universitatdandorranokotowokanngaerutotanoshikunarimasu.	Universitat d'Andorraのことを考えると楽しくなります。	company	Universitat d'Andorra	sample
+dellemchasekaijuudeshirareteimasu.	Dell EMCは世界中で知られています。	company	Dell EMC	sample
+darwinairlinehasekaijuudeshirareteimasu.	Darwin Airlineは世界中で知られています。	company	Darwin Airline	sample
+frederiksborgpalacenokotowokanngaerutotanoshikunarimasu.	Frederiksborg Palaceのことを考えると楽しくなります。	company	Frederiksborg Palace	sample
+ekidenationalsemiconductornokoukokuwomitsukemashita.	駅でNational Semiconductorの広告を見つけました。	company	National Semiconductor	sample
+anohitohanesquikdehataraiteimasu.	あの人はNesquikで働いています。	company	Nesquik	sample
+konohonnhagearboxsoftwarenitsuitekakareteimasu.	この本はGearbox Softwareについて書かれています。	company	Gearbox Software	sample
+kaigidevestasnojireiwoshoukaishimashita.	会議でVestasの事例を紹介しました。	company	Vestas	sample
+sennshuu,washingtonmutualnohanashiwoshimashita.	先週、Washington Mutualの話をしました。	company	Washington Mutual	sample
+casteldelmontenokoushikisaitowokakuninnshitekudasai.	Castel del Monteの公式サイトを確認してください。	company	Castel del Monte	sample
+kinou,charlesuniversitynonyu-suwomimashita.	昨日、Charles Universityのニュースを見ました。	company	Charles University	sample
+kinou,severstalnonyu-suwomimashita.	昨日、Severstalのニュースを見ました。	company	Severstal	sample
+ekiderockwellinternationalnokoukokuwomitsukemashita.	駅でRockwell Internationalの広告を見つけました。	company	Rockwell International	sample
+kodomonokorokaraegyptianmuseumniakogareteimashita.	子供のころからEgyptian Museumに憧れていました。	company	Egyptian Museum	sample
+karehafloridapanthersnikuwashiidesu.	彼はFlorida Panthersに詳しいです。	company	Florida Panthers	sample
+pallacanestrovirtusromanokoushikisaitowokakuninnshitekudasai.	Pallacanestro Virtus Romaの公式サイトを確認してください。	company	Pallacanestro Virtus Roma	sample
+universityofconstantinoplehasekaijuudeshirareteimasu.	University of Constantinopleは世界中で知られています。	company	University of Constantinople	sample
+sennshuu,nationaldietlibrarynohanashiwoshimashita.	先週、National Diet Libraryの話をしました。	company	National Diet Library	sample
+innsofcourtnokoushikisaitowokakuninnshitekudasai.	Inns of Courtの公式サイトを確認してください。	company	Inns of Court	sample
+konohonnhaelilillyandnitsuitekakareteimasu.	この本はEli Lilly andについて書かれています。	company	Eli Lilly and	sample
+usairwayshasekaijuudeshirareteimasu.	US Airwaysは世界中で知られています。	company	US Airways	sample
+ekideabbeytheatrenokoukokuwomitsukemashita.	駅でAbbey Theatreの広告を見つけました。	company	Abbey Theatre	sample
+konohonnhafocusfeaturesnitsuitekakareteimasu.	この本はFocus Featuresについて書かれています。	company	Focus Features	sample
+anohitohatuftsuniversitydehataraiteimasu.	あの人はTufts Universityで働いています。	company	Tufts University	sample
+imoutohanewjerseydevilsnofanndesu.	妹はNew Jersey Devilsのファンです。	company	New Jersey Devils	sample
+imoutohatsitsernakaberdnofanndesu.	妹はTsitsernakaberdのファンです。	company	Tsitsernakaberd	sample
+ekideashmoleanmuseumnokoukokuwomitsukemashita.	駅でAshmolean Museumの広告を見つけました。	company	Ashmolean Museum	sample
+watakushihacessnagasukidesu.	私はCessnaが好きです。	company	Cessna	sample
+airvanuatunokoushikisaitowokakuninnshitekudasai.	Air Vanuatuの公式サイトを確認してください。	company	Air Vanuatu	sample
+acspartapraguenokotowokanngaerutotanoshikunarimasu.	AC Sparta Pragueのことを考えると楽しくなります。	company	AC Sparta Prague	sample
+konohonnhabarrandovstudiosnitsuitekakareteimasu.	この本はBarrandov Studiosについて書かれています。	company	Barrandov Studios	sample
+sennshuu,archiecomicsnohanashiwoshimashita.	先週、Archie Comicsの話をしました。	company	Archie Comics	sample
+karehaadobecreativecloudnikuwashiidesu.	彼はAdobe Creative Cloudに詳しいです。	software	Adobe Creative Cloud	sample
+kyouhakantaicollectionnitsuiteshirabemashita.	今日はKantai Collectionについて調べました。	software	Kantai Collection	sample
+semanticwebnokotowokanngaerutotanoshikunarimasu.	Semantic Webのことを考えると楽しくなります。	software	Semantic Web	sample
+tomodachigalifeisstrangewotsukatteimasu.	友達がLife Is Strangeを使っています。	software	Life Is Strange	sample
+karehaprinceofpersianikuwashiidesu.	彼はPrince of Persiaに詳しいです。	software	Prince of Persia	sample
+konohonnhawiifitnitsuitekakareteimasu.	この本はWii Fitについて書かれています。	software	Wii Fit	sample
+activeserverpagesnokotowokanngaerutotanoshikunarimasu.	Active Server Pagesのことを考えると楽しくなります。	software	Active Server Pages	sample
+mitappinventorhasekaijuudeshirareteimasu.	MIT App Inventorは世界中で知られています。	software	MIT App Inventor	sample
+tomodachigaworldofwarshipswotsukatteimasu.	友達がWorld of Warshipsを使っています。	software	World of Warships	sample
+kyouhayandextranslatenitsuiteshirabemashita.	今日はYandex Translateについて調べました。	software	Yandex Translate	sample
+kyouhagodofwarnitsuiteshirabemashita.	今日はGod of Warについて調べました。	software	God of War	sample
+mainichikerbalspaceprogramwotsukatteshigotowoshiteimasu.	毎日Kerbal Space Programを使って仕事をしています。	software	Kerbal Space Program	sample
+mainichicaminowotsukatteshigotowoshiteimasu.	毎日Caminoを使って仕事をしています。	software	Camino	sample
+karehachesscomnikuwashiidesu.	彼はChess.comに詳しいです。	software	Chess.com	sample
+kinou,trisquelnonyu-suwomimashita.	昨日、Trisquelのニュースを見ました。	software	Trisquel	sample
+drmarionokoushikisaitowokakuninnshitekudasai.	Dr. Marioの公式サイトを確認してください。	software	Dr. Mario	sample
+kinou,windows31xnonyu-suwomimashita.	昨日、Windows 3.1xのニュースを見ました。	software	Windows 3.1x	sample
+theforesthasekaijuudeshirareteimasu.	The Forestは世界中で知られています。	software	The Forest	sample
+kaigidegoogleshoppingnojireiwoshoukaishimashita.	会議でGoogle Shoppingの事例を紹介しました。	software	Google Shopping	sample
+mainichiworldwidewebwotsukatteshigotowoshiteimasu.	毎日WorldWideWebを使って仕事をしています。	software	WorldWideWeb	sample
+watakushihafinalfantasyxvgasukidesu.	私はFinal Fantasy XVが好きです。	software	Final Fantasy XV	sample
+watakushihagooglewebtoolkitgasukidesu.	私はGoogle Web Toolkitが好きです。	software	Google Web Toolkit	sample
+wordperfecthasekaijuudeshirareteimasu.	WordPerfectは世界中で知られています。	software	WordPerfect	sample
+kyouhafileexplorernitsuiteshirabemashita.	今日はFile Explorerについて調べました。	software	File Explorer	sample
+macosbigsurnokotowokanngaerutotanoshikunarimasu.	macOS Big Surのことを考えると楽しくなります。	software	macOS Big Sur	sample
+konohonnhacydianitsuitekakareteimasu.	この本はCydiaについて書かれています。	software	Cydia	sample
+empireearthnokotowokanngaerutotanoshikunarimasu.	Empire Earthのことを考えると楽しくなります。	software	Empire Earth	sample
+labviewhasekaijuudeshirareteimasu.	LabVIEWは世界中で知られています。	software	LabVIEW	sample
+kyouhawordfastnitsuiteshirabemashita.	今日はWordfastについて調べました。	software	Wordfast	sample
+ultimaonlinenokotowokanngaerutotanoshikunarimasu.	Ultima Onlineのことを考えると楽しくなります。	software	Ultima Online	sample
+atarashiimicrosoftflightsimulatornokinouwotameshimashita.	新しいMicrosoft Flight Simulatorの機能を試しました。	software	Microsoft Flight Simulator	sample
+tomodachigaquarkxpresswotsukatteimasu.	友達がQuarkXPressを使っています。	software	QuarkXPress	sample
+karehapclinuxosnikuwashiidesu.	彼はPCLinuxOSに詳しいです。	software	PCLinuxOS	sample
+tomodachigaarkanoidwotsukatteimasu.	友達がArkanoidを使っています。	software	Arkanoid	sample
+konohonnhacolossalcaveadventurenitsuitekakareteimasu.	この本はColossal Cave Adventureについて書かれています。	software	Colossal Cave Adventure	sample
+kinou,glynisjohnsnonyu-suwomimashita.	昨日、Glynis Johnsのニュースを見ました。	person	Glynis Johns	sample
+sennshuu,bettyfordnohanashiwoshimashita.	先週、Betty Fordの話をしました。	person	Betty Ford	sample
+kinou,judelawnonyu-suwomimashita.	昨日、Jude Lawのニュースを見ました。	person	Jude Law	sample
+kyouhagarynevillenitsuiteshirabemashita.	今日はGary Nevilleについて調べました。	person	Gary Neville	sample
+josephfiennesnokotowokanngaerutotanoshikunarimasu.	Joseph Fiennesのことを考えると楽しくなります。	person	Joseph Fiennes	sample
+louistomlinsonhasekaijuudeshirareteimasu.	Louis Tomlinsonは世界中で知られています。	person	Louis Tomlinson	sample
+kinou,abrahamlincolnnonyu-suwomimashita.	昨日、Abraham Lincolnのニュースを見ました。	person	Abraham Lincoln	sample
+kinou,bobnewhartnonyu-suwomimashita.	昨日、Bob Newhartのニュースを見ました。	person	Bob Newhart	sample
+watakushihaanthonydavisgasukidesu.	私はAnthony Davisが好きです。	person	Anthony Davis	sample
+watakushihasaladingasukidesu.	私はSaladinが好きです。	person	Saladin	sample
+kyouhakrisjennernitsuiteshirabemashita.	今日はKris Jennerについて調べました。	person	Kris Jenner	sample
+littlerichardnokotowokanngaerutotanoshikunarimasu.	Little Richardのことを考えると楽しくなります。	person	Little Richard	sample
+olafscholzhasekaijuudeshirareteimasu.	Olaf Scholzは世界中で知られています。	person	Olaf Scholz	sample
+karehacormacmccarthynikuwashiidesu.	彼はCormac McCarthyに詳しいです。	person	Cormac McCarthy	sample
+kodomonokorokararobinwilliamsniakogareteimashita.	子供のころからRobin Williamsに憧れていました。	person	Robin Williams	sample
+kinou,ayrtonsennanonyu-suwomimashita.	昨日、Ayrton Sennaのニュースを見ました。	person	Ayrton Senna	sample
+lukeperryhasekaijuudeshirareteimasu.	Luke Perryは世界中で知られています。	person	Luke Perry	sample
+imoutohamadeleinestowenofanndesu.	妹はMadeleine Stoweのファンです。	person	Madeleine Stowe	sample
+kinou,guillermodeltorononyu-suwomimashita.	昨日、Guillermo del Toroのニュースを見ました。	person	Guillermo del Toro	sample
+konohonnharichardmaddennitsuitekakareteimasu.	この本はRichard Maddenについて書かれています。	person	Richard Madden	sample
+kodomonokorokarajesseeisenbergniakogareteimashita.	子供のころからJesse Eisenbergに憧れていました。	person	Jesse Eisenberg	sample
+aaroncarterhasekaijuudeshirareteimasu.	Aaron Carterは世界中で知られています。	person	Aaron Carter	sample
+harrystylesnokotowokanngaerutotanoshikunarimasu.	Harry Stylesのことを考えると楽しくなります。	person	Harry Styles	sample
+kinou,ralphmacchiononyu-suwomimashita.	昨日、Ralph Macchioのニュースを見ました。	person	Ralph Macchio	sample
+watakushihagabbygiffordsgasukidesu.	私はGabby Giffordsが好きです。	person	Gabby Giffords	sample
+karehacharlottegainsbourgnikuwashiidesu.	彼はCharlotte Gainsbourgに詳しいです。	person	Charlotte Gainsbourg	sample
+jimmykimmelhasekaijuudeshirareteimasu.	Jimmy Kimmelは世界中で知られています。	person	Jimmy Kimmel	sample
+sennshuu,paulhogannohanashiwoshimashita.	先週、Paul Hoganの話をしました。	person	Paul Hogan	sample
+karehajamalkhashogginikuwashiidesu.	彼はJamal Khashoggiに詳しいです。	person	Jamal Khashoggi	sample
+konohonnhasimoneinzaghinitsuitekakareteimasu.	この本はSimone Inzaghiについて書かれています。	person	Simone Inzaghi	sample
+watakushihaafrikabambaataagasukidesu.	私はAfrika Bambaataaが好きです。	person	Afrika Bambaataa	sample
+watakushihaakshaykumargasukidesu.	私はAkshay Kumarが好きです。	person	Akshay Kumar	sample
+rosemaryclooneyhasekaijuudeshirareteimasu.	Rosemary Clooneyは世界中で知られています。	person	Rosemary Clooney	sample
+watakushihaolenazelenskagasukidesu.	私はOlena Zelenskaが好きです。	person	Olena Zelenska	sample
+johnnyknoxvillenokotowokanngaerutotanoshikunarimasu.	Johnny Knoxvilleのことを考えると楽しくなります。	person	Johnny Knoxville	sample
+kodomonokorokaraantoniobanderasniakogareteimashita.	子供のころからAntonio Banderasに憧れていました。	person	Antonio Banderas	sample
+karehaxherdanshaqirinikuwashiidesu.	彼はXherdan Shaqiriに詳しいです。	person	Xherdan Shaqiri	sample
+kinou,imanekhelifnonyu-suwomimashita.	昨日、Imane Khelifのニュースを見ました。	person	Imane Khelif	sample
+jasonsudeikisnokotowokanngaerutotanoshikunarimasu.	Jason Sudeikisのことを考えると楽しくなります。	person	Jason Sudeikis	sample
+konohonnhabritneyspearsnitsuitekakareteimasu.	この本はBritney Spearsについて書かれています。	person	Britney Spears	sample
+watakushiharufussewellgasukidesu.	私はRufus Sewellが好きです。	person	Rufus Sewell	sample
+kinou,patriciaarquettenonyu-suwomimashita.	昨日、Patricia Arquetteのニュースを見ました。	person	Patricia Arquette	sample
+alicewalkerhasekaijuudeshirareteimasu.	Alice Walkerは世界中で知られています。	person	Alice Walker	sample
+konohonnhahelenmccrorynitsuitekakareteimasu.	この本はHelen McCroryについて書かれています。	person	Helen McCrory	sample
+imoutohabrendaleenofanndesu.	妹はBrenda Leeのファンです。	person	Brenda Lee	sample
+kodomonokorokarabernardarnaultniakogareteimashita.	子供のころからBernard Arnaultに憧れていました。	person	Bernard Arnault	sample
+karehaastonmartindb9nikuwashiidesu.	彼はAston Martin DB9に詳しいです。	product	Aston Martin DB9	sample
+sennshuu,renaultzoenohanashiwoshimashita.	先週、Renault Zoeの話をしました。	product	Renault Zoe	sample
+ekideopelmokkanokoukokuwomitsukemashita.	駅でOpel Mokkaの広告を見つけました。	product	Opel Mokka	sample
+ekidejoystiqnokoukokuwomitsukemashita.	駅でJoystiqの広告を見つけました。	product	Joystiq	sample
+atarashiilexuslfanokinouwotameshimashita.	新しいLexus LFAの機能を試しました。	product	Lexus LFA	sample
+kaigidemercedesbenzmclassnojireiwoshoukaishimashita.	会議でMercedes-Benz M-Classの事例を紹介しました。	product	Mercedes-Benz M-Class	sample
+tomodachigaechoofmoscowwotsukatteimasu.	友達がEcho of Moscowを使っています。	product	Echo of Moscow	sample
+breitbartnewshasekaijuudeshirareteimasu.	Breitbart Newsは世界中で知られています。	product	Breitbart News	sample
+tomodachigadaewoolanoswotsukatteimasu.	友達がDaewoo Lanosを使っています。	product	Daewoo Lanos	sample
+rollingstonehasekaijuudeshirareteimasu.	Rolling Stoneは世界中で知られています。	product	Rolling Stone	sample
+ekideaudiv8nokoukokuwomitsukemashita.	駅でAudi V8の広告を見つけました。	product	Audi V8	sample
+fordcaprinokoushikisaitowokakuninnshitekudasai.	Ford Capriの公式サイトを確認してください。	product	Ford Capri	sample
+konohonnhaindexfungorumnitsuitekakareteimasu.	この本はIndex Fungorumについて書かれています。	product	Index Fungorum	sample
+tomodachigachevroletvoltwotsukatteimasu.	友達がChevrolet Voltを使っています。	product	Chevrolet Volt	sample
+atarashiimazdacx5nokinouwotameshimashita.	新しいMazda CX-5の機能を試しました。	product	Mazda CX-5	sample
+kinou,bentleybentayganonyu-suwomimashita.	昨日、Bentley Bentaygaのニュースを見ました。	product	Bentley Bentayga	sample
+watakushihalexusrxgasukidesu.	私はLexus RXが好きです。	product	Lexus RX	sample
+ekidefordsmaxnokoukokuwomitsukemashita.	駅でFord S-Maxの広告を見つけました。	product	Ford S-Max	sample
+teslaroadsternokotowokanngaerutotanoshikunarimasu.	Tesla Roadsterのことを考えると楽しくなります。	product	Tesla Roadster	sample
+sennshuu,vaz2103nohanashiwoshimashita.	先週、VAZ-2103の話をしました。	product	VAZ-2103	sample
+mainichibmwz3wotsukatteshigotowoshiteimasu.	毎日BMW Z3を使って仕事をしています。	product	BMW Z3	sample
+tomodachigawikifeetwotsukatteimasu.	友達がwikiFeetを使っています。	product	wikiFeet	sample
+imoutohavolvos60nofanndesu.	妹はVolvo S60のファンです。	product	Volvo S60	sample
+kyouhavolvoxc90nitsuiteshirabemashita.	今日はVolvo XC90について調べました。	product	Volvo XC90	sample
+tomodachigaaudiq2wotsukatteimasu.	友達がAudi Q2を使っています。	product	Audi Q2	sample
+atarashiiaudiquattronokinouwotameshimashita.	新しいAudi Quattroの機能を試しました。	product	Audi Quattro	sample
+kaigideconservapedianojireiwoshoukaishimashita.	会議でConservapediaの事例を紹介しました。	product	Conservapedia	sample
+imoutohaferrarif40nofanndesu.	妹はFerrari F40のファンです。	product	Ferrari F40	sample
+mainichidbpediawotsukatteshigotowoshiteimasu.	毎日DBpediaを使って仕事をしています。	product	DBpedia	sample
+ekidefordorionnokoukokuwomitsukemashita.	駅でFord Orionの広告を見つけました。	product	Ford Orion	sample
+konohonnhalincolntowncarnitsuitekakareteimasu.	この本はLincoln Town Carについて書かれています。	product	Lincoln Town Car	sample
+kyouhamercedesbenzw123nitsuiteshirabemashita.	今日はMercedes-Benz W123について調べました。	product	Mercedes-Benz W123	sample
+watakushihajaguaretypegasukidesu.	私はJaguar E-Typeが好きです。	product	Jaguar E-Type	sample
+atarashiideviantartnokinouwotameshimashita.	新しいDeviantArtの機能を試しました。	product	DeviantArt	sample
+vaz2101nokotowokanngaerutotanoshikunarimasu.	VAZ-2101のことを考えると楽しくなります。	product	VAZ-2101	sample
+lamborghiniestoquenokoushikisaitowokakuninnshitekudasai.	Lamborghini Estoqueの公式サイトを確認してください。	product	Lamborghini Estoque	sample
+mainichialfaromeomitowotsukatteshigotowoshiteimasu.	毎日Alfa Romeo MiToを使って仕事をしています。	product	Alfa Romeo MiTo	sample
+imoutoha1upnetworknofanndesu.	妹は1Up Networkのファンです。	product	1Up Network	sample
+teslacybertrucknokotowokanngaerutotanoshikunarimasu.	Tesla Cybertruckのことを考えると楽しくなります。	product	Tesla Cybertruck	sample
+sennshuu,opeladamnohanashiwoshimashita.	先週、Opel Adamの話をしました。	product	Opel Adam	sample
+mainichimclarenf1wotsukatteshigotowoshiteimasu.	毎日McLaren F1を使って仕事をしています。	product	McLaren F1	sample
+imoutohadirtyharrynofanndesu.	妹はDirty Harryのファンです。	work	Dirty Harry	sample
+sennshuu,nostringsattachednohanashiwoshimashita.	先週、No Strings Attachedの話をしました。	work	No Strings Attached	sample
+thrillernokoushikisaitowokakuninnshitekudasai.	Thrillerの公式サイトを確認してください。	work	Thriller	sample
+karehailvolonikuwashiidesu.	彼はIl Voloに詳しいです。	work	Il Volo	sample
+naturenokotowokanngaerutotanoshikunarimasu.	Natureのことを考えると楽しくなります。	work	Nature	sample
+tropicthunderhasekaijuudeshirareteimasu.	Tropic Thunderは世界中で知られています。	work	Tropic Thunder	sample
+ekideamericanhorrorstorynokoukokuwomitsukemashita.	駅でAmerican Horror Storyの広告を見つけました。	work	American Horror Story	sample
+konohonnhathebatmannitsuitekakareteimasu.	この本はThe Batmanについて書かれています。	work	The Batman	sample
+karehaaclockworkorangenikuwashiidesu.	彼はA Clockwork Orangeに詳しいです。	work	A Clockwork Orange	sample
+savagegardennokotowokanngaerutotanoshikunarimasu.	Savage Gardenのことを考えると楽しくなります。	work	Savage Garden	sample
+thesacrificenokoushikisaitowokakuninnshitekudasai.	The Sacrificeの公式サイトを確認してください。	work	The Sacrifice	sample
+ekideoldtestamentnokoukokuwomitsukemashita.	駅でOld Testamentの広告を見つけました。	work	Old Testament	sample
+kinou,midnightsnonyu-suwomimashita.	昨日、Midnightsのニュースを見ました。	work	Midnights	sample
+aphroditehasekaijuudeshirareteimasu.	Aphroditeは世界中で知られています。	work	Aphrodite	sample
+imoutoharomancingthestonenofanndesu.	妹はRomancing the Stoneのファンです。	work	Romancing the Stone	sample
+kyouhathegreatwallnitsuiteshirabemashita.	今日はThe Great Wallについて調べました。	work	The Great Wall	sample
+thegreatdictatornokotowokanngaerutotanoshikunarimasu.	The Great Dictatorのことを考えると楽しくなります。	work	The Great Dictator	sample
+imoutohathepianoteachernofanndesu.	妹はThe Piano Teacherのファンです。	work	The Piano Teacher	sample
+kindergartencophasekaijuudeshirareteimasu.	Kindergarten Copは世界中で知られています。	work	Kindergarten Cop	sample
+kyouhatheknifenitsuiteshirabemashita.	今日はThe Knifeについて調べました。	work	The Knife	sample
+kodomonokorokarathecosbyshowniakogareteimashita.	子供のころからThe Cosby Showに憧れていました。	work	The Cosby Show	sample
+imoutohaurbansymphonynofanndesu.	妹はUrban Symphonyのファンです。	work	Urban Symphony	sample
+watakushihacuttingcrewgasukidesu.	私はCutting Crewが好きです。	work	Cutting Crew	sample
+imoutohabooksofkingsnofanndesu.	妹はBooks of Kingsのファンです。	work	Books of Kings	sample
+imoutohakinglearnofanndesu.	妹はKing Learのファンです。	work	King Lear	sample
+rockyivnokotowokanngaerutotanoshikunarimasu.	Rocky IVのことを考えると楽しくなります。	work	Rocky IV	sample
+kyouhanibelungenliednitsuiteshirabemashita.	今日はNibelungenliedについて調べました。	work	Nibelungenlied	sample
+konohonnhacheburashkanitsuitekakareteimasu.	この本はCheburashkaについて書かれています。	work	Cheburashka	sample
+ekidepitchblacknokoukokuwomitsukemashita.	駅でPitch Blackの広告を見つけました。	work	Pitch Black	sample
+basicinstinctnokoushikisaitowokakuninnshitekudasai.	Basic Instinctの公式サイトを確認してください。	work	Basic Instinct	sample
+lisasimpsonnokotowokanngaerutotanoshikunarimasu.	Lisa Simpsonのことを考えると楽しくなります。	work	Lisa Simpson	sample
+kyouhalacunacoilnitsuiteshirabemashita.	今日はLacuna Coilについて調べました。	work	Lacuna Coil	sample
+cradleoffilthnokoushikisaitowokakuninnshitekudasai.	Cradle of Filthの公式サイトを確認してください。	work	Cradle of Filth	sample
+withoutatracenokotowokanngaerutotanoshikunarimasu.	Without a Traceのことを考えると楽しくなります。	work	Without a Trace	sample
+konohonnhaskunkanansienitsuitekakareteimasu.	この本はSkunk Anansieについて書かれています。	work	Skunk Anansie	sample
+sennshuu,areyouexperiencednohanashiwoshimashita.	先週、Are You Experiencedの話をしました。	work	Are You Experienced	sample
+imoutohaappetitefordestructionnofanndesu.	妹はAppetite for Destructionのファンです。	work	Appetite for Destruction	sample

@@ -10,6 +10,7 @@
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
+#   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
@@ -105,6 +106,18 @@ g)
       $BATCH $W/domain-$field.txt $OUT/domain-$field.tsv 4
     fi
   done
+  ;;
+k)
+  # 大文字で始まる英字の固有名詞（Google、GitHub、New York、Elon Musk、iPhone ...）。文の中に小文字で打った名前を入れた文と、
+  # 名前だけを打って（英字、または読みのかな）変換したときの候補。採点はまとめの段で（tools/score_proper_nouns.py）
+  if [ -f $T/proper-nouns.tsv ]; then
+    grep -v '^#' $T/proper-nouns.tsv | cut -f1 > $W/proper-nouns.txt
+    $BATCH $W/proper-nouns.txt $OUT/proper-nouns.tsv 4
+  fi
+  if [ -f $T/proper-nouns-cand.tsv ]; then
+    grep -v '^#' $T/proper-nouns-cand.tsv | cut -f1 > $W/proper-nouns-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
+  fi
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。

@@ -162,8 +162,9 @@ int main(int argc, char** argv) {
     for (const auto& piece : pieces) {
       if (!piece.english) continue;
       std::string w = line.substr(piece.begin, piece.end - piece.begin);
-      for (size_t k = piece.spaces.size(); k-- > 0;) {
-        if (piece.spaces[k] > piece.begin) w.insert(piece.spaces[k] - piece.begin, " ");
+      // piece.spaces is in descending order, so the later positions are not shifted.
+      for (const size_t at : piece.spaces) {
+        if (at > piece.begin) w.insert(at - piece.begin, " ");
       }
       std::cout << sep << w;
       sep = ",";

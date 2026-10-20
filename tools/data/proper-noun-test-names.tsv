@@ -1,0 +1,465 @@
+# 固有名詞の試験に使う名前。tools/proper_noun_test.py が読む。手で書いたもの（Wikidata の一覧は見ていない）。
+# 列: 正しい書き方<TAB>カタカナの読み<TAB>分野
+# 分野: company 会社, product 製品・サービス, software ソフト・言語・道具, place 地名, person 人名, work 作品
+Google	グーグル	company
+Microsoft	マイクロソフト	company
+Amazon	アマゾン	company
+Facebook	フェイスブック	company
+Netflix	ネットフリックス	company
+Tesla	テスラ	company
+Nvidia	エヌビディア	company
+Intel	インテル	company
+Samsung	サムスン	company
+Huawei	ファーウェイ	company
+Xiaomi	シャオミ	company
+Disney	ディズニー	company
+Walmart	ウォルマート	company
+Starbucks	スターバックス	company
+McDonald's	マクドナルド	company
+Coca-Cola	コカコーラ	company
+Pepsi	ペプシ	company
+Nike	ナイキ	company
+Adidas	アディダス	company
+Puma	プーマ	company
+Toyota	トヨタ	company
+Honda	ホンダ	company
+Nissan	ニッサン	company
+Sony	ソニー	company
+Panasonic	パナソニック	company
+Nintendo	ニンテンドー	company
+Uniqlo	ユニクロ	company
+Rakuten	ラクテン	company
+Yahoo	ヤフー	company
+Oracle	オラクル	company
+Adobe	アドビ	company
+Salesforce	セールスフォース	company
+Spotify	スポティファイ	company
+Uber	ウーバー	company
+Airbnb	エアビーアンドビー	company
+PayPal	ペイパル	company
+Visa	ビザ	company
+Mastercard	マスターカード	company
+Boeing	ボーイング	company
+Airbus	エアバス	company
+Ferrari	フェラーリ	company
+Porsche	ポルシェ	company
+Volkswagen	フォルクスワーゲン	company
+Mercedes-Benz	メルセデスベンツ	company
+BMW	ビーエムダブリュー	company
+IBM	アイビーエム	company
+Qualcomm	クアルコム	company
+Cisco	シスコ	company
+Dell	デル	company
+Lenovo	レノボ	company
+Asus	エイスース	company
+Logitech	ロジクール	company
+Nestle	ネスレ	company
+Unilever	ユニリーバ	company
+Ikea	イケア	company
+Zara	ザラ	company
+Gucci	グッチ	company
+Louis Vuitton	ルイヴィトン	company
+Chanel	シャネル	company
+Rolex	ロレックス	company
+OpenAI	オープンエーアイ	company
+Anthropic	アンスロピック	company
+iPhone	アイフォン	product
+iPad	アイパッド	product
+MacBook	マックブック	product
+AirPods	エアポッズ	product
+PlayStation	プレイステーション	product
+Xbox	エックスボックス	product
+YouTube	ユーチューブ	product
+Instagram	インスタグラム	product
+Twitter	ツイッター	product
+TikTok	ティックトック	product
+LinkedIn	リンクトイン	product
+WhatsApp	ワッツアップ	product
+Snapchat	スナップチャット	product
+Pinterest	ピンタレスト	product
+Reddit	レディット	product
+Wikipedia	ウィキペディア	product
+Dropbox	ドロップボックス	product
+Evernote	エバーノート	product
+Skype	スカイプ	product
+Zoom	ズーム	product
+Slack	スラック	product
+Discord	ディスコード	product
+Twitch	ツイッチ	product
+Steam	スチーム	product
+Kindle	キンドル	product
+Alexa	アレクサ	product
+Siri	シリ	product
+Gmail	ジーメール	product
+Chrome	クローム	product
+Firefox	ファイアフォックス	product
+Safari	サファリ	product
+Android	アンドロイド	product
+Windows	ウィンドウズ	product
+Photoshop	フォトショップ	product
+Excel	エクセル	product
+PowerPoint	パワーポイント	product
+Notion	ノーション	product
+GitHub	ギットハブ	software
+GitLab	ギットラブ	software
+Python	パイソン	software
+JavaScript	ジャバスクリプト	software
+TypeScript	タイプスクリプト	software
+Kubernetes	クバネティス	software
+Docker	ドッカー	software
+Linux	リナックス	software
+Ubuntu	ウブントゥ	software
+Debian	デビアン	software
+Redis	レディス	software
+MongoDB	モンゴディービー	software
+PostgreSQL	ポストグレエスキューエル	software
+MySQL	マイエスキューエル	software
+Node.js	ノードジェイエス	software
+React	リアクト	software
+Vue	ビュー	software
+Angular	アンギュラー	software
+TensorFlow	テンサーフロー	software
+PyTorch	パイトーチ	software
+Jupyter	ジュピター	software
+Kotlin	コトリン	software
+Rust	ラスト	software
+Swift	スウィフト	software
+Ruby	ルビー	software
+Haskell	ハスケル	software
+Terraform	テラフォーム	software
+Ansible	アンシブル	software
+Jenkins	ジェンキンス	software
+Elasticsearch	エラスティックサーチ	software
+Bitcoin	ビットコイン	software
+Ethereum	イーサリアム	software
+Solana	ソラナ	software
+Binance	バイナンス	software
+Coinbase	コインベース	software
+Tokyo	トウキョウ	place
+New York	ニューヨーク	place
+Los Angeles	ロサンゼルス	place
+San Francisco	サンフランシスコ	place
+Las Vegas	ラスベガス	place
+London	ロンドン	place
+Paris	パリ	place
+Berlin	ベルリン	place
+Madrid	マドリード	place
+Barcelona	バルセロナ	place
+Rome	ローマ	place
+Milan	ミラノ	place
+Amsterdam	アムステルダム	place
+Vienna	ウィーン	place
+Prague	プラハ	place
+Moscow	モスクワ	place
+Istanbul	イスタンブール	place
+Dubai	ドバイ	place
+Singapore	シンガポール	place
+Bangkok	バンコク	place
+Seoul	ソウル	place
+Beijing	ペキン	place
+Shanghai	シャンハイ	place
+Hong Kong	ホンコン	place
+Sydney	シドニー	place
+Melbourne	メルボルン	place
+Toronto	トロント	place
+Vancouver	バンクーバー	place
+Chicago	シカゴ	place
+Boston	ボストン	place
+Seattle	シアトル	place
+Hawaii	ハワイ	place
+California	カリフォルニア	place
+Texas	テキサス	place
+Florida	フロリダ	place
+Brazil	ブラジル	place
+Mexico	メキシコ	place
+Argentina	アルゼンチン	place
+Egypt	エジプト	place
+Kenya	ケニア	place
+Switzerland	スイス	place
+Sweden	スウェーデン	place
+Norway	ノルウェー	place
+Finland	フィンランド	place
+Vietnam	ベトナム	place
+Indonesia	インドネシア	place
+Philippines	フィリピン	place
+Thailand	タイ	place
+Mount Everest	エベレスト	place
+Himalayas	ヒマラヤ	place
+Elon Musk	イーロンマスク	person
+Bill Gates	ビルゲイツ	person
+Steve Jobs	スティーブジョブズ	person
+Mark Zuckerberg	マークザッカーバーグ	person
+Jeff Bezos	ジェフベゾス	person
+Tim Cook	ティムクック	person
+Taylor Swift	テイラースウィフト	person
+Lady Gaga	レディーガガ	person
+Michael Jackson	マイケルジャクソン	person
+Albert Einstein	アルベルトアインシュタイン	person
+Isaac Newton	アイザックニュートン	person
+Barack Obama	バラクオバマ	person
+Donald Trump	ドナルドトランプ	person
+Lionel Messi	リオネルメッシ	person
+Cristiano Ronaldo	クリスティアーノロナウド	person
+Tom Cruise	トムクルーズ	person
+Leonardo DiCaprio	レオナルドディカプリオ	person
+Brad Pitt	ブラッドピット	person
+Harry Potter	ハリーポッター	work
+Star Wars	スターウォーズ	work
+Avatar	アバター	work
+Titanic	タイタニック	work
+Minecraft	マインクラフト	work
+Fortnite	フォートナイト	work
+Pokemon	ポケモン	work
+Super Mario	スーパーマリオ	work
+The Beatles	ビートルズ	work
+Queen	クイーン	work
+Coldplay	コールドプレイ	work
+Radiohead	レディオヘッド	work
+Nirvana	ニルヴァーナ	work
+Oasis	オアシス	work
+Marvel	マーベル	work
+Batman	バットマン	work
+Spider-Man	スパイダーマン	work
+Mickey Mouse	ミッキーマウス	work
+Hello Kitty	ハローキティ	work
+Apple	アップル	company
+Meta	メタ	company
+Alphabet	アルファベット	company
+Cloudflare	クラウドフレア	company
+Twilio	トゥイリオ	company
+Shopify	ショッピファイ	company
+Stripe	ストライプ	company
+Snowflake	スノーフレーク	company
+Palantir	パランティア	company
+Zendesk	ゼンデスク	company
+Atlassian	アトラシアン	company
+Hyundai	ヒュンダイ	company
+Lamborghini	ランボルギーニ	company
+Maserati	マセラティ	company
+Bentley	ベントレー	company
+Volvo	ボルボ	company
+Subaru	スバル	company
+Mazda	マツダ	company
+Kawasaki	カワサキ	company
+Yamaha	ヤマハ	company
+Canon	キヤノン	company
+Nikon	ニコン	company
+Fujifilm	フジフイルム	company
+Toshiba	トウシバ	company
+Hitachi	ヒタチ	company
+Sharp	シャープ	company
+Casio	カシオ	company
+Seiko	セイコー	company
+Muji	ムジ	company
+Lawson	ローソン	company
+KFC	ケーエフシー	company
+Subway	サブウェイ	company
+Burger King	バーガーキング	company
+Domino's	ドミノピザ	company
+Heinz	ハインツ	company
+Kellogg's	ケロッグ	company
+Nutella	ヌテラ	product
+Red Bull	レッドブル	product
+Monster Energy	モンスターエナジー	product
+Fanta	ファンタ	product
+Sprite	スプライト	product
+Gatorade	ゲータレード	product
+Kit Kat	キットカット	product
+Oreo	オレオ	product
+Pringles	プリングルズ	product
+Prius	プリウス	product
+Mustang	マスタング	product
+Cybertruck	サイバートラック	product
+Galaxy	ギャラクシー	product
+Pixel	ピクセル	product
+Surface	サーフェス	product
+ThinkPad	シンクパッド	product
+Raspberry Pi	ラズベリーパイ	product
+Arduino	アルドゥイーノ	product
+Oculus	オキュラス	product
+GoPro	ゴープロ	product
+Fitbit	フィットビット	product
+Roomba	ルンバ	product
+Dyson	ダイソン	company
+Bose	ボーズ	company
+Sennheiser	ゼンハイザー	company
+Spotify Premium	スポティファイプレミアム	product
+Google Maps	グーグルマップ	product
+Google Drive	グーグルドライブ	product
+Google Docs	グーグルドキュメント	product
+Google Chrome	グーグルクローム	product
+Microsoft Teams	マイクロソフトチームズ	product
+Microsoft Office	マイクロソフトオフィス	product
+Visual Studio	ビジュアルスタジオ	software
+Visual Studio Code	ビジュアルスタジオコード	software
+IntelliJ IDEA	インテリジェイアイデア	software
+Eclipse	エクリプス	software
+Vim	ヴィム	software
+Emacs	イーマックス	software
+Homebrew	ホームブルー	software
+npm	エヌピーエム	software
+Webpack	ウェブパック	software
+Vite	ヴィート	software
+Next.js	ネクストジェイエス	software
+Django	ジャンゴ	software
+Flask	フラスク	software
+Laravel	ララベル	software
+Spring Boot	スプリングブート	software
+GraphQL	グラフキューエル	software
+Prometheus	プロメテウス	software
+Grafana	グラファナ	software
+Nginx	エンジンエックス	software
+Apache	アパッチ	software
+Kafka	カフカ	software
+RabbitMQ	ラビットエムキュー	software
+Figma	フィグマ	software
+Sketch	スケッチ	software
+Blender	ブレンダー	software
+Unity	ユニティ	software
+Unreal Engine	アンリアルエンジン	software
+Godot	ゴドー	software
+Arch Linux	アーチリナックス	software
+Red Hat	レッドハット	software
+Chromium	クロミウム	software
+Opera	オペラ	software
+Brave	ブレイブ	software
+Tor	トーア	software
+Dogecoin	ドージコイン	software
+Ripple	リップル	software
+Cardano	カルダノ	software
+Polkadot	ポルカドット	software
+Chainlink	チェーンリンク	software
+Uniswap	ユニスワップ	software
+MetaMask	メタマスク	software
+Ledger	レジャー	software
+Washington	ワシントン	place
+Philadelphia	フィラデルフィア	place
+Miami	マイアミ	place
+Denver	デンバー	place
+Houston	ヒューストン	place
+Detroit	デトロイト	place
+Manchester	マンチェスター	place
+Liverpool	リバプール	place
+Edinburgh	エディンバラ	place
+Dublin	ダブリン	place
+Lisbon	リスボン	place
+Venice	ベネチア	place
+Florence	フィレンツェ	place
+Naples	ナポリ	place
+Munich	ミュンヘン	place
+Hamburg	ハンブルク	place
+Frankfurt	フランクフルト	place
+Zurich	チューリッヒ	place
+Geneva	ジュネーブ	place
+Brussels	ブリュッセル	place
+Copenhagen	コペンハーゲン	place
+Stockholm	ストックホルム	place
+Oslo	オスロ	place
+Helsinki	ヘルシンキ	place
+Warsaw	ワルシャワ	place
+Budapest	ブダペスト	place
+Athens	アテネ	place
+Cairo	カイロ	place
+Nairobi	ナイロビ	place
+Mumbai	ムンバイ	place
+Delhi	デリー	place
+Kathmandu	カトマンズ	place
+Hanoi	ハノイ	place
+Manila	マニラ	place
+Jakarta	ジャカルタ	place
+Taipei	タイペイ	place
+Kuala Lumpur	クアラルンプール	place
+Auckland	オークランド	place
+Santiago	サンティアゴ	place
+Lima	リマ	place
+Havana	ハバナ	place
+Jamaica	ジャマイカ	place
+Iceland	アイスランド	place
+Ireland	アイルランド	place
+Portugal	ポルトガル	place
+Greece	ギリシャ	place
+Turkey	トルコ	place
+Morocco	モロッコ	place
+Alaska	アラスカ	place
+Colorado	コロラド	place
+Arizona	アリゾナ	place
+Kilimanjaro	キリマンジャロ	place
+Sahara	サハラ	place
+Yellowstone	イエローストーン	place
+Mark Twain	マークトウェイン	person
+Ernest Hemingway	アーネストヘミングウェイ	person
+Agatha Christie	アガサクリスティ	person
+Stephen King	スティーヴンキング	person
+Pablo Picasso	パブロピカソ	person
+Vincent van Gogh	フィンセントファンゴッホ	person
+Leonardo da Vinci	レオナルドダヴィンチ	person
+Wolfgang Amadeus Mozart	ヴォルフガングアマデウスモーツァルト	person
+Ludwig van Beethoven	ルートヴィヒファンベートーヴェン	person
+Marie Curie	マリーキュリー	person
+Nikola Tesla	ニコラテスラ	person
+Stephen Hawking	スティーヴンホーキング	person
+Alan Turing	アランチューリング	person
+Linus Torvalds	リーナストーバルズ	person
+Guido van Rossum	グイドヴァンロッサム	person
+Satoshi Nakamoto	サトシナカモト	person
+Vitalik Buterin	ヴィタリックブテリン	person
+Sam Altman	サムアルトマン	person
+Jensen Huang	ジェンスンファン	person
+Warren Buffett	ウォーレンバフェット	person
+Oprah Winfrey	オプラウィンフリー	person
+Beyonce	ビヨンセ	person
+Rihanna	リアーナ	person
+Ed Sheeran	エドシーラン	person
+Justin Bieber	ジャスティンビーバー	person
+Ariana Grande	アリアナグランデ	person
+Billie Eilish	ビリーアイリッシュ	person
+Bruno Mars	ブルーノマーズ	person
+Adele	アデル	person
+Eminem	エミネム	person
+Madonna	マドンナ	person
+Keanu Reeves	キアヌリーブス	person
+Johnny Depp	ジョニーデップ	person
+Scarlett Johansson	スカーレットヨハンソン	person
+Emma Watson	エマワトソン	person
+Serena Williams	セリーナウィリアムズ	person
+Roger Federer	ロジャーフェデラー	person
+Rafael Nadal	ラファエルナダル	person
+Novak Djokovic	ノバクジョコビッチ	person
+Michael Jordan	マイケルジョーダン	person
+LeBron James	レブロンジェームズ	person
+Kobe Bryant	コービーブライアント	person
+Usain Bolt	ウサインボルト	person
+Neymar	ネイマール	person
+Kylian Mbappe	キリアンエムバペ	person
+Jurassic Park	ジュラシックパーク	work
+The Lord of the Rings	ロードオブザリング	work
+The Matrix	マトリックス	work
+Inception	インセプション	work
+Interstellar	インターステラー	work
+Toy Story	トイストーリー	work
+Finding Nemo	ファインディングニモ	work
+The Lion King	ライオンキング	work
+Game of Thrones	ゲームオブスローンズ	work
+Breaking Bad	ブレイキングバッド	work
+Stranger Things	ストレンジャーシングス	work
+The Simpsons	シンプソンズ	work
+Zelda	ゼルダ	work
+Tetris	テトリス	work
+Pac-Man	パックマン	work
+Sonic	ソニック	work
+Call of Duty	コールオブデューティ	work
+Grand Theft Auto	グランドセフトオート	work
+League of Legends	リーグオブレジェンド	work
+Overwatch	オーバーウォッチ	work
+Elden Ring	エルデンリング	work
+Genshin Impact	ゲンシンインパクト	work
+Led Zeppelin	レッドツェッペリン	work
+Pink Floyd	ピンクフロイド	work
+The Rolling Stones	ローリングストーンズ	work
+Metallica	メタリカ	work
+Linkin Park	リンキンパーク	work
+Green Day	グリーンデイ	work
+Imagine Dragons	イマジンドラゴンズ	work
+BTS	ビーティーエス	work
+Blackpink	ブラックピンク	work
+Pixar	ピクサー	work
