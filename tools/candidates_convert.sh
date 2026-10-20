@@ -1,6 +1,6 @@
 #!/bin/bash
 # candidates_convert.sh <session_handler_main> <engine dir> <model.gguf> <inputs.txt> <out.tsv> [並列数]
-# 1行に1つのローマ字を、空白で変換して、候補を先頭から最大12個、「入力<TAB>候補<TAB>候補…」と書く。
+# 1行に1つのローマ字を、空白で変換して、候補を先頭から最大30個、「入力<TAB>候補<TAB>候補…」と書く。
 # （変換の後は Enter で確定して次の入力へ。tools/batch_convert.sh と同じ進め方。人工知能の待ち時間は無制限）
 set -e
 EXE=$1; ENGINE=$2; MODEL=$3; IN=$4; OUT=$5; P=${6:-4}
@@ -12,7 +12,7 @@ for f in $w/part.*; do
     # 候補の窓（all_candidate_words { candidates { value: … } … }）の value: だけを取る。次の result { … } が来たら1行書く。
     awk -v inputs=$f 'BEGIN{while((getline l < inputs)>0) in_[++n]=l}
       /^all_candidate_words \{/{c=1; list=""; k=0}
-      c&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); if (k<12) {list=list "\t" v; k++}}
+      c&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); if (k<30) {list=list "\t" v; k++}}
       c&&/^\}/{c=0}
       /^result \{/{r=1}
       r&&/^  value:/{i++; printf "%s%s\n", in_[i], list; list=""; k=0; r=0}' $f.out > $f.res ) &

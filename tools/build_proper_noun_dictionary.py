@@ -8,9 +8,11 @@ spelling (Google, New York, Elon Musk) becomes a candidate of each reading (ぐ�
 It never takes the first place from what Mozc already has:
 - the same katakana word is in Mozc's dictionary with that reading: the name takes its part of speech
   and cost plus --penalty, so it comes right after the katakana word (グーグル, then Google);
-- the reading is in Mozc's dictionary otherwise: the name costs more than every entry of that reading;
-- a reading Mozc does not have: a proper-noun entry with the cost of a name Mozc does not know
-  (--default-cost), as the mozcdic-ut entries.
+- the reading is in Mozc's dictionary otherwise: the name costs --margin more than every entry of that
+  reading;
+- a reading Mozc does not have (4 kana or more): a proper-noun entry at --default-cost, high enough that
+  the name never wins in a sentence over Mozc's own words (an earlier 8200 turned たいら into Tyla and
+  カップヌードル into Cup Noodles) and is only a candidate of its reading.
 A (reading, spelling) pair Mozc already has is skipped. Readings shorter than 3 kana are not used.
 """
 import argparse
@@ -43,8 +45,8 @@ def main():
     parser.add_argument("--names", type=Path, required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--penalty", type=int, default=10)
-    parser.add_argument("--margin", type=int, default=100)
-    parser.add_argument("--default-cost", type=int, default=8200)
+    parser.add_argument("--margin", type=int, default=2000)
+    parser.add_argument("--default-cost", type=int, default=15000)
     parser.add_argument("--install", action="store_true")
     args = parser.parse_args()
 
