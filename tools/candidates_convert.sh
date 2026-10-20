@@ -9,11 +9,11 @@ for f in $w/part.*; do
   ( { printf 'SEND_KEY\tON\n'; while IFS= read -r r; do printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\nCLEAR_ALL\nRESET_CONTEXT\nSEND_KEY\tON\n' "$r"; done < $f; } > $f.tsv
     MYIME_ZENZAI_TIME_LIMIT_MS="${MYIME_ZENZAI_TIME_LIMIT_MS:-0}" MYIME_ZENZAI_STATS_FILE="$OUT.zstats" MYIME_AI_BUDGET_MS=0 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
       MYIME_AZOOKEY_ZENZAI_GPU=0 TEST_TMPDIR=$f.prof "$EXE" --input $f.tsv --profile $f.prof --dictionary oss > $f.out 2> $f.err
-    # 候補の窓（all_candidate_words の中の candidates { … }）の value: だけを取る。次の result { … } が来たら1行書く。
+    # 候補の窓（all_candidate_words { candidates { value: … } … }）の value: だけを取る。次の result { … } が来たら1行書く。
     awk -v inputs=$f 'BEGIN{while((getline l < inputs)>0) in_[++n]=l}
-      /^  candidates \{/{c=1; list=""; k=0}
-      c&&/^ +value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); if (k<12) {list=list "\t" v; k++}}
-      c&&/^  \}/{c=0}
+      /^all_candidate_words \{/{c=1; list=""; k=0}
+      c&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); if (k<12) {list=list "\t" v; k++}}
+      c&&/^\}/{c=0}
       /^result \{/{r=1}
       r&&/^  value:/{i++; printf "%s%s\n", in_[i], list; list=""; k=0; r=0}' $f.out > $f.res ) &
 done; wait
