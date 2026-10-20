@@ -4,8 +4,11 @@
 //       速い tanh と exp の誤差を調べる
 //   jevgate_infer check <jevgate.bin> <case.txt> [スレッド数]
 //       tools/jev-gate/jevgate.py dumpcase の見本（torch の出力）と同じ答えが出るか確かめる
+//       （門・候補の点・答えを選ぶ頭 b（枠ごとの度合い）と a（v5 と候補の一番）。見本は v5 の出力の枠つき。
+//        枠を外した入力の門の出力が枠つきと同じことも確かめる）
 //   jevgate_infer bench [--model jevgate.bin] [--d 256 --layers 4 --heads 4 --ffn 1024 --vocab 4096 --gate-hidden 256]
-//                       [--k 4] [--prefix 60] [--cand 25] [--threads 1] [--iters 300]
+//                       [--k 4] [--prefix 60] [--cand 25] [--threads 1] [--iters 300] [--v5 0]
+//       --v5 1 なら v5 の出力の枠を 1 つ足した入力（生成のあとの2回目の通し）の時間を測る
 //       1回の推論の時間（ミリ秒）。--model がなければ乱数の重みで同じ形の模型を作って測る（時間は重みの値によらない）
 //
 // 組み立て: g++ -O3 -std=c++17 -mavx2 -mfma -fopenmp tools/jev-gate/jevgate_infer.cpp -o jevgate_infer
@@ -33,6 +36,7 @@
 namespace {
 
 constexpr int kTypeCand = 3;
+constexpr int kSrcV5 = 4;  // v5 の出力の枠の src 番号（jevgate.py の V5_SRC）
 
 // ---------------------------------------------------------------- 速い tanh と exp（ベクトル化できる形）
 inline float FastTanh(float x) {
@@ -220,7 +224,7 @@ struct Model {
   Config c;
   std::vector<float> tok, typ, pos_prefix, pos_cand, rank, src;
   std::vector<Layer> layers;
-  std::vector<float> lnfw, lnfb, s1w, s1b, s2w, s2b, g1w, g1b, g2w, g2b;
+  std::vector<float> lnfw, lnfb, s1w, s1b, s2w, s2b, g1w, g1b, g2w, g2b, i1w, i1b, i2w, i2b, p1w, p1b, p2w, p2b;
 };
 
 float HalfToFloat(uint16_t h) {
@@ -244,7 +248,7 @@ void ForEachTensor(Model& m, F f) {
   f(m.pos_prefix, static_cast<size_t>(c.max_prefix_pos) * d, "pos_prefix");
   f(m.pos_cand, static_cast<size_t>(c.max_cand_pos) * d, "pos_cand");
   f(m.rank, static_cast<size_t>(c.max_rank) * d, "rank");
-  f(m.src, 4 * d, "src");
+  f(m.src, 5 * d, "src");
   const size_t ffn = c.ffn;
   for (auto& L : m.layers) {
     f(L.ln1w, d, "ln1w"); f(L.ln1b, d, "ln1b");
@@ -260,6 +264,10 @@ void ForEachTensor(Model& m, F f) {
   const size_t gin = 3 * d + 3, gh = c.gate_hidden;
   f(m.g1w, gh * gin, "g1w"); f(m.g1b, gh, "g1b");
   f(m.g2w, static_cast<size_t>(c.n_gate) * gh, "g2w"); f(m.g2b, c.n_gate, "g2b");
+  f(m.i1w, gh * (3 * d + 7), "i1w"); f(m.i1b, gh, "i1b");
+  f(m.i2w, gh, "i2w"); f(m.i2b, 1, "i2b");
+  f(m.p1w, gh * (3 * d + 6), "p1w"); f(m.p1b, gh, "p1b");
+  f(m.p2w, gh, "p2w"); f(m.p2b, 1, "p2b");
 }
 
 bool LoadModel(const std::string& path, Model* m) {
@@ -306,8 +314,13 @@ struct Input {
 
 struct Output {
   std::vector<float> gate;   // 確率（need、need_k、need_top1、harm_k）
-  std::vector<float> score;  // 候補ごとの点
+  std::vector<float> score;  // 候補ごとの点（v5 の枠は含めない）
   int best = 0;
+  // 答えを選ぶ頭（入力に v5 の出力の枠があるときだけ）
+  std::vector<float> item;   // b: 候補ごとの正解の度合い（ロジット）、最後が v5 の出力
+  float pair = 0.f;          // a: v5 が正しいほうのロジット（v5 と候補の一番）
+  float score_v5 = 0.f;
+  bool has_v5 = false;
 };
 
 struct Runner {
@@ -325,7 +338,7 @@ struct Runner {
     ff.resize(static_cast<size_t>(T) * c.ffn);
     int Lp = 0;
     while (Lp < T && in.seg[Lp] == 0) ++Lp;
-    // 候補の範囲
+    // 枠の範囲
     std::vector<int> cs, ce;
     for (int i = Lp; i < T; ++i) {
       const int s = in.seg[i] - 1;
@@ -333,7 +346,10 @@ struct Runner {
       cs[s] = std::min(cs[s], i);
       ce[s] = std::max(ce[s], i + 1);
     }
-    const int nc = static_cast<int>(cs.size());
+    const int nseg = static_cast<int>(cs.size());
+    // v5 の出力の枠（src が kSrcV5 の最後の枠）。あれば候補の数は 1 つ少ない
+    const bool has_v5 = nseg > 0 && in.src[cs[nseg - 1]] == kSrcV5;
+    const int nc = nseg - (has_v5 ? 1 : 0);
     for (int t = 0; t < T; ++t) {
       float* xr = &x[static_cast<size_t>(t) * d];
       const bool cand = in.typ[t] == kTypeCand;
@@ -390,11 +406,13 @@ struct Runner {
       for (size_t i = 0; i < x.size(); ++i) x[i] += h[i];
     }
     LayerNorm(x.data(), T, d, m.lnfw.data(), m.lnfb.data(), h.data());
-    // 候補ごとの平均と点
-    pooled.assign(static_cast<size_t>(std::max(nc, 1)) * d, 0.f);
+    // 枠ごとの平均と点（v5 の枠も同じ頭で点を付ける）
+    const int ns = nc + (has_v5 ? 1 : 0);
+    pooled.assign(static_cast<size_t>(std::max(ns, 1)) * d, 0.f);
+    std::vector<float> sc_all(ns, 0.f), len_all(ns, 0.f);
     out->score.assign(nc, 0.f);
     std::vector<float> s1(d / 2);
-    for (int s = 0; s < nc; ++s) {
+    for (int s = 0; s < ns; ++s) {
       float* pr = &pooled[static_cast<size_t>(s) * d];
       int cnt = 0;
       for (int i = cs[s]; i < ce[s]; ++i) {
@@ -403,19 +421,20 @@ struct Runner {
         ++cnt;
       }
       for (int e = 0; e < d; ++e) pr[e] /= std::max(cnt, 1);
+      len_all[s] = cnt / 20.0f;
       Linear(pr, 1, d, m.s1w.data(), m.s1b.data(), d / 2, s1.data());
       for (auto& v : s1) v = Gelu(v);
       float sc = m.s2b[0];
       for (int e = 0; e < d / 2; ++e) sc += s1[e] * m.s2w[e];
-      out->score[s] = sc;
+      sc_all[s] = sc;
+      if (s < nc) out->score[s] = sc;
     }
     int best = 0;
     for (int s = 1; s < nc; ++s) if (out->score[s] > out->score[best]) best = s;
     float second = -1e30f;
     for (int s = 0; s < nc; ++s) if (s != best) second = std::max(second, out->score[s]);
     const float margin = nc >= 2 ? out->score[best] - second : 1.0f;
-    int len = 0;
-    for (int i = cs[best]; nc > 0 && i < ce[best]; ++i) len += in.seg[i] - 1 == best;
+    const int len = nc > 0 ? static_cast<int>(std::lround(len_all[best] * 20.0f)) : 0;
     std::vector<float> gin(3 * d + 3, 0.f);
     std::memcpy(gin.data(), &h[0], sizeof(float) * d);
     if (nc > 0) {
@@ -432,6 +451,50 @@ struct Runner {
     out->gate.resize(c.n_gate);
     for (int i = 0; i < c.n_gate; ++i) out->gate[i] = 1.0f / (1.0f + std::exp(-g2[i]));
     out->best = best;
+    out->has_v5 = has_v5;
+    out->item.clear();
+    if (!has_v5 || nc == 0) return;
+    // 答えを選ぶ頭。v5 の枠は他の枠から見えないので、ここまでの門・点は枠の有無で変わらない
+    const int gh = c.gate_hidden, v5 = nc;
+    const float* pv5 = &pooled[static_cast<size_t>(v5) * d];
+    out->score_v5 = sc_all[v5];
+    const float sc_max = out->score[best];
+    auto same_as_v5 = [&](int s) {
+      int a = 0, b = 0;
+      for (int i = cs[s]; i < ce[s]; ++i) a += in.seg[i] - 1 == s;
+      for (int i = cs[v5]; i < ce[v5]; ++i) b += in.seg[i] - 1 == v5;
+      if (a != b) return 0.f;
+      int i = cs[s], j = cs[v5];
+      for (int n = 0; n < a; ++n, ++i, ++j) if (in.tok[i] != in.tok[j]) return 0.f;
+      return 1.f;
+    };
+    auto head = [&](const std::vector<float>& x, int dim, const std::vector<float>& w1, const std::vector<float>& b1,
+                    const std::vector<float>& w2, const std::vector<float>& b2) {
+      std::vector<float> hid(gh);
+      Linear(x.data(), 1, dim, w1.data(), b1.data(), gh, hid.data());
+      for (auto& v : hid) v = Gelu(v);
+      float o = b2[0];
+      for (int e = 0; e < gh; ++e) o += hid[e] * w2[e];
+      return o;
+    };
+    out->item.resize(ns);
+    std::vector<float> iin(3 * d + 7);
+    for (int j = 0; j < ns; ++j) {
+      std::memcpy(iin.data(), &h[0], sizeof(float) * d);
+      std::memcpy(iin.data() + d, &pooled[static_cast<size_t>(j) * d], sizeof(float) * d);
+      std::memcpy(iin.data() + 2 * d, pv5, sizeof(float) * d);
+      float* ex = iin.data() + 3 * d;
+      ex[0] = sc_all[j]; ex[1] = sc_max; ex[2] = sc_all[v5]; ex[3] = len_all[j]; ex[4] = len_all[v5];
+      ex[5] = j == v5 ? 1.f : same_as_v5(j); ex[6] = j == v5 ? 1.f : 0.f;
+      out->item[j] = head(iin, 3 * d + 7, m.i1w, m.i1b, m.i2w, m.i2b);
+    }
+    std::vector<float> pin(3 * d + 6);
+    std::memcpy(pin.data(), &h[0], sizeof(float) * d);
+    std::memcpy(pin.data() + d, pv5, sizeof(float) * d);
+    std::memcpy(pin.data() + 2 * d, &pooled[0], sizeof(float) * d);
+    float* ep = pin.data() + 3 * d;
+    ep[0] = sc_all[0]; ep[1] = sc_all[v5]; ep[2] = sc_max; ep[3] = len_all[0]; ep[4] = len_all[v5]; ep[5] = same_as_v5(0);
+    out->pair = head(pin, 3 * d + 6, m.p1w, m.p1b, m.p2w, m.p2b);
   }
 };
 
@@ -485,8 +548,32 @@ int Check(const std::string& model_path, const std::string& case_path, int threa
     std::getline(in, line); x.seg = ReadInts(line);
     std::getline(in, line); const auto gate = ReadFloats(line);
     std::getline(in, line); const auto score = ReadFloats(line);
+    std::getline(in, line); const auto item = ReadFloats(line);
+    std::getline(in, line); const auto pair = ReadFloats(line);
     Output out;
     runner.Run(x, &out);
+    for (size_t i = 0; i < item.size() && i < out.item.size(); ++i)
+      worst = std::max(worst, static_cast<double>(std::fabs(item[i] - out.item[i])));
+    if (!pair.empty()) worst = std::max(worst, static_cast<double>(std::fabs(pair[0] - out.pair)));
+    if (!item.empty() && item.size() != out.item.size()) { std::printf("枠ごとの度合いの数が違う\n"); worst = 1e9; }
+    // 生成の前の入力（v5 の出力の枠を外したもの）でも門と点が同じか
+    if (out.has_v5) {
+      Input y;
+      for (size_t i = 0; i < x.tok.size(); ++i) {
+        if (x.src[i] == kSrcV5) continue;
+        y.tok.push_back(x.tok[i]); y.typ.push_back(x.typ[i]); y.pos.push_back(x.pos[i]);
+        y.rank.push_back(x.rank[i]); y.src.push_back(x.src[i]); y.seg.push_back(x.seg[i]);
+      }
+      Output o2;
+      runner.Run(y, &o2);
+      double d2 = 0;
+      for (size_t i = 0; i < out.gate.size(); ++i) d2 = std::max(d2, static_cast<double>(std::fabs(out.gate[i] - o2.gate[i])));
+      for (size_t i = 0; i < out.score.size() && i < o2.score.size(); ++i)
+        d2 = std::max(d2, static_cast<double>(std::fabs(out.score[i] - o2.score[i])));
+      std::printf("  v5 の枠を外した入力との差 %.2e（門・点）、選ぶ頭 b %zu 個 a %.4f（torch %.4f）\n", d2, out.item.size(), out.pair,
+                  pair.empty() ? 0.f : pair[0]);
+      worst = std::max(worst, d2);
+    }
     for (size_t i = 0; i < gate.size(); ++i) worst = std::max(worst, static_cast<double>(std::fabs(gate[i] - out.gate[i])));
     for (size_t i = 0; i < score.size() && i < out.score.size(); ++i)
       worst = std::max(worst, static_cast<double>(std::fabs(score[i] - out.score[i])));
@@ -497,7 +584,7 @@ int Check(const std::string& model_path, const std::string& case_path, int threa
   return worst < 2e-3 ? 0 : 1;
 }
 
-Input MakeInput(int prefix, int cand, int k, int vocab, std::mt19937* rng) {
+Input MakeInput(int prefix, int cand, int k, int vocab, std::mt19937* rng, bool v5 = false) {
   Input in;
   std::uniform_int_distribution<int> tok(5, vocab - 1);
   auto push = [&](int t, int ty, int pos, int rank, int src, int seg) {
@@ -506,6 +593,8 @@ Input MakeInput(int prefix, int cand, int k, int vocab, std::mt19937* rng) {
   for (int i = 0; i < prefix; ++i) push(i == 0 ? 2 : tok(*rng), i == 0 ? 0 : (i < prefix / 3 ? 1 : 2), i, 0, 0, 0);
   for (int s = 0; s < k; ++s)
     for (int i = 0; i < cand; ++i) push(i == cand - 1 ? 4 : tok(*rng), kTypeCand, i, s, 1 + (s > 0), s + 1);
+  if (v5)
+    for (int i = 0; i < cand; ++i) push(i == cand - 1 ? 4 : tok(*rng), kTypeCand, i, k, kSrcV5, k + 1);
   return in;
 }
 
@@ -513,7 +602,7 @@ int Bench(int argc, char** argv) {
   Config c;
   c.d = 256; c.layers = 4; c.heads = 4; c.ffn = 1024; c.vocab = 4096; c.gate_hidden = 256; c.k = 4;
   std::string model_path;
-  int k = 4, prefix = 60, cand = 25, threads = 1, iters = 300;
+  int k = 4, prefix = 60, cand = 25, threads = 1, iters = 300, v5 = 0;
   for (int i = 2; i + 1 < argc; i += 2) {
     const std::string a = argv[i];
     const int v = std::atoi(argv[i + 1]);
@@ -529,6 +618,7 @@ int Bench(int argc, char** argv) {
     else if (a == "--cand") cand = v;
     else if (a == "--threads") threads = v;
     else if (a == "--iters") iters = v;
+    else if (a == "--v5") v5 = v;
   }
 #ifdef _OPENMP
   omp_set_num_threads(threads);
@@ -546,7 +636,7 @@ int Bench(int argc, char** argv) {
   std::vector<double> ms;
   Output out;
   for (int it = 0; it < iters + 30; ++it) {
-    Input in = MakeInput(prefix, cand, k, m.c.vocab, &rng);
+    Input in = MakeInput(prefix, cand, k, m.c.vocab, &rng, v5 != 0);
     const auto t0 = std::chrono::steady_clock::now();
     runner.Run(in, &out);
     const double e = std::chrono::duration<double, std::milli>(std::chrono::steady_clock::now() - t0).count();
@@ -555,7 +645,7 @@ int Bench(int argc, char** argv) {
   std::sort(ms.begin(), ms.end());
   double sum = 0;
   for (double v : ms) sum += v;
-  const int T = prefix + k * cand;
+  const int T = prefix + (k + (v5 ? 1 : 0)) * cand;
   std::printf("d=%d 層=%d 頭=%d ffn=%d 語彙=%d 数=%.2f百万 | 前置き %d 字 候補 %d 個×%d 字 = %d 語片 | スレッド %d | 平均 %.2f ms、中央値 %.2f、90%%点 %.2f、最小 %.2f\n",
               m.c.d, m.c.layers, m.c.heads, m.c.ffn, m.c.vocab, params / 1e6, prefix, k, cand, T, threads, sum / ms.size(),
               ms[ms.size() / 2], ms[static_cast<size_t>(ms.size() * 0.9)], ms.front());

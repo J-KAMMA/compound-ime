@@ -9,6 +9,10 @@
               2 need_top1 人工知能なしの出力が v5 の出力と違う
               3 harm_k    v5 は正解で、上位 k 個の中の zenz の最大は不正解（生成を省くと損をする）
       score  候補ごとの点（zenz の点の蒸留。最大の候補との差を 10 で割って -3 から 0 に切ったもの）
+      item   答えを選ぶ頭 (b)  候補 k 個と v5 の出力（最後の枠）の、それぞれが正解である度合い（ロジット）
+      pair   答えを選ぶ頭 (a)  v5 の出力と、生成なしの候補の一番（cands[0]）の、どちらが正しいか（v5 が正しいほうのロジット）
+      v5 の出力の枠は、前置きにも候補にも見えない（他の枠から見えない）ので、枠を付けても付けなくても
+      門・score の出力は変わらない。item・pair だけが v5 の出力を使う（生成のあとにしか使えない）。
 学習データの記録は tools/jev_gate_build.py の書式。使い方は tools/jev-gate/train.ipynb と docs/jev-gate.md。
 
   python tools/jev-gate/jevgate.py train   --records train.jsonl.gz --out run1 [--k 4 --epochs 8 ...]
@@ -41,13 +45,15 @@ TYPE_SPECIAL, TYPE_PREV, TYPE_READ, TYPE_CAND = 0, 1, 2, 3
 MAX_PREFIX_POS = 128
 MAX_CAND_POS = 64
 MAX_RANK = 16
+V5_SRC = 4  # v5 の出力の枠の src 番号（0 空き、1〜3 候補の由来）
+FEATURE_TAG = "sel1"  # 特徴の一時ファイルの版（教師を足したときに上げる）
 GATE_NAMES = ["need", "need_k", "need_top1", "harm_k"]
 # 教師 need（全部の候補から決めた「生成が要る」）は、生成なしの候補の先頭のこの数だけで決め直す。
 # 材料の新しい記録は採点の時点で16個までだが、古い記録（最大24個）と同じ定義にそろえるため
 NEED_AVAIL = 16
 GATE_WEIGHTS = [1.0, 1.0, 0.5, 0.5]
 MAGIC = b"JEVG"
-VERSION = 1
+VERSION = 2
 
 DEFAULT_CFG = dict(d=256, layers=4, heads=4, ffn=1024, dropout=0.1, max_vocab=4096, k=4,
                    prev_chars=24, read_chars=64, cand_chars=40, gate_hidden=256)
@@ -107,7 +113,8 @@ def is_ok(text, answers, fold):
 
 class Sample:
     """1文ぶんの入力と教師。配列はすべて短い整数の列"""
-    __slots__ = ("id", "prefix", "ptype", "cands", "csrc", "gap", "best", "labels", "cand_ok", "v5_ok", "nc")
+    __slots__ = ("id", "prefix", "ptype", "cands", "csrc", "gap", "best", "labels", "cand_ok", "v5_ok", "nc",
+                 "v5tok", "same", "pair_y", "pair_m", "v5gap")
 
 
 def featurize(rec, vocab, cfg):
@@ -135,6 +142,15 @@ def featurize(rec, vocab, cfg):
         s.gap = np.zeros(0, dtype=np.float32)
         sel = rec["noai"]
     v5_ok = int(is_ok(rec["v5"], answers, fold))
+    # v5 の出力の枠（候補と同じ形。生成のあとにしか入力できない）と、答えを選ぶ頭の教師
+    s.v5tok = np.array(vocab.encode(rec["v5"][:cfg["cand_chars"]]) + [EOC], dtype=np.int16)
+    s.same = np.array([int(np.array_equal(c, s.v5tok)) for c in s.cands], dtype=np.float32)
+    # v5 の出力の zenz の点も、候補と同じ向きで蒸留する（候補の最大との差を 10 で割る。v5 のほうが高ければ正になる）
+    v5s = rec.get("v5s")
+    cs_max = float(max((c[1] for c in cands), default=0.0))
+    s.v5gap = float(np.clip((v5s - cs_max) / 10.0, -3.0, 3.0)) if (isinstance(v5s, (int, float)) and cands) else float("nan")
+    s.pair_y = v5_ok
+    s.pair_m = int(s.nc > 0 and v5_ok != int(s.cand_ok[0]))  # 片方だけ正解のときだけ教師にする
     sel_ok = int(is_ok(sel, answers, fold))
     s.v5_ok = v5_ok
     need = rec["need"]
@@ -166,12 +182,14 @@ def split_valid(samples, valid_share=0.02):
 
 
 # ---------------------------------------------------------------- 束ねる
-def collate(batch, k, device="cpu"):
-    """並びの形: [前置き（先頭、前の文、区切り、読み、区切り）][候補1の枠][候補2の枠]…。枠の長さは束の中の最長にそろえる"""
+def collate(batch, k, device="cpu", with_v5=True):
+    """並びの形: [前置き（先頭、前の文、区切り、読み、区切り）][候補1の枠]…[候補kの枠][v5 の出力の枠]。枠の長さは束の中の最長にそろえる。
+    with_v5=False なら v5 の出力の枠を付けない（生成の前の門の入力。門・score の出力は付けても変わらない）"""
     B = len(batch)
+    S = k + 1 if (k > 0 and with_v5) else k
     Lp = max(len(s.prefix) for s in batch)
-    Lc = max([len(c) for s in batch for c in s.cands] + [1])
-    T = Lp + k * Lc
+    Lc = max([len(c) for s in batch for c in s.cands] + ([len(s.v5tok) for s in batch] if S > k else []) + [1])
+    T = Lp + S * Lc
     tok = np.zeros((B, T), dtype=np.int64)
     typ = np.zeros((B, T), dtype=np.int64)
     pos = np.zeros((B, T), dtype=np.int64)
@@ -182,7 +200,12 @@ def collate(batch, k, device="cpu"):
     cvalid = np.zeros((B, k), dtype=bool)
     gap = np.zeros((B, k), dtype=np.float32)
     best = np.full(B, -1, dtype=np.int64)
-    ok = np.zeros((B, k), dtype=np.int64)
+    ok = np.zeros((B, S), dtype=np.int64)
+    same = np.zeros((B, S), dtype=np.float32)
+    pair_y = np.zeros(B, dtype=np.float32)
+    pair_m = np.zeros(B, dtype=np.float32)
+    v5gap = np.zeros(B, dtype=np.float32)
+    v5gap_m = np.zeros(B, dtype=np.float32)
     for b, s in enumerate(batch):
         n = len(s.prefix)
         tok[b, :n] = s.prefix
@@ -200,15 +223,33 @@ def collate(batch, k, device="cpu"):
             seg[b, a:a + Lc] = j + 1
             valid[b, a:a + m] = True
             cvalid[b, j] = True
+        if S > k:
+            a = Lp + k * Lc
+            m = len(s.v5tok)
+            tok[b, a:a + m] = s.v5tok
+            typ[b, a:a + m] = TYPE_CAND
+            pos[b, a:a + m] = np.minimum(np.arange(m), MAX_CAND_POS - 1)
+            rank[b, a:a + m] = min(k, MAX_RANK - 1)
+            src[b, a:a + m] = V5_SRC
+            seg[b, a:a + Lc] = k + 1
+            valid[b, a:a + m] = True
+            ok[b, k] = s.v5_ok
+            same[b, k] = 1.0
         gap[b, :s.nc] = s.gap
         ok[b, :s.nc] = s.cand_ok
+        same[b, :s.nc] = s.same
         best[b] = s.best
+        pair_y[b] = s.pair_y
+        pair_m[b] = s.pair_m
+        if s.v5gap == s.v5gap:  # nan でない
+            v5gap[b], v5gap_m[b] = s.v5gap, 1.0
     labels = np.stack([s.labels for s in batch])
     v5_ok = np.array([s.v5_ok for s in batch], dtype=np.int64)
+    ivalid = np.concatenate([cvalid, np.ones((B, 1), dtype=bool)], axis=1) if S > k else cvalid
     t = lambda x: torch.from_numpy(x).to(device)  # noqa: E731
     return dict(tok=t(tok), typ=t(typ), pos=t(pos), rank=t(rank), src=t(src), seg=t(seg), valid=t(valid),
-                cvalid=t(cvalid), gap=t(gap), best=t(best), labels=t(labels), cand_ok=t(ok), v5_ok=t(v5_ok),
-                Lp=Lp, Lc=Lc)
+                cvalid=t(cvalid), ivalid=t(ivalid), gap=t(gap), best=t(best), labels=t(labels), cand_ok=t(ok), v5_ok=t(v5_ok),
+                same=t(same), pair_y=t(pair_y), pair_m=t(pair_m), v5gap=t(v5gap), v5gap_m=t(v5gap_m), Lp=Lp, Lc=Lc, S=S)
 
 
 def to_device(b, device):
@@ -281,13 +322,18 @@ class JevGate(nn.Module):
         self.pos_prefix = nn.Embedding(MAX_PREFIX_POS, d)
         self.pos_cand = nn.Embedding(MAX_CAND_POS, d)
         self.rank = nn.Embedding(MAX_RANK, d)
-        self.src = nn.Embedding(4, d)
+        self.src = nn.Embedding(5, d)
         self.blocks = nn.ModuleList([Block(d, cfg["heads"], cfg["ffn"], cfg["dropout"]) for _ in range(cfg["layers"])])
         self.ln_f = nn.LayerNorm(d)
         self.s1 = nn.Linear(d, d // 2)
         self.s2 = nn.Linear(d // 2, 1)
         self.g1 = nn.Linear(3 * d + 3, cfg["gate_hidden"])
         self.g2 = nn.Linear(cfg["gate_hidden"], len(GATE_NAMES))
+        # 答えを選ぶ頭。i: 枠ごとの正解の度合い（入力 cls、その枠、v5 の枠、補助の数 7 個）、p: v5 と候補の一番の比べ（cls、v5 の枠、候補1の枠、補助 6 個）
+        self.i1 = nn.Linear(3 * d + 7, cfg["gate_hidden"])
+        self.i2 = nn.Linear(cfg["gate_hidden"], 1)
+        self.p1 = nn.Linear(3 * d + 6, cfg["gate_hidden"])
+        self.p2 = nn.Linear(cfg["gate_hidden"], 1)
         for m in self.modules():
             if isinstance(m, (nn.Linear, nn.Embedding)):
                 nn.init.normal_(m.weight, std=0.02)
@@ -312,11 +358,14 @@ class JevGate(nn.Module):
         if k == 0:
             zero = torch.zeros_like(cls)
             g_in = torch.cat([cls, zero, zero, torch.zeros(B, 3, device=h.device, dtype=h.dtype)], dim=-1)
-            return dict(gate=self.g2(F.gelu(self.g1(g_in), approximate="tanh")), score=None, best=None)
-        hc = h[:, Lp:].reshape(B, k, Lc, d)
-        vc = valid[:, Lp:].reshape(B, k, Lc).unsqueeze(-1).to(h.dtype)
-        pooled = (hc * vc).sum(2) / vc.sum(2).clamp(min=1)
-        score = self.s2(F.gelu(self.s1(pooled), approximate="tanh")).squeeze(-1)
+            return dict(gate=self.g2(F.gelu(self.g1(g_in), approximate="tanh")), score=None, best=None, item=None, pair=None, score_v5=None)
+        S = b["S"]
+        hc = h[:, Lp:].reshape(B, S, Lc, d)
+        vc = valid[:, Lp:].reshape(B, S, Lc).unsqueeze(-1).to(h.dtype)
+        pooled_all = (hc * vc).sum(2) / vc.sum(2).clamp(min=1)
+        pooled = pooled_all[:, :k]
+        score_all = self.s2(F.gelu(self.s1(pooled_all), approximate="tanh")).squeeze(-1)
+        score = score_all[:, :k]
         cv = b["cvalid"]
         masked = score.masked_fill(~cv, -1e4)
         best = masked.argmax(-1)
@@ -326,26 +375,61 @@ class JevGate(nn.Module):
         top2 = masked.topk(min(2, k), dim=-1).values
         margin = (top2[:, 0] - top2[:, 1]) if k >= 2 else torch.zeros_like(top2[:, 0])
         margin = torch.where(cv.sum(-1) >= 2, margin, torch.ones_like(margin))
-        length = vc.squeeze(-1).sum(2)[ar, best] / 20.0
+        length_all = vc.squeeze(-1).sum(2) / 20.0
+        length = length_all[ar, best]
         g_in = torch.cat([cls, c_best, c0, torch.stack([masked[ar, best], margin, length], dim=-1).to(h.dtype)], dim=-1)
-        return dict(gate=self.g2(F.gelu(self.g1(g_in), approximate="tanh")), score=score, best=best)
+        out = dict(gate=self.g2(F.gelu(self.g1(g_in), approximate="tanh")), score=score, best=best, item=None, pair=None, score_v5=None)
+        if S > k:  # v5 の出力の枠がある（生成のあと）
+            pv5 = pooled_all[:, k]
+            sc_v5 = score_all[:, k]
+            out["score_v5"] = sc_v5
+            sc_all = torch.cat([score.masked_fill(~cv, 0.0), sc_v5.unsqueeze(1)], dim=1)
+            sc_max = masked[ar, best].unsqueeze(1).expand(B, S)
+            is_v5 = torch.zeros(B, S, device=h.device, dtype=h.dtype)
+            is_v5[:, k] = 1.0
+            same = b["same"].to(h.dtype)
+            len_v5 = length_all[:, k].unsqueeze(1).expand(B, S)
+            ex = torch.stack([sc_all, sc_max, sc_v5.unsqueeze(1).expand(B, S), length_all, len_v5, same, is_v5], dim=-1).to(h.dtype)
+            i_in = torch.cat([cls.unsqueeze(1).expand(B, S, d), pooled_all, pv5.unsqueeze(1).expand(B, S, d), ex], dim=-1)
+            item = self.i2(F.gelu(self.i1(i_in), approximate="tanh")).squeeze(-1)
+            ex_p = torch.stack([masked[ar, 0].to(h.dtype), sc_v5.to(h.dtype), masked[ar, best].to(h.dtype), length_all[:, 0],
+                                length_all[:, k], same[:, 0]], dim=-1)
+            p_in = torch.cat([cls, pv5, c0, ex_p], dim=-1)
+            out["item"] = item
+            out["pair"] = self.p2(F.gelu(self.p1(p_in), approximate="tanh")).squeeze(-1)
+        return out
 
 
 def count_params(model):
     return sum(p.numel() for p in model.parameters())
 
 
-def loss_fn(out, b):
+def loss_fn(out, b, sel_weight=1.0):
     gate = out["gate"].float()
     w = torch.tensor(GATE_WEIGHTS, device=gate.device)
     l_gate = (F.binary_cross_entropy_with_logits(gate, b["labels"], reduction="none") * w).sum(-1).mean()
     if out["score"] is None:
-        return l_gate, dict(gate=l_gate.item(), reg=0.0, rank=0.0)
+        return l_gate, dict(gate=l_gate.item(), reg=0.0, rank=0.0, sel=0.0)
     score, cv = out["score"].float(), b["cvalid"]
     reg = (F.huber_loss(score, b["gap"], reduction="none", delta=0.5) * cv).sum() / cv.sum().clamp(min=1)
     has = (b["best"] >= 0)
     ce = F.cross_entropy(score.masked_fill(~cv, -1e4)[has], b["best"][has]) if has.any() else score.sum() * 0
-    return l_gate + reg + 0.5 * ce, dict(gate=l_gate.item(), reg=reg.item(), rank=ce.item())
+    sel = score.sum() * 0
+    if out["item"] is not None and sel_weight > 0:
+        item, iv, ok = out["item"].float(), b["ivalid"], b["cand_ok"].float()
+        bce = (F.binary_cross_entropy_with_logits(item, ok, reduction="none") * iv).sum() / iv.sum().clamp(min=1)
+        t = ok * iv
+        ts = t.sum(-1)
+        hs = ts > 0
+        logp = F.log_softmax(item.masked_fill(~iv, -1e4), dim=-1)
+        lce = -((t / ts.clamp(min=1).unsqueeze(-1)) * logp).sum(-1)
+        lce = lce[hs].mean() if hs.any() else item.sum() * 0
+        pm = b["pair_m"]
+        lp = (F.binary_cross_entropy_with_logits(out["pair"].float(), b["pair_y"], reduction="none") * pm).sum() / pm.sum().clamp(min=1)
+        vm = b["v5gap_m"]
+        lv = (F.huber_loss(out["score_v5"].float(), b["v5gap"], reduction="none", delta=0.5) * vm).sum() / vm.sum().clamp(min=1)
+        sel = 0.5 * bce + 0.5 * lce + lp + lv
+    return l_gate + reg + 0.5 * ce + sel_weight * sel, dict(gate=l_gate.item(), reg=reg.item(), rank=ce.item(), sel=sel.item())
 
 
 # ---------------------------------------------------------------- 評価
@@ -362,26 +446,56 @@ def auc(y, p):
 
 @torch.no_grad()
 def run_model(model, samples, device, batch_size=256, autocast=None):
+    """各文の出力（確率 4 つ、門の選んだ候補、候補の点、枠ごとの正解の度合い、v5 と候補の一番の比べ）を文の順で返す"""
     model.eval()
     k = model.k
-    probs, bests, scores = [], [], []
+    probs, bests, scores, items, pairs = [], [], [], [], []
     order = sorted(range(len(samples)), key=lambda i: len(samples[i].prefix) + sum(len(c) for c in samples[i].cands))
     for a in range(0, len(order), batch_size):
         idx = order[a:a + batch_size]
         b = collate([samples[i] for i in idx], k, device)
         with torch.autocast(device_type=device.type, dtype=autocast, enabled=autocast is not None):
             out = model(b)
+        n = len(idx)
         probs.append(torch.sigmoid(out["gate"].float()).cpu().numpy())
-        bests.append(out["best"].cpu().numpy() if out["best"] is not None else np.zeros(len(idx), dtype=np.int64))
-        scores.append(out["score"].float().cpu().numpy() if out["score"] is not None else np.zeros((len(idx), 0)))
+        bests.append(out["best"].cpu().numpy() if out["best"] is not None else np.zeros(n, dtype=np.int64))
+        scores.append(out["score"].float().cpu().numpy() if out["score"] is not None else np.zeros((n, 0)))
+        items.append(out["item"].float().cpu().numpy() if out["item"] is not None else np.zeros((n, 0)))
+        pairs.append(out["pair"].float().cpu().numpy() if out["pair"] is not None else np.zeros(n))
     inv = np.empty(len(order), dtype=np.int64)
     inv[np.array(order)] = np.arange(len(order))
-    return np.concatenate(probs)[inv], np.concatenate(bests)[inv], np.concatenate(scores)[inv]
+    cat = lambda x: np.concatenate(x)[inv]  # noqa: E731
+    return cat(probs), cat(bests), cat(scores), cat(items), cat(pairs)
+
+
+def select_stats(samples, items, pairs):
+    """答えを選ぶ頭の成績（確かめ用）。比べる相手: いつも v5、いつも候補の一番、当て推量（枠をでたらめに選ぶ期待値）、上限"""
+    n = len(samples)
+    v5 = np.array([s.v5_ok for s in samples])
+    c0 = np.array([int(s.cand_ok[0]) if s.nc else 0 for s in samples])
+    pick = np.zeros(n, dtype=int)
+    rand = 0.0
+    or_all = 0
+    for i, s in enumerate(samples):
+        ok = np.concatenate([s.cand_ok, [s.v5_ok]])
+        pick[i] = ok[int(np.argmax(items[i][:len(ok)]))] if items.shape[1] else 0
+        rand += ok.mean()
+        or_all += int(ok.max())
+    pair_pick = np.where(pairs > 0, v5, c0)
+    m = np.array([s.pair_m for s in samples], dtype=bool)
+    y = np.array([s.pair_y for s in samples])
+    res = dict(pick_ok=int(pick.sum()), pick_random=float(rand), pick_oracle=int(or_all), always_v5=int(v5.sum()),
+               always_c0=int(c0.sum()), pair_ok=int(pair_pick.sum()), pair_oracle=int(np.maximum(v5, c0).sum()),
+               pair_random=float((v5 + c0).sum() / 2), pair_n=int(m.sum()),
+               pair_auc=auc(y[m], pairs[m]) if m.any() else float("nan"),
+               pair_acc=float(((pairs[m] > 0) == (y[m] == 1)).mean()) if m.any() else float("nan"),
+               pair_major=float(max(y[m].mean(), 1 - y[m].mean())) if m.any() else float("nan"))
+    return res
 
 
 def evaluate(model, samples, device, autocast=None):
-    """確かめ用の成績: 各頭の AUC と、生成に回す割合ごとの正解数（模型の選んだ候補で）"""
-    probs, bests, _ = run_model(model, samples, device, autocast=autocast)
+    """確かめ用の成績: 各頭の AUC と、生成に回す割合ごとの正解数（模型の選んだ候補で）、答えを選ぶ頭の成績"""
+    probs, bests, _, items, pairs = run_model(model, samples, device, autocast=autocast)
     labels = np.stack([s.labels for s in samples])
     res = {"n": len(samples), "auc": {}}
     for j, name in enumerate(GATE_NAMES):
@@ -398,6 +512,11 @@ def evaluate(model, samples, device, autocast=None):
         ok = np.where(gen, v5_ok, stud_ok).sum()
         rows.append({"threshold": th, "gen_share": float(gen.mean()), "correct": int(ok)})
     res["gate_k"] = rows
+    if model.k > 0 and items.shape[1]:
+        res["select"] = select_stats(samples, items, pairs)
+        pa = res["select"]["pair_auc"]
+        res["auc"]["pair"] = pa
+        res["auc"]["need_k+pair"] = (res["auc"]["need_k"] + pa) / 2  # 早めに止める基準に使える（門と選ぶ頭の平均）
     return res
 
 
@@ -406,6 +525,11 @@ def print_eval(res):
     print("  AUC: " + "、".join(f"{k} {v:.3f}" for k, v in res["auc"].items()))
     for r in res["gate_k"]:
         print(f"  need_k >= {r['threshold']:.2f} で生成: 生成の割合 {100 * r['gen_share']:.1f}%、正解 {r['correct']}")
+    if "select" in res:
+        q = res["select"]
+        print(f"  選ぶ頭 (b) 枠から選ぶ: 正解 {q['pick_ok']}（いつも v5 {q['always_v5']}、当て推量 {q['pick_random']:.0f}、上限 {q['pick_oracle']}）")
+        print(f"  選ぶ頭 (a) v5 と候補の一番: 正解 {q['pair_ok']}（いつも v5 {q['always_v5']}、いつも一番 {q['always_c0']}、当て推量 {q['pair_random']:.0f}、"
+              f"上限 {q['pair_oracle']}）。割れる文 {q['pair_n']} で AUC {q['pair_auc']:.3f}、正答率 {q['pair_acc']:.3f}（多いほうに決め打ち {q['pair_major']:.3f}）")
 
 
 # ---------------------------------------------------------------- 学習
@@ -429,7 +553,7 @@ def latest_checkpoint(out):
 
 def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=20261019, limit=None,
           checkpoint_minutes=10, device=None, log_every=100, valid_share=0.02, max_steps=None, cache_dir=None,
-          eval_every=None, patience=None, metric="need_k"):
+          eval_every=None, patience=None, metric="need_k", sel_weight=1.0):
     """学習する。out の中に ckpt-<歩>.pt（最新の2つ）、best.pt、final.pt、vocab.json、log.txt を置く。途中から再開できる。
     特徴の一時ファイルは cache_dir（既定は out。Colab では手元の高速な場所を渡す）。
     早めの止め方: eval_every 歩ごと（と周の終わり）に確かめ用の AUC（metric の頭）を測り、いちばん良い結果を best.pt に残す。
@@ -448,7 +572,7 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
         vocab = build_vocab(records, cfg, limit=limit or 200000)
     cache_root = Path(cache_dir) if cache_dir else out
     cache_root.mkdir(parents=True, exist_ok=True)
-    cache = cache_root / f"features-k{cfg['k']}-a{NEED_AVAIL}-{limit or 'all'}.pkl"
+    cache = cache_root / f"features-{FEATURE_TAG}-k{cfg['k']}-a{NEED_AVAIL}-{limit or 'all'}.pkl"
     if cache.exists():
         samples = pickle.load(open(cache, "rb"))
         print("特徴を読みました:", len(samples))
@@ -522,7 +646,7 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
             b = to_device(b_cpu, device)
             with torch.autocast(device_type=device.type, dtype=autocast, enabled=autocast is not None):
                 outp = model(b)
-            loss, parts = loss_fn(outp, b)
+            loss, parts = loss_fn(outp, b, sel_weight)
             opt.zero_grad(set_to_none=True)
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)
@@ -532,7 +656,7 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
                 el = time.time() - t0
                 rate = (step - done0) / el
                 msg = (f"歩 {step}/{total} 損失 {loss.item():.4f} 門 {parts['gate']:.4f} 点 {parts['reg']:.4f} "
-                       f"順位 {parts['rank']:.4f} lr {opt.param_groups[0]['lr']:.2e} 残り約 {(total - step) / rate / 60:.1f} 分")
+                       f"順位 {parts['rank']:.4f} 選び {parts['sel']:.4f} lr {opt.param_groups[0]['lr']:.2e} 残り約 {(total - step) / rate / 60:.1f} 分")
                 print(msg, flush=True)
                 logf.write(msg + "\n")
                 logf.flush()
@@ -577,14 +701,17 @@ def load_model(path, device="cpu"):
 
 
 def predict(ckpt, records, out_tsv, device=None, limit=None):
-    """記録ごとの出力を書く: id<TAB>need<TAB>need_k<TAB>need_top1<TAB>harm_k<TAB>選んだ候補の番号<TAB>候補ごとの点…"""
+    """記録ごとの出力を書く: id<TAB>need<TAB>need_k<TAB>need_top1<TAB>harm_k<TAB>選んだ候補の番号<TAB>候補ごとの点…
+    答えを選ぶ頭があれば、続けて「|」、v5 が正しいほうの確率（頭 a。v5 と候補の一番）、枠ごとの正解の度合い（頭 b。候補…、最後に v5 の出力）"""
     device = torch.device(device or ("cuda" if torch.cuda.is_available() else "cpu"))
     model, vocab = load_model(ckpt, device)
     samples = featurize_all(records, vocab, model.cfg, limit, log=False)
-    probs, bests, scores = run_model(model, samples, device)
+    probs, bests, scores, items, pairs = run_model(model, samples, device)
     with open(out_tsv, "w", encoding="utf-8", newline="\n") as f:
         for i, s in enumerate(samples):
             row = [s.id] + [f"{x:.5f}" for x in probs[i]] + [str(int(bests[i]))] + [f"{x:.4f}" for x in scores[i][:s.nc]]
+            if items.shape[1]:
+                row += ["|", f"{1 / (1 + math.exp(-float(pairs[i]))):.5f}"] + [f"{x:.4f}" for x in items[i][:s.nc]] + [f"{items[i][model.k]:.4f}"]
             f.write("\t".join(row) + "\n")
     print(f"{len(samples)} 文の出力を書きました: {out_tsv}")
 
@@ -600,7 +727,7 @@ def tensor_order(model):
             m = getattr(blk, n)
             out.append((f"b{i}.{n}.weight", m.weight))
             out.append((f"b{i}.{n}.bias", m.bias))
-    for n in ("ln_f", "s1", "s2", "g1", "g2"):
+    for n in ("ln_f", "s1", "s2", "g1", "g2", "i1", "i2", "p1", "p2"):
         m = getattr(model, n)
         out.append((f"{n}.weight", m.weight))
         out.append((f"{n}.bias", m.bias))
@@ -640,7 +767,9 @@ def dump_case(ckpt, records, out_path, n=3):
                 toks.append(" ".join(str(int(x)) for x in b[key][0][b["valid"][0]]))
             gate = " ".join(f"{x:.6f}" for x in torch.sigmoid(o["gate"][0]).tolist())
             sc = " ".join(f"{x:.6f}" for x in o["score"][0][b["cvalid"][0]].tolist()) if o["score"] is not None else ""
-            f.write(f"{len(b['tok'][0][b['valid'][0]])}\n" + "\n".join(toks) + f"\n{gate}\n{sc}\n")
+            it = " ".join(f"{x:.6f}" for x in o["item"][0][b["ivalid"][0]].tolist()) if o["item"] is not None else ""
+            pr = f"{o['pair'][0].item():.6f}" if o["pair"] is not None else ""
+            f.write(f"{len(b['tok'][0][b['valid'][0]])}\n" + "\n".join(toks) + f"\n{gate}\n{sc}\n{it}\n{pr}\n")
     print("見本を書きました:", out_path)
 
 
@@ -658,7 +787,8 @@ def main():
     t.add_argument("--seed", type=int, default=20261019)
     t.add_argument("--eval-every", type=int, default=None, help="確かめ用を測る歩の間隔（周の終わりにも測る）")
     t.add_argument("--patience", type=int, default=None, help="確かめ用の AUC がこの回数つづけて良くならなければ止める")
-    t.add_argument("--metric", default="need_k", choices=GATE_NAMES)
+    t.add_argument("--metric", default="need_k", choices=GATE_NAMES + ["pair", "need_k+pair"])
+    t.add_argument("--sel-weight", type=float, default=1.0, help="答えを選ぶ頭の損失の重み（0 なら選ぶ頭を学習しない）")
     for key in ("k", "d", "layers", "heads", "ffn", "max_vocab", "prev_chars", "read_chars", "cand_chars"):
         t.add_argument("--" + key.replace("_", "-"), type=int, default=None)
     p = sub.add_parser("predict")
@@ -681,7 +811,7 @@ def main():
         cfg = {k: getattr(a, k) for k in ("k", "d", "layers", "heads", "ffn", "max_vocab", "prev_chars", "read_chars",
                                            "cand_chars") if getattr(a, k) is not None}
         train(a.records, a.out, cfg, epochs=a.epochs, batch_size=a.batch, lr=a.lr, seed=a.seed, limit=a.limit,
-              max_steps=a.max_steps, eval_every=a.eval_every, patience=a.patience, metric=a.metric)
+              max_steps=a.max_steps, eval_every=a.eval_every, patience=a.patience, metric=a.metric, sel_weight=a.sel_weight)
     elif a.cmd == "predict":
         predict(a.ckpt, a.records, a.out)
     elif a.cmd == "export":
