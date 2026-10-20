@@ -6,6 +6,8 @@
     python tools/jev_gate_build.py records <pre.jsonl> <採点の出力.tsv> <records.jsonl>
   試験の組（run 39249431055 の材料。机上の評価用）:
     python tools/jev_gate_build.py test <材料> <tests/conversion> <本線の結果> <採点の出力のフォルダ> <records.jsonl>
+  記録の生成なしの候補を先頭の n 個に絞って付け直す（採点のやり直しなし）:
+    python tools/jev_gate_build.py cap <n> <入力.jsonl.gz> <出力.jsonl.gz>
   記録を結ぶ・数える:
     python tools/jev_gate_build.py stats <records.jsonl>…
 
@@ -13,6 +15,9 @@
 （ローマ字<TAB>文節|…<TAB>確定）。候補の集まりは tools/jev_ceiling.py と同じ
 （人工知能なしの出力 ∪ AzooKey の辞書の文全体の候補（最大32）∪ Mozc の組（上位32）∪ v5 の出力 ∪ 正解）で、
 tools/jev_score.cpp で今の zenz v5 が点を付ける。
+学習用の文では、生成なしの候補を先頭の CAND_AVAIL（16、環境変数 JEV_GATE_AVAIL で変える）個までにしてから採点する
+（1文 約36個 → 約18個。模型が使うのは上位 k=4 個だけ。need_k・need_top1・harm_k と蒸留の教師は変わらず、need だけが
+ 「上位16個の中の zenz 最大」で決まる）。試験の記録は従来どおり全部の候補（最大64）。
 
 記録（1文1行の JSON）:
   id        名前:番号（学習用は <組>:<番号>、試験は jev_ceiling.py と同じ）
@@ -29,6 +34,7 @@ tools/jev_score.cpp で今の zenz v5 が点を付ける。
 """
 import gzip
 import json
+import os
 import sys
 from pathlib import Path
 
@@ -36,6 +42,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import jev_ceiling as jc  # noqa: E402
 
 CAND_KEEP = 24
+CAND_AVAIL = 16  # 学習用の文で採点する「生成なしの候補」の数（模型が使うのは上位 k=4 個。試験の記録は従来どおり最大64）
 
 
 def open_text(path, mode="r"):
@@ -56,11 +63,24 @@ def read_list(path):
     return rows
 
 
-def make_candidates(noai, whole, combos, v5, gold):
-    """[(表記, 出どころ)]。出どころは n/w/c（生成なしで作れる）、b（v5 の出力）、g（正解）の文字の集まり"""
+def make_candidates(noai, whole, combos, v5, gold, avail=None):
+    """[(表記, 出どころ)]。出どころは n/w/c（生成なしで作れる）、b（v5 の出力）、g（正解）の文字の集まり。
+    avail が数なら、生成なしで作れる候補（n/w/c）を並びの先頭からその数だけにしてから v5 の出力と正解を足す
+    （採点の候補を減らす。ラベルの need はこの範囲での zenz 最大で決まる）"""
     out, index = [], {}
-    for text, tag in ([(noai, "n")] + [(x, "w") for x in whole[:32]] + [(x, "c") for x in combos[:32]]
-                      + [(v5, "b"), (gold, "g")]):
+    for text, tag in [(noai, "n")] + [(x, "w") for x in whole[:32]] + [(x, "c") for x in combos[:32]]:
+        text = jc.norm(text)
+        if not text:
+            continue
+        if text in index:
+            out[index[text]][1] += tag
+        else:
+            index[text] = len(out)
+            out.append([text, tag])
+    if avail:
+        out = out[:avail]
+        index = {c[0]: i for i, c in enumerate(out)}
+    for text, tag in [(v5, "b"), (gold, "g")]:
         text = jc.norm(text)
         if not text:
             continue
@@ -72,9 +92,9 @@ def make_candidates(noai, whole, combos, v5, gold):
     return out[:64]
 
 
-def pre_record(rid, reading, prev, answers, fold, v5, noai, whole, combos):
+def pre_record(rid, reading, prev, answers, fold, v5, noai, whole, combos, avail=None):
     answers = [jc.norm(a) for a in answers]
-    cands = make_candidates(noai, whole, combos, v5, answers[0])
+    cands = make_candidates(noai, whole, combos, v5, answers[0], avail)
     return {"id": rid, "reading": reading, "prev": prev, "answers": answers, "fold": bool(fold),
             "v5": jc.norm(v5), "noai": jc.norm(noai), "cands": cands}
 
@@ -130,6 +150,7 @@ def cmd_jobs(mdir, list_path, v5_path, name, jobs_path, pre_path):
     dump = jc.blocks(Path(mdir) / f"dump-{name}.txt")
     feat = jc.blocks(Path(mdir) / f"features-{name}.txt")
     whole = jc.blocks(Path(mdir) / f"whole-{name}.txt")
+    avail = int(os.environ.get("JEV_GATE_AVAIL") or CAND_AVAIL)
     n = skipped = 0
     with open(jobs_path, "w", encoding="utf-8", newline="\n") as jf, open(pre_path, "w", encoding="utf-8", newline="\n") as pf:
         for i, (romaji, orig, prev) in enumerate(rows, 1):
@@ -146,7 +167,7 @@ def cmd_jobs(mdir, list_path, v5_path, name, jobs_path, pre_path):
                     w = lst
                     break
             pre = pre_record(f"{name}:{i}", reading, prev, [orig], False, v5[romaji], noai[romaji], w,
-                             jc.kbest(fsegs, 32) if fsegs else [])
+                             jc.kbest(fsegs, 32) if fsegs else [], avail)
             jf.write(job_row(pre) + "\n")
             pf.write(json.dumps(pre, ensure_ascii=False) + "\n")
             n += 1
@@ -190,6 +211,33 @@ def cmd_test(mdir, tdir, bdir, sdir, out_path):
     print(f"試験の記録 {n}、外した {bad}")
 
 
+def cap_record(r, n):
+    """記録の生成なしの候補を先頭の n 個までにし、sel／ラベルを付け直す（採点のやり直しなし）。v5s、golds はそのまま"""
+    cands = [c for c in r["cands"] if set(c[2]) & set("nwc")][:n]
+    if not cands:
+        return None
+    best = max(range(len(cands)), key=lambda i: cands[i][1])
+    sel = cands[best][0]
+    r = dict(r)
+    r.update({"cands": cands, "sel": sel, "sel_i": best, "need": int(sel != r["v5"]),
+              "sel_ok": int(jc.correct(sel, r["answers"], r["fold"]))})
+    return r
+
+
+def cmd_cap(n, in_path, out_path):
+    n = int(n)
+    k = bad = 0
+    with open_text(out_path, "w") as out:
+        for r in iter_records([in_path]):
+            r = cap_record(r, n)
+            if r is None:
+                bad += 1
+                continue
+            out.write(json.dumps(r, ensure_ascii=False) + "\n")
+            k += 1
+    print(f"記録 {k}、候補がなくて外した {bad}")
+
+
 def iter_records(paths):
     for p in paths:
         with open_text(p) as f:
@@ -229,6 +277,8 @@ def main():
         cmd_records(*a)
     elif cmd == "test" and len(a) == 5:
         cmd_test(*a)
+    elif cmd == "cap" and len(a) == 3:
+        cmd_cap(*a)
     elif cmd == "stats" and a:
         cmd_stats(a)
     else:
