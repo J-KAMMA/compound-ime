@@ -176,6 +176,7 @@ jobs:
     timeout-minutes: 330
     strategy:
       fail-fast: false
+      max-parallel: 16   # 同じアカウントの別のリポジトリと同時実行の枠を分けるため、4枠を空ける
       matrix:
         shard: ${{ fromJSON(needs.sentences.outputs.matrix) }}
     steps:

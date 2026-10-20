@@ -42,6 +42,9 @@ MAX_PREFIX_POS = 128
 MAX_CAND_POS = 64
 MAX_RANK = 16
 GATE_NAMES = ["need", "need_k", "need_top1", "harm_k"]
+# 教師 need（全部の候補から決めた「生成が要る」）は、生成なしの候補の先頭のこの数だけで決め直す。
+# 材料の新しい記録は採点の時点で16個までだが、古い記録（最大24個）と同じ定義にそろえるため
+NEED_AVAIL = 16
 GATE_WEIGHTS = [1.0, 1.0, 0.5, 0.5]
 MAGIC = b"JEVG"
 VERSION = 1
@@ -134,7 +137,11 @@ def featurize(rec, vocab, cfg):
     v5_ok = int(is_ok(rec["v5"], answers, fold))
     sel_ok = int(is_ok(sel, answers, fold))
     s.v5_ok = v5_ok
-    s.labels = np.array([rec["need"], int(sel != rec["v5"]), rec["need_top1"], int(v5_ok and not sel_ok)],
+    need = rec["need"]
+    avail = [c for c in rec["cands"] if set(c[2]) & set("nwc")][:NEED_AVAIL]
+    if avail:
+        need = int(max(avail, key=lambda c: c[1])[0] != rec["v5"])
+    s.labels = np.array([need, int(sel != rec["v5"]), rec["need_top1"], int(v5_ok and not sel_ok)],
                         dtype=np.float32)
     return s
 
@@ -441,7 +448,7 @@ def train(records, out, cfg=None, epochs=8, batch_size=128, lr=6e-4, seed=202610
         vocab = build_vocab(records, cfg, limit=limit or 200000)
     cache_root = Path(cache_dir) if cache_dir else out
     cache_root.mkdir(parents=True, exist_ok=True)
-    cache = cache_root / f"features-k{cfg['k']}-{limit or 'all'}.pkl"
+    cache = cache_root / f"features-k{cfg['k']}-a{NEED_AVAIL}-{limit or 'all'}.pkl"
     if cache.exists():
         samples = pickle.load(open(cache, "rb"))
         print("特徴を読みました:", len(samples))
