@@ -22,6 +22,12 @@ on:
       gate_material:
         description: exp/jev-gate の枝だけ。まとめの成果物の名前（空なら jevgate-material）
         default: ''
+      gate_prev_run:
+        description: exp/jev-gate の枝だけ。途中までの run の番号（その run の文と、終わった組の記録を使う）
+        default: ''
+      gate_done:
+        description: exp/jev-gate の枝だけ。gate_prev_run で終わっている組の番号（JSON の配列。この組は流さない）
+        default: ''
 
 permissions:
   contents: read
@@ -183,6 +189,8 @@ jobs:
       count: ${{ inputs.gate_count || '4000' }}
       shards: ${{ inputs.gate_shards || '2' }}
       material: ${{ inputs.gate_material || 'jevgate-material' }}
+      prev_run: ${{ inputs.gate_prev_run || '' }}
+      done_shards: ${{ inputs.gate_done || '' }}
 
   # 試験を3つの組に分けて、別々の計算機で同時に流す（tools/run_tests.sh）
   # 選び手の材料集めの枝と、判定専用の模型の設計の枝では、計算機を材料集めに回すため流さない。

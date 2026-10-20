@@ -25,6 +25,14 @@ on:
         description: まとめの成果物の名前
         type: string
         default: 'jevgate-material'
+      prev_run:
+        description: 途中までの run の番号。空でなければ、その run の文（成果物 jevgate-sentences）を使い、done_shards の組はその run の記録を使う
+        type: string
+        default: ''
+      done_shards:
+        description: prev_run で終わっている組の番号（JSON の配列。例 [1,3,4]）。この組は流さない
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -47,8 +55,18 @@ jobs:
         id: m
         run: |
           S="${{ inputs.shards }}"; [ -n "$S" ] || S=2
-          echo "matrix=$(python3 -c "import sys; print(list(range(1, int(sys.argv[1]) + 1)))" "$S")" >> "$GITHUB_OUTPUT"
+          D='${{ inputs.done_shards }}'; [ -n "$D" ] || D='[]'
+          echo "matrix=$(python3 -c "import sys, json; d = set(json.loads(sys.argv[2])); print([i for i in range(1, int(sys.argv[1]) + 1) if i not in d])" "$S" "$D")" >> "$GITHUB_OUTPUT"
+      - name: 途中までの run の文を使う
+        if: inputs.prev_run != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p out
+          gh run download "${{ inputs.prev_run }}" -R $GITHUB_REPOSITORY -n jevgate-sentences -D out
+          grep -vc '^#' out/train.tsv
       - name: 材料（版と SHA256 を固定）
+        if: inputs.prev_run == ''
         run: |
           set -eo pipefail
           python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0"
@@ -74,6 +92,7 @@ jobs:
             https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
           echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
       - name: 学習用の文を作る（試験の文は除く）
+        if: inputs.prev_run == ''
         run: |
           set -eo pipefail
           mkdir -p out
@@ -165,7 +184,7 @@ jobs:
       - name: 組 ${{ matrix.shard }}（材料集め）
         run: |
           set -eo pipefail
-          W=$GITHUB_WORKSPACE; E=$W/bin/engine; K=${{ matrix.shard }}; S=${{ strategy.job-total }}
+          W=$GITHUB_WORKSPACE; E=$W/bin/engine; K=${{ matrix.shard }}; S=${{ inputs.shards }}
           chmod +x $E/session_handler_main llama/jev_score
           curl -fsSL -o model.gguf $MODEL_URL && echo "$MODEL_SHA  model.gguf" | sha256sum -c
           mkdir -p out material
@@ -244,6 +263,14 @@ jobs:
           pattern: jevgate-records-*
           path: parts
           merge-multiple: false
+      - name: 途中までの run で終わっていた組の記録
+        if: inputs.prev_run != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          for k in $(python3 -c "import json; print(*json.loads('${{ inputs.done_shards }}'))"); do
+            gh run download "${{ inputs.prev_run }}" -R $GITHUB_REPOSITORY -n jevgate-records-$k -D parts/prev-$k
+          done
       - uses: actions/download-artifact@v4
         with:
           name: jevgate-test-records
@@ -257,6 +284,7 @@ jobs:
           set -eo pipefail
           mkdir -p out
           echo "組の数 $(ls -d parts/* | wc -l)"
+          [ "$(ls -d parts/* | wc -l)" -eq "${{ inputs.shards }}" ] || { echo "全部の組がそろっていません" >&2; exit 1; }
           cat parts/*/records-*.jsonl.gz > all.jsonl.gz
           python3 repo/tools/jev_gate_build.py stats all.jsonl.gz | tee out/stats.txt
           # 総行数を files（既定 10）で割った行数ごとに分ける（大きさがほぼそろう）
