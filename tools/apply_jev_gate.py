@@ -102,9 +102,19 @@ edit(A, "    ConvertTextWithContext = nullptr;\n", "    ConvertTextWithContext =
 # 人工知能を使わない呼び出しの印（同じスレッドの間だけ）
 edit(A, "// Dynamic DLL loader for AzooKey engine\n", '''// 判定の門（tools/apply_jev_gate.py）: このスレッドの AzooKey の変換を、人工知能なし（辞書だけ）にする印。
 thread_local bool g_azookey_no_ai = false;
+// 人工知能なしの呼び出しでも打ち間違いの補正の探索を残すか（MYIME_JEV_GATE_NOAI_TYPO=1）。既定は止める（探索は変換1回で約55ミリ秒かかる）。
+static bool JevGateNoAiKeepsTypo() {
+  static const bool keep = [] {
+    const char* value = std::getenv("MYIME_JEV_GATE_NOAI_TYPO");
+    return value != nullptr && value[0] == '1';
+  }();
+  return keep;
+}
 
 // Dynamic DLL loader for AzooKey engine
 ''')
+edit(A, "        loader.SetTypoCorrectionEnabled(typo_correction_enabled);\n",
+     "        loader.SetTypoCorrectionEnabled(typo_correction_enabled && !(g_azookey_no_ai && !JevGateNoAiKeepsTypo()));\n")
 edit(A, "        loader.SetTypoCorrectionUseAi(typo_correction_use_ai);\n",
      "        loader.SetTypoCorrectionUseAi(typo_correction_use_ai && !g_azookey_no_ai);\n")
 edit(A, """      const char* candidates_json = loader.ConvertTextWithContext

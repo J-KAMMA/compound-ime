@@ -181,6 +181,24 @@ def main():
                            f"{statistics.mean(p90):.1f} | {min(p90):.1f}〜{max(p90):.1f} | {statistics.mean(means):.1f} |")
                 st = log_stats(folder, f"lat-{cfg}-r*.gatelog")
                 details.append((cfg, st, sum(len(v) for v in reps.values()) + 5 * len(reps)))
+        # 着工前の値付け（speed-claims）: 門なしでの全文の生成（all_zenzai）が変換1回の時間に占める割合と、その上限（Amdahl）
+        for name, folder in (x.split("=", 1) for x in a.time):
+            tot = allz = n = 0
+            for p in sorted(Path(folder).glob("lat-off-r*.profile.tsv")):
+                for line in open(p, encoding="utf-8", errors="replace"):
+                    row = dict(kv.split("=", 1) for kv in line.rstrip("\n").split("\t") if "=" in kv)
+                    if row.get("kind") != "conv":
+                        continue
+                    try:
+                        tot += int(row.get("total_us", 0))
+                        allz += int(row.get("allz_us", 0))
+                        n += 1
+                    except ValueError:
+                        pass
+            if tot:
+                share = allz / tot
+                out.append(f"\n門なし（off）の変換 {n} 回で、全文の生成（all_zenzai）が入り口の時間に占める割合 {100 * share:.1f}%。"
+                           f"生成を全部なくせたとしても（Amdahl の上限）速さは最大 {1 / (1 - share):.2f} 倍。")
         out.append("\n### 時間の試験での門の判断\n")
         for cfg, st, total in details:
             out.append(f"#### {cfg}\n")
