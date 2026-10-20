@@ -18,5 +18,7 @@ for f in $w/part.*; do
       r&&/^  value:/{i++; printf "%s%s\n", in_[i], list; list=""; k=0; r=0}' $f.out > $f.res ) &
 done; wait
 cat $w/part.*.res > "$OUT"
+# 形の確かめ用に、最初の部分の生の出力の先頭を残す
+head -c 60000 $(ls $w/part.*.out | head -1) > "$OUT.raw" 2> /dev/null || true
 if grep -l -i "failed to load\|dlopen error\|unavailable" $w/*.err; then grep -h -i "dlopen\|failed to load" $w/*.err | head -3; echo "変換エンジンを読めませんでした"; exit 1; fi
 rm -rf $w
