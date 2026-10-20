@@ -7,8 +7,8 @@ sentences: results.tsv is the output of tools/batch_convert.sh (ローマ字<TAB
   sentences that are exactly as expected and the sentences that have the name in its official spelling
   (the rest of the sentence may differ in kanji or kana), by kind of name and by origin.
 candidates: results.tsv is the output of tools/candidates_convert.sh (ローマ字<TAB>候補<TAB>候補 ...).
-  Counts the tests whose expected spelling is the first candidate, among the first 3, and among all
-  the candidates listed (at most 12), by way of typing.
+  Counts the tests whose expected spelling is the first candidate, among the first 3, and among the first 9 (one page), and among all
+  the candidates listed (at most 30), by way of typing.
 Both list the first 60 misses. The results are matched to the tests by order (same number of lines).
 """
 import sys
@@ -53,7 +53,7 @@ def sentences(tests, results, label):
 
 
 def candidates(tests, results, label):
-    groups = defaultdict(lambda: [0, 0, 0, 0])  # first, first 3, any, all
+    groups = defaultdict(lambda: [0, 0, 0, 0, 0])  # first, first 3, first 9 (one page), any, all
     misses = []
     results = results + [[]] * (len(tests) - len(results))
     for test, got in zip(tests, results):
@@ -67,16 +67,17 @@ def candidates(tests, results, label):
             g = groups[key]
             g[0] += rank == 0
             g[1] += rank is not None and rank < 3
-            g[2] += rank is not None
-            g[3] += 1
+            g[2] += rank is not None and rank < 9
+            g[3] += rank is not None
+            g[4] += 1
         if rank is None:
             misses.append(f"  {raw}（{mode}）→ {' / '.join(cands[:6])}（期待: {expected}）")
     total = groups["全部"]
-    print(f"{label}: 先頭 {total[0]}/{total[3]}、上位3つ {total[1]}/{total[3]}、候補の中 {total[2]}/{total[3]}")
+    print(f"{label}: 先頭 {total[0]}/{total[4]}、上位3つ {total[1]}/{total[4]}、1ページ目（9つ） {total[2]}/{total[4]}、候補の中 {total[3]}/{total[4]}")
     for key in sorted(groups):
         if key != "全部":
             g = groups[key]
-            print(f"  {key}: 先頭 {g[0]}/{g[3]}、上位3つ {g[1]}/{g[3]}、候補の中 {g[2]}/{g[3]}")
+            print(f"  {key}: 先頭 {g[0]}/{g[4]}、上位3つ {g[1]}/{g[4]}、1ページ目 {g[2]}/{g[4]}、候補の中 {g[3]}/{g[4]}")
     if len(results) != len(tests):
         print(f"注意: 結果が {len(results)} 行、試験が {len(tests)} 行")
     if misses:
