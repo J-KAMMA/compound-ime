@@ -112,6 +112,33 @@ int main() {
   CheckReplace("980", "九百八十円と二円", "980円と二円");
   CheckReplace("980", "九百八十円と二", "980円と二");
   CheckReplace("10.5", "十点五度", "10.5度");
+  // Review fixes. A percent mark in the key is not doubled by パーセント.
+  CheckKeep("10%", "10パーセント", true);
+  CheckKeep("10.5%", "10.5パーセント", true);
+  CheckKeep("10%", "10%", true);
+  CheckKeep("10%", "十パーセント", false);
+  CheckReplace("10%", "十パーセント", "10%");
+  CheckReplace("10.5%", "十点五パーセント", "10.5%");
+  CheckReplace("10.5%", "10.5パーセント", "10.5%");
+  CheckReplace("10%", "十%", "10%");
+  CheckReplace("5%のうち3", "五パーセントのうち三", "5%のうち3");
+  // A kana kanji numeral right before a typed number keeps its kanji.
+  CheckKeep("いち2", "一2", true);
+  CheckKeep("にじゅう20", "二十20", true);
+  CheckKeep("はちじゅう80", "八十80", true);
+  CheckReplace("いち2", "一2", "一2");
+  CheckReplace("にじゅう20", "二十20", "二十20");
+  CheckReplace("はちじゅう80", "八十80", "八十80");
+  // A comma or a period that ends a sentence is not part of the number.
+  CheckKeep("1,", "1、", true);
+  CheckKeep("1,", "1,", true);
+  CheckKeep("100.", "100.", true);
+  CheckReplace("1,", "一、", "1、");
+  CheckReplace("100.", "百.", "100.");
+  CheckReplace("1,2", "一、二", "1,2");
+  CheckReplace("1,2,3", "一、二、三", "1,2,3");
+  CheckReplace("1,000", "千円", "1,000円");
+  CheckNoReplace("いち", "一");
   if (g_failed != 0) {
     std::cout << g_failed << "/" << g_total << " failed\n";
     return 1;

@@ -91,15 +91,28 @@ inline std::vector<Token> NumberTokens(std::string_view text) {
     }
     const size_t begin = i;
     bool has_number = false;
+    size_t last_end = begin;
+    char32_t previous = 0;
     while (i < text.size()) {
       const size_t l = Utf8Length(static_cast<unsigned char>(text[i]));
       const size_t e = i + l <= text.size() ? i + l : text.size();
       const char32_t c = Decode(text.data() + i, e - i);
       if (!IsTokenChar(c)) break;
+      // A digit right after a kanji numeral starts a new token: the 二十 of
+      // 二十20 is read from kana, the 20 is typed.
+      if (IsDigit(c) && IsKanjiNumeral(previous)) break;
+      if (IsDigit(c) || IsKanjiNumeral(c) || c == U'%' || c == 0xFF05) {
+        last_end = e;
+      }
       has_number = has_number || IsDigit(c) || IsKanjiNumeral(c);
+      previous = c;
       i = e;
     }
-    if (has_number) tokens.push_back({begin, i});
+    // Marks at the end are sentence punctuation (1, / 100.), not the number.
+    if (has_number) {
+      tokens.push_back({begin, last_end});
+      i = last_end;
+    }
   }
   return tokens;
 }
@@ -143,18 +156,71 @@ inline bool NextChar(std::string_view text, size_t pos, char32_t* out) {
 }
 
 // A typed token must stand on its own: not inside a longer digit run and not
-// next to a number mark. A kanji numeral after it is allowed because it may be
-// the unit of the number (3億, 5百円).
+// joined to another number by a mark. A kanji numeral after it is allowed
+// because it may be the unit of the number (3億, 5百円); one before it is
+// allowed because it may be read from kana (いち2 -> 一2). A mark that only
+// ends a sentence (1. / 1,) does not join anything.
 inline bool MatchesAt(std::string_view text, size_t pos, size_t length) {
   char32_t c;
-  if (PreviousChar(text, pos, &c) &&
-      (IsDigit(c) || IsKanjiNumeral(c) || IsNumberMark(c))) {
+  if (PreviousChar(text, pos, &c) && (IsDigit(c) || IsNumberMark(c))) {
     return false;
   }
-  if (NextChar(text, pos + length, &c) && (IsDigit(c) || IsNumberMark(c))) {
-    return false;
+  if (NextChar(text, pos + length, &c)) {
+    if (IsDigit(c)) return false;
+    if (IsNumberMark(c)) {
+      char32_t after;
+      if (NextChar(text, pos + length + Utf8Length(static_cast<unsigned char>(
+                                            text[pos + length])),
+                   &after) &&
+          (IsDigit(after) || IsKanjiNumeral(after))) {
+        return false;
+      }
+    }
   }
   return true;
+}
+
+inline bool EndsWithPercent(std::string_view typed) {
+  return (!typed.empty() && typed.back() == '%') ||
+         (typed.size() >= 3 && typed.substr(typed.size() - 3) == "％");
+}
+
+inline std::string_view WithoutPercent(std::string_view typed) {
+  if (typed.size() >= 3 && typed.substr(typed.size() - 3) == "％") {
+    return typed.substr(0, typed.size() - 3);
+  }
+  if (!typed.empty() && typed.back() == '%') return typed.substr(0, typed.size() - 1);
+  return typed;
+}
+
+constexpr std::string_view kPercentWord = "パーセント";
+
+// Finds |typed| in |candidate| from |from|, standing alone. A typed percent
+// (10%) is also met by the word spelling (10パーセント). Sets |end| to the
+// end of the matched text.
+inline bool FindTyped(std::string_view candidate, std::string_view typed,
+                      size_t from, size_t* end) {
+  size_t pos = candidate.find(typed, from);
+  while (pos != std::string_view::npos) {
+    if (MatchesAt(candidate, pos, typed.size())) {
+      *end = pos + typed.size();
+      return true;
+    }
+    pos = candidate.find(typed, pos + 1);
+  }
+  if (!EndsWithPercent(typed)) return false;
+  const std::string_view bare = WithoutPercent(typed);
+  if (bare.empty()) return false;
+  pos = candidate.find(bare, from);
+  while (pos != std::string_view::npos) {
+    if (MatchesAt(candidate, pos, bare.size()) &&
+        candidate.substr(pos + bare.size(), kPercentWord.size()) == kPercentWord) {
+      *end = pos + bare.size() + kPercentWord.size();
+      return true;
+    }
+    pos = candidate.find(bare, pos + 1);
+  }
+  return false;
 }
 
 inline bool KeepsTypedDigits(std::string_view key, std::string_view candidate) {
@@ -167,17 +233,9 @@ inline bool KeepsTypedDigits(std::string_view key, std::string_view candidate) {
     if (!TokenHasDigit(key, token)) continue;
     const std::string_view typed =
         key.substr(token.begin, token.end - token.begin);
-    size_t pos = candidate.find(typed, from);
-    bool found = false;
-    while (pos != std::string_view::npos) {
-      if (MatchesAt(candidate, pos, typed.size())) {
-        found = true;
-        break;
-      }
-      pos = candidate.find(typed, pos + 1);
-    }
-    if (!found) return false;
-    from = pos + typed.size();
+    size_t end = 0;
+    if (!FindTyped(candidate, typed, from, &end)) return false;
+    from = end;
   }
   return true;
 }
@@ -355,6 +413,16 @@ inline bool CandidateIndices(size_t candidate_count, const std::vector<Token>& t
   return true;
 }
 
+// Length of the word パーセント at |pos| when the typed number ends with a
+// percent mark (the mark and the word must not both be written).
+inline size_t PercentWordLength(std::string_view typed, std::string_view candidate,
+                                size_t pos) {
+  if (!EndsWithPercent(typed)) return 0;
+  return candidate.substr(pos, kPercentWord.size()) == kPercentWord
+             ? kPercentWord.size()
+             : 0;
+}
+
 // Puts the key's typed number tokens into candidate, leaving the other text
 // alone. False when the tokens cannot be placed without guessing.
 inline bool ReplaceWithTypedDigits(std::string_view key, std::string_view candidate,
@@ -370,10 +438,13 @@ inline bool ReplaceWithTypedDigits(std::string_view key, std::string_view candid
   // A decimal read with 点 or ・ between the digits (三点一四 for 3.14): the
   // gap must be only that mark, so 九百八十円と二 (a gap of 円と) is not taken.
   bool key_has_mark = false;
+  bool key_has_comma = false;
   for (size_t i = typed[0].begin; i < typed[0].end;) {
     const size_t len = Utf8Length(static_cast<unsigned char>(key[i]));
     const size_t end = i + len <= typed[0].end ? i + len : typed[0].end;
-    if (IsNumberMark(Decode(key.data() + i, end - i))) key_has_mark = true;
+    const char32_t mark = Decode(key.data() + i, end - i);
+    if (IsNumberMark(mark)) key_has_mark = true;
+    if (mark == U',' || mark == 0xFF0C) key_has_comma = true;
     i = end;
   }
   if (key_has_mark && typed.size() == 1 && candidate_tokens.size() > 1) {
@@ -382,14 +453,21 @@ inline bool ReplaceWithTypedDigits(std::string_view key, std::string_view candid
       const std::string_view gap(
           candidate.data() + candidate_tokens[i - 1].end,
           candidate_tokens[i].begin - candidate_tokens[i - 1].end);
-      if (gap != "点" && gap != "．" && gap != "." && gap != "・") {
+      const bool comma_gap = gap == "、" || gap == "，" || gap == ",";
+      if (gap != "点" && gap != "．" && gap != "." && gap != "・" &&
+          !(key_has_comma && comma_gap)) {
         decimal_marks = false;
       }
     }
     if (decimal_marks) {
       std::string result(candidate.substr(0, candidate_tokens.front().begin));
-      result.append(key.substr(typed[0].begin, typed[0].end - typed[0].begin));
-      result.append(candidate.substr(candidate_tokens.back().end));
+      const std::string_view typed_value =
+          key.substr(typed[0].begin, typed[0].end - typed[0].begin);
+      result.append(typed_value);
+      result.append(candidate.substr(
+          candidate_tokens.back().end +
+          PercentWordLength(typed_value, candidate,
+                            candidate_tokens.back().end)));
       *out = std::move(result);
       return true;
     }
@@ -418,6 +496,9 @@ inline bool ReplaceWithTypedDigits(std::string_view key, std::string_view candid
       ReplaceNumberToken(typed_value, value, &replaced);
       result.append(replaced);
       ++next;
+      // 10% already says パーセント: drop the word after the number.
+      at = token.end + PercentWordLength(typed_value, candidate, token.end);
+      continue;
     } else {
       result.append(value);
     }

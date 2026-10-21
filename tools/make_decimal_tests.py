@@ -176,6 +176,17 @@ for number, kana, want, tail_kana, tail_kanji in [
 ]:
     add("数字とかなの数", N(number), (kana, want), (tail_kana, tail_kanji))
 
+# ---- かなで打った漢数字の語のすぐあとに、打った算用数字が続く形（いち2、にじゅう20）。
+# かなの数は漢字のまま、打った数字は数字のまま。かなの数を消して数字だけにしない。
+for kana_number, kanji_number, number, tail_kana, tail_kanji in [
+    ("いち", "一", "2", "かいめです。", "回目です。"),
+    ("にじゅう", "二十", "20", "ねんまえのはなしです。", "年前の話です。"),
+    ("はちじゅう", "八十", "80", "えんのほんです。", "円の本です。"),
+    ("さん", "三", "10", "ばんめです。", "番目です。"),
+    ("ご", "五", "7", "かいです。", "回です。"),
+]:
+    add("数字とかなの数", (kana_number, kanji_number), N(number), (tail_kana, tail_kanji))
+
 # ---- 英語まじり（英単語を含む文は日本語の部分を別に読み直す道を通る）
 ENGLISH = [("python", "Python"), ("windows", "Windows"), ("google", "Google"), ("chrome", "Chrome"),
            ("linux", "Linux"), ("android", "Android")]

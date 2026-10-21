@@ -42,6 +42,24 @@ def unit_skeleton(text):
     return "".join(out)
 
 
+KANJI_DIGITS = set("〇零一二三四五六七八九十百千万億兆")
+
+
+def lead_skeleton(text):
+    """算用数字のすぐ前にある漢数字だけを取り出す（二十20 → 二十、3億 → 空）。
+    かなで打った漢数字の語が、打った数字のとなりで消えていないかを見る。"""
+    out = []
+    run = []
+    for c in text.translate(FULL):
+        if c in KANJI_DIGITS:
+            run.append(c)
+        else:
+            if c in DIGITS and run:
+                out.append("".join(run))
+            run = []
+    return "|".join(out)
+
+
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     flags = {a for a in sys.argv[1:] if a.startswith("--")}
@@ -68,7 +86,8 @@ def main():
             continue
         total += 1
         ok = (skeleton(out) == skeleton(want) and
-              unit_skeleton(out) == unit_skeleton(want))
+              unit_skeleton(out) == unit_skeleton(want) and
+              lead_skeleton(out) == lead_skeleton(want))
         if ok and "--halfwidth" in flags and any(c in FULL_FORMS for c in out):
             ok = False
         same += ok
