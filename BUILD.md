@@ -57,6 +57,8 @@ python tools/build_ut_dictionary.py --mozc <src> --ut <ut-dir> --sources sudachi
 
 大文字を含む英字の固有名詞（`tools/data/proper-nouns.tsv`、Wikidata の CC0 データ）の作り直し: `fetch_wikidata_names.py --out <dir>`（Wikidata の問い合わせサービスと Wikimedia の API から取得。約1時間）、続けて `build_proper_nouns.py`（`--wikidata <dir>` ほか。詳しくは冒頭の説明。英語の検出器の試し用 `native/jaen-detector/jaen_trial.cc` が要る）。日本語だけの文のローマ字と英単語まじりの文は `make_japanese_romaji_corpus.py` で作る。
 
+小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）: 一覧は `tools/data/acronyms.tsv`（型 a: ローマ字として読めない並び、型 b: 日本語に読める並び）、型 b を文の中で先頭にする手がかりは `tools/data/acronym-cues.tsv`。型 b の表は `python tools/build_acronym_table.py` が `native/jaen-detector/jaen_detector.cc` に書く（`--check` で一覧との食い違いを確かめる）。読みの候補への入れ方は `build_proper_noun_dictionary.py --acronyms`（作り物の辞書の試験は `python tools/acronym_dictionary_test.py`）。試験の文は `python tools/make_acronym_tests.py` で作り直す（`tests/conversion/acronyms*.tsv`、流す組は `tools/run_tests.sh` の `r`）。Mozc なしの前後比べは `python tools/acronym_probe.py --before <git の版>`（検出器の単体試験は `native/jaen-detector/jaen_detector_test.cc`。g++ なら `g++ -std=c++20 -include algorithm -I native/jaen-detector native/jaen-detector/{jaen_detector,jaen_choices,correction_log,jaen_typo,jaen_detector_test}.cc`）。
+
 ## 4. precision117 エンジンを重ねる
 
 ```

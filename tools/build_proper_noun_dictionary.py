@@ -16,9 +16,17 @@ It never takes the first place from what Mozc already has:
   the name never wins in a sentence over Mozc's own words (an earlier 8200 turned たいら into Tyla and
   カップヌードル into Cup Noodles) and is only a candidate of its reading.
 A (reading, spelling) pair Mozc already has is skipped. Readings shorter than 3 kana are not used.
+
+--acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
+the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (2 or 3): its
+cost lies between the (rank - 1)th and the rank-th cheapest entries of the reading, with the part of speech of the
+cheapest entry, so it never wins a sentence over that entry (愛 stays first for あい). A reading no word has gets
+--default-cost. (The reading あい of AI in proper-nouns.tsv is skipped by the 3-kana rule; this is what makes AI
+a candidate of あい.)
 """
 import argparse
 import re
+from collections import defaultdict
 from pathlib import Path
 
 HIRAGANA = re.compile(r"[ぁ-ゖー]+")
@@ -49,6 +57,7 @@ def main():
     parser.add_argument("--penalty", type=int, default=10)
     parser.add_argument("--margin", type=int, default=2000)
     parser.add_argument("--default-cost", type=int, default=15000)
+    parser.add_argument("--acronyms", type=Path, help="tools/data/acronyms.tsv (type b rows: reading and rank)")
     parser.add_argument("--install", action="store_true")
     args = parser.parse_args()
 
@@ -57,6 +66,17 @@ def main():
     for line in (data / "id.def").read_text(encoding="utf-8").splitlines():
         number, _, pos = line.partition(" ")
         ids.setdefault(pos, number)
+    acronyms = []  # (shown, reading, rank) of the acronyms that read as Japanese words
+    if args.acronyms:
+        for line in args.acronyms.read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if line.startswith("#") or len(f) < 6 or f[2] != "b":
+                continue
+            if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("2", "3"):
+                raise SystemExit(f"bad acronym row: {line}")
+            acronyms.append((f[1], f[3], int(f[5])))
+    wanted = {reading for _, reading, _ in acronyms}
+    reading_entries = defaultdict(list)  # reading -> [(cost, lid, rid)] of Mozc's own entries, for the acronyms
     existing = set()
     katakana_entries = {}  # (reading, katakana) -> (lid, rid, cost)
     max_cost, min_cost = {}, {}
@@ -69,6 +89,8 @@ def main():
                 continue
             reading, lid, rid, cost, surface = f[0], int(f[1]), int(f[2]), int(f[3]), f[4]
             existing.add((reading, surface))
+            if reading in wanted:
+                reading_entries[reading].append((cost, lid, rid))
             max_cost[reading] = max(max_cost.get(reading, 0), cost)
             min_cost[reading] = min(min_cost.get(reading, 1 << 30), cost)
             if surface == katakana(reading):  # the reading written in katakana, as the name is usually written
@@ -99,6 +121,22 @@ def main():
             key = (reading, shown)
             if key not in entries or cost < entries[key][2]:
                 entries[key] = (lid, rid, cost)
+
+    for shown, reading, rank in acronyms:
+        if (reading, shown) in existing:
+            continue
+        found = sorted(reading_entries.get(reading, []))
+        if not found:
+            pos = int(ids[POS["other"]])
+            entries[(reading, shown)] = (pos, pos, args.default_cost)
+            continue
+        costs = [c for c, _, _ in found]
+        if len(costs) >= rank:  # between the (rank - 1)th and the rank-th cheapest
+            lo, hi = costs[rank - 2], costs[rank - 1]
+            cost = lo + (hi - lo) // 2 if hi - lo >= 2 else hi
+        else:
+            cost = costs[-1] + 100
+        entries[(reading, shown)] = (found[0][1], found[0][2], cost)
 
     with args.out.open("w", encoding="utf-8", newline="\n") as out:
         for (reading, shown), (lid, rid, cost) in sorted(entries.items()):

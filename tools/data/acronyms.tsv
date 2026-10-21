@@ -1,0 +1,238 @@
+# 小文字で打たれやすい英字の略語（大文字で書くもの）の一覧。2026-10-21 作成。自作（試験データ・変換結果は見ていない）。
+# 列: 打つ形（小文字）<TAB>表示する形<TAB>型<TAB>かなの読み<TAB>方式<TAB>候補の順位<TAB>追加の手がかり（かな、コンマ区切り）
+# 型 a: ローマ字として読めない並び（api、url、cpu、html、it、ok、id ...）。打った並びに英字が残る（あぴ、く、ぷ）ので、
+#   英語の検出器（native/jaen-detector）が英語として取り、表示の形（API、URL）を先頭に出す。語の一覧は jaen-modern-words.tsv か
+#   brand-casing.tsv など（tools/build_acronym_table.py --check が、この一覧と食い違わないかを確かめる）。
+# 型 b: ローマ字として日本語に読める並び（ai: あい、ui: うい ...）。日本語の語と重なる。
+#   方式 cue: 略語の次に助詞（を・が・は・で・に・の・と・も）が続き、その次が acronym-cues.tsv か追加の手がかりで始まるときだけ略語にする
+#   方式 plain: 日本語の語としてはほぼ使わない並び（seo、ipo）。助詞か文の終わり・句読点が続くとき略語にする。
+#     既存の試験の文（13,553文）で、ime（三回目の）、ipa（タイパを）、gui（手ぬぐいの）、roe（心得に）、eu、agi が日本語の文を壊したので、
+#     それらは方式 cue（ime、gui）にするか、一覧から外した
+#   方式 rank: 文の中の規則は使わず、読みの候補の順位だけ（辞書の費用。tools/build_proper_noun_dictionary.py --acronyms）
+#   順位: 読みの候補の中で何番目に出すか（辞書にある語の費用の間に入れる）。2 か 3
+aed	AED	a				
+amd	AMD	a				
+apec	APEC	a				
+api	API	a				
+ar	AR	a				
+asap	ASAP	a				
+atm	ATM	a				
+aws	AWS	a				
+bbs	BBS	a				
+bcm	BCM	a				
+bgm	BGM	a				
+bim	BIM	a				
+bmi	BMI	a				
+bmw	BMW	a				
+btob	BtoB	a				
+btoc	BtoC	a				
+btw	BTW	a				
+byod	BYOD	a				
+cad	CAD	a				
+cdn	CDN	a				
+ceo	CEO	a				
+cfo	CFO	a				
+cgi	CGI	a				
+cio	CIO	a				
+cli	CLI	a				
+cm	CM	a				
+cmo	CMO	a				
+cms	CMS	a				
+cnn	CNN	a				
+coo	COO	a				
+cpi	CPI	a				
+cpu	CPU	a				
+crm	CRM	a				
+css	CSS	a				
+csv	CSV	a				
+cto	CTO	a				
+cui	CUI	a				
+dao	DAO	a				
+db	DB	a				
+diy	DIY	a				
+dl	DL	a				
+dlc	DLC	a				
+dm	DM	a				
+dna	DNA	a				
+dns	DNS	a				
+docx	DOCX	a				
+dvd	DVD	a				
+dx	DX	a				
+ecs	ECS	a				
+eks	EKS	a				
+eps	EPS	a				
+erp	ERP	a				
+esg	ESG	a				
+esim	eSIM	a				
+etf	ETF	a				
+etl	ETL	a				
+ev	EV	a				
+faq	FAQ	a				
+fcv	FCV	a				
+fhd	FHD	a				
+fps	FPS	a				
+ftp	FTP	a				
+fyi	FYI	a				
+gcp	GCP	a				
+gdp	GDP	a				
+gdpr	GDPR	a				
+gif	GIF	a				
+gps	GPS	a				
+gpt	GPT	a				
+gpu	GPU	a				
+grpc	gRPC	a				
+guid	GUID	a				
+hdd	HDD	a				
+hdmi	HDMI	a				
+hdr	HDR	a				
+hr	HR	a				
+html	HTML	a				
+http	HTTP	a				
+https	HTTPS	a				
+iam	IAM	a				
+ibm	IBM	a				
+icu	ICU	a				
+id	ID	a				
+imf	IMF	a				
+ioc	IOC	a				
+ios	iOS	a				
+iot	IoT	a				
+it	IT	a				
+jal	JAL	a				
+jas	JAS	a				
+jis	JIS	a				
+jlpt	JLPT	a				
+jpg	JPG	a				
+jr	JR	a				
+json	JSON	a				
+kddi	KDDI	a				
+kgi	KGI	a				
+kpi	KPI	a				
+lan	LAN	a				
+lcd	LCD	a				
+led	LED	a				
+lgbt	LGBT	a				
+llm	LLM	a				
+lol	LOL	a				
+lte	LTE	a				
+mba	MBA	a				
+mcp	MCP	a				
+mdm	MDM	a				
+ml	ML	a				
+mlb	MLB	a				
+mms	MMS	a				
+mri	MRI	a				
+mvc	MVC	a				
+mvp	MVP	a				
+nas	NAS	a				
+nec	NEC	a				
+nfc	NFC	a				
+nfl	NFL	a				
+nft	NFT	a				
+ng	NG	a				
+nhk	NHK	a				
+nlp	NLP	a				
+npc	NPC	a				
+ntt	NTT	a				
+nvidia	NVIDIA	a				
+ocr	OCR	a				
+oecd	OECD	a				
+ok	OK	a				
+okr	OKR	a				
+omg	OMG	a				
+opec	OPEC	a				
+orm	ORM	a				
+os	OS	a				
+oss	OSS	a				
+ott	OTT	a				
+pbr	PBR	a				
+pc	PC	a				
+pcr	PCR	a				
+pdf	PDF	a				
+php	PHP	a				
+phv	PHV	a				
+plc	PLC	a				
+pm	PM	a				
+png	PNG	a				
+poc	PoC	a				
+pptx	PPTX	a				
+pr	PR	a				
+pwa	PWA	a				
+qa	QA	a				
+qol	QOL	a				
+qr	QR	a				
+rds	RDS	a				
+rl	RL	a				
+rna	RNA	a				
+rnn	RNN	a				
+roas	ROAS	a				
+rpa	RPA	a				
+rpc	RPC	a				
+rpg	RPG	a				
+rss	RSS	a				
+saas	SaaS	a				
+sdg	SDG	a				
+sdgs	SDGs	a				
+sdk	SDK	a				
+sfa	SFA	a				
+sim	SIM	a				
+sla	SLA	a				
+slo	SLO	a				
+sms	SMS	a				
+sns	SNS	a				
+sos	SOS	a				
+spa	SPA	a				
+spi	SPI	a				
+sql	SQL	a				
+ssd	SSD	a				
+ssh	SSH	a				
+ssl	SSL	a				
+ssr	SSR	a				
+svg	SVG	a				
+tbd	TBD	a				
+tcp	TCP	a				
+tdd	TDD	a				
+tls	TLS	a				
+toefl	TOEFL	a				
+toeic	TOEIC	a				
+toml	TOML	a				
+tpu	TPU	a				
+tsv	TSV	a				
+tv	TV	a				
+udp	UDP	a				
+uhd	UHD	a				
+uk	UK	a				
+ups	UPS	a				
+url	URL	a				
+usb	USB	a				
+utf	UTF	a				
+uuid	UUID	a				
+ux	UX	a				
+vip	VIP	a				
+vod	VOD	a				
+vpc	VPC	a				
+vpn	VPN	a				
+vps	VPS	a				
+vr	VR	a				
+wfh	WFH	a				
+wifi	Wi-Fi	a				
+wto	WTO	a				
+xlsx	XLSX	a				
+xml	XML	a				
+xr	XR	a				
+yaml	YAML	a				
+ai	AI	b	あい	cue	3	
+ui	UI	b	うい	cue	3	ひょうじ,でざいん,がめん,ぼたん,かいぜん,へんこう
+ide	IDE	b	いで	cue	3	せってい,きどう,ぷらぐいん,いんすとーる
+iso	ISO	b	いそ	cue	3	にんしょう,しゅとく,きかく,きじゅん,しんさ
+roi	ROI	b	ろい	cue	3	けいさん,さんしゅつ,とうし,さいだいか
+usa	USA	b	うさ	rank	3	
+ana	ANA	b	あな	rank	3	
+ime	IME	b	いめ	cue	3	きりかえ,せってい,にゅうりょく,へんかん
+ipo	IPO	b	いぽ	plain	3	
+seo	SEO	b	せお	plain	3	
+uae	UAE	b	うあえ	plain	3	
+nasa	NASA	b	なさ	rank	3	
+gui	GUI	b	ぐい	cue	3	そうさ,ひょうじ,せってい,さくせい,かいはつ
+fifa	FIFA	b	ふぃふぁ	plain	3	
+gafa	GAFA	b	がふぁ	plain	3	
