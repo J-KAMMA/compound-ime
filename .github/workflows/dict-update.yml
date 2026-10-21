@@ -1,0 +1,312 @@
+# 辞書の自動更新（月1回と手動）。docs/dict-update.md
+#
+#   data    固有名詞（Wikidata）を取り直し、追加の辞書（supplement.tsv）と英語の一覧（english-extra.tsv）を作り、
+#           目録を作って署名する。取り直した一覧の行数が、いまの一覧から大きく外れたらここで止める。
+#   test    変換の試験（linux-test.yml）を、同じ変換エンジンで「いまの辞書」と「新しい辞書」の両方で流す。
+#           同時に流す数は linux-test.yml の max-parallel: 16。
+#   gate    2つの結果を比べる（tools/dict_quality_gate.py。基準は tools/data/dict-gate.json）。
+#   publish 悪くならなかったときだけ、下書きの配布ページ dict-YYYYMMDD に置く（公開はしない。公開は dict-publish.yml を手で流す）。
+#   notify  置かなかったときは issue で知らせる。
+# 署名の鍵: GitHub の secret DICT_SIGNING_KEY（tools/make_dict_release.py keygen の秘密鍵）。公開鍵は tools/dict-update/public-key.txt。
+name: Dictionary update
+
+on:
+  schedule:
+    - cron: '17 3 1 * *'   # 毎月1日 03:17（UTC）
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 配布物の版（年月日の8桁。空なら今日（UTC））
+        default: ''
+      refetch:
+        description: Wikidata から固有名詞を取り直す（false にすると、リポジトリの今の proper-nouns.tsv で作る。流れだけを短く確かめるとき）
+        type: boolean
+        default: true
+      groups:
+        description: 新しい辞書を比べる試験の組（JSON の配列。空なら既定）
+        default: ''
+
+concurrency:
+  group: dict-update
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  data:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 330
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: repo
+
+      - id: v
+        name: 版
+        run: |
+          set -eo pipefail
+          V="${{ inputs.version }}"
+          [ -n "$V" ] || V=$(date -u +%Y%m%d)
+          echo "$V" | grep -Eq '^[0-9]{8}$' || { echo "版は年月日の8桁: $V"; exit 1; }
+          echo "version=$V" >> $GITHUB_OUTPUT
+
+      - name: 道具と、署名の鍵の確かめ（長い作業の前に）
+        env:
+          DICT_SIGNING_KEY: ${{ secrets.DICT_SIGNING_KEY }}
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          sudo apt-get update -qq && sudo apt-get install -y -qq g++ > /dev/null
+          python3 -m venv $W/venv && $W/venv/bin/pip -q install pillow cryptography
+          $W/venv/bin/python $W/repo/tools/make_dict_release.py check-key --public-key-file $W/repo/tools/dict-update/public-key.txt
+
+      - name: 辞書の更新の単体試験（Mozc なし）
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE
+          bash $W/repo/tools/run_dict_update_unit_tests.sh $W/venv/bin/python $RUNNER_TEMP/dict-update-test
+
+      # 組み立ての元の木（linux-test.yml と同じ手順）。追加の辞書の費用と品詞は、この木の辞書に合わせて決まる
+      - name: 上流のソースと土台の改修、生成器と改造の適用
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python
+          git clone -q https://github.com/unok/myime.git myime
+          git -C myime checkout -q a8486eca5312556ff88fed7f1850a28843b67977
+          git -C myime submodule update -q --init --recursive
+          git -C myime/mozc apply --whitespace=nowarn $W/repo/patches/mozc-base.patch
+          git -C myime apply --whitespace=nowarn $W/repo/patches/myime-engine.patch
+          $PY $W/repo/tools/build_english_lexicon.py --out $W/lex
+          mkdir -p $W/ut
+          curl -fsSL -o $W/ut/mozcdic-ut-sudachidict.txt.bz2 \
+            https://raw.githubusercontent.com/utuhiro78/mozcdic-ut-sudachidict/c686771bada1d59e9b105c81b29e6ac1a239cb54/mozcdic-ut-sudachidict.txt.bz2
+          echo "d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc  $W/ut/mozcdic-ut-sudachidict.txt.bz2" | sha256sum -c
+          bunzip2 -k $W/ut/mozcdic-ut-sudachidict.txt.bz2
+          $PY $W/repo/tools/build_ut_dictionary.py --mozc $S --ut $W/ut --sources sudachidict --out $W/dictionary10.txt --install
+          cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
+          cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
+          $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
+          $PY $W/repo/tools/apply_dict_update.py $S
+
+      - name: 英語の検出器の試し用（jaen_trial）、ローマ字の表、日本語のローマ字の文
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; D=$W/repo/tools/data; PY=$W/venv/bin/python
+          g++ -std=c++20 -O2 -I $W/repo/native/jaen-detector $W/repo/native/jaen-detector/jaen_trial.cc $W/repo/native/jaen-detector/jaen_detector.cc -o $W/jaen_trial
+          curl -fsSL -o $W/romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  $W/romanji-hiragana.tsv" | sha256sum -c
+          # 英語の検出器に渡す語の一覧の場所（build_english_lexicon.py の出力に、tools/data の語の一覧を足す）
+          mkdir -p $W/lexq $W/trialwork $W/work
+          cp $W/lex/*.txt $W/lexq/
+          cp $D/english-joined.txt $W/lexq/joined.txt; cp $D/english-phrases.txt $W/lexq/phrases.txt; cp $D/hepburn-places.tsv $W/lexq/places.tsv
+          cp $W/romanji-hiragana.tsv $W/trialwork/romaji.tsv
+          # Mozc の辞書にある読み（かな）。この読みの語が固有名詞と重なるかを見るのに使う
+          cut -f1 $S/data/dictionary_oss/dictionary0*.txt $S/data/dictionary_oss/dictionary1[0-3].txt | sort -u > $W/trialwork/readings.txt
+          $PY $W/repo/tools/make_japanese_romaji_corpus.py --table $W/romanji-hiragana.tsv --dictionary-dir $S/data/dictionary_oss --out $W/corpus-ja.txt
+          $PY $W/repo/tools/make_japanese_romaji_corpus.py --table $W/romanji-hiragana.tsv --dictionary-dir $S/data/dictionary_oss \
+            --english-words $W/lex/common-words.txt --out $W/corpus-mixed.txt
+
+      - name: 固有名詞を Wikidata から取り直す（1時間ほど）
+        # 手動で refetch を false にしたとき以外（月1回の自動のときは inputs が空）は取り直す
+        if: ${{ github.event_name == 'schedule' || inputs.refetch }}
+        run: |
+          set -eo pipefail
+          $GITHUB_WORKSPACE/venv/bin/python $GITHUB_WORKSPACE/repo/tools/fetch_wikidata_names.py --out $GITHUB_WORKSPACE/wikidata
+
+      - name: 固有名詞の一覧を作り直す
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python
+          mkdir -p $W/new
+          if [ "${{ inputs.refetch }}" = "false" ]; then
+            cp $W/repo/tools/data/proper-nouns.tsv $W/new/proper-nouns.tsv
+          else
+            $PY $W/repo/tools/build_proper_nouns.py --wikidata $W/wikidata --mozc-dictionaries $S/data/dictionary_oss \
+              --ut $W/ut/mozcdic-ut-sudachidict.txt --table $W/romanji-hiragana.tsv --lexicon $W/lexq --trial $W/jaen_trial \
+              --trial-work $W/trialwork --corpus $W/corpus-ja.txt $W/corpus-mixed.txt --out $W/new/proper-nouns.tsv --work $W/work
+          fi
+          wc -l $W/new/proper-nouns.tsv
+
+      - name: 追加の辞書と英語の一覧を作る。いまの一覧（本体に焼き込んである分）と行数を比べる
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
+          # 新しい一覧から
+          $PY $T/build_proper_noun_dictionary.py --mozc $S --names $W/new/proper-nouns.tsv --acronyms $T/data/acronyms.tsv --out $W/new/supplement.tsv
+          $PY $T/build_english_extra.py --proper-nouns $W/new/proper-nouns.tsv --out $W/new/english-extra.tsv
+          # いまの一覧（リポジトリのもの。supplement は本体に焼き込んだ dictionary14.txt と同じ作り方）
+          mkdir -p $W/old
+          cp $T/data/proper-nouns.tsv $W/old/proper-nouns.tsv
+          cp $S/data/dictionary_oss/dictionary14.txt $W/old/supplement.tsv
+          $PY $T/build_english_extra.py --out $W/old/english-extra.tsv
+          # 止める基準 その1（試験を流す前に）
+          $PY $T/dict_quality_gate.py data --old-dir $W/old --new-dir $W/new --summary $W/gate-data.md
+
+      - name: 目録を作って署名する
+        env:
+          DICT_SIGNING_KEY: ${{ secrets.DICT_SIGNING_KEY }}
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
+          read POS_SHA POS_COUNT < <($PY $T/make_dict_release.py pos-info $S/data/dictionary_oss/id.def)
+          V=${{ steps.v.outputs.version }}
+          $PY $T/make_dict_release.py build --supplement $W/new/supplement.tsv --english $W/new/english-extra.tsv \
+            --version $V --pos-table-sha $POS_SHA --pos-count $POS_COUNT \
+            --url-base https://github.com/${{ github.repository }}/releases/download/dict-$V --out $W/release
+          PUB=$(grep -v '^#' $T/dict-update/public-key.txt | grep -v '^$' | head -1)
+          $PY $T/make_dict_release.py verify $W/release --public-key $PUB --pos-table-sha $POS_SHA --pos-count $POS_COUNT
+          mkdir -p $W/sources && cp $W/new/proper-nouns.tsv $W/gate-data.md $W/sources/
+          cat $W/release/manifest.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dict-release
+          path: release/
+          retention-days: 30
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dict-sources
+          path: sources/
+          retention-days: 30
+
+  # 変換の試験を、同じ変換エンジンで「いまの辞書」と「新しい辞書」の両方で流す（組の数 × 2。同時に16まで）
+  test:
+    needs: data
+    uses: ./.github/workflows/linux-test.yml
+    permissions:
+      contents: write
+    with:
+      groups: ${{ inputs.groups || '["a1","a2","b","e1","e2","g","h","k","m","r"]' }}
+      dict_candidate: dict-release
+
+  gate:
+    needs: [data, test]
+    if: ${{ !cancelled() && needs.data.result == 'success' }}
+    runs-on: ubuntu-24.04
+    outputs:
+      passed: ${{ steps.gate.outputs.passed }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-results
+          path: base
+        continue-on-error: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: linux-results-cand
+          path: cand
+        continue-on-error: true
+      - uses: actions/download-artifact@v4
+        with:
+          name: dict-sources
+          path: sources
+      - id: gate
+        name: 止める基準 その2（いまの辞書と新しい辞書の試験の結果を比べる）
+        run: |
+          mkdir -p base cand
+          # 試験の組のどれかが落ちたときは、結果がそろっていない。比べる前に止める
+          TEST_RESULT="${{ needs.test.result }}"
+          set +e
+          python3 tools/dict_quality_gate.py scores --base base --cand cand --summary gate-report.md --json gate.json
+          RC=$?
+          set -e
+          if [ "$TEST_RESULT" != "success" ]; then
+            echo "" >> gate-report.md
+            echo "**試験の組のどれかが最後まで流れませんでした（結果: $TEST_RESULT）。辞書は置きません。**" >> gate-report.md
+            RC=1
+          fi
+          { echo; echo '### 取り直した一覧の行数'; echo; sed -n '3,$p' sources/gate-data.md; } >> gate-report.md
+          cat gate-report.md >> $GITHUB_STEP_SUMMARY
+          if [ $RC -eq 0 ]; then echo "passed=true" >> $GITHUB_OUTPUT; else echo "passed=false" >> $GITHUB_OUTPUT; fi
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dict-gate-report
+          path: gate-report.md
+          if-no-files-found: ignore
+
+  # 悪くならなかったときだけ、下書きの配布ページに置く。公開は、中身を見てから dict-publish.yml を手で流す。
+  publish:
+    needs: [data, test, gate]
+    if: ${{ needs.gate.outputs.passed == 'true' && needs.test.result == 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dict-release
+          path: release
+      - uses: actions/download-artifact@v4
+        with:
+          name: dict-sources
+          path: sources
+      - uses: actions/download-artifact@v4
+        with:
+          name: dict-gate-report
+          path: report
+      - name: 下書きの配布ページ dict-YYYYMMDD に置く
+        run: |
+          set -eo pipefail
+          V=${{ needs.data.outputs.version }}
+          {
+            echo "辞書の自動更新（$V）。**下書き**です（公開は、中身を見てから Actions の「Dictionary publish」を手で流す）。"
+            echo
+            echo "- manifest.txt / manifest.txt.sig: 目録と署名（Ed25519）。本体はこれを見て、辞書を取って入れ替えます"
+            echo "- supplement.tsv: 追加の辞書（固有名詞と、日本語に読める略語の読み）"
+            echo "- english-extra.tsv: 英語の一覧（英単語、名前、言い回し、表示の形）"
+            echo "- proper-nouns.tsv: 作り直した固有名詞の一覧（次の版の本体に焼き込むときは tools/data/proper-nouns.tsv に入れる）"
+            echo "- gate-report.md: いまの辞書と比べた試験の結果"
+            echo
+            echo "元の実行: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          } > notes.md
+          gh release create "dict-$V" --repo ${{ github.repository }} --draft --latest=false \
+            --title "辞書 $V（下書き）" --notes-file notes.md \
+            release/manifest.txt release/manifest.txt.sig release/supplement.tsv release/english-extra.tsv \
+            sources/proper-nouns.tsv report/gate-report.md
+
+  # 置かなかったとき（取得や作成の失敗、基準に届かない、試験が流れない）は issue で知らせる
+  notify:
+    needs: [data, test, gate, publish]
+    if: ${{ always() && !cancelled() && needs.publish.result != 'success' }}
+    runs-on: ubuntu-24.04
+    permissions:
+      issues: write
+      contents: read
+    env:
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: dict-gate-report
+          path: report
+        continue-on-error: true
+      - name: issue を作る
+        run: |
+          set -eo pipefail
+          V="${{ needs.data.outputs.version }}"; [ -n "$V" ] || V=$(date -u +%Y%m%d)
+          {
+            echo "辞書の自動更新（$V）は、辞書を配布ページに置きませんでした。"
+            echo
+            echo "| 段 | 結果 |"
+            echo "|---|---|"
+            echo "| data（作る・署名） | ${{ needs.data.result }} |"
+            echo "| test（変換の試験） | ${{ needs.test.result }} |"
+            echo "| gate（いまの辞書と比べる） | ${{ needs.gate.result }}（通ってよい: ${{ needs.gate.outputs.passed }}） |"
+            echo "| publish（下書きの配布ページ） | ${{ needs.publish.result }} |"
+            echo
+            echo "実行: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            echo "data が失敗なら、取得（Wikidata）や作成の失敗、または取り直した一覧の行数がいまの一覧から大きく外れた（止める基準 その1）、または署名の鍵の設定です。"
+            echo "gate が止めたなら、下の表の NG の行が理由です（基準は tools/data/dict-gate.json）。"
+            if [ -f report/gate-report.md ]; then echo; cat report/gate-report.md; fi
+          } > body.md
+          gh label create dict-update --repo ${{ github.repository }} --color 0e8a16 --description "辞書の自動更新" 2>/dev/null || true
+          gh issue create --repo ${{ github.repository }} --title "辞書の自動更新: 置きませんでした（$V）" --label dict-update --body-file body.md
