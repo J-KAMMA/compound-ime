@@ -263,6 +263,8 @@ s)
     )
     local flags=""
     if [ "$config" = half ]; then flags="--halfwidth"; fi
+    # 入力中の表示は変換しないので、漢字の単位（3億）や、かなの漢数字（にじゅう）は見ない
+    if [ "$mode" = preedit ]; then flags="$flags --preedit"; fi
     python3 $REPO/tools/score_decimal.py $T/$name.tsv $OUT/$tag.tsv "$tag" $flags | tee $OUT/$tag-score.txt || fail=1
   }
   for name in decimal decimal-ja; do

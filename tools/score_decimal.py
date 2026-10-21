@@ -85,9 +85,9 @@ def main():
             missing += 1
             continue
         total += 1
-        ok = (skeleton(out) == skeleton(want) and
-              unit_skeleton(out) == unit_skeleton(want) and
-              lead_skeleton(out) == lead_skeleton(want))
+        ok = skeleton(out) == skeleton(want)
+        if "--preedit" not in flags:  # 入力中の表示は変換しないので、単位とかなの漢数字は見ない
+            ok = ok and unit_skeleton(out) == unit_skeleton(want) and lead_skeleton(out) == lead_skeleton(want)
         if ok and "--halfwidth" in flags and any(c in FULL_FORMS for c in out):
             ok = False
         same += ok
