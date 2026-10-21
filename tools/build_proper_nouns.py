@@ -63,6 +63,8 @@ ALIAS_KINDS = {"business", "brand", "software", "app", "website", "videogame", "
                "airline", "sportsteam", "country", "usstate", "city", "region", "island", "mountain", "river",
                "lake", "band", "film", "tvseries", "album", "novel", "character", "proglang", "os", "university",
                "museum"}
+# Hand-added readings: short capital words people type as plain romaji (ai -> あい -> AI).
+EXTRA_READINGS = {"AI": ["あい"]}
 
 
 def hira(text):
@@ -256,6 +258,9 @@ def main():
             kana = rv.to_kana(joined, table)
             # only a reading Mozc has as a word (あまぞん), not what x, l, q or v would make (ぁ, ぃ)
             if kana in known_readings and len(kana) >= 3 and kana not in e["readings"]:
+                e["readings"].append(kana)
+        for kana in EXTRA_READINGS.get(shown, []):
+            if kana not in e["readings"]:
                 e["readings"].append(kana)
         rows.append({"shown": shown, "tokens": tokens, "key": key, "joined": joined, "flags": flags,
                      "kind": e["kind"], "sl": e["sl"], "readings": e["readings"][:3]})
