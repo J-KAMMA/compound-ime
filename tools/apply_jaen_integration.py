@@ -3612,6 +3612,34 @@ edit("converter/converter.cc",
 edit("converter/converter.cc",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading);",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);")
+
+# 打った英字の並びが英単語として読めるなら英語にする: 節: ローマ字として日本語に読める英単語（made、take、same、
+# one）は、前後の読みが日本語として自然かで決める。英語にしていない日本語の部分ごとに、Mozc の辞書と
+# 接続の費用で「全部を日本語の語で読む一番安い費用」と「英単語を入れてよい分け方での一番安い費用」を
+# 比べ、英語のほうが十分（2000、英単語1語だけなら 3500）安いときだけ英語にする。助詞・活用が続いて
+# 日本語として自然に読める文は日本語のまま。中身は native/jaen-detector（jaen_detector.cc の
+# SplitEnglish の |japanese_model|、converter_reading_check.inc の JapanesePrefixCollector）。
+# MYIME_ALL_ENGLISH=off で止める。
+edit("converter/converter.cc",
+     "    return ReadsAsJapanese(modules(), kana) &&\n           ReadingCost(modules(), kana, &reading_cache) < kNaturalReadingCost;\n  };\n",
+     "    return ReadsAsJapanese(modules(), kana) &&\n           ReadingCost(modules(), kana, &reading_cache) < kNaturalReadingCost;\n  };\n"
+     "  // The Japanese dictionary and connection costs, for deciding by context whether a typed word that\n"
+     "  // also reads as Japanese romaji (made, take) is English.\n"
+     "  jaen::JapaneseModel japanese_model;\n"
+     "  japanese_model.prefix_words = [this](std::string_view kana, std::vector<jaen::JapaneseWord>* words) {\n"
+     "    JapanesePrefixCollector collector(words);\n"
+     "    modules().GetDictionary().LookupPrefix(kana, &collector);\n"
+     "  };\n"
+     "  japanese_model.transition = [this](uint16_t rid, uint16_t lid) {\n"
+     "    return modules().GetConnector().GetTransitionCost(rid, lid);\n"
+     "  };\n"
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n")
+edit("converter/converter.cc",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);")
+edit("converter/converter.cc",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);")
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")

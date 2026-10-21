@@ -7,6 +7,7 @@
 #include "correction_log.h"
 #include "jaen_typo.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -227,6 +228,43 @@ int main() {
     with_joined.AddJoined("download");
     const auto one = jaen::SplitEnglish(Parse("downloadshita"), with_joined, Parse);
     Expect(!one.empty() && one[0].english && one[0].spaces.empty(), "a joined word keeps no space");
+  }
+
+  {
+    // 文脈で決める段（JapaneseModel）: ローマ字として日本語に読める英単語は、前後の読みが日本語として
+    // 自然なら日本語のまま、読みが不自然なら（英単語のつながり、英語の隣）英語にする。
+    // 辞書は小さな代わり（かな→費用）、接続の費用は 0。
+    const std::map<std::string, int> costs = {{"きょう", 3000}, {"は", 500}, {"さめ", 6000}, {"たけ", 6000},
+                                              {"を", 300}, {"みた", 3000}, {"で", 300}, {"です", 300}, {"きょうは", 3500}};
+    jaen::JapaneseModel model;
+    model.prefix_words = [&](std::string_view kana, std::vector<jaen::JapaneseWord>* words) {
+      for (const auto& [reading, cost] : costs) {
+        if (kana.substr(0, reading.size()) == reading) words->push_back({reading.size(), 1, 1, cost});
+      }
+    };
+    model.transition = [](uint16_t, uint16_t) { return 0; };
+    jaen::Lexicon context = lexicon;
+    context.Add("time");
+    context.Add("take");
+    context.Add("google", true);
+    const auto decided = [&](std::string_view raw) {
+      return jaen::SplitEnglish(Parse(raw), context, Parse, nullptr, nullptr, nullptr, &model);
+    };
+    const auto decided_text = [&](std::string_view raw) { return Text(raw, decided(raw), true); };
+    Expect(decided_text("samewomita").empty(), "文脈: 助詞が続いて自然に読める same は日本語のまま");
+    Expect(decided_text("kyouhasamewomita").empty(), "文脈: 文の中の same + を は日本語のまま");
+    Expect(decided_text("takewomita").empty(), "文脈: take + を は日本語のまま");
+    Expect(decided_text("kyouhasame").empty(), "文脈: 日本語の文の中の1語だけの same は日本語のまま");
+    Expect(decided_text("sametime") == "sametime|", "文脈: 読みが不自然な2語のつながりは英語");
+    {
+      const auto pieces = decided("sametime");
+      Expect(pieces.size() == 1 && pieces[0].spaces == std::vector<size_t>{4}, "文脈: つながりの語の間に空白");
+    }
+    Expect(decided_text("kyouhasamegoogledesu") == "samegoogle|", "文脈: 英語の隣の same は英語（google の隣）");
+    Expect(english("sametime").empty() && Text("sametime", jaen::SplitEnglish(Parse("sametime"), lexicon, Parse), true).empty(),
+           "文脈の段は、辞書の費用を渡さなければ働かない");
+    Expect(Text("kyouhasamegoogledesu", jaen::SplitEnglish(Parse("kyouhasamegoogledesu"), context, Parse), true) == "google|",
+           "文脈の段を使わないときは今までどおり（same は日本語）");
   }
 
   Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");

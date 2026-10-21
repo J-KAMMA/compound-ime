@@ -10,6 +10,8 @@
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv、道具の名前の domain-tools.tsv。tools/domain_typing_test.py）
+#   m: 英単語と重なるローマ字（tests/conversion/allenglish-mixed.tsv の英語にしたい文、allenglish-ja.tsv の日本語だけの文。
+#      tools/make_allenglish_tests.py、tools/score_allenglish.py）。文脈で英語にする段を使う版と、止めた版（MYIME_ALL_ENGLISH=off）の両方
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
@@ -118,6 +120,17 @@ k)
     grep -v '^#' $T/proper-nouns-cand.tsv | cut -f1 > $W/proper-nouns-cand.txt
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
   fi
+  ;;
+m)
+  # 英単語と重なるローマ字: ローマ字として日本語に読める英単語（made、take、same、one）を日本語の文にはさんだ文と英語だけの文（英語に
+  # したい）、英単語と同じ綴りの日本語の語だけの文（英語にしてはいけない）。既定の版と、文脈の段を止めた版（off）の両方を流して比べる
+  for f in mixed ja; do
+    if [ -f $T/allenglish-$f.tsv ]; then
+      grep -v '^#' $T/allenglish-$f.tsv | cut -f1 > $W/allenglish-$f.txt
+      $BATCH $W/allenglish-$f.txt $OUT/allenglish-$f.tsv 4
+      MYIME_ALL_ENGLISH=off $BATCH $W/allenglish-$f.txt $OUT/allenglish-$f-off.tsv 4
+    fi
+  done
   ;;
 q)
   # 開発の道具の名前（opencode ...）: 名前だけを打って変換したときの候補の並び（採点は tools/score_proper_nouns.py candidates）と、

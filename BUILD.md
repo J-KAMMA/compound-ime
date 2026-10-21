@@ -57,6 +57,8 @@ python tools/build_ut_dictionary.py --mozc <src> --ut <ut-dir> --sources sudachi
 
 大文字を含む英字の固有名詞（`tools/data/proper-nouns.tsv`、Wikidata の CC0 データ）の作り直し: `fetch_wikidata_names.py --out <dir>`（Wikidata の問い合わせサービスと Wikimedia の API から取得。約1時間）、続けて `build_proper_nouns.py`（`--wikidata <dir>` ほか。詳しくは冒頭の説明。英語の検出器の試し用 `native/jaen-detector/jaen_trial.cc` が要る）。日本語だけの文のローマ字と英単語まじりの文は `make_japanese_romaji_corpus.py` で作る。
 
+英語の切り分けだけを手元で動かす（Mozc なし）: `g++ -std=c++20 -O2 -I native/jaen-detector native/jaen-detector/jaen_trial.cc native/jaen-detector/jaen_detector.cc -o jaen_trial`、続けて `JAEN_DICT=<mozc>/src/data/dictionary_oss CONTEXT=1 ./jaen_trial <romaji.tsv と readings.txt の場所> <一覧の場所> < ローマ字の行`（`CONTEXT=1` で、ローマ字として日本語に読める英単語を文脈で決める段まで動く。詳しくは [docs/all-english.md](docs/all-english.md)）。英単語と重なるローマ字の試験の文は `tools/make_allenglish_tests.py` で作り、組 `m` で流す。
+
 ## 4. precision117 エンジンを重ねる
 
 ```

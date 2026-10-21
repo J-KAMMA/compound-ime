@@ -169,7 +169,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","p"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","p"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -262,6 +262,17 @@ jobs:
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/proper-nouns-cand.tsv results/proper-nouns-cand.tsv "固有名詞の候補" > results/proper-nouns-cand-score.txt
             head -26 results/proper-nouns-cand-score.txt
           fi
+          # 英単語と重なるローマ字（組 m）の採点: 既定の版、止めた版（off）、その差
+          for f in mixed ja; do
+            if [ -f results/allenglish-$f.tsv ] && [ -f repo/tests/conversion/allenglish-$f.tsv ]; then
+              python3 repo/tools/score_allenglish.py $f repo/tests/conversion/allenglish-$f.tsv results/allenglish-$f.tsv > results/allenglish-$f-score.txt
+              head -60 results/allenglish-$f-score.txt
+              if [ -f results/allenglish-$f-off.tsv ]; then
+                python3 repo/tools/score_allenglish.py $f repo/tests/conversion/allenglish-$f.tsv results/allenglish-$f-off.tsv "止めた版（MYIME_ALL_ENGLISH=off）" | head -8
+                python3 repo/tools/score_allenglish.py compare $f repo/tests/conversion/allenglish-$f.tsv results/allenglish-$f-off.tsv results/allenglish-$f.tsv | tail -30
+              fi
+            fi
+          done
           # 開発の道具の名前の候補（組 q）の採点と、F10・Shift の記録
           if [ -f results/domain-tools-cand.tsv ] && [ -f repo/tests/conversion/domain-tools-cand.tsv ]; then
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/domain-tools-cand.tsv results/domain-tools-cand.tsv "開発の道具の候補" > results/domain-tools-cand-score.txt
