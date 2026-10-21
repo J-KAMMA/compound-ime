@@ -1,6 +1,8 @@
 #include "dictionary/supplement_dictionary.h"
 
 #include <cstddef>
+#include <cstdio>
+#include <cstdlib>
 #include <string>
 #include <utility>
 
@@ -9,6 +11,17 @@
 
 namespace mozc {
 namespace dictionary {
+
+void DictTrace(const std::string& line) {
+  const char* path = std::getenv("MYIME_DICT_TRACE");
+  if (path == nullptr || *path == 0) return;
+  FILE* f = std::fopen(path, "ab");
+  if (f == nullptr) return;
+  std::fprintf(f, "%s
+", line.c_str());
+  std::fclose(f);
+}
+
 namespace {
 
 using ::dict_update::SupplementTable;
@@ -38,6 +51,8 @@ bool Emit(const SupplementTable& table, size_t begin, size_t end, Callback* call
       const ::dict_update::SupplementEntry& e = table.at(k);
       const Token token(e.key, e.value, e.cost, e.lid, e.rid, Token::NONE);
       const Callback::ResultType on_token = callback->OnToken(key, key, token);
+      DictTrace("  token key=" + key + " value=" + e.value + " onkey=" + std::to_string(on_key) + " onactual=" +
+                std::to_string(on_actual) + " ontoken=" + std::to_string(on_token));
       if (on_token == Callback::TRAVERSE_DONE) return false;
       if (on_token == Callback::TRAVERSE_NEXT_KEY || on_token == Callback::TRAVERSE_CULL) break;
     }
@@ -54,6 +69,7 @@ SupplementDictionary& SupplementDictionary::Instance() {
 }
 
 void SupplementDictionary::Set(std::shared_ptr<const SupplementTable> table) {
+  DictTrace(std::string("Set rows=") + (table ? std::to_string(table->size()) : std::string("null")));
   std::lock_guard<std::mutex> lock(mutex_);
   table_ = std::move(table);
 }
@@ -75,6 +91,7 @@ bool SupplementDictionary::HasValue(absl::string_view value) const {
 
 void SupplementDictionary::LookupPredictive(absl::string_view key, Callback* callback) const {
   const auto table = Get();
+  DictTrace(std::string("LookupPredictive key=") + std::string(key) + (table ? " table" : " no-table"));
   if (!table || key.empty()) return;
   const auto range = table->PredictiveRange(std::string_view(key.data(), key.size()));
   Emit(*table, range.first, range.second, callback);
@@ -82,6 +99,7 @@ void SupplementDictionary::LookupPredictive(absl::string_view key, Callback* cal
 
 void SupplementDictionary::LookupPrefix(absl::string_view key, Callback* callback) const {
   const auto table = Get();
+  DictTrace(std::string("LookupPrefix key=") + std::string(key) + (table ? " table" : " no-table"));
   if (!table || key.empty()) return;
   // 短い読みから順に（システム辞書と同じ並び）。UTF-8 の文字の切れ目だけで切る。
   for (size_t length = 1; length <= key.size(); ++length) {
@@ -94,6 +112,7 @@ void SupplementDictionary::LookupPrefix(absl::string_view key, Callback* callbac
 
 void SupplementDictionary::LookupExact(absl::string_view key, Callback* callback) const {
   const auto table = Get();
+  DictTrace(std::string("LookupExact key=") + std::string(key) + (table ? " table" : " no-table"));
   if (!table || key.empty()) return;
   const auto range = table->ExactRange(std::string_view(key.data(), key.size()));
   Emit(*table, range.first, range.second, callback);

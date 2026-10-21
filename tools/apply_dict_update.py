@@ -282,6 +282,22 @@ mozc_cc_library(
 '''
 (src / "converter/BUILD.bazel").write_text(build, encoding="utf-8", newline="")
 
+# 読みが日本語か（converter_reading_check.inc の ReadsAsJapanese）: 追加の辞書の読みは、値が英字だけでも日本語の読みと見なす。
+# （英字だけの値は「英語の別名」と見なされて落ちるが、追加の辞書の行は、かなの読みから語を出すために配られたもの）
+edit("converter/converter.cc", '#include "dictionary/pos_matcher.h"\n',
+     '#include "dictionary/pos_matcher.h"\n#include "dictionary/supplement_dictionary.h"\n')
+edit("converter/converter.cc", "  const std::string katakana = KatakanaOf(kana);\n  bool japanese = false;\n",
+     "  const std::string katakana = KatakanaOf(kana);\n  bool japanese = false;\n"
+     "  if (std::getenv(\"MYIME_DICT_NOFIX\") == nullptr && dictionary::SupplementDictionary::Instance().HasKey(kana)) {\n"
+     "    dictionary::DictTrace(\"ReadsAsJapanese by supplement kana=\" + std::string(kana));\n"
+     "    return true;\n"
+     "  }\n")
+build = (src / "converter/BUILD.bazel").read_text(encoding="utf-8")
+start = build.index('    name = "converter",\n    srcs = [\n        "converter.cc",')
+at = build.index('        "//dictionary:pos_matcher",\n', start)
+build = build[:at] + '        "//dictionary:pos_matcher",\n        "//dictionary:supplement_dictionary",\n' + build[at + len('        "//dictionary:pos_matcher",\n'):]
+(src / "converter/BUILD.bazel").write_text(build, encoding="utf-8", newline="")
+
 edit("server/mozc_server.cc", '#include "base/vlog.h"\n', '#include "base/vlog.h"\n#include "converter/dict_update_glue.h"\n')
 edit("server/mozc_server.cc", """      LOG(ERROR) << "SessionServer initialization failed";
       return -1;

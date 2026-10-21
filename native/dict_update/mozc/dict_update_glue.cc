@@ -44,6 +44,7 @@ bool Apply(const ::dict_update::Snapshot& snap) {
   if (g_in_update_check.load() && ::dict_update::IsHermeticTest() && std::getenv("MYIME_DICT_UPDATE_FAIL_APPLY")) {
     return false;
   }
+  dictionary::DictTrace("Apply version=" + std::to_string(snap.version) + " in_check=" + (g_in_update_check.load() ? "1" : "0"));
   dictionary::SupplementDictionary::Instance().Set(snap.table);
   SetEnglishExtra(snap.english);
   InvalidateReadingMemo();

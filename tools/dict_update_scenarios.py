@@ -68,8 +68,8 @@ class Site:
 
 
 class Runner:
-    def __init__(self, mode, binary, extra_env):
-        self.mode, self.binary = mode, binary
+    def __init__(self, mode, binary, extra_env, dump=None):
+        self.mode, self.binary, self.dump = mode, binary, dump
         self.extra_env = dict(kv.split("=", 1) for kv in extra_env)
 
     def run(self, state_dir: Path, base: str, pubkey: str, *, update: bool, env=None, profile: Path = None):
@@ -92,6 +92,10 @@ class Runner:
                 prof.mkdir(exist_ok=True)
                 cmd = [self.binary, "--input", str(script), "--profile", str(prof), "--dictionary", "oss"]
                 out = subprocess.run(cmd, env=e, capture_output=True, text=True, timeout=600, stdin=subprocess.DEVNULL).stdout
+        if self.dump:
+            self.dump_count = getattr(self, "dump_count", 0) + 1
+            Path(self.dump).mkdir(parents=True, exist_ok=True)
+            (Path(self.dump) / f"run{self.dump_count:02d}-update{int(update)}.txt").write_text(out, encoding="utf-8")
         return self.parse(out)
 
     def parse(self, out):
@@ -143,8 +147,9 @@ def main():
     ap.add_argument("mode", choices=["tool", "session"])
     ap.add_argument("binary")
     ap.add_argument("--env", action="append", default=[])
+    ap.add_argument("--dump", default=None, help="各回の本体の出力を置く場所（調べ用）")
     args = ap.parse_args()
-    runner = Runner(args.mode, args.binary, args.env)
+    runner = Runner(args.mode, args.binary, args.env, args.dump)
     pos_sha, pos_count, noun = runner.info()
     key, other = Ed25519PrivateKey.generate(), Ed25519PrivateKey.generate()
     pub = fx.pub_hex(key)
