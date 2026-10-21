@@ -73,6 +73,11 @@ class Lexicon {
   // Rarer words and names (london, ukulele, pilates) taken only when what was
   // typed is no plain Japanese romaji (lo: ぉ, a pending c), on chunk edges.
   void AddSignalOnly(std::string_view word);
+  // A hand-listed name (opencode, geminicli, llamacpp) of 6+ letters: like AddSignalOnly, but a
+  // longer English word running over its first or last edge does not stop it (hage over
+  // ha|geminicli, hall over ha|llamacpp).
+  void AddNamed(std::string_view word);
+  bool IsNamed(std::string_view word) const;
   // Common English words (SCOWL level 20 or less): only these are kept as
   // English when their kana reads only as a rare Japanese entry (hero: へろ),
   // not rarer ones (omen: お面, redo).
@@ -85,6 +90,7 @@ class Lexicon {
   std::unordered_map<std::string, Place> places_;
   std::unordered_set<std::string> joined_;
   std::unordered_set<std::string> signal_only_;
+  std::unordered_set<std::string> named_;
   std::unordered_set<std::string> common_;
   std::unordered_map<std::string, std::vector<size_t>> phrases_;
 };

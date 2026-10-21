@@ -22,6 +22,7 @@ constexpr int64_t kLeadingParticleCost = 30;  // 助詞で始まる語（deform�
 constexpr int64_t kStealCost = 50;     // a word ending in the s of shi, the c of chi, the t of tsu
 constexpr size_t kMinCompoundLength = 8;  // opencode: 2語（open + code）のつながりを1語の英語と見る最小の長さ
 constexpr size_t kMinCompoundPart = 4;    // つながりの各語の最小の長さ
+constexpr int64_t kCompoundPenalty = 3;   // 2語ずつ取れる分け方より少し高い
 
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
@@ -42,17 +43,6 @@ std::optional<std::string> Normalize(std::string_view word) {
 }
 
 
-// 2語のつながり（opencode = open + code）: 各語が4文字以上で、普通の英単語（SCOWL の水準20以下）か
-// 厳選した語であるような切れ目があるか。
-bool IsCommonCompound(const Lexicon& lexicon, std::string_view word) {
-  const auto usable = [&](std::string_view part) {
-    return lexicon.Contains(part) && (lexicon.IsCommon(part) || lexicon.IsCurated(part));
-  };
-  for (size_t cut = kMinCompoundPart; cut + kMinCompoundPart <= word.size(); ++cut) {
-    if (usable(word.substr(0, cut)) && usable(word.substr(cut))) return true;
-  }
-  return false;
-}
 int64_t ForeignWeight(const Chunk& chunk);
 bool IsKanaForLoanword(const Chunk& chunk);
 
@@ -117,6 +107,18 @@ bool Lexicon::IsJoined(std::string_view word) const {
 
 void Lexicon::AddSignalOnly(std::string_view word) {
   if (auto lower = Normalize(word); lower && !words_.contains(*lower)) signal_only_.insert(*std::move(lower));
+}
+
+void Lexicon::AddNamed(std::string_view word) {
+  if (auto lower = Normalize(word); lower && !words_.contains(*lower)) {
+    signal_only_.insert(*lower);
+    named_.insert(*std::move(lower));
+  }
+}
+
+bool Lexicon::IsNamed(std::string_view word) const {
+  const auto lower = Normalize(word);
+  return lower && named_.contains(*lower);
 }
 
 void Lexicon::AddCommon(std::string_view word) {
@@ -238,7 +240,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     const bool small = IsSmallKana(chunk);
     raw += chunk.raw;
     boundary.resize(raw.size() + 1, false);
-    blocked.resize(raw.size() + 1, small);
+    // A doubled l (the っ of "shell|wo", chunk "llw") is no small kana typed with l: a word may end inside it.
+    blocked.resize(raw.size() + 1, small && !(chunk.raw.size() >= 2 && Lower(chunk.raw[0]) == Lower(chunk.raw[1])));
     no_start.resize(raw.size() + 1, false);
     no_end.resize(raw.size() + 1, false);
     unread.resize(raw.size(), chunk.conversion.empty());
@@ -261,6 +264,9 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     } else if (r.size() == 3 && consonant(r[0]) && Lower(r[0]) != 's' && Lower(r[0]) != 'c' &&
                Lower(r[1]) == 'h' && IsVowel(r[2])) {
       boundary[start + 1] = true;  // "dhe" read as でぇ: "madrid|he"
+    } else if (r.size() == 2 && Lower(r[0]) == 'x' && Lower(r[1]) == 'n' && chunk.conversion == "ん") {
+      boundary[start + 1] = true;  // "xn" read as ん: "codex|ni", "tmux|ni"
+      no_start[start + 1] = true;
     } else if (r.size() == 2 && Lower(r[0]) == 'n' && Lower(r[1]) == 'n') {
       boundary[start + 1] = true;  // "nn" read as ん: "berlin|ni", "darwin|no"
       no_start[start + 1] = true;  // but no word starts at its second n ("matijikan|ntt|e")
@@ -403,7 +409,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       }
       // Four or more keys in a row the table could not read ("jpyc" of
       // jpycdake): an unknown abbreviation or name, kept as typed.
-      if (word.size() >= 4 && boundary[i] && boundary[j] &&
+      // The run is not taken when a listed word of 3+ letters is the run without its last
+      // one or two keys (wsl|wo: the w of wo waits in the chunk "lw"; "wslw" is no name).
+      bool listed_prefix = false;
+      for (size_t k = 1; k <= 2 && word.size() >= 3 + k; ++k) {
+        listed_prefix = listed_prefix || lexicon.Contains(word.substr(0, word.size() - k));
+      }
+      if (word.size() >= 4 && boundary[i] && boundary[j] && !listed_prefix &&
           std::all_of(unread.begin() + i, unread.begin() + j, [](bool u) { return u; })) {
         english[i].emplace_back(j, kSpanCost - kLengthBonus * static_cast<int64_t>(word.size()));  // as a word with a foreign sign: a listed word wins (chatgpt)
         continue;
@@ -412,8 +424,20 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       const bool signal_only = learned == 0 && !place && !lexicon.Contains(word) && lexicon.IsSignalOnly(word);
       // 2語のつながり（opencode = open + code）: 一覧にない語でも、長さと切れ目の条件を満たし、
       // どちらの語も普通の英単語か厳選した語なら、下で「かなが日本語の読みでない」ことを確かめて取る。
-      const bool compound = learned == 0 && !place && is_reading && !signal_only && word.size() >= kMinCompoundLength &&
-                            boundary[i] && boundary[j] && !lexicon.Contains(word) && IsCommonCompound(lexicon, word);
+      // 切れ目は打った文字の区切りで、各語のかなも日本語の読みでないこと（firefox + demo の「でも」は読み）。
+      bool compound = false;
+      if (learned == 0 && !place && is_reading && !signal_only && word.size() >= kMinCompoundLength &&
+          boundary[i] && boundary[j] && !lexicon.Contains(word)) {
+        const auto usable = [&](std::string_view part) {
+          return lexicon.Contains(part) && (lexicon.IsCommon(part) || lexicon.IsCurated(part));
+        };
+        for (size_t cut = kMinCompoundPart; cut + kMinCompoundPart <= word.size() && !compound; ++cut) {
+          const size_t e = i + cut;
+          if (!boundary[e] || kana_at[e] <= kana_at[i] || kana_at[j] <= kana_at[e]) continue;
+          if (!usable(word.substr(0, cut)) || !usable(word.substr(cut))) continue;
+          compound = !(*is_reading)(kana_text(kana_at[i], kana_at[e])) && !(*is_reading)(kana_text(kana_at[e], kana_at[j]));
+        }
+      }
       if (learned == 0 && !place && !lexicon.Contains(word) && !signal_only && !compound) continue;
       // Its only sign is a small kana typed for a Japanese word ("lore" in
       // ato|ulo|retto, あとうぉれっと): no word.
@@ -426,17 +450,22 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         // A word starting at such a small kana ("lair" in fu|la|iru, ふぁいる)
         // takes it from its kana whatever else it has (the r left waiting).
         const bool starts_there = small_start[i] && small_in_reading(kana_at[i]);
-        if (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese)) continue;
+        // 厳選した語（ブランド名など）が7文字以上なら、前の助詞とのかな（は + ぁ + ん）に取られない
+        // （halangchain: langchain）。偶然の一致は、これだけ長いと起きにくい。
+        const bool vetted_long = word.size() >= 7 && lexicon.IsCurated(word);
+        if (!vetted_long && (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese))) continue;
       }
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
       if (compound) {
         if (kana_at[j] > kana_at[i] && !(*is_reading)(kana_text(kana_at[i], kana_at[j])) &&
             !crosses_reading(kana_at[i], kana_at[j]) && !japanese_grammar(kana_at[i], kana_at[j])) {
-          cost = ForeignCost(parse(word)) > 0 ? kSpanCost - length : -length;
+          // 1語ずつ取れる2語（commit + message）の分け方に負けるよう、少し高くする。
+          cost = (ForeignCost(parse(word)) > 0 ? kSpanCost - length : -length) + kCompoundPenalty;
         }
       } else if (signal_only) {
-        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && !word_across(i) && !word_across(j)) {
+        const bool named = word.size() >= 6 && lexicon.IsNamed(word);
+        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && (named || (!word_across(i) && !word_across(j)))) {
           cost = kSpanCost - length;
         }
       } else if (const int64_t sign = ForeignCost(parse(word)); sign > 0) {

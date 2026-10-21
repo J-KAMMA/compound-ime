@@ -2721,6 +2721,66 @@ edit("converter/converter.cc", """      PutTypedValueFirst((next++)->second, &se
       }
       AddPlaceKanji(&segment);""")
 
+# 空白を入れて見せる英語の文節（claude code）も、空白を除いた打つ形（claudecode）で公式の書き方
+# （Claude Code）を引く。
+edit("converter/converter.cc", """      if (const std::string_view official = BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""", """      std::string unspaced;
+      for (const char c : typed) {
+        if (c != ' ') unspaced.push_back(c);
+      }
+      if (const std::string_view official = BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""")
+
+
+# 英語が見つかった短い入力（opencode、geminicli）で、打った英字そのものを4番目の候補に必ず入れる。
+# 打った英字は今まで F9/F10 でしか出なかった。英語として取れなかった語（一覧にない名前）の逃げ道は
+# F10（打ったまま）と、最初の文字を Shift で打つ入力。
+edit("converter/converter.h", """  void AddPlaceKanji(Segment* segment) const;""", """  void AddPlaceKanji(Segment* segment) const;
+
+  // When English was found in a short composition of lowercase letters only,
+  // adds what was typed (opencode) as the fourth candidate of the first
+  // segment, spanning every segment and never learned.
+  void AddRawAsEnglish(const ConversionRequest& request, Segments* segments) const;""")
+edit("converter/converter.cc", """void Converter::AddPlaceKanji(Segment* segment) const {""", """void Converter::AddRawAsEnglish(const ConversionRequest& request,
+                                Segments* segments) const {
+  if (segments->conversion_segments_size() == 0 ||
+      segments->conversion_segment(0).candidates_size() == 0) {
+    return;
+  }
+  std::string raw;
+  for (const composer::CharChunk& chunk :
+       request.composer().composition().GetCharChunkList()) {
+    raw.append(chunk.raw());
+  }
+  if (raw.size() < 4 || raw.size() > 24) return;
+  for (const char c : raw) {
+    if (c < 'a' || c > 'z') return;
+  }
+  Segment* first = segments->mutable_conversion_segment(0);
+  for (size_t i = 0; i < first->candidates_size(); ++i) {
+    if (first->candidate(i).value == raw) return;
+  }
+  std::string key;
+  for (const Segment& segment : segments->conversion_segments()) {
+    key.append(segment.key());
+  }
+  Candidate* candidate =
+      first->insert_candidate(std::min<size_t>(3, first->candidates_size()));
+  candidate->key = candidate->content_key = key;
+  candidate->value = candidate->content_value = raw;
+  candidate->lid = candidate->rid = general_noun_id_;
+  candidate->cost = first->candidate(0).cost + 1;
+  candidate->converted_segment_count =
+      static_cast<uint32_t>(segments->conversion_segments_size());
+  candidate->attributes |= Attribute::NO_LEARNING | Attribute::NO_VARIANTS_EXPANSION;
+}
+
+void Converter::AddPlaceKanji(Segment* segment) const {""")
+edit("converter/converter.cc", """  if (typo_fixed) AddTypedAsIs(request, segments);""", """  if (typo_fixed) {
+    AddTypedAsIs(request, segments);
+  } else if (!english.empty()) {
+    AddRawAsEnglish(request, segments);
+  }""")
 
 # AI time budget: Section: an AI time budget per conversion so a busy PC never freezes the app.
 # 
@@ -3022,16 +3082,17 @@ edit("converter/english_lexicon.cc",
 # ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
 signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
 # 略語・IT・サービス名（tools/data/jaen-modern-words.tsv、約6,000語）も、強い印のときだけ使う語に足す
-signal += [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
-           if line and not line.startswith("#") and "\t" in line]
+named = [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
+         if line and not line.startswith("#") and "\t" in line]
 # 大文字を含む英字の固有名詞（tools/data/proper-nouns.tsv）のうち、英語として取れる名前（打つ形が空でないもの）
 signal += [row[1] for row in proper_nouns if row[1] and " " not in row[1]]
 inc = src / "converter/english_lexicon_data.inc"
-inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
+inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal) + array("kNamedWords", named), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
-     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n"
+     "    for (const char* word : kNamedWords) words->AddNamed(word);\n")
 
 # 英語の決まった言い回し: 節: tools/data/english-phrases.txt（see you、made in japan など）を組み込む。
 # 続けて打った言い回しは、かなの切れ目の上なら1つの英語の文節にし、空白を入れて表示する。
