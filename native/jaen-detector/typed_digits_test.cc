@@ -75,6 +75,32 @@ int main() {
   CheckReplace("12345", "一万二千三百四十五円", "12345円");
   CheckReplace("2026", "二〇二六年", "2026年");
   CheckReplace("3.14", "三点一四", "3.14");
+  CheckReplace("1.5", "一・五場合", "1.5場合");
+  // A kanji unit after the typed digits is not swallowed (3億 stays 3億).
+  CheckKeep("3おく", "3億", true);
+  CheckKeep("1まん", "1万", true);
+  CheckKeep("2せんえん", "2千円", true);
+  CheckKeep("5まんにん", "5万人", true);
+  CheckKeep("3.5まん", "3.5万", true);
+  CheckKeep("5ひゃくえん", "5百円", true);
+  CheckKeep("10まんえん", "10万円", true);
+  CheckKeep("10までです", "10万です", true);
+  // A kanji numeral added from the kana part does not hide the typed digits.
+  CheckKeep("2にんいっしょ", "2人一緒", true);
+  CheckKeep("10ねんいちど", "10年一度", true);
+  CheckKeep("2にんいっしょ", "2人いっしょ", true);
+  // When no candidate has the typed spelling, keep the unit in the first one.
+  CheckReplace("3おく", "三億", "3億");
+  CheckReplace("2せんえん", "二千円", "2千円");
+  CheckReplace("5まんにん", "五万人", "5万人");
+  CheckReplace("10まんえん", "十万円", "10万円");
+  CheckReplace("10までです", "十までです", "10までです");
+  CheckReplace("2にんいっしょ", "二人一緒", "2人一緒");
+  CheckReplace("2にんいっしょ", "二人いっしょ", "2人いっしょ");
+  CheckReplace("いちばん2", "一番二", "一番2");
+  CheckReplace("900", "九百万円", "900万円");
+  CheckReplace("1,000", "千万円", "1,000万円");
+  CheckReplace("３", "3億", "３億");
   // Kana words and no-digit keys are never touched.
   CheckKeep("ひとつ", "一つ", true);
   CheckKeep("いちばん", "一番", true);
@@ -82,8 +108,9 @@ int main() {
   CheckNoReplace("ひとつ", "一つ");
   CheckNoReplace("いちばん", "一番");
   CheckNoReplace("じゅうぶん", "十分");
-  // Different counts are left alone rather than guessed.
-  CheckNoReplace("980", "九百八十円と二円");
+  // Only the number that the key spells is replaced; a later number stays.
+  CheckReplace("980", "九百八十円と二円", "980円と二円");
+  CheckReplace("980", "九百八十円と二", "980円と二");
   CheckReplace("10.5", "十点五度", "10.5度");
   if (g_failed != 0) {
     std::cout << g_failed << "/" << g_total << " failed\n";

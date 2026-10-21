@@ -161,6 +161,14 @@ edit("converter/converter.h", """  void CompletePosIds(Candidate* candidate) con
 
   // Moves or inserts a candidate with |value| to the top of |segment|.
   void PutTypedValueFirst(absl::string_view value, Segment* segment) const;
+""")
+
+# PreferTypedDigits is called from engine.cc, so declare it in the public part
+# of Converter (CompletePosIds above sits in the private part).
+edit("converter/converter.h", """  void RewriteAsyncCandidates(const ConversionRequest& request,
+                              Segments* segments) const override;
+""", """  void RewriteAsyncCandidates(const ConversionRequest& request,
+                              Segments* segments) const override;
 
   // Typed Arabic digits in a key stay Arabic in the first candidate (980, not
   // 九百八十). A kana word with no typed digit (hitotsu -> 一つ) is untouched.

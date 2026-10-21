@@ -4,7 +4,9 @@
 
 結果の tsv は tools/batch_convert.sh の出力（打った文字列<TAB>変換前の表示<TAB>確定した文）。
 
-見るのは、数字と「. , 。 、 %」の並びだけ（漢字・かなの選び方は見ない）。全角の数字・「．」「，」「％」は
+見るのは、数字と「. , 。 、 %」の並び、および算用数字のすぐあとに付く漢字の単位（十百千万億兆）
+だけ（漢字・かなの選び方は見ない）。単位を見るのは、打った数字を戻すときに「3億」の億を
+消していないか（3 にしていないか）を確かめるため。全角の数字・「．」「，」「％」は
 半角と同じとして比べる（数字の設定が全角の既定でも通る）。
   --halfwidth  数字の設定が半角のときの試験。出力に全角の数字・「．」「，」があれば違いとする
                （「4．1」のように、数字は半角で点だけ全角になるのもここで見つかる）
@@ -16,10 +18,28 @@ import sys
 FULL = str.maketrans("０１２３４５６７８９．，％", "0123456789.,%")
 KEEP = set("0123456789.,。、%")
 FULL_FORMS = set("０１２３４５６７８９．，")  # ％ は対象外（「%」の幅はこの直しの外）
+DIGITS = set("0123456789")
+UNITS = set("十百千万億兆")
 
 
 def skeleton(text):
     return "".join(c for c in text.translate(FULL) if c in KEEP)
+
+
+def unit_skeleton(text):
+    """算用数字のすぐあとに続く漢字の単位だけを取り出す（3億 → 3億、百円 → 空）。"""
+    out = []
+    previous_digit = False
+    for c in text.translate(FULL):
+        if c in DIGITS:
+            out.append(c)
+            previous_digit = True
+        elif c in UNITS and previous_digit:
+            out.append(c)
+            previous_digit = False
+        else:
+            previous_digit = False
+    return "".join(out)
 
 
 def main():
@@ -47,7 +67,8 @@ def main():
             missing += 1
             continue
         total += 1
-        ok = skeleton(out) == skeleton(want)
+        ok = (skeleton(out) == skeleton(want) and
+              unit_skeleton(out) == unit_skeleton(want))
         if ok and "--halfwidth" in flags and any(c in FULL_FORMS for c in out):
             ok = False
         same += ok
@@ -57,7 +78,7 @@ def main():
         counts[1] += 1
         if not ok:
             bad.append(f"  [{category}] {raw} → {out}（期待 {want}）")
-    print(f"{label}: 数字・点の並びが合う {same}/{total}、文字まで同じ {exact}/{total}"
+    print(f"{label}: 数字・点・単位の並びが合う {same}/{total}、文字まで同じ {exact}/{total}"
           + (f"、結果がない {missing}" if missing else ""))
     for category in sorted(groups):
         print(f"  {category}: {groups[category][0]}/{groups[category][1]}")
