@@ -17,8 +17,7 @@ void DictTrace(const std::string& line) {
   if (path == nullptr || *path == 0) return;
   FILE* f = std::fopen(path, "ab");
   if (f == nullptr) return;
-  std::fprintf(f, "%s
-", line.c_str());
+  std::fprintf(f, "%s%c", line.c_str(), 10);
   std::fclose(f);
 }
 
