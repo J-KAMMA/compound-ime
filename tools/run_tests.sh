@@ -19,6 +19,10 @@
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
+#   s: 数字の間の点と文末の句点（docs/decimal-point.md）。tests/conversion/decimal.tsv（小数、版の番号、アドレスの番号、金額、割合、英語まじり、
+#      文末の数字、数字のあとの読点）と decimal-ja.tsv（普通の日本語の文）を、数字の設定が半角のとき（tools/make_decimal_config.py）と既定のとき、
+#      変換して確定する形と、変換せず入力中の表示をそのまま確定する形で流し、tools/score_decimal.py で数字と「. , 。、%」の並びを採点する。
+#      違いが1件でもあれば、この組は失敗にする（tools/make_decimal_tests.py、tools/decimal_transform_test.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
@@ -238,6 +242,33 @@ f)
     done
   fi
   ;;
+s)
+  # 数字の間の点と文末の句点。文は tools/make_decimal_tests.py で作る。採点は数字と「. , 。 、 %」の並びだけ（漢字・かなは見ない）。
+  # 半角の設定では、全角の数字・「．」「，」が出ても違いとする（数字は半角で点だけ全角、を見つける）。違いがあっても最後まで流し、最後に失敗にする
+  python3 $REPO/tools/make_decimal_config.py $W/half.db
+  fail=0
+  run_decimal() {  # <試験名> <半角|既定> <変換|入力中>
+    local name=$1 config=$2 mode=$3
+    local tag=$name-$config-$mode
+    grep -v '^#' $T/$name.tsv | cut -f1 > $W/$tag.txt
+    (
+      if [ "$config" = half ]; then export MYIME_TEST_CONFIG_DB=$W/half.db; fi
+      if [ "$mode" = preedit ]; then export MYIME_BATCH_NO_CONVERT=1; fi
+      $BATCH $W/$tag.txt $OUT/$tag.tsv 4
+    )
+    local flags=""
+    if [ "$config" = half ]; then flags="--halfwidth"; fi
+    python3 $REPO/tools/score_decimal.py $T/$name.tsv $OUT/$tag.tsv "$tag" $flags | tee $OUT/$tag-score.txt || fail=1
+  }
+  for name in decimal decimal-ja; do
+    for config in half default; do
+      for mode in convert preedit; do
+        run_decimal $name $config $mode
+      done
+    done
+  done
+  [ $fail = 0 ] || { echo "数字の間の点・文末の句点の試験に違いがあった" >&2; exit 1; }
+  ;;
 i)
   # 人工知能の時間の上限の試験（わざと遅くする）。日本語だけの400文の先頭100文を、
   #   unlimited: 上限なし（人工知能あり）、noai: 人工知能なし（重みのファイルがない）、
@@ -427,5 +458,5 @@ PY
   ) || true
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、p、q、r、x、y のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、m、n、p、q、r、s、x、y のどれか" >&2; exit 2 ;;
 esac
