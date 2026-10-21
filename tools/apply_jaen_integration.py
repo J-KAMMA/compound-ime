@@ -3650,7 +3650,7 @@ edit("converter/converter.cc",
 # ときだけ、日本語から英語への切り替えの費用を払わず、差 2000（follow_margin）で英語にする。助詞・活用が続く並び
 # （takewotabeta）、入力の途中の語、直前が日本語のときは今までどおり。中身は native/jaen-detector
 # （jaen_detector.cc の EndsWithEnglishWord と decide の follows_text）、converter_reading_check.inc の PreviousEndsInEnglish。
-# MYIME_ENGLISH_FOLLOW=off で止める（既定は有効）。
+# MYIME_ENGLISH_FOLLOW=off で止める（既定は有効）。session の記憶（前の文がないとき）は、この下の「英語の文を1語ずつ打つ人（続き）」の節。
 edit("converter/converter.cc",
      "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n",
      "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n"
@@ -3733,6 +3733,178 @@ edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (c
   } else if (command == "SET_EXPERIMENTAL_FEATURE") {
     client_->SetExperimentalFeature(args.size() >= 2 ? args[1] : "");
   } else if (command == "SET_PRECEDING_TEXT") {""")
+
+# 英語の文を1語ずつ打つ人（続き）: 節: session が「さっき確定した文字」を覚える（native/jaen-detector/recent_commit.h、
+# docs/english-follow.md）。Mozc は、確定のあとに空白を打つと変換の履歴を消す（Session::EchoBack が converter の Reset を呼ぶ）ので、
+# 前の文を渡さないアプリでは、履歴から直前を取る道が効かない。そこで session（入力欄ごとの会話）が、
+#   - 確定した文字（Output の result）、
+#   - 変換を通らずアプリへ返したキー（空白・英字・Backspace。EchoBack。Windows では TestSendKey だけが届く）
+# を最後の 64 字だけ覚え、前の文がないときだけ、次の組み立ての最初のキーで context の recent_committed_text に詰める
+# （converter_reading_check.inc の PreviousEndsInEnglish が読む）。捨てる条件: revision が変わった、RESET_CONTEXT・MOVE_CURSOR・
+# SWITCH_INPUT_FIELD_TYPE・取り消し・やり直し・再変換、Output の deletion_range、確定の cursor_offset が 0 でない、矢印・Home・End・
+# Enter・Tab・Delete・Ctrl/Alt つきのキー、覚えた分より前への Backspace、IME を切った（DIRECT になった）、最後から 60 秒。
+# MYIME_ENGLISH_FOLLOW=off でこの記憶ごと止まる。試験のためだけに MYIME_ENGLISH_FOLLOW_TTL_MS で 60 秒を替えられる。
+write("session/recent_commit.h", (REPO / "native/jaen-detector/recent_commit.h").read_text(encoding="utf-8"))
+edit("session/BUILD.bazel", """    srcs = ["session.cc"],
+    hdrs = ["session.h"],
+""", """    srcs = ["session.cc"],
+    hdrs = [
+        "recent_commit.h",
+        "session.h",
+    ],
+""")
+edit("protocol/commands.proto", """  // Repeated fields to be used for experimental features.
+  repeated string experimental_features = 100;
+}""", """  // Set by the session itself (never by a client; it is cleared on every key): the tail of the text this
+  // session just committed or echoed back, used only when preceding_text is empty (docs/english-follow.md).
+  optional string recent_committed_text = 101;
+
+  // Repeated fields to be used for experimental features.
+  repeated string experimental_features = 100;
+}""")
+edit("session/session.h", "#include \"session/keymap.h\"\n",
+     "#include \"session/keymap.h\"\n#include \"session/recent_commit.h\"\n")
+edit("session/session.h", "  std::unique_ptr<ImeContext> context_;\n", """  std::unique_ptr<ImeContext> context_;
+
+  // The text just committed or echoed back (docs/english-follow.md). Lives and dies with this session.
+  jaen::RecentCommit recent_commit_{jaen::RecentLifetimeMs()};
+  void NoteRecentBefore(const mozc::commands::Command& command);
+  void NoteRecentAfter(const mozc::commands::Command& command, bool was_direct);
+  void AttachRecentText(mozc::commands::Context* context) const;
+  // Watches one SendKey / TestSendKey / SendCommand call (all return paths).
+  class RecentScope {
+   public:
+    RecentScope(Session* session, mozc::commands::Command* command)
+        : session_(session),
+          command_(command),
+          was_direct_(session->context_ != nullptr &&
+                      session->context_->state() == ImeContext::DIRECT) {
+      session_->NoteRecentBefore(*command_);
+    }
+    ~RecentScope() { session_->NoteRecentAfter(*command_, was_direct_); }
+    RecentScope(const RecentScope&) = delete;
+    RecentScope& operator=(const RecentScope&) = delete;
+
+   private:
+    Session* session_;
+    mozc::commands::Command* command_;
+    bool was_direct_;
+  };
+""")
+for fn in ("SendCommand", "TestSendKey", "SendKey"):
+    edit("session/session.cc", f"bool Session::{fn}(commands::Command* command) {{\n",
+         f"bool Session::{fn}(commands::Command* command) {{\n  RecentScope recent_scope(this, command);\n")
+edit("session/session.cc", """    *context_->mutable_client_context() = command->input().context();
+  } else {
+    context_->mutable_client_context()->Clear();
+  }
+""", """    *context_->mutable_client_context() = command->input().context();
+  } else {
+    context_->mutable_client_context()->Clear();
+  }
+  AttachRecentText(context_->mutable_client_context());
+""")
+edit("session/session.cc", "bool Session::RequestAsyncConversion(commands::Command* command) {\n",
+     r"""// KeyEvent's numbers copied in native/jaen-detector/recent_commit.h.
+static_assert(commands::KeyEvent::ON == jaen::kKeyOn && commands::KeyEvent::OFF == jaen::kKeyOff &&
+              commands::KeyEvent::SPACE == jaen::kKeySpace &&
+              commands::KeyEvent::BACKSPACE == jaen::kKeyBackspace &&
+              commands::KeyEvent::HENKAN == jaen::kKeyHenkan &&
+              commands::KeyEvent::MUHENKAN == jaen::kKeyMuhenkan &&
+              commands::KeyEvent::KANA == jaen::kKeyKana && commands::KeyEvent::EISU == jaen::kKeyEisu &&
+              commands::KeyEvent::TEXT_INPUT == jaen::kKeyTextInput &&
+              commands::KeyEvent::HANKAKU == jaen::kKeyHankaku &&
+              commands::KeyEvent::KANJI == jaen::kKeyKanji &&
+              commands::KeyEvent::KATAKANA == jaen::kKeyKatakana &&
+              commands::KeyEvent::CAPS_LOCK == jaen::kKeyCapsLock,
+              "recent_commit.h: KeyEvent special key numbers changed");
+static_assert(commands::KeyEvent::SHIFT == 4 && commands::KeyEvent::LEFT_SHIFT == 128 &&
+              commands::KeyEvent::RIGHT_SHIFT == 1024 && commands::KeyEvent::KEY_DOWN == 8 &&
+              commands::KeyEvent::KEY_UP == 16 && commands::KeyEvent::CAPS == 2048,
+              "recent_commit.h: KeyEvent modifier numbers changed");
+
+// A key's revision is checked before the key is handled, so that the first key typed in another input field
+// never sees the text remembered for the previous one.
+void Session::NoteRecentBefore(const commands::Command& command) {
+  if (!jaen::RecentCommitEnabled()) return;
+  const commands::Input& input = command.input();
+  if (input.has_context() && input.context().has_revision()) {
+    recent_commit_.NoteRevision(input.context().revision());
+  }
+}
+
+// Reads what the call did. Nothing is logged or written: the text stays in recent_commit_.
+void Session::NoteRecentAfter(const commands::Command& command, bool was_direct) {
+  if (!jaen::RecentCommitEnabled()) return;
+  const int64_t now = jaen::SteadyNowMs();
+  const commands::Input& input = command.input();
+  const commands::Output& output = command.output();
+  if (output.has_deletion_range()) {
+    recent_commit_.Clear();
+    return;
+  }
+  if (input.has_command()) {
+    switch (input.command().type()) {
+      case commands::SessionCommand::RESET_CONTEXT:
+      case commands::SessionCommand::MOVE_CURSOR:
+      case commands::SessionCommand::SWITCH_INPUT_FIELD_TYPE:
+      case commands::SessionCommand::UNDO:
+      case commands::SessionCommand::UNDO_OR_REWIND:
+      case commands::SessionCommand::REVERT:
+      case commands::SessionCommand::CONVERT_REVERSE:
+        recent_commit_.Clear();
+        return;
+      default:
+        break;
+    }
+  }
+  if (output.has_result() && output.result().type() == commands::Result::STRING) {
+    if (output.result().cursor_offset() != 0) {
+      recent_commit_.Clear();
+    } else {
+      recent_commit_.Append(output.result().value(), now);
+    }
+  }
+  if (input.has_key() && output.has_consumed() && !output.consumed()) {
+    const commands::KeyEvent& key = input.key();
+    jaen::EchoedKey echoed;
+    echoed.special_key = key.has_special_key() ? static_cast<int>(key.special_key()) : 0;
+    echoed.key_code = key.has_key_code() ? key.key_code() : 0;
+    echoed.modifiers = KeyEventUtil::GetModifiers(key);
+    echoed.key_string = key.has_key_string() ? std::string_view(key.key_string()) : std::string_view();
+    recent_commit_.NoteEchoedKey(echoed, now);
+  }
+  // Keys typed while the IME is off never reach the session, so what it remembers may be out of date.
+  if (!was_direct && context_ != nullptr && context_->state() == ImeContext::DIRECT) {
+    recent_commit_.Clear();
+  }
+}
+
+// Called with the context captured at the first key of a composition. Only fills the field when the client
+// gave no preceding text; always clears what a client may have put there.
+void Session::AttachRecentText(commands::Context* context) const {
+  context->clear_recent_committed_text();
+  if (!jaen::RecentCommitEnabled() || !context->preceding_text().empty()) return;
+  const std::string text = recent_commit_.Text(jaen::SteadyNowMs());
+  if (!text.empty()) context->set_recent_committed_text(text);
+}
+
+bool Session::RequestAsyncConversion(commands::Command* command) {
+""")
+
+# 試験用の道具に、入力欄の印（revision）を付ける SET_REVISION<TAB>数 を足す（引数なしで消える。Windows の画面側が付けるのと同じ印）。
+# 入力欄が変わったときに記憶が捨てられるかの試験（tools/english_follow_memory.sh）に使う。
+edit(H, "  void SetFollowingText(absl::string_view text) { following_text_ = std::string(text); }\n",
+     "  void SetFollowingText(absl::string_view text) { following_text_ = std::string(text); }\n"
+     "  void SetRevision(bool has_revision, int revision) { has_revision_ = has_revision; revision_ = revision; }\n")
+edit(H, "  std::string following_text_;\n", "  std::string following_text_;\n  bool has_revision_ = false;\n  int revision_ = 0;\n")
+edit(T, "  if (!following_text_.empty()) input->mutable_context()->set_following_text(following_text_);\n",
+     "  if (!following_text_.empty()) input->mutable_context()->set_following_text(following_text_);\n"
+     "  if (has_revision_) input->mutable_context()->set_revision(revision_);\n")
+edit(T, """  } else if (command == "SET_FOLLOWING_TEXT") {""", """  } else if (command == "SET_REVISION") {
+    client_->SetRevision(args.size() >= 2 && !args[1].empty(),
+                         args.size() >= 2 && !args[1].empty() ? NumberUtil::SimpleAtoi(args[1]) : 0);
+  } else if (command == "SET_FOLLOWING_TEXT") {""")
 
 # 人工知能を、zenz-v3.2-small を追加学習した ft-v5 に替える（tools/zenz-finetune、配布ページ model-zenz-ft-v5）。
 # ファイル名を変えるので、前の版を入れた人も導入時に新しいほうを取りに行く。取れなかったときは前の名前のファイルを使う。

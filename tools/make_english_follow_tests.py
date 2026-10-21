@@ -10,6 +10,11 @@ IME ではスペースで変換するので、英語の文を1語ずつ（make �
                                                英語か日本語か決められない（打った人にしか分からない）ので、合否にせず数だけ出す（寄せの代償の目安）
 語の一覧と前の文はこのファイルに手で書いてある（決まった順番で作るので、何度流しても同じ表ができる。実装を見て決めていない）。  tests/conversion/english-follow-history.tsv  word と同じ語を、前の文を入力欄の前の文として渡さず、前の語をキーで打って確定してから打つ
                                                （server →変換→確定→空白→次の語）。変換の履歴から直前を取る道の確かめ。tools/english_follow_history.sh
+  tests/conversion/english-follow-memory.tsv   前の文を渡さず、session が覚えた「さっき確定した文字」だけで英語寄せができるか。確定のあとの操作（場面）
+                                               を替える: 覚えているべき場面（空白・TestSendKey だけ・同じ入力欄・Backspace で戻る）と、捨てるべき場面
+                                               （覚えた分より前の Backspace・矢印・RESET_CONTEXT・入力欄の変更・IME を切る）。tools/english_follow_memory.sh
+  tests/conversion/english-follow-cause.tsv    記憶だけを止めて、変換の履歴から取る道が、確定のすぐあと・空白のあとで効くかを比べる（履歴が効かない理由の切り分け）
+  tests/conversion/english-follow-expire.tsv   同じ表で、覚えておく時間（試験では 3 秒に縮める）の内と外。tools/english_follow_memory.sh
 前の文は、末尾に空白があるもの（「make 」）とないもの（変換の履歴から取るときの形）の両方。
   python tools/make_english_follow_tests.py          # tests/conversion/ に書く
   python tools/make_english_follow_tests.py --stats  # 数だけ出す
@@ -98,6 +103,38 @@ def words_after_typed_english():
     return rows
 
 
+# 記憶の試験: 場面ごとの期待（tools/english_follow_memory.sh の場面）。KEEP は記憶が残って英語になるべき、DROP は捨てられて
+# 止めた版（MYIME_ENGLISH_FOLLOW=off）と同じになるべき
+MEMORY_KEEP = ["space", "testkey", "same-field", "bs-in"]
+MEMORY_DROP = ["bs-beyond", "arrow", "reset", "field", "ime-off"]
+MEMORY_WORDS = """make take same name home game one some mode data date base size tone zone house mouse region session token theme
+image domain engine""".split()
+
+
+def memory_scenarios():
+    rows = []
+    for i, word in enumerate(MEMORY_WORDS):
+        for j, scenario in enumerate(MEMORY_KEEP + MEMORY_DROP):
+            rows.append((word, word, HISTORY_BEFORE[(i + j) % len(HISTORY_BEFORE)], scenario))
+    return rows
+
+
+def expire_scenarios():
+    rows = []
+    for i, word in enumerate(MEMORY_WORDS[:12]):
+        for j, scenario in enumerate(("nowait", "wait")):
+            rows.append((word, word, HISTORY_BEFORE[(i + j) % len(HISTORY_BEFORE)], scenario))
+    return rows
+
+
+def cause_scenarios():
+    rows = []
+    for i, word in enumerate(MEMORY_WORDS[:12]):
+        for j, scenario in enumerate(("nospace", "space")):
+            rows.append((word, word, HISTORY_BEFORE[(i + j) % len(HISTORY_BEFORE)], scenario))
+    return rows
+
+
 def english_after_japanese():
     rows = []
     for i, word in enumerate(WORDS[:-MIXED_TAIL]):
@@ -119,6 +156,12 @@ FILES = [
      "# 日本語のあとに英単語1語を打つ場面。前の文が日本語なので今までどおり（前の文なしと同じ結果）を期待する。tools/make_english_follow_tests.py で作成。列: ローマ字<TAB>語<TAB>前の文"),
     ("english-follow-history.tsv", words_after_typed_english,
      "# 前の語をキーで打って確定してから（変換の履歴が前の文になる）、次の1語を打つ場面。列: ローマ字<TAB>期待<TAB>前に打って確定する語。tools/english_follow_history.sh で流す"),
+    ("english-follow-memory.tsv", memory_scenarios,
+     "# session が覚えた直前の確定だけで英語寄せができるか（前の文は渡さない）。列: ローマ字<TAB>期待<TAB>前に打って確定する語<TAB>場面。tools/english_follow_memory.sh で流す"),
+    ("english-follow-expire.tsv", expire_scenarios,
+     "# 覚えておく時間の内（nowait）と外（wait）。MYIME_ENGLISH_FOLLOW_TTL_MS=3000 で tools/english_follow_memory.sh を流す。列は memory と同じ"),
+    ("english-follow-cause.tsv", cause_scenarios,
+     "# 履歴の道が効かない理由の切り分け。session の記憶だけを止めて（MYIME_ENGLISH_FOLLOW_MEMORY=off）、確定のすぐあと（nospace）と、確定のあとに空白を打ったとき（space）を比べる。列は memory と同じ"),
     ("english-follow-bare.tsv", bare_after_english,
      "# 英語の語のあとに、英単語と綴りが同じ日本語の語だけを1語で打つ場面（英語か日本語か決められない。合否にせず数だけ出す）。tools/make_english_follow_tests.py で作成。列: ローマ字<TAB>語<TAB>前の文"),
 ]
@@ -133,7 +176,7 @@ def main():
         if args.stats:
             print(name, len(rows))
             continue
-        text = header + "\n" + "".join(f"{r}\t{e}\t{b}\n" for r, e, b in rows)
+        text = header + "\n" + "".join("\t".join(row) + "\n" for row in rows)
         (OUT / name).write_text(text, encoding="utf-8", newline="\n")
         print("wrote", name, len(rows))
 

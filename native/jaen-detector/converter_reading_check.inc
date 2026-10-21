@@ -79,13 +79,18 @@ bool EnglishFollowEnabled() {
   return enabled;
 }
 
-// 直前に確定した文字が英字の語で終わっているか。入力欄の前の文（クライアントが渡した preceding_text）があれば
-// それを、なければ変換の履歴（直前に確定した文節の先頭の候補）を見る。
+// 直前に確定した文字が英字の語で終わっているか。次の順で、取れたものだけを見る。
+//   1. 入力欄の前の文（クライアントが渡した preceding_text）
+//   2. session が覚えている「さっき確定した文字」（recent_committed_text。session/session.cc が、前の文がないときだけ
+//      詰める。確定・変換を通らなかった空白や英字を足し、入力欄が変わる・カーソルが動く・60 秒たつと捨てる）
+//   3. 変換の履歴（直前に確定した文節の先頭の候補。Mozc は空白を打つと履歴を消すので、実際にはほぼ空）
 bool PreviousEndsInEnglish(const ConversionRequest& request, const Segments& segments) {
   if (!EnglishFollowEnabled()) return false;
   const auto [left, right] = request.GetSurroundingContext();
   static_cast<void>(right);
   if (!left.empty()) return jaen::EndsWithEnglishWord(left);
+  const std::string& remembered = request.context().recent_committed_text();
+  if (!remembered.empty()) return jaen::EndsWithEnglishWord(remembered);
   const size_t history = segments.history_segments_size();
   if (history == 0) return false;
   const Segment& last = segments.history_segment(history - 1);

@@ -15,6 +15,7 @@
 #   n: 英語の文を1語ずつ確定しながら打つ場面（直前の確定が英字の語で終わるとき、次の変換を英語寄りにする。docs/english-follow.md）。
 #      tests/conversion/english-follow-{word,ja,control,bare}.tsv を前の文を渡す形で（tools/context_convert.sh）、-history.tsv を前の語をキーで
 #      打って確定する形で（tools/english_follow_history.sh）流す。既定の版と、止めた版（MYIME_ENGLISH_FOLLOW=off）の両方。
+#      -memory.tsv / -expire.tsv は session が覚える直前の確定の試験（tools/english_follow_memory.sh、前の文は渡さない）。
 #      tools/make_english_follow_tests.py、tools/score_english_follow.py
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
@@ -153,6 +154,24 @@ n)
     HISTF="bash $REPO/tools/english_follow_history.sh $E/session_handler_main $E $MODEL $T/english-follow-history.tsv"
     $HISTF $OUT/english-follow-history.tsv 4
     MYIME_ENGLISH_FOLLOW=off $HISTF $OUT/english-follow-history-off.tsv 4
+  fi
+  # session の記憶（前の文を渡さない）: 確定のあとの操作（空白・Backspace・矢印・入力欄の変更 ...）を替えて、記憶が残る場面と捨てられる場面を比べる。
+  # 覚える時間の試験（expire）は、時間を 3 秒に縮めて別に流す。どちらも既定の版と止めた版（off）の両方
+  if [ -f $T/english-follow-memory.tsv ]; then
+    MEMF="bash $REPO/tools/english_follow_memory.sh $E/session_handler_main $E $MODEL $T/english-follow-memory.tsv"
+    $MEMF $OUT/english-follow-memory.tsv 4
+    MYIME_ENGLISH_FOLLOW=off $MEMF $OUT/english-follow-memory-off.tsv 4
+  fi
+  # 履歴の道の切り分け: 記憶だけを止めて（MYIME_ENGLISH_FOLLOW_MEMORY=off）、確定のすぐあと（nospace）と空白のあと（space）を比べる
+  if [ -f $T/english-follow-cause.tsv ]; then
+    CAUF="bash $REPO/tools/english_follow_memory.sh $E/session_handler_main $E $MODEL $T/english-follow-cause.tsv"
+    MYIME_ENGLISH_FOLLOW_MEMORY=off $CAUF $OUT/english-follow-cause.tsv 4
+    MYIME_ENGLISH_FOLLOW=off $CAUF $OUT/english-follow-cause-off.tsv 4
+  fi
+  if [ -f $T/english-follow-expire.tsv ]; then
+    EXPF="bash $REPO/tools/english_follow_memory.sh $E/session_handler_main $E $MODEL $T/english-follow-expire.tsv"
+    MYIME_ENGLISH_FOLLOW_TTL_MS=3000 $EXPF $OUT/english-follow-expire.tsv 4
+    MYIME_ENGLISH_FOLLOW=off MYIME_ENGLISH_FOLLOW_TTL_MS=3000 $EXPF $OUT/english-follow-expire-off.tsv 4
   fi
   ;;
 r)

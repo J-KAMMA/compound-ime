@@ -281,6 +281,17 @@ jobs:
               head -40 results/english-follow-$f-score.txt
             fi
           done
+          # session の記憶の試験（組 n）: 残る場面は英語の1語になった数、捨てる場面は止めた版と同じか。expire は覚える時間を 3 秒に縮めたもの
+          for f in memory expire; do
+            if [ -f results/english-follow-$f.tsv ] && [ -f results/english-follow-$f-off.tsv ] && [ -f repo/tests/conversion/english-follow-$f.tsv ]; then
+              python3 repo/tools/score_english_follow.py memory repo/tests/conversion/english-follow-$f.tsv results/english-follow-$f.tsv results/english-follow-$f-off.tsv > results/english-follow-$f-score.txt || true
+              echo "== $f"; head -40 results/english-follow-$f-score.txt
+            fi
+          done
+          if [ -f results/english-follow-cause.tsv ] && [ -f results/english-follow-cause-off.tsv ]; then
+            python3 repo/tools/score_english_follow.py cause repo/tests/conversion/english-follow-cause.tsv results/english-follow-cause.tsv results/english-follow-cause-off.tsv > results/english-follow-cause-score.txt || true
+            echo "== cause"; cat results/english-follow-cause-score.txt
+          fi
           # 開発の道具の名前の候補（組 q）の採点と、F10・Shift の記録
           if [ -f results/domain-tools-cand.tsv ] && [ -f repo/tests/conversion/domain-tools-cand.tsv ]; then
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/domain-tools-cand.tsv results/domain-tools-cand.tsv "開発の道具の候補" > results/domain-tools-cand-score.txt
