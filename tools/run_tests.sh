@@ -119,6 +119,20 @@ k)
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
   fi
   ;;
+q)
+  # 開発の道具の名前（opencode ...）: 名前だけを打って変換したときの候補の並び（採点は tools/score_proper_nouns.py candidates）と、
+  # 英字で打ち続けたいときの操作（F10、Shift で始める）が今の版で効くかの記録（tools-keys.txt）
+  if [ -f $T/domain-tools-cand.tsv ]; then
+    grep -v '^#' $T/domain-tools-cand.tsv | cut -f1 > $W/tools-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/tools-cand.txt $OUT/domain-tools-cand.tsv 4
+  fi
+  for r in opencode opencodewotsukau. kyouhaopencodewotsukau. Opencode Opencodewotsukau. kyouhaOpencodewotsukau. claudecode geminicli; do
+    for how in F10 F9 Space Enter; do
+      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\t%s\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" "$how" > $W/key.tsv
+      echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
+    done
+  done | tee $OUT/tools-keys.txt
+  ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
   # 採点はまとめの段で（tools/score_colloquial.py。厳しい採点と、記号・かな漢字の揺れを許す緩い採点）

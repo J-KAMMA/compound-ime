@@ -262,6 +262,12 @@ jobs:
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/proper-nouns-cand.tsv results/proper-nouns-cand.tsv "固有名詞の候補" > results/proper-nouns-cand-score.txt
             head -26 results/proper-nouns-cand-score.txt
           fi
+          # 開発の道具の名前の候補（組 q）の採点と、F10・Shift の記録
+          if [ -f results/domain-tools-cand.tsv ] && [ -f repo/tests/conversion/domain-tools-cand.tsv ]; then
+            python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/domain-tools-cand.tsv results/domain-tools-cand.tsv "開発の道具の候補" > results/domain-tools-cand-score.txt
+            head -30 results/domain-tools-cand-score.txt
+          fi
+          [ -f results/tools-keys.txt ] && cat results/tools-keys.txt
           # ja400.json の話し言葉の区分（colloquial）の結果。話し言葉の打ち込み試験（組 h）と並べて見る
           if [ -f results/ja400.tsv ]; then
             python3 repo/tools/score_categories.py results/ja400.tsv repo/tests/conversion/ja400.json > results/ja400-score.txt
