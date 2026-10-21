@@ -245,6 +245,10 @@ f)
 s)
   # 数字の間の点と文末の句点。文は tools/make_decimal_tests.py で作る。採点は数字と「. , 。 、 %」の並びだけ（漢字・かなは見ない）。
   # 半角の設定では、全角の数字・「．」「，」が出ても違いとする（数字は半角で点だけ全角、を見つける）。違いがあっても最後まで流し、最後に失敗にする
+  # 打った算用数字を漢数字にしない部分の単体試験（Mozc を組み立てずに g++ で動く）
+  g++ -std=c++20 -O2 -I $REPO/native/jaen-detector \
+    $REPO/native/jaen-detector/typed_digits_test.cc -o $W/typed_digits_test
+  $W/typed_digits_test | tee $OUT/typed-digits.txt
   python3 $REPO/tools/make_decimal_config.py $W/half.db
   fail=0
   run_decimal() {  # <試験名> <半角|既定> <変換|入力中>

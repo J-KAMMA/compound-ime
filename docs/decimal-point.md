@@ -56,3 +56,15 @@
 - 人工知能（Zenzai）を使う変換での動き（手元は人工知能なし）。
 - 画面側（Windows の入力中の表示）。
 - 隣の問題として、`2026/10/21` が「2026・10・21」になる（`/` が「・」）、`12:30` の入力中の表示が全角の「：」になる、を見つけたが、今回は直していない。
+
+## 打った算用数字が漢数字になる（2026-10-21、同じ枝で追加）
+
+小数の直しのあと、打った算用数字が変換で漢数字になった（`980` → 九百八十、`10` → 十、`4.1` → `4.一`、`100` → 百、`1,2,3` → 一、二、三）。原因は点ではなく、数字の表記を選ぶ段にある。
+
+1. **Mozc の数字の書き換え**: `rewriter/number_rewriter.cc` の `NumberRewriter::Finish`（この木では `patches/mozc-base.patch` 6772 行目付近で触っている）が、数字の読みの候補に漢数字・算用数字・全角の表記を足し、並べる。`converter/immutable_converter.cc` に足した `prediction::NumberDecoder`（同パッチ 2400 行目付近）も、同じ読みに漢数字と算用数字の候補を作る。打った `980` はどちらの候補にもなる。
+2. **人工知能の全文の候補**: `tools/apply_jaen_integration.py` の `PreferWholePhrase`（1932 行目付近で呼び出し、`MatchWholePhrase` はパッチ 3226 行目付近）は、人工知能（Zenzai）の文を Mozc の文節の候補と突き合わせ、一致した候補を先頭へ移す。人工知能が「九百八十」と書いた文は、Mozc にも「九百八十」の候補があるため、そのまま先頭になる。
+3. **選び手**: `tools/apply_selector_stage3.py` は変換の最後に文節の候補を移す（489〜500 行目付近）。そのため、その前の段で数字に戻しても、また漢数字が先頭になり得る。
+
+直し方: `native/jaen-detector/typed_digits.inc` の `KeepsTypedDigits` / `ReplaceWithTypedDigits` を `Converter::PreferTypedDigits`（`tools/apply_jaen_integration.py` 220 行目付近）から呼ぶ。打った読み（文節の鍵）に算用数字がある文節だけを対象に、先頭の候補が打った数字をそのまま含んでいなければ、同じ数字を持つ候補を先頭へ移し、なければ先頭の候補の数字の部分だけを打った数字に戻す（`九百八十円` → `980円`、`十度` → `10度`、`4.一点` → `4.1点`、`10.0.0.一` → `10.0.0.1`）。数字の幅は打った鍵（数字の設定）に合わせる。かなで打った「一つ」「一番」「十分」は鍵に算用数字がないので触らない。呼ぶ場所は Mozc の書き換えのあと（`tools/apply_jaen_integration.py` 3219 行目付近）、人工知能と同音語の選択のあと（同 1656 行目付近）、選び手のあと（`tools/apply_selector_stage3.py` 506 行目）の3か所。
+
+試験: 単体は `native/jaen-detector/typed_digits_test.cc`（組 `s` が g++ で組み立てて動かす）。`tests/conversion/decimal.tsv` に、かなで打った漢数字の語（一つ、一番、十分、三人、六時、百円、三匹、二十年、十一月、四十分、一人前、七十歳）を足し、算用数字に化けたら `tools/score_decimal.py` が違いとして数えるようにした。
