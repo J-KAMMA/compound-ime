@@ -4,12 +4,12 @@
 
 名前を小文字のローマ字のまま打ち（opencode、claudecode、geminicli ...）、名前だけの入力と、
 文頭・文中・文末・後ろに助詞（を、で、は、が、について）が付く文に入れる。期待するのは
-公式の書き方（opencode、Claude Code、VS Code ...）。打つ形と期待する形は、日本語のローマ字として
+公式の書き方（OpenCode、Claude Code、VS Code ...）。打つ形と期待する形は、日本語のローマ字として
 読める語（codex の「こでx」、cursor の「くrそr」）と取り違えやすい形を含む。
 列: ローマ字<TAB>期待する文<TAB>出典名（tools）
 """
 NAMES = [
-    ("opencode", "opencode"), ("claudecode", "Claude Code"), ("codex", "Codex"),
+    ("opencode", "OpenCode"), ("claudecode", "Claude Code"), ("codex", "Codex"),
     ("cursor", "Cursor"), ("ollama", "Ollama"), ("llamacpp", "llama.cpp"),
     ("huggingface", "Hugging Face"), ("langchain", "LangChain"), ("openai", "OpenAI"),
     ("anthropic", "Anthropic"), ("geminicli", "Gemini CLI"), ("copilot", "Copilot"),

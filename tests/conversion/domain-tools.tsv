@@ -1,12 +1,12 @@
 # 開発の道具・サービスの名前の試験。tools/tool_names_test.py で作成（手で書いた、実装を見ない打ち方）。名前は小文字のローマ字のまま打ち、公式の書き方で出ることを期待する。
-opencode	opencode	tools
-opencodewotsukaimasu.	opencodeを使います。	tools
-opencodedejikkoushimasu.	opencodeで実行します。	tools
-kinouopencodewotsukaimashita.	昨日opencodeを使いました。	tools
-opencodehasaikoudesu.	opencodeは最高です。	tools
-watashihaopencodegasukidesu.	私はopencodeが好きです。	tools
-kyouhaopencodewo	今日はopencodeを	tools
-korekaraopencodenitsuiteshirabemasu.	これからopencodeについて調べます。	tools
+opencode	OpenCode	tools
+opencodewotsukaimasu.	OpenCodeを使います。	tools
+opencodedejikkoushimasu.	OpenCodeで実行します。	tools
+kinouopencodewotsukaimashita.	昨日OpenCodeを使いました。	tools
+opencodehasaikoudesu.	OpenCodeは最高です。	tools
+watashihaopencodegasukidesu.	私はOpenCodeが好きです。	tools
+kyouhaopencodewo	今日はOpenCodeを	tools
+korekaraopencodenitsuiteshirabemasu.	これからOpenCodeについて調べます。	tools
 claudecode	Claude Code	tools
 claudecodewotsukaimasu.	Claude Codeを使います。	tools
 claudecodedejikkoushimasu.	Claude Codeで実行します。	tools
