@@ -1,0 +1,64 @@
+# 英語の語のあとに、英単語と綴りが同じ日本語の語だけを1語で打つ場面（英語か日本語か決められない。合否にせず数だけ出す）。tools/make_english_follow_tests.py で作成。列: ローマ字<TAB>語<TAB>前の文
+take	take	Slack 
+sake	sake	I want to 
+same	same	make 
+hate	hate	今日は meeting 
+son	son	Google
+min	min	iPhone 
+bin	bin	Please
+mine	mine	Notion 
+mare	mare	Slack 
+hone	hone	I want to 
+ago	ago	make 
+numa	numa	今日は meeting 
+tuna	tuna	Google
+tuba	tuba	iPhone 
+iso	iso	Please
+saga	saga	Notion 
+bingo	bingo	Slack 
+kohaku	kohaku	I want to 
+dote	dote	make 
+shake	shake	今日は meeting 
+dome	dome	Google
+hobo	hobo	iPhone 
+sonata	sonata	Please
+pen	pen	Notion 
+banana	banana	Slack 
+memo	memo	I want to 
+mini	mini	make 
+domino	domino	今日は meeting 
+mania	mania	Google
+panda	panda	iPhone 
+home	home	Please
+make	make	Notion 
+mate	mate	Slack 
+hare	hare	I want to 
+tame	tame	make 
+some	some	今日は meeting 
+name	name	Google
+bake	bake	iPhone 
+kane	kane	Please
+hon	hon	Notion 
+men	men	Slack 
+ken	ken	I want to 
+sen	sen	make 
+ban	ban	今日は meeting 
+san	san	Google
+ten	ten	iPhone 
+jin	jin	Please
+hen	hen	Notion 
+kin	kin	Slack 
+kare	kare	I want to 
+dare	dare	make 
+tango	tango	今日は meeting 
+kimono	kimono	Google
+karate	karate	iPhone 
+mama	mama	Please
+piano	piano	Notion 
+demo	demo	Slack 
+tomato	tomato	I want to 
+papa	papa	make 
+zero	zero	今日は meeting 
+nano	nano	Google
+panama	panama	iPhone 
+pino	pino	Please

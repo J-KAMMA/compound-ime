@@ -1736,6 +1736,16 @@ subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py
                 "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
 
+# 大文字を含む英字の固有名詞（dictionary14.txt）: ぐーぐる の候補に Google、にゅーよーく に New York など
+# （tools/data/proper-nouns.tsv。カタカナの語があればその次、なければ既存の語より後ろ）。
+# 日本語に読める略語（あい → AI、うい → UI。tools/data/acronyms.tsv の型 b）は、読みが2かなでも、読みの候補の
+# 2〜3番目に入れる（一番安い語の品詞を使うので、文の中で一番安い語に勝たない）。
+subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.py"), "--mozc", str(src),
+                "--names", str(REPO / "tools/data/proper-nouns.tsv"),
+                "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
+                "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
+(src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
@@ -2627,16 +2637,35 @@ for line in (REPO / "tools/data/domain-casing.tsv").read_text(encoding="utf-8").
         if typed not in _cased and shown != typed and '"' not in shown and "\\" not in shown:
             pairs.append([typed, shown])
             _cased.add(typed)
-assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs)
+# 大文字を含む英字の固有名詞（tools/data/proper-nouns.tsv。tools/build_proper_nouns.py で作る。Wikidata CC0）の
+# 表示の形も足す（上の表を優先）。普通の英単語でもある名前（印 s: china、shell）は、打った形を先に、
+# 固有名詞を2番目に出す表（kBrandCasingSecond）に入れる。打つ形が2語（new york）の名前は、英語の言い回しの
+# 一覧にも入れる（下の kPhrases）。
+second_pairs = []
+proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.tsv").read_text(encoding="utf-8").splitlines()
+                if line and not line.startswith("#")]
+for row in proper_nouns:
+    shown, typed_form = row[0], row[1]
+    if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
+        (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
+        _cased.add(typed_form)
+assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs + second_pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"
     "inline constexpr const char* kBrandCasing[][2] = {\n" +
-    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(pairs)) + "};\n",
+    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(pairs)) + "};\n"
+    "// Names that are also common English words: the word as typed first, the name second.\n"
+    "// (An empty first entry keeps the array from being empty.)\n"
+    "inline constexpr const char* kBrandCasingSecond[][2] = {\n    {\"\", \"\"},\n" +
+    "".join(f'    {{"{a}", "{b}"}},\n' for a, b in sorted(second_pairs)) + "};\n",
     encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.h", """// Kana trigram model of Mozc's dictionary readings, for jaen::FixTypo.""",
      """// The official spelling of a brand or service name typed in lowercase
 // ("youtube" -> "YouTube"), or empty (tools/data/brand-casing.tsv).
 std::string_view BrandCasing(std::string_view typed);
+
+// A name that is also a common English word ("china" -> "China"): shown after the word as typed.
+std::string_view BrandCasingSecond(std::string_view typed);
 
 // Kana trigram model of Mozc's dictionary readings, for jaen::FixTypo.""")
 edit("converter/english_lexicon.h", """#include "converter/correction_log.h"
@@ -2658,6 +2687,17 @@ edit("converter/english_lexicon.cc", """jaen::ChoiceStore& EnglishChoices() {"""
                                                           : std::string_view();
 }
 
+std::string_view BrandCasingSecond(std::string_view typed) {
+  const auto* end = std::end(kBrandCasingSecond);
+  const auto* it = std::lower_bound(std::begin(kBrandCasingSecond), end, typed,
+                                    [](const auto& entry, std::string_view key) {
+                                      return std::string_view(entry[0]) < key;
+                                    });
+  return it != end && std::string_view((*it)[0]) == typed && !typed.empty()
+             ? std::string_view((*it)[1])
+             : std::string_view();
+}
+
 jaen::ChoiceStore& EnglishChoices() {""")
 t = (src / "converter/english_lexicon.cc").read_text(encoding="utf-8")
 if "#include <algorithm>" not in t:
@@ -2675,9 +2715,75 @@ edit("converter/converter.cc", """      PutTypedValueFirst((next++)->second, &se
       if (const std::string_view official = BrandCasing(typed);
           !official.empty() && !EnglishLexicon().FindPlace(typed)) {
         PutTypedValueFirst(official, &segment);
+      } else if (const std::string_view second = BrandCasingSecond(typed);
+                 !second.empty() && !EnglishLexicon().FindPlace(typed)) {
+        // A name that is also a common word (china, shell): the word as typed
+        // stays first, the name is second.
+        PutTypedValueFirst(second, &segment);
+        PutTypedValueFirst(typed, &segment);
       }
       AddPlaceKanji(&segment);""")
 
+# 空白を入れて見せる英語の文節（claude code）も、空白を除いた打つ形（claudecode）で公式の書き方
+# （Claude Code）を引く。
+edit("converter/converter.cc", """      if (const std::string_view official = BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""", """      std::string unspaced;
+      for (const char c : typed) {
+        if (c != ' ') unspaced.push_back(c);
+      }
+      if (const std::string_view official = BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""")
+
+
+# 英語が見つかった短い入力（opencode、geminicli）で、打った英字そのものを4番目の候補に必ず入れる。
+# 打った英字は今まで F9/F10 でしか出なかった。英語として取れなかった語（一覧にない名前）の逃げ道は
+# F10（打ったまま）と、最初の文字を Shift で打つ入力。
+edit("converter/converter.h", """  void AddPlaceKanji(Segment* segment) const;""", """  void AddPlaceKanji(Segment* segment) const;
+
+  // When English was found in a short composition of lowercase letters only,
+  // adds what was typed (opencode) as the fourth candidate of the first
+  // segment, spanning every segment and never learned.
+  void AddRawAsEnglish(const ConversionRequest& request, Segments* segments) const;""")
+edit("converter/converter.cc", """void Converter::AddPlaceKanji(Segment* segment) const {""", """void Converter::AddRawAsEnglish(const ConversionRequest& request,
+                                Segments* segments) const {
+  if (segments->conversion_segments_size() == 0 ||
+      segments->conversion_segment(0).candidates_size() == 0) {
+    return;
+  }
+  std::string raw;
+  for (const composer::CharChunk& chunk :
+       request.composer().composition().GetCharChunkList()) {
+    raw.append(chunk.raw());
+  }
+  if (raw.size() < 4 || raw.size() > 24) return;
+  for (const char c : raw) {
+    if (c < 'a' || c > 'z') return;
+  }
+  Segment* first = segments->mutable_conversion_segment(0);
+  for (size_t i = 0; i < first->candidates_size(); ++i) {
+    if (first->candidate(i).value == raw) return;
+  }
+  std::string key;
+  for (const Segment& segment : segments->conversion_segments()) {
+    key.append(segment.key());
+  }
+  Candidate* candidate =
+      first->insert_candidate(std::min<size_t>(3, first->candidates_size()));
+  candidate->key = candidate->content_key = key;
+  candidate->value = candidate->content_value = raw;
+  candidate->lid = candidate->rid = general_noun_id_;
+  candidate->cost = first->candidate(0).cost + 1;
+  candidate->converted_segment_count =
+      static_cast<uint32_t>(segments->conversion_segments_size());
+  candidate->attributes |= Attribute::NO_LEARNING | Attribute::NO_VARIANTS_EXPANSION;
+}
+
+void Converter::AddPlaceKanji(Segment* segment) const {""")
+edit("converter/converter.cc", """  if (typo_fixed) AddTypedAsIs(request, segments);""", """  if (typo_fixed) {
+    AddTypedAsIs(request, segments);
+  } else if (!english.empty()) {
+    AddRawAsEnglish(request, segments);
+  }""")
 
 # AI time budget: Section: an AI time budget per conversion so a busy PC never freezes the app.
 # 
@@ -2979,19 +3085,23 @@ edit("converter/english_lexicon.cc",
 # ローマ字でないとき（lo が「ぉ」、c が残る）だけ、文節の切れ目で英単語として取る。
 signal = (lexdir / "signal-words.txt").read_text(encoding="ascii").split()
 # 略語・IT・サービス名（tools/data/jaen-modern-words.tsv、約6,000語）も、強い印のときだけ使う語に足す
-signal += [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
-           if line and not line.startswith("#") and "\t" in line]
+named = [line.split("\t")[0] for line in (REPO / "tools/data/jaen-modern-words.tsv").read_text(encoding="utf-8").splitlines()
+         if line and not line.startswith("#") and "\t" in line]
+# 大文字を含む英字の固有名詞（tools/data/proper-nouns.tsv）のうち、英語として取れる名前（打つ形が空でないもの）
+signal += [row[1] for row in proper_nouns if row[1] and " " not in row[1]]
 inc = src / "converter/english_lexicon_data.inc"
-inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal), encoding="utf-8", newline="\n")
+inc.write_text(inc.read_text(encoding="utf-8") + array("kSignalWords", signal) + array("kNamedWords", named), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n",
      "    for (const char* word : kJoinedWords) words->AddJoined(word);\n"
-     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n")
+     "    for (const char* word : kSignalWords) words->AddSignalOnly(word);\n"
+     "    for (const char* word : kNamedWords) words->AddNamed(word);\n")
 
 # 英語の決まった言い回し: 節: tools/data/english-phrases.txt（see you、made in japan など）を組み込む。
 # 続けて打った言い回しは、かなの切れ目の上なら1つの英語の文節にし、空白を入れて表示する。
 phrases = [line.strip() for line in (REPO / "tools/data/english-phrases.txt").read_text(encoding="utf-8").splitlines()
            if line.strip() and not line.startswith("#")]
+phrases += [row[1] for row in proper_nouns if " " in row[1]]  # new york、los angeles など2語以上の名前
 inc = src / "converter/english_lexicon_data.inc"
 inc.write_text(inc.read_text(encoding="utf-8") + array("kPhrases", phrases), encoding="utf-8", newline="\n")
 edit("converter/english_lexicon.cc",
@@ -3505,6 +3615,54 @@ edit("converter/converter.cc",
 edit("converter/converter.cc",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading);",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);")
+
+# 打った英字の並びが英単語として読めるなら英語にする: 節: ローマ字として日本語に読める英単語（made、take、same、
+# one）は、前後の読みが日本語として自然かで決める。英語にしていない日本語の部分ごとに、Mozc の辞書と
+# 接続の費用で「全部を日本語の語で読む一番安い費用」と「英単語を入れてよい分け方での一番安い費用」を
+# 比べ、英語のほうが十分（2000、英単語1語だけなら 3500）安いときだけ英語にする。助詞・活用が続いて
+# 日本語として自然に読める文は日本語のまま。中身は native/jaen-detector（jaen_detector.cc の
+# SplitEnglish の |japanese_model|、converter_reading_check.inc の JapanesePrefixCollector）。
+# MYIME_ALL_ENGLISH=off で止める。
+edit("converter/converter.cc",
+     "    return ReadsAsJapanese(modules(), kana) &&\n           ReadingCost(modules(), kana, &reading_cache) < kNaturalReadingCost;\n  };\n",
+     "    return ReadsAsJapanese(modules(), kana) &&\n           ReadingCost(modules(), kana, &reading_cache) < kNaturalReadingCost;\n  };\n"
+     "  // The Japanese dictionary and connection costs, for deciding by context whether a typed word that\n"
+     "  // also reads as Japanese romaji (made, take) is English.\n"
+     "  jaen::JapaneseModel japanese_model;\n"
+     "  japanese_model.prefix_words = [this](std::string_view kana, std::vector<jaen::JapaneseWord>* words) {\n"
+     "    JapanesePrefixCollector collector(words);\n"
+     "    modules().GetDictionary().LookupPrefix(kana, &collector);\n"
+     "  };\n"
+     "  japanese_model.transition = [this](uint16_t rid, uint16_t lid) {\n"
+     "    return modules().GetConnector().GetTransitionCost(rid, lid);\n"
+     "  };\n"
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n")
+edit("converter/converter.cc",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);")
+edit("converter/converter.cc",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);")
+# 英語の文を1語ずつ打つ人（make →変換→確定→空白→ sure →変換）: 節: 直前に確定した文字が英字の語で終わっているとき、
+# 次の変換の英語の判定を英語寄りにする。直前の文字は、入力欄の前の文（request.GetSurroundingContext() の左、
+# クライアントが preceding_text で渡したもの）から、空なら変換の履歴（Segments の履歴の最後の文節の先頭の候補）から取る。
+# 英字の語（空白を除いた最後の文字が A-Z、a-z）で終わるなら、入力の最初から終わりまでがまるごと一覧の英単語1語で読める
+# ときだけ、日本語から英語への切り替えの費用を払わず、差 2000（follow_margin）で英語にする。助詞・活用が続く並び
+# （takewotabeta）、入力の途中の語、直前が日本語のときは今までどおり。中身は native/jaen-detector
+# （jaen_detector.cc の EndsWithEnglishWord と decide の follows_text）、converter_reading_check.inc の PreviousEndsInEnglish。
+# MYIME_ENGLISH_FOLLOW=off で止める（既定は有効）。
+edit("converter/converter.cc",
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n",
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n"
+     "  // Whether the text committed just before ends in an English word (typing English one word at a time).\n"
+     "  const bool previous_english = context_model != nullptr && PreviousEndsInEnglish(request, *segments);\n")
+edit("converter/converter.cc",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model, nullptr, previous_english);")
+edit("converter/converter.cc",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model, nullptr, previous_english);")
+
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")

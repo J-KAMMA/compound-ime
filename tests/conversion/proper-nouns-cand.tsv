@@ -1,0 +1,2806 @@
+# 固有名詞の試験（候補）。tools/proper_noun_test.py で作成。列: ローマ字<TAB>期待する候補<TAB>方式（typed: 英字で打つ、kana: 読みを打つ、kana-kunrei: 訓令式、kana-small-x: 小さいかなを x で）<TAB>分野<TAB>由来
+google	Google	typed	company	hand
+Google	Google	info-capital	company	hand
+GOOGLE	Google	info-allcaps	company	hand
+gu-guru	Google	kana	company	hand
+microsoft	Microsoft	typed	company	hand
+Microsoft	Microsoft	info-capital	company	hand
+MICROSOFT	Microsoft	info-allcaps	company	hand
+maikurosofuto	Microsoft	kana	company	hand
+maikurosohuto	Microsoft	kana-kunrei	company	hand
+amazon	Amazon	typed	company	hand
+Amazon	Amazon	info-capital	company	hand
+AMAZON	Amazon	info-allcaps	company	hand
+amazonn	Amazon	kana	company	hand
+facebook	Facebook	typed	company	hand
+Facebook	Facebook	info-capital	company	hand
+FACEBOOK	Facebook	info-allcaps	company	hand
+feisubukku	Facebook	kana	company	hand
+fuxeisubukku	Facebook	kana-small-x	company	hand
+netflix	Netflix	typed	company	hand
+Netflix	Netflix	info-capital	company	hand
+NETFLIX	Netflix	info-allcaps	company	hand
+nettofurikkusu	Netflix	kana	company	hand
+nettohurikkusu	Netflix	kana-kunrei	company	hand
+tesla	Tesla	typed	company	hand
+Tesla	Tesla	info-capital	company	hand
+TESLA	Tesla	info-allcaps	company	hand
+tesura	Tesla	kana	company	hand
+nvidia	Nvidia	typed	company	hand
+Nvidia	Nvidia	info-capital	company	hand
+NVIDIA	Nvidia	info-allcaps	company	hand
+enubidhia	Nvidia	kana	company	hand
+enubidexia	Nvidia	kana-small-x	company	hand
+intel	Intel	typed	company	hand
+Intel	Intel	info-capital	company	hand
+INTEL	Intel	info-allcaps	company	hand
+innteru	Intel	kana	company	hand
+samsung	Samsung	typed	company	hand
+Samsung	Samsung	info-capital	company	hand
+SAMSUNG	Samsung	info-allcaps	company	hand
+samusunn	Samsung	kana	company	hand
+huawei	Huawei	typed	company	hand
+Huawei	Huawei	info-capital	company	hand
+HUAWEI	Huawei	info-allcaps	company	hand
+fa-wei	Huawei	kana	company	hand
+fuxa-uxei	Huawei	kana-small-x	company	hand
+xiaomi	Xiaomi	typed	company	hand
+Xiaomi	Xiaomi	info-capital	company	hand
+XIAOMI	Xiaomi	info-allcaps	company	hand
+shaomi	Xiaomi	kana	company	hand
+syaomi	Xiaomi	kana-kunrei	company	hand
+shixyaomi	Xiaomi	kana-small-x	company	hand
+disney	Disney	typed	company	hand
+Disney	Disney	info-capital	company	hand
+DISNEY	Disney	info-allcaps	company	hand
+dhizuni-	Disney	kana	company	hand
+dexizuni-	Disney	kana-small-x	company	hand
+walmart	Walmart	typed	company	hand
+Walmart	Walmart	info-capital	company	hand
+WALMART	Walmart	info-allcaps	company	hand
+whoruma-to	Walmart	kana	company	hand
+uxoruma-to	Walmart	kana-small-x	company	hand
+starbucks	Starbucks	typed	company	hand
+Starbucks	Starbucks	info-capital	company	hand
+STARBUCKS	Starbucks	info-allcaps	company	hand
+suta-bakkusu	Starbucks	kana	company	hand
+mcdonalds	McDonald's	typed	company	hand
+Mcdonalds	McDonald's	info-capital	company	hand
+MCDONALDS	McDonald's	info-allcaps	company	hand
+makudonarudo	McDonald's	kana	company	hand
+cocacola	Coca-Cola	typed	company	hand
+Cocacola	Coca-Cola	info-capital	company	hand
+COCACOLA	Coca-Cola	info-allcaps	company	hand
+coca-cola	Coca-Cola	info-hyphen	company	hand
+kokako-ra	Coca-Cola	kana	company	hand
+pepsi	Pepsi	typed	company	hand
+Pepsi	Pepsi	info-capital	company	hand
+PEPSI	Pepsi	info-allcaps	company	hand
+pepushi	Pepsi	kana	company	hand
+pepusi	Pepsi	kana-kunrei	company	hand
+nike	Nike	typed	company	hand
+Nike	Nike	info-capital	company	hand
+NIKE	Nike	info-allcaps	company	hand
+naiki	Nike	kana	company	hand
+adidas	Adidas	typed	company	hand
+Adidas	Adidas	info-capital	company	hand
+ADIDAS	Adidas	info-allcaps	company	hand
+adhidasu	Adidas	kana	company	hand
+adexidasu	Adidas	kana-small-x	company	hand
+puma	Puma	typed	company	hand
+Puma	Puma	info-capital	company	hand
+PUMA	Puma	info-allcaps	company	hand
+pu-ma	Puma	kana	company	hand
+toyota	Toyota	typed	company	hand
+Toyota	Toyota	info-capital	company	hand
+TOYOTA	Toyota	info-allcaps	company	hand
+toyota	Toyota	kana	company	hand
+honda	Honda	typed	company	hand
+Honda	Honda	info-capital	company	hand
+HONDA	Honda	info-allcaps	company	hand
+honnda	Honda	kana	company	hand
+nissan	Nissan	typed	company	hand
+Nissan	Nissan	info-capital	company	hand
+NISSAN	Nissan	info-allcaps	company	hand
+nissann	Nissan	kana	company	hand
+sony	Sony	typed	company	hand
+Sony	Sony	info-capital	company	hand
+SONY	Sony	info-allcaps	company	hand
+soni-	Sony	kana	company	hand
+panasonic	Panasonic	typed	company	hand
+Panasonic	Panasonic	info-capital	company	hand
+PANASONIC	Panasonic	info-allcaps	company	hand
+panasonikku	Panasonic	kana	company	hand
+nintendo	Nintendo	typed	company	hand
+Nintendo	Nintendo	info-capital	company	hand
+NINTENDO	Nintendo	info-allcaps	company	hand
+ninntenndo-	Nintendo	kana	company	hand
+uniqlo	Uniqlo	typed	company	hand
+Uniqlo	Uniqlo	info-capital	company	hand
+UNIQLO	Uniqlo	info-allcaps	company	hand
+yunikuro	Uniqlo	kana	company	hand
+rakuten	Rakuten	typed	company	hand
+Rakuten	Rakuten	info-capital	company	hand
+RAKUTEN	Rakuten	info-allcaps	company	hand
+rakutenn	Rakuten	kana	company	hand
+yahoo	Yahoo	typed	company	hand
+Yahoo	Yahoo	info-capital	company	hand
+YAHOO	Yahoo	info-allcaps	company	hand
+yafu-	Yahoo	kana	company	hand
+yahu-	Yahoo	kana-kunrei	company	hand
+oracle	Oracle	typed	company	hand
+Oracle	Oracle	info-capital	company	hand
+ORACLE	Oracle	info-allcaps	company	hand
+orakuru	Oracle	kana	company	hand
+adobe	Adobe	typed	company	hand
+Adobe	Adobe	info-capital	company	hand
+ADOBE	Adobe	info-allcaps	company	hand
+adobi	Adobe	kana	company	hand
+salesforce	Salesforce	typed	company	hand
+Salesforce	Salesforce	info-capital	company	hand
+SALESFORCE	Salesforce	info-allcaps	company	hand
+se-rusufo-su	Salesforce	kana	company	hand
+se-rusufuxo-su	Salesforce	kana-small-x	company	hand
+spotify	Spotify	typed	company	hand
+Spotify	Spotify	info-capital	company	hand
+SPOTIFY	Spotify	info-allcaps	company	hand
+supothifai	Spotify	kana	company	hand
+supotexifuxai	Spotify	kana-small-x	company	hand
+uber	Uber	typed	company	hand
+Uber	Uber	info-capital	company	hand
+UBER	Uber	info-allcaps	company	hand
+u-ba-	Uber	kana	company	hand
+airbnb	Airbnb	typed	company	hand
+Airbnb	Airbnb	info-capital	company	hand
+AIRBNB	Airbnb	info-allcaps	company	hand
+eabi-anndobi-	Airbnb	kana	company	hand
+paypal	PayPal	typed	company	hand
+Paypal	PayPal	info-capital	company	hand
+PAYPAL	PayPal	info-allcaps	company	hand
+peiparu	PayPal	kana	company	hand
+visa	Visa	typed	company	hand
+Visa	Visa	info-capital	company	hand
+VISA	Visa	info-allcaps	company	hand
+mastercard	Mastercard	typed	company	hand
+Mastercard	Mastercard	info-capital	company	hand
+MASTERCARD	Mastercard	info-allcaps	company	hand
+masuta-ka-do	Mastercard	kana	company	hand
+boeing	Boeing	typed	company	hand
+Boeing	Boeing	info-capital	company	hand
+BOEING	Boeing	info-allcaps	company	hand
+bo-inngu	Boeing	kana	company	hand
+airbus	Airbus	typed	company	hand
+Airbus	Airbus	info-capital	company	hand
+AIRBUS	Airbus	info-allcaps	company	hand
+eabasu	Airbus	kana	company	hand
+ferrari	Ferrari	typed	company	hand
+Ferrari	Ferrari	info-capital	company	hand
+FERRARI	Ferrari	info-allcaps	company	hand
+fera-ri	Ferrari	kana	company	hand
+fuxera-ri	Ferrari	kana-small-x	company	hand
+porsche	Porsche	typed	company	hand
+Porsche	Porsche	info-capital	company	hand
+PORSCHE	Porsche	info-allcaps	company	hand
+porushe	Porsche	kana	company	hand
+porushixe	Porsche	kana-small-x	company	hand
+volkswagen	Volkswagen	typed	company	hand
+Volkswagen	Volkswagen	info-capital	company	hand
+VOLKSWAGEN	Volkswagen	info-allcaps	company	hand
+forukusuwa-genn	Volkswagen	kana	company	hand
+fuxorukusuwa-genn	Volkswagen	kana-small-x	company	hand
+mercedesbenz	Mercedes-Benz	typed	company	hand
+Mercedesbenz	Mercedes-Benz	info-capital	company	hand
+MERCEDESBENZ	Mercedes-Benz	info-allcaps	company	hand
+mercedes-benz	Mercedes-Benz	info-hyphen	company	hand
+merusedesubenntsu	Mercedes-Benz	kana	company	hand
+merusedesubenntu	Mercedes-Benz	kana-kunrei	company	hand
+bmw	BMW	typed	company	hand
+Bmw	BMW	info-capital	company	hand
+BMW	BMW	info-allcaps	company	hand
+bi-emudaburyu-	BMW	kana	company	hand
+bi-emudaburixyu-	BMW	kana-small-x	company	hand
+ibm	IBM	typed	company	hand
+Ibm	IBM	info-capital	company	hand
+IBM	IBM	info-allcaps	company	hand
+aibi-emu	IBM	kana	company	hand
+qualcomm	Qualcomm	typed	company	hand
+Qualcomm	Qualcomm	info-capital	company	hand
+QUALCOMM	Qualcomm	info-allcaps	company	hand
+kuarukomu	Qualcomm	kana	company	hand
+cisco	Cisco	typed	company	hand
+Cisco	Cisco	info-capital	company	hand
+CISCO	Cisco	info-allcaps	company	hand
+shisuko	Cisco	kana	company	hand
+sisuko	Cisco	kana-kunrei	company	hand
+dell	Dell	typed	company	hand
+Dell	Dell	info-capital	company	hand
+DELL	Dell	info-allcaps	company	hand
+lenovo	Lenovo	typed	company	hand
+Lenovo	Lenovo	info-capital	company	hand
+LENOVO	Lenovo	info-allcaps	company	hand
+renobo	Lenovo	kana	company	hand
+asus	Asus	typed	company	hand
+Asus	Asus	info-capital	company	hand
+ASUS	Asus	info-allcaps	company	hand
+eisu-su	Asus	kana	company	hand
+logitech	Logitech	typed	company	hand
+Logitech	Logitech	info-capital	company	hand
+LOGITECH	Logitech	info-allcaps	company	hand
+rojiku-ru	Logitech	kana	company	hand
+roziku-ru	Logitech	kana-kunrei	company	hand
+nestle	Nestle	typed	company	hand
+Nestle	Nestle	info-capital	company	hand
+NESTLE	Nestle	info-allcaps	company	hand
+nesure	Nestle	kana	company	hand
+unilever	Unilever	typed	company	hand
+Unilever	Unilever	info-capital	company	hand
+UNILEVER	Unilever	info-allcaps	company	hand
+yuniri-ba	Unilever	kana	company	hand
+ikea	Ikea	typed	company	hand
+Ikea	Ikea	info-capital	company	hand
+IKEA	Ikea	info-allcaps	company	hand
+ikea	Ikea	kana	company	hand
+zara	Zara	typed	company	hand
+Zara	Zara	info-capital	company	hand
+ZARA	Zara	info-allcaps	company	hand
+gucci	Gucci	typed	company	hand
+Gucci	Gucci	info-capital	company	hand
+GUCCI	Gucci	info-allcaps	company	hand
+gutchi	Gucci	kana	company	hand
+gutti	Gucci	kana-kunrei	company	hand
+louisvuitton	Louis Vuitton	typed	company	hand
+Louisvuitton	Louis Vuitton	info-capital	company	hand
+LOUISVUITTON	Louis Vuitton	info-allcaps	company	hand
+ruivitonn	Louis Vuitton	kana	company	hand
+ruivuxitonn	Louis Vuitton	kana-small-x	company	hand
+chanel	Chanel	typed	company	hand
+Chanel	Chanel	info-capital	company	hand
+CHANEL	Chanel	info-allcaps	company	hand
+shaneru	Chanel	kana	company	hand
+syaneru	Chanel	kana-kunrei	company	hand
+shixyaneru	Chanel	kana-small-x	company	hand
+rolex	Rolex	typed	company	hand
+Rolex	Rolex	info-capital	company	hand
+ROLEX	Rolex	info-allcaps	company	hand
+rorekkusu	Rolex	kana	company	hand
+openai	OpenAI	typed	company	hand
+Openai	OpenAI	info-capital	company	hand
+OPENAI	OpenAI	info-allcaps	company	hand
+o-punne-ai	OpenAI	kana	company	hand
+anthropic	Anthropic	typed	company	hand
+Anthropic	Anthropic	info-capital	company	hand
+ANTHROPIC	Anthropic	info-allcaps	company	hand
+annsuropikku	Anthropic	kana	company	hand
+iphone	iPhone	typed	product	hand
+Iphone	iPhone	info-capital	product	hand
+IPHONE	iPhone	info-allcaps	product	hand
+aifonn	iPhone	kana	product	hand
+aifuxonn	iPhone	kana-small-x	product	hand
+ipad	iPad	typed	product	hand
+Ipad	iPad	info-capital	product	hand
+IPAD	iPad	info-allcaps	product	hand
+aipaddo	iPad	kana	product	hand
+macbook	MacBook	typed	product	hand
+Macbook	MacBook	info-capital	product	hand
+MACBOOK	MacBook	info-allcaps	product	hand
+makkubukku	MacBook	kana	product	hand
+airpods	AirPods	typed	product	hand
+Airpods	AirPods	info-capital	product	hand
+AIRPODS	AirPods	info-allcaps	product	hand
+eapozzu	AirPods	kana	product	hand
+playstation	PlayStation	typed	product	hand
+Playstation	PlayStation	info-capital	product	hand
+PLAYSTATION	PlayStation	info-allcaps	product	hand
+pureisute-shonn	PlayStation	kana	product	hand
+pureisute-syonn	PlayStation	kana-kunrei	product	hand
+pureisute-shixyonn	PlayStation	kana-small-x	product	hand
+xbox	Xbox	typed	product	hand
+Xbox	Xbox	info-capital	product	hand
+XBOX	Xbox	info-allcaps	product	hand
+ekkusubokkusu	Xbox	kana	product	hand
+youtube	YouTube	typed	product	hand
+Youtube	YouTube	info-capital	product	hand
+YOUTUBE	YouTube	info-allcaps	product	hand
+yu-chu-bu	YouTube	kana	product	hand
+yu-tyu-bu	YouTube	kana-kunrei	product	hand
+yu-chixyu-bu	YouTube	kana-small-x	product	hand
+instagram	Instagram	typed	product	hand
+Instagram	Instagram	info-capital	product	hand
+INSTAGRAM	Instagram	info-allcaps	product	hand
+innsutaguramu	Instagram	kana	product	hand
+twitter	Twitter	typed	product	hand
+Twitter	Twitter	info-capital	product	hand
+TWITTER	Twitter	info-allcaps	product	hand
+tsuitta-	Twitter	kana	product	hand
+tuitta-	Twitter	kana-kunrei	product	hand
+tiktok	TikTok	typed	product	hand
+Tiktok	TikTok	info-capital	product	hand
+TIKTOK	TikTok	info-allcaps	product	hand
+thikkutokku	TikTok	kana	product	hand
+texikkutokku	TikTok	kana-small-x	product	hand
+linkedin	LinkedIn	typed	product	hand
+Linkedin	LinkedIn	info-capital	product	hand
+LINKEDIN	LinkedIn	info-allcaps	product	hand
+rinnkutoinn	LinkedIn	kana	product	hand
+whatsapp	WhatsApp	typed	product	hand
+Whatsapp	WhatsApp	info-capital	product	hand
+WHATSAPP	WhatsApp	info-allcaps	product	hand
+wattsuappu	WhatsApp	kana	product	hand
+wattuappu	WhatsApp	kana-kunrei	product	hand
+snapchat	Snapchat	typed	product	hand
+Snapchat	Snapchat	info-capital	product	hand
+SNAPCHAT	Snapchat	info-allcaps	product	hand
+sunappuchatto	Snapchat	kana	product	hand
+sunapputyatto	Snapchat	kana-kunrei	product	hand
+sunappuchixyatto	Snapchat	kana-small-x	product	hand
+pinterest	Pinterest	typed	product	hand
+Pinterest	Pinterest	info-capital	product	hand
+PINTEREST	Pinterest	info-allcaps	product	hand
+pinntaresuto	Pinterest	kana	product	hand
+reddit	Reddit	typed	product	hand
+Reddit	Reddit	info-capital	product	hand
+REDDIT	Reddit	info-allcaps	product	hand
+redhitto	Reddit	kana	product	hand
+redexitto	Reddit	kana-small-x	product	hand
+wikipedia	Wikipedia	typed	product	hand
+Wikipedia	Wikipedia	info-capital	product	hand
+WIKIPEDIA	Wikipedia	info-allcaps	product	hand
+wikipedhia	Wikipedia	kana	product	hand
+uxikipedexia	Wikipedia	kana-small-x	product	hand
+dropbox	Dropbox	typed	product	hand
+Dropbox	Dropbox	info-capital	product	hand
+DROPBOX	Dropbox	info-allcaps	product	hand
+doroppubokkusu	Dropbox	kana	product	hand
+evernote	Evernote	typed	product	hand
+Evernote	Evernote	info-capital	product	hand
+EVERNOTE	Evernote	info-allcaps	product	hand
+eba-no-to	Evernote	kana	product	hand
+skype	Skype	typed	product	hand
+Skype	Skype	info-capital	product	hand
+SKYPE	Skype	info-allcaps	product	hand
+sukaipu	Skype	kana	product	hand
+zoom	Zoom	typed	product	hand-ambiguous
+Zoom	Zoom	info-capital	product	hand-ambiguous
+ZOOM	Zoom	info-allcaps	product	hand-ambiguous
+zu-mu	Zoom	kana	product	hand-ambiguous
+slack	Slack	typed	product	hand
+Slack	Slack	info-capital	product	hand
+SLACK	Slack	info-allcaps	product	hand
+surakku	Slack	kana	product	hand
+discord	Discord	typed	product	hand
+Discord	Discord	info-capital	product	hand
+DISCORD	Discord	info-allcaps	product	hand
+dhisuko-do	Discord	kana	product	hand
+dexisuko-do	Discord	kana-small-x	product	hand
+twitch	Twitch	typed	product	hand
+Twitch	Twitch	info-capital	product	hand
+TWITCH	Twitch	info-allcaps	product	hand
+tsuitchi	Twitch	kana	product	hand
+tuitti	Twitch	kana-kunrei	product	hand
+steam	Steam	typed	product	hand-ambiguous
+Steam	Steam	info-capital	product	hand-ambiguous
+STEAM	Steam	info-allcaps	product	hand-ambiguous
+suchi-mu	Steam	kana	product	hand-ambiguous
+suti-mu	Steam	kana-kunrei	product	hand-ambiguous
+kindle	Kindle	typed	product	hand
+Kindle	Kindle	info-capital	product	hand
+KINDLE	Kindle	info-allcaps	product	hand
+kinndoru	Kindle	kana	product	hand
+alexa	Alexa	typed	product	hand
+Alexa	Alexa	info-capital	product	hand
+ALEXA	Alexa	info-allcaps	product	hand
+arekusa	Alexa	kana	product	hand
+siri	Siri	typed	product	hand
+Siri	Siri	info-capital	product	hand
+SIRI	Siri	info-allcaps	product	hand
+gmail	Gmail	typed	product	hand
+Gmail	Gmail	info-capital	product	hand
+GMAIL	Gmail	info-allcaps	product	hand
+ji-me-ru	Gmail	kana	product	hand
+zi-me-ru	Gmail	kana-kunrei	product	hand
+chrome	Chrome	typed	product	hand
+Chrome	Chrome	info-capital	product	hand
+CHROME	Chrome	info-allcaps	product	hand
+kuro-mu	Chrome	kana	product	hand
+firefox	Firefox	typed	product	hand
+Firefox	Firefox	info-capital	product	hand
+FIREFOX	Firefox	info-allcaps	product	hand
+faiafokkusu	Firefox	kana	product	hand
+fuxaiafuxokkusu	Firefox	kana-small-x	product	hand
+safari	Safari	typed	product	hand
+Safari	Safari	info-capital	product	hand
+SAFARI	Safari	info-allcaps	product	hand
+safari	Safari	kana	product	hand
+safuxari	Safari	kana-small-x	product	hand
+android	Android	typed	product	hand
+Android	Android	info-capital	product	hand
+ANDROID	Android	info-allcaps	product	hand
+anndoroido	Android	kana	product	hand
+windows	Windows	typed	product	hand-ambiguous
+Windows	Windows	info-capital	product	hand-ambiguous
+WINDOWS	Windows	info-allcaps	product	hand-ambiguous
+winndouzu	Windows	kana	product	hand-ambiguous
+uxinndouzu	Windows	kana-small-x	product	hand-ambiguous
+photoshop	Photoshop	typed	product	hand
+Photoshop	Photoshop	info-capital	product	hand
+PHOTOSHOP	Photoshop	info-allcaps	product	hand
+fotoshoppu	Photoshop	kana	product	hand
+fotosyoppu	Photoshop	kana-kunrei	product	hand
+fuxotoshixyoppu	Photoshop	kana-small-x	product	hand
+excel	Excel	typed	product	hand
+Excel	Excel	info-capital	product	hand
+EXCEL	Excel	info-allcaps	product	hand
+ekuseru	Excel	kana	product	hand
+powerpoint	PowerPoint	typed	product	hand
+Powerpoint	PowerPoint	info-capital	product	hand
+POWERPOINT	PowerPoint	info-allcaps	product	hand
+pawa-poinnto	PowerPoint	kana	product	hand
+notion	Notion	typed	product	hand-ambiguous
+Notion	Notion	info-capital	product	hand-ambiguous
+NOTION	Notion	info-allcaps	product	hand-ambiguous
+no-shonn	Notion	kana	product	hand-ambiguous
+no-syonn	Notion	kana-kunrei	product	hand-ambiguous
+no-shixyonn	Notion	kana-small-x	product	hand-ambiguous
+github	GitHub	typed	software	hand
+Github	GitHub	info-capital	software	hand
+GITHUB	GitHub	info-allcaps	software	hand
+gittohabu	GitHub	kana	software	hand
+gitlab	GitLab	typed	software	hand
+Gitlab	GitLab	info-capital	software	hand
+GITLAB	GitLab	info-allcaps	software	hand
+gittorabu	GitLab	kana	software	hand
+python	Python	typed	software	hand-ambiguous
+Python	Python	info-capital	software	hand-ambiguous
+PYTHON	Python	info-allcaps	software	hand-ambiguous
+paisonn	Python	kana	software	hand-ambiguous
+javascript	JavaScript	typed	software	hand
+Javascript	JavaScript	info-capital	software	hand
+JAVASCRIPT	JavaScript	info-allcaps	software	hand
+jabasukuriputo	JavaScript	kana	software	hand
+zyabasukuriputo	JavaScript	kana-kunrei	software	hand
+jixyabasukuriputo	JavaScript	kana-small-x	software	hand
+typescript	TypeScript	typed	software	hand
+Typescript	TypeScript	info-capital	software	hand
+TYPESCRIPT	TypeScript	info-allcaps	software	hand
+taipusukuriputo	TypeScript	kana	software	hand
+kubernetes	Kubernetes	typed	software	hand
+Kubernetes	Kubernetes	info-capital	software	hand
+KUBERNETES	Kubernetes	info-allcaps	software	hand
+kubanethisu	Kubernetes	kana	software	hand
+kubanetexisu	Kubernetes	kana-small-x	software	hand
+docker	Docker	typed	software	hand
+Docker	Docker	info-capital	software	hand
+DOCKER	Docker	info-allcaps	software	hand
+dokka-	Docker	kana	software	hand
+linux	Linux	typed	software	hand
+Linux	Linux	info-capital	software	hand
+LINUX	Linux	info-allcaps	software	hand
+rinakkusu	Linux	kana	software	hand
+ubuntu	Ubuntu	typed	software	hand
+Ubuntu	Ubuntu	info-capital	software	hand
+UBUNTU	Ubuntu	info-allcaps	software	hand
+ubunntwu	Ubuntu	kana	software	hand
+ubunntoxu	Ubuntu	kana-small-x	software	hand
+debian	Debian	typed	software	hand
+Debian	Debian	info-capital	software	hand
+DEBIAN	Debian	info-allcaps	software	hand
+debiann	Debian	kana	software	hand
+redis	Redis	typed	software	hand
+Redis	Redis	info-capital	software	hand
+REDIS	Redis	info-allcaps	software	hand
+redhisu	Redis	kana	software	hand
+redexisu	Redis	kana-small-x	software	hand
+mongodb	MongoDB	typed	software	hand
+Mongodb	MongoDB	info-capital	software	hand
+MONGODB	MongoDB	info-allcaps	software	hand
+monngodhi-bi-	MongoDB	kana	software	hand
+monngodexi-bi-	MongoDB	kana-small-x	software	hand
+postgresql	PostgreSQL	typed	software	hand
+Postgresql	PostgreSQL	info-capital	software	hand
+POSTGRESQL	PostgreSQL	info-allcaps	software	hand
+posutogureesukyu-eru	PostgreSQL	kana	software	hand
+posutogureesukixyu-eru	PostgreSQL	kana-small-x	software	hand
+mysql	MySQL	typed	software	hand
+Mysql	MySQL	info-capital	software	hand
+MYSQL	MySQL	info-allcaps	software	hand
+maiesukyu-eru	MySQL	kana	software	hand
+maiesukixyu-eru	MySQL	kana-small-x	software	hand
+nodejs	Node.js	typed	software	hand
+Nodejs	Node.js	info-capital	software	hand
+NODEJS	Node.js	info-allcaps	software	hand
+no-dojeiesu	Node.js	kana	software	hand
+no-dojixeiesu	Node.js	kana-small-x	software	hand
+react	React	typed	software	hand-ambiguous
+React	React	info-capital	software	hand-ambiguous
+REACT	React	info-allcaps	software	hand-ambiguous
+riakuto	React	kana	software	hand-ambiguous
+vue	Vue	typed	software	hand
+Vue	Vue	info-capital	software	hand
+VUE	Vue	info-allcaps	software	hand
+byu-	Vue	kana	software	hand
+bixyu-	Vue	kana-small-x	software	hand
+angular	Angular	typed	software	hand
+Angular	Angular	info-capital	software	hand
+ANGULAR	Angular	info-allcaps	software	hand
+anngyura-	Angular	kana	software	hand
+anngixyura-	Angular	kana-small-x	software	hand
+tensorflow	TensorFlow	typed	software	hand
+Tensorflow	TensorFlow	info-capital	software	hand
+TENSORFLOW	TensorFlow	info-allcaps	software	hand
+tennsa-furo-	TensorFlow	kana	software	hand
+tennsa-huro-	TensorFlow	kana-kunrei	software	hand
+pytorch	PyTorch	typed	software	hand
+Pytorch	PyTorch	info-capital	software	hand
+PYTORCH	PyTorch	info-allcaps	software	hand
+paito-chi	PyTorch	kana	software	hand
+paito-ti	PyTorch	kana-kunrei	software	hand
+jupyter	Jupyter	typed	software	hand
+Jupyter	Jupyter	info-capital	software	hand
+JUPYTER	Jupyter	info-allcaps	software	hand
+jupita-	Jupyter	kana	software	hand
+zyupita-	Jupyter	kana-kunrei	software	hand
+jixyupita-	Jupyter	kana-small-x	software	hand
+kotlin	Kotlin	typed	software	hand
+Kotlin	Kotlin	info-capital	software	hand
+KOTLIN	Kotlin	info-allcaps	software	hand
+kotorinn	Kotlin	kana	software	hand
+rust	Rust	typed	software	hand
+Rust	Rust	info-capital	software	hand
+RUST	Rust	info-allcaps	software	hand
+rasuto	Rust	kana	software	hand
+swift	Swift	typed	software	hand
+Swift	Swift	info-capital	software	hand
+SWIFT	Swift	info-allcaps	software	hand
+suwifuto	Swift	kana	software	hand
+suwihuto	Swift	kana-kunrei	software	hand
+suuxifuto	Swift	kana-small-x	software	hand
+ruby	Ruby	typed	software	hand
+Ruby	Ruby	info-capital	software	hand
+RUBY	Ruby	info-allcaps	software	hand
+rubi-	Ruby	kana	software	hand
+haskell	Haskell	typed	software	hand
+Haskell	Haskell	info-capital	software	hand
+HASKELL	Haskell	info-allcaps	software	hand
+hasukeru	Haskell	kana	software	hand
+terraform	Terraform	typed	software	hand
+Terraform	Terraform	info-capital	software	hand
+TERRAFORM	Terraform	info-allcaps	software	hand
+terafo-mu	Terraform	kana	software	hand
+terafuxo-mu	Terraform	kana-small-x	software	hand
+ansible	Ansible	typed	software	hand
+Ansible	Ansible	info-capital	software	hand
+ANSIBLE	Ansible	info-allcaps	software	hand
+annshiburu	Ansible	kana	software	hand
+annsiburu	Ansible	kana-kunrei	software	hand
+jenkins	Jenkins	typed	software	hand
+Jenkins	Jenkins	info-capital	software	hand
+JENKINS	Jenkins	info-allcaps	software	hand
+jennkinnsu	Jenkins	kana	software	hand
+jixennkinnsu	Jenkins	kana-small-x	software	hand
+elasticsearch	Elasticsearch	typed	software	hand
+Elasticsearch	Elasticsearch	info-capital	software	hand
+ELASTICSEARCH	Elasticsearch	info-allcaps	software	hand
+erasuthikkusa-chi	Elasticsearch	kana	software	hand
+erasuthikkusa-ti	Elasticsearch	kana-kunrei	software	hand
+erasutexikkusa-chi	Elasticsearch	kana-small-x	software	hand
+bitcoin	Bitcoin	typed	software	hand
+Bitcoin	Bitcoin	info-capital	software	hand
+BITCOIN	Bitcoin	info-allcaps	software	hand
+bittokoinn	Bitcoin	kana	software	hand
+ethereum	Ethereum	typed	software	hand
+Ethereum	Ethereum	info-capital	software	hand
+ETHEREUM	Ethereum	info-allcaps	software	hand
+i-sariamu	Ethereum	kana	software	hand
+solana	Solana	typed	software	hand
+Solana	Solana	info-capital	software	hand
+SOLANA	Solana	info-allcaps	software	hand
+sorana	Solana	kana	software	hand
+binance	Binance	typed	software	hand
+Binance	Binance	info-capital	software	hand
+BINANCE	Binance	info-allcaps	software	hand
+bainannsu	Binance	kana	software	hand
+coinbase	Coinbase	typed	software	hand
+Coinbase	Coinbase	info-capital	software	hand
+COINBASE	Coinbase	info-allcaps	software	hand
+koinnbe-su	Coinbase	kana	software	hand
+tokyo	Tokyo	typed	place	hand
+Tokyo	Tokyo	info-capital	place	hand
+TOKYO	Tokyo	info-allcaps	place	hand
+toukyou	Tokyo	kana	place	hand
+toukixyou	Tokyo	kana-small-x	place	hand
+newyork	New York	typed	place	hand
+Newyork	New York	info-capital	place	hand
+NEWYORK	New York	info-allcaps	place	hand
+nyu-yo-ku	New York	kana	place	hand
+nixyu-yo-ku	New York	kana-small-x	place	hand
+losangeles	Los Angeles	typed	place	hand
+Losangeles	Los Angeles	info-capital	place	hand
+LOSANGELES	Los Angeles	info-allcaps	place	hand
+rosannzerusu	Los Angeles	kana	place	hand
+sanfrancisco	San Francisco	typed	place	hand
+Sanfrancisco	San Francisco	info-capital	place	hand
+SANFRANCISCO	San Francisco	info-allcaps	place	hand
+sannfurannshisuko	San Francisco	kana	place	hand
+sannhurannsisuko	San Francisco	kana-kunrei	place	hand
+lasvegas	Las Vegas	typed	place	hand
+Lasvegas	Las Vegas	info-capital	place	hand
+LASVEGAS	Las Vegas	info-allcaps	place	hand
+rasubegasu	Las Vegas	kana	place	hand
+london	London	typed	place	hand
+London	London	info-capital	place	hand
+LONDON	London	info-allcaps	place	hand
+ronndonn	London	kana	place	hand
+paris	Paris	typed	place	hand
+Paris	Paris	info-capital	place	hand
+PARIS	Paris	info-allcaps	place	hand
+berlin	Berlin	typed	place	hand
+Berlin	Berlin	info-capital	place	hand
+BERLIN	Berlin	info-allcaps	place	hand
+berurinn	Berlin	kana	place	hand
+madrid	Madrid	typed	place	hand
+Madrid	Madrid	info-capital	place	hand
+MADRID	Madrid	info-allcaps	place	hand
+madori-do	Madrid	kana	place	hand
+barcelona	Barcelona	typed	place	hand
+Barcelona	Barcelona	info-capital	place	hand
+BARCELONA	Barcelona	info-allcaps	place	hand
+baruserona	Barcelona	kana	place	hand
+rome	Rome	typed	place	hand
+Rome	Rome	info-capital	place	hand
+ROME	Rome	info-allcaps	place	hand
+ro-ma	Rome	kana	place	hand
+milan	Milan	typed	place	hand
+Milan	Milan	info-capital	place	hand
+MILAN	Milan	info-allcaps	place	hand
+mirano	Milan	kana	place	hand
+amsterdam	Amsterdam	typed	place	hand
+Amsterdam	Amsterdam	info-capital	place	hand
+AMSTERDAM	Amsterdam	info-allcaps	place	hand
+amusuterudamu	Amsterdam	kana	place	hand
+vienna	Vienna	typed	place	hand
+Vienna	Vienna	info-capital	place	hand
+VIENNA	Vienna	info-allcaps	place	hand
+wi-nn	Vienna	kana	place	hand
+uxi-nn	Vienna	kana-small-x	place	hand
+prague	Prague	typed	place	hand
+Prague	Prague	info-capital	place	hand
+PRAGUE	Prague	info-allcaps	place	hand
+puraha	Prague	kana	place	hand
+moscow	Moscow	typed	place	hand
+Moscow	Moscow	info-capital	place	hand
+MOSCOW	Moscow	info-allcaps	place	hand
+mosukuwa	Moscow	kana	place	hand
+istanbul	Istanbul	typed	place	hand
+Istanbul	Istanbul	info-capital	place	hand
+ISTANBUL	Istanbul	info-allcaps	place	hand
+isutannbu-ru	Istanbul	kana	place	hand
+dubai	Dubai	typed	place	hand
+Dubai	Dubai	info-capital	place	hand
+DUBAI	Dubai	info-allcaps	place	hand
+dobai	Dubai	kana	place	hand
+singapore	Singapore	typed	place	hand
+Singapore	Singapore	info-capital	place	hand
+SINGAPORE	Singapore	info-allcaps	place	hand
+shinngapo-ru	Singapore	kana	place	hand
+sinngapo-ru	Singapore	kana-kunrei	place	hand
+bangkok	Bangkok	typed	place	hand
+Bangkok	Bangkok	info-capital	place	hand
+BANGKOK	Bangkok	info-allcaps	place	hand
+bannkoku	Bangkok	kana	place	hand
+seoul	Seoul	typed	place	hand
+Seoul	Seoul	info-capital	place	hand
+SEOUL	Seoul	info-allcaps	place	hand
+souru	Seoul	kana	place	hand
+beijing	Beijing	typed	place	hand
+Beijing	Beijing	info-capital	place	hand
+BEIJING	Beijing	info-allcaps	place	hand
+pekinn	Beijing	kana	place	hand
+shanghai	Shanghai	typed	place	hand
+Shanghai	Shanghai	info-capital	place	hand
+SHANGHAI	Shanghai	info-allcaps	place	hand
+shannhai	Shanghai	kana	place	hand
+syannhai	Shanghai	kana-kunrei	place	hand
+shixyannhai	Shanghai	kana-small-x	place	hand
+hongkong	Hong Kong	typed	place	hand
+Hongkong	Hong Kong	info-capital	place	hand
+HONGKONG	Hong Kong	info-allcaps	place	hand
+honnkonn	Hong Kong	kana	place	hand
+sydney	Sydney	typed	place	hand
+Sydney	Sydney	info-capital	place	hand
+SYDNEY	Sydney	info-allcaps	place	hand
+shidoni-	Sydney	kana	place	hand
+sidoni-	Sydney	kana-kunrei	place	hand
+melbourne	Melbourne	typed	place	hand
+Melbourne	Melbourne	info-capital	place	hand
+MELBOURNE	Melbourne	info-allcaps	place	hand
+meruborunn	Melbourne	kana	place	hand
+toronto	Toronto	typed	place	hand
+Toronto	Toronto	info-capital	place	hand
+TORONTO	Toronto	info-allcaps	place	hand
+toronnto	Toronto	kana	place	hand
+vancouver	Vancouver	typed	place	hand
+Vancouver	Vancouver	info-capital	place	hand
+VANCOUVER	Vancouver	info-allcaps	place	hand
+bannku-ba-	Vancouver	kana	place	hand
+chicago	Chicago	typed	place	hand
+Chicago	Chicago	info-capital	place	hand
+CHICAGO	Chicago	info-allcaps	place	hand
+shikago	Chicago	kana	place	hand
+sikago	Chicago	kana-kunrei	place	hand
+boston	Boston	typed	place	hand
+Boston	Boston	info-capital	place	hand
+BOSTON	Boston	info-allcaps	place	hand
+bosutonn	Boston	kana	place	hand
+seattle	Seattle	typed	place	hand
+Seattle	Seattle	info-capital	place	hand
+SEATTLE	Seattle	info-allcaps	place	hand
+shiatoru	Seattle	kana	place	hand
+siatoru	Seattle	kana-kunrei	place	hand
+hawaii	Hawaii	typed	place	hand
+Hawaii	Hawaii	info-capital	place	hand
+HAWAII	Hawaii	info-allcaps	place	hand
+hawai	Hawaii	kana	place	hand
+california	California	typed	place	hand
+California	California	info-capital	place	hand
+CALIFORNIA	California	info-allcaps	place	hand
+kariforunia	California	kana	place	hand
+karifuxorunia	California	kana-small-x	place	hand
+texas	Texas	typed	place	hand
+Texas	Texas	info-capital	place	hand
+TEXAS	Texas	info-allcaps	place	hand
+tekisasu	Texas	kana	place	hand
+florida	Florida	typed	place	hand
+Florida	Florida	info-capital	place	hand
+FLORIDA	Florida	info-allcaps	place	hand
+furorida	Florida	kana	place	hand
+hurorida	Florida	kana-kunrei	place	hand
+brazil	Brazil	typed	place	hand
+Brazil	Brazil	info-capital	place	hand
+BRAZIL	Brazil	info-allcaps	place	hand
+burajiru	Brazil	kana	place	hand
+buraziru	Brazil	kana-kunrei	place	hand
+mexico	Mexico	typed	place	hand
+Mexico	Mexico	info-capital	place	hand
+MEXICO	Mexico	info-allcaps	place	hand
+mekishiko	Mexico	kana	place	hand
+mekisiko	Mexico	kana-kunrei	place	hand
+argentina	Argentina	typed	place	hand
+Argentina	Argentina	info-capital	place	hand
+ARGENTINA	Argentina	info-allcaps	place	hand
+aruzennchinn	Argentina	kana	place	hand
+aruzenntinn	Argentina	kana-kunrei	place	hand
+egypt	Egypt	typed	place	hand
+Egypt	Egypt	info-capital	place	hand
+EGYPT	Egypt	info-allcaps	place	hand
+ejiputo	Egypt	kana	place	hand
+eziputo	Egypt	kana-kunrei	place	hand
+kenya	Kenya	typed	place	hand
+Kenya	Kenya	info-capital	place	hand
+KENYA	Kenya	info-allcaps	place	hand
+kenia	Kenya	kana	place	hand
+switzerland	Switzerland	typed	place	hand
+Switzerland	Switzerland	info-capital	place	hand
+SWITZERLAND	Switzerland	info-allcaps	place	hand
+suisu	Switzerland	kana	place	hand
+sweden	Sweden	typed	place	hand
+Sweden	Sweden	info-capital	place	hand
+SWEDEN	Sweden	info-allcaps	place	hand
+suwe-denn	Sweden	kana	place	hand
+suuxe-denn	Sweden	kana-small-x	place	hand
+norway	Norway	typed	place	hand
+Norway	Norway	info-capital	place	hand
+NORWAY	Norway	info-allcaps	place	hand
+noruwe-	Norway	kana	place	hand
+noruuxe-	Norway	kana-small-x	place	hand
+finland	Finland	typed	place	hand
+Finland	Finland	info-capital	place	hand
+FINLAND	Finland	info-allcaps	place	hand
+finnranndo	Finland	kana	place	hand
+fuxinnranndo	Finland	kana-small-x	place	hand
+vietnam	Vietnam	typed	place	hand
+Vietnam	Vietnam	info-capital	place	hand
+VIETNAM	Vietnam	info-allcaps	place	hand
+betonamu	Vietnam	kana	place	hand
+indonesia	Indonesia	typed	place	hand
+Indonesia	Indonesia	info-capital	place	hand
+INDONESIA	Indonesia	info-allcaps	place	hand
+inndoneshia	Indonesia	kana	place	hand
+inndonesia	Indonesia	kana-kunrei	place	hand
+philippines	Philippines	typed	place	hand
+Philippines	Philippines	info-capital	place	hand
+PHILIPPINES	Philippines	info-allcaps	place	hand
+firipinn	Philippines	kana	place	hand
+fuxiripinn	Philippines	kana-small-x	place	hand
+thailand	Thailand	typed	place	hand
+Thailand	Thailand	info-capital	place	hand
+THAILAND	Thailand	info-allcaps	place	hand
+mounteverest	Mount Everest	typed	place	hand
+Mounteverest	Mount Everest	info-capital	place	hand
+MOUNTEVEREST	Mount Everest	info-allcaps	place	hand
+eberesuto	Mount Everest	kana	place	hand
+himalayas	Himalayas	typed	place	hand
+Himalayas	Himalayas	info-capital	place	hand
+HIMALAYAS	Himalayas	info-allcaps	place	hand
+himaraya	Himalayas	kana	place	hand
+elonmusk	Elon Musk	typed	person	hand
+Elonmusk	Elon Musk	info-capital	person	hand
+ELONMUSK	Elon Musk	info-allcaps	person	hand
+i-ronnmasuku	Elon Musk	kana	person	hand
+billgates	Bill Gates	typed	person	hand
+Billgates	Bill Gates	info-capital	person	hand
+BILLGATES	Bill Gates	info-allcaps	person	hand
+birugeitsu	Bill Gates	kana	person	hand
+birugeitu	Bill Gates	kana-kunrei	person	hand
+stevejobs	Steve Jobs	typed	person	hand
+Stevejobs	Steve Jobs	info-capital	person	hand
+STEVEJOBS	Steve Jobs	info-allcaps	person	hand
+suthi-bujobuzu	Steve Jobs	kana	person	hand
+suthi-buzyobuzu	Steve Jobs	kana-kunrei	person	hand
+sutexi-bujixyobuzu	Steve Jobs	kana-small-x	person	hand
+markzuckerberg	Mark Zuckerberg	typed	person	hand
+Markzuckerberg	Mark Zuckerberg	info-capital	person	hand
+MARKZUCKERBERG	Mark Zuckerberg	info-allcaps	person	hand
+ma-kuzakka-ba-gu	Mark Zuckerberg	kana	person	hand
+jeffbezos	Jeff Bezos	typed	person	hand
+Jeffbezos	Jeff Bezos	info-capital	person	hand
+JEFFBEZOS	Jeff Bezos	info-allcaps	person	hand
+jefubezosu	Jeff Bezos	kana	person	hand
+jehubezosu	Jeff Bezos	kana-kunrei	person	hand
+jixefubezosu	Jeff Bezos	kana-small-x	person	hand
+timcook	Tim Cook	typed	person	hand
+Timcook	Tim Cook	info-capital	person	hand
+TIMCOOK	Tim Cook	info-allcaps	person	hand
+thimukukku	Tim Cook	kana	person	hand
+teximukukku	Tim Cook	kana-small-x	person	hand
+taylorswift	Taylor Swift	typed	person	hand
+Taylorswift	Taylor Swift	info-capital	person	hand
+TAYLORSWIFT	Taylor Swift	info-allcaps	person	hand
+teira-suwifuto	Taylor Swift	kana	person	hand
+teira-suwihuto	Taylor Swift	kana-kunrei	person	hand
+teira-suuxifuto	Taylor Swift	kana-small-x	person	hand
+ladygaga	Lady Gaga	typed	person	hand
+Ladygaga	Lady Gaga	info-capital	person	hand
+LADYGAGA	Lady Gaga	info-allcaps	person	hand
+redhi-gaga	Lady Gaga	kana	person	hand
+redexi-gaga	Lady Gaga	kana-small-x	person	hand
+michaeljackson	Michael Jackson	typed	person	hand
+Michaeljackson	Michael Jackson	info-capital	person	hand
+MICHAELJACKSON	Michael Jackson	info-allcaps	person	hand
+maikerujakusonn	Michael Jackson	kana	person	hand
+maikeruzyakusonn	Michael Jackson	kana-kunrei	person	hand
+maikerujixyakusonn	Michael Jackson	kana-small-x	person	hand
+alberteinstein	Albert Einstein	typed	person	hand
+Alberteinstein	Albert Einstein	info-capital	person	hand
+ALBERTEINSTEIN	Albert Einstein	info-allcaps	person	hand
+aruberutoainnshutainn	Albert Einstein	kana	person	hand
+aruberutoainnsyutainn	Albert Einstein	kana-kunrei	person	hand
+aruberutoainnshixyutainn	Albert Einstein	kana-small-x	person	hand
+isaacnewton	Isaac Newton	typed	person	hand
+Isaacnewton	Isaac Newton	info-capital	person	hand
+ISAACNEWTON	Isaac Newton	info-allcaps	person	hand
+aizakkunyu-tonn	Isaac Newton	kana	person	hand
+aizakkunixyu-tonn	Isaac Newton	kana-small-x	person	hand
+barackobama	Barack Obama	typed	person	hand
+Barackobama	Barack Obama	info-capital	person	hand
+BARACKOBAMA	Barack Obama	info-allcaps	person	hand
+barakuobama	Barack Obama	kana	person	hand
+donaldtrump	Donald Trump	typed	person	hand
+Donaldtrump	Donald Trump	info-capital	person	hand
+DONALDTRUMP	Donald Trump	info-allcaps	person	hand
+donarudotorannpu	Donald Trump	kana	person	hand
+lionelmessi	Lionel Messi	typed	person	hand
+Lionelmessi	Lionel Messi	info-capital	person	hand
+LIONELMESSI	Lionel Messi	info-allcaps	person	hand
+rionerumesshi	Lionel Messi	kana	person	hand
+rionerumessi	Lionel Messi	kana-kunrei	person	hand
+cristianoronaldo	Cristiano Ronaldo	typed	person	hand
+Cristianoronaldo	Cristiano Ronaldo	info-capital	person	hand
+CRISTIANORONALDO	Cristiano Ronaldo	info-allcaps	person	hand
+kurisuthia-noronaudo	Cristiano Ronaldo	kana	person	hand
+kurisutexia-noronaudo	Cristiano Ronaldo	kana-small-x	person	hand
+tomcruise	Tom Cruise	typed	person	hand
+Tomcruise	Tom Cruise	info-capital	person	hand
+TOMCRUISE	Tom Cruise	info-allcaps	person	hand
+tomukuru-zu	Tom Cruise	kana	person	hand
+leonardodicaprio	Leonardo DiCaprio	typed	person	hand
+Leonardodicaprio	Leonardo DiCaprio	info-capital	person	hand
+LEONARDODICAPRIO	Leonardo DiCaprio	info-allcaps	person	hand
+reonarudodhikapurio	Leonardo DiCaprio	kana	person	hand
+reonarudodexikapurio	Leonardo DiCaprio	kana-small-x	person	hand
+bradpitt	Brad Pitt	typed	person	hand
+Bradpitt	Brad Pitt	info-capital	person	hand
+BRADPITT	Brad Pitt	info-allcaps	person	hand
+buraddopitto	Brad Pitt	kana	person	hand
+harrypotter	Harry Potter	typed	work	hand
+Harrypotter	Harry Potter	info-capital	work	hand
+HARRYPOTTER	Harry Potter	info-allcaps	work	hand
+hari-potta-	Harry Potter	kana	work	hand
+starwars	Star Wars	typed	work	hand
+Starwars	Star Wars	info-capital	work	hand
+STARWARS	Star Wars	info-allcaps	work	hand
+suta-who-zu	Star Wars	kana	work	hand
+suta-uxo-zu	Star Wars	kana-small-x	work	hand
+avatar	Avatar	typed	work	hand
+Avatar	Avatar	info-capital	work	hand
+AVATAR	Avatar	info-allcaps	work	hand
+abata-	Avatar	kana	work	hand
+titanic	Titanic	typed	work	hand
+Titanic	Titanic	info-capital	work	hand
+TITANIC	Titanic	info-allcaps	work	hand
+taitanikku	Titanic	kana	work	hand
+minecraft	Minecraft	typed	work	hand
+Minecraft	Minecraft	info-capital	work	hand
+MINECRAFT	Minecraft	info-allcaps	work	hand
+mainnkurafuto	Minecraft	kana	work	hand
+mainnkurahuto	Minecraft	kana-kunrei	work	hand
+fortnite	Fortnite	typed	work	hand
+Fortnite	Fortnite	info-capital	work	hand
+FORTNITE	Fortnite	info-allcaps	work	hand
+fo-tonaito	Fortnite	kana	work	hand
+fuxo-tonaito	Fortnite	kana-small-x	work	hand
+pokemon	Pokemon	typed	work	hand
+Pokemon	Pokemon	info-capital	work	hand
+POKEMON	Pokemon	info-allcaps	work	hand
+pokemonn	Pokemon	kana	work	hand
+supermario	Super Mario	typed	work	hand
+Supermario	Super Mario	info-capital	work	hand
+SUPERMARIO	Super Mario	info-allcaps	work	hand
+su-pa-mario	Super Mario	kana	work	hand
+thebeatles	The Beatles	typed	work	hand
+Thebeatles	The Beatles	info-capital	work	hand
+THEBEATLES	The Beatles	info-allcaps	work	hand
+bi-toruzu	The Beatles	kana	work	hand
+queen	Queen	typed	work	hand-ambiguous
+Queen	Queen	info-capital	work	hand-ambiguous
+QUEEN	Queen	info-allcaps	work	hand-ambiguous
+kui-nn	Queen	kana	work	hand-ambiguous
+coldplay	Coldplay	typed	work	hand
+Coldplay	Coldplay	info-capital	work	hand
+COLDPLAY	Coldplay	info-allcaps	work	hand
+ko-rudopurei	Coldplay	kana	work	hand
+radiohead	Radiohead	typed	work	hand
+Radiohead	Radiohead	info-capital	work	hand
+RADIOHEAD	Radiohead	info-allcaps	work	hand
+redhioheddo	Radiohead	kana	work	hand
+redexioheddo	Radiohead	kana-small-x	work	hand
+nirvana	Nirvana	typed	work	hand
+Nirvana	Nirvana	info-capital	work	hand
+NIRVANA	Nirvana	info-allcaps	work	hand
+niruva-na	Nirvana	kana	work	hand
+niruvuxa-na	Nirvana	kana-small-x	work	hand
+oasis	Oasis	typed	work	hand
+Oasis	Oasis	info-capital	work	hand
+OASIS	Oasis	info-allcaps	work	hand
+oashisu	Oasis	kana	work	hand
+oasisu	Oasis	kana-kunrei	work	hand
+marvel	Marvel	typed	work	hand
+Marvel	Marvel	info-capital	work	hand
+MARVEL	Marvel	info-allcaps	work	hand
+ma-beru	Marvel	kana	work	hand
+batman	Batman	typed	work	hand
+Batman	Batman	info-capital	work	hand
+BATMAN	Batman	info-allcaps	work	hand
+battomann	Batman	kana	work	hand
+spiderman	Spider-Man	typed	work	hand
+Spiderman	Spider-Man	info-capital	work	hand
+SPIDERMAN	Spider-Man	info-allcaps	work	hand
+spider-man	Spider-Man	info-hyphen	work	hand
+supaida-mann	Spider-Man	kana	work	hand
+mickeymouse	Mickey Mouse	typed	work	hand
+Mickeymouse	Mickey Mouse	info-capital	work	hand
+MICKEYMOUSE	Mickey Mouse	info-allcaps	work	hand
+mikki-mausu	Mickey Mouse	kana	work	hand
+hellokitty	Hello Kitty	typed	work	hand
+Hellokitty	Hello Kitty	info-capital	work	hand
+HELLOKITTY	Hello Kitty	info-allcaps	work	hand
+haro-kithi	Hello Kitty	kana	work	hand
+haro-kitexi	Hello Kitty	kana-small-x	work	hand
+apple	Apple	typed	company	hand-ambiguous
+Apple	Apple	info-capital	company	hand-ambiguous
+APPLE	Apple	info-allcaps	company	hand-ambiguous
+appuru	Apple	kana	company	hand-ambiguous
+meta	Meta	typed	company	hand
+Meta	Meta	info-capital	company	hand
+META	Meta	info-allcaps	company	hand
+alphabet	Alphabet	typed	company	hand-ambiguous
+Alphabet	Alphabet	info-capital	company	hand-ambiguous
+ALPHABET	Alphabet	info-allcaps	company	hand-ambiguous
+arufabetto	Alphabet	kana	company	hand-ambiguous
+arufuxabetto	Alphabet	kana-small-x	company	hand-ambiguous
+cloudflare	Cloudflare	typed	company	hand
+Cloudflare	Cloudflare	info-capital	company	hand
+CLOUDFLARE	Cloudflare	info-allcaps	company	hand
+kuraudofurea	Cloudflare	kana	company	hand
+kuraudohurea	Cloudflare	kana-kunrei	company	hand
+twilio	Twilio	typed	company	hand
+Twilio	Twilio	info-capital	company	hand
+TWILIO	Twilio	info-allcaps	company	hand
+twuirio	Twilio	kana	company	hand
+toxuirio	Twilio	kana-small-x	company	hand
+shopify	Shopify	typed	company	hand
+Shopify	Shopify	info-capital	company	hand
+SHOPIFY	Shopify	info-allcaps	company	hand
+shoppifai	Shopify	kana	company	hand
+syoppifai	Shopify	kana-kunrei	company	hand
+shixyoppifuxai	Shopify	kana-small-x	company	hand
+stripe	Stripe	typed	company	hand
+Stripe	Stripe	info-capital	company	hand
+STRIPE	Stripe	info-allcaps	company	hand
+sutoraipu	Stripe	kana	company	hand
+snowflake	Snowflake	typed	company	hand
+Snowflake	Snowflake	info-capital	company	hand
+SNOWFLAKE	Snowflake	info-allcaps	company	hand
+suno-fure-ku	Snowflake	kana	company	hand
+suno-hure-ku	Snowflake	kana-kunrei	company	hand
+palantir	Palantir	typed	company	hand
+Palantir	Palantir	info-capital	company	hand
+PALANTIR	Palantir	info-allcaps	company	hand
+parannthia	Palantir	kana	company	hand
+paranntexia	Palantir	kana-small-x	company	hand
+zendesk	Zendesk	typed	company	hand
+Zendesk	Zendesk	info-capital	company	hand
+ZENDESK	Zendesk	info-allcaps	company	hand
+zenndesuku	Zendesk	kana	company	hand
+atlassian	Atlassian	typed	company	hand
+Atlassian	Atlassian	info-capital	company	hand
+ATLASSIAN	Atlassian	info-allcaps	company	hand
+atorashiann	Atlassian	kana	company	hand
+atorasiann	Atlassian	kana-kunrei	company	hand
+hyundai	Hyundai	typed	company	hand
+Hyundai	Hyundai	info-capital	company	hand
+HYUNDAI	Hyundai	info-allcaps	company	hand
+hyunndai	Hyundai	kana	company	hand
+hixyunndai	Hyundai	kana-small-x	company	hand
+lamborghini	Lamborghini	typed	company	hand
+Lamborghini	Lamborghini	info-capital	company	hand
+LAMBORGHINI	Lamborghini	info-allcaps	company	hand
+rannborugi-ni	Lamborghini	kana	company	hand
+maserati	Maserati	typed	company	hand
+Maserati	Maserati	info-capital	company	hand
+MASERATI	Maserati	info-allcaps	company	hand
+maserathi	Maserati	kana	company	hand
+maseratexi	Maserati	kana-small-x	company	hand
+bentley	Bentley	typed	company	hand
+Bentley	Bentley	info-capital	company	hand
+BENTLEY	Bentley	info-allcaps	company	hand
+benntore-	Bentley	kana	company	hand
+volvo	Volvo	typed	company	hand
+Volvo	Volvo	info-capital	company	hand
+VOLVO	Volvo	info-allcaps	company	hand
+borubo	Volvo	kana	company	hand
+subaru	Subaru	typed	company	hand
+Subaru	Subaru	info-capital	company	hand
+SUBARU	Subaru	info-allcaps	company	hand
+subaru	Subaru	kana	company	hand
+mazda	Mazda	typed	company	hand
+Mazda	Mazda	info-capital	company	hand
+MAZDA	Mazda	info-allcaps	company	hand
+matsuda	Mazda	kana	company	hand
+matuda	Mazda	kana-kunrei	company	hand
+kawasaki	Kawasaki	typed	company	hand
+Kawasaki	Kawasaki	info-capital	company	hand
+KAWASAKI	Kawasaki	info-allcaps	company	hand
+kawasaki	Kawasaki	kana	company	hand
+yamaha	Yamaha	typed	company	hand
+Yamaha	Yamaha	info-capital	company	hand
+YAMAHA	Yamaha	info-allcaps	company	hand
+yamaha	Yamaha	kana	company	hand
+canon	Canon	typed	company	hand
+Canon	Canon	info-capital	company	hand
+CANON	Canon	info-allcaps	company	hand
+kiyanonn	Canon	kana	company	hand
+nikon	Nikon	typed	company	hand
+Nikon	Nikon	info-capital	company	hand
+NIKON	Nikon	info-allcaps	company	hand
+nikonn	Nikon	kana	company	hand
+fujifilm	Fujifilm	typed	company	hand
+Fujifilm	Fujifilm	info-capital	company	hand
+FUJIFILM	Fujifilm	info-allcaps	company	hand
+fujifuirumu	Fujifilm	kana	company	hand
+huzihuirumu	Fujifilm	kana-kunrei	company	hand
+toshiba	Toshiba	typed	company	hand
+Toshiba	Toshiba	info-capital	company	hand
+TOSHIBA	Toshiba	info-allcaps	company	hand
+toushiba	Toshiba	kana	company	hand
+tousiba	Toshiba	kana-kunrei	company	hand
+hitachi	Hitachi	typed	company	hand
+Hitachi	Hitachi	info-capital	company	hand
+HITACHI	Hitachi	info-allcaps	company	hand
+hitachi	Hitachi	kana	company	hand
+hitati	Hitachi	kana-kunrei	company	hand
+sharp	Sharp	typed	company	hand-ambiguous
+Sharp	Sharp	info-capital	company	hand-ambiguous
+SHARP	Sharp	info-allcaps	company	hand-ambiguous
+sha-pu	Sharp	kana	company	hand-ambiguous
+sya-pu	Sharp	kana-kunrei	company	hand-ambiguous
+shixya-pu	Sharp	kana-small-x	company	hand-ambiguous
+casio	Casio	typed	company	hand
+Casio	Casio	info-capital	company	hand
+CASIO	Casio	info-allcaps	company	hand
+kashio	Casio	kana	company	hand
+kasio	Casio	kana-kunrei	company	hand
+seiko	Seiko	typed	company	hand
+Seiko	Seiko	info-capital	company	hand
+SEIKO	Seiko	info-allcaps	company	hand
+seiko-	Seiko	kana	company	hand
+muji	Muji	typed	company	hand
+Muji	Muji	info-capital	company	hand
+MUJI	Muji	info-allcaps	company	hand
+lawson	Lawson	typed	company	hand
+Lawson	Lawson	info-capital	company	hand
+LAWSON	Lawson	info-allcaps	company	hand
+ro-sonn	Lawson	kana	company	hand
+kfc	KFC	typed	company	hand
+Kfc	KFC	info-capital	company	hand
+KFC	KFC	info-allcaps	company	hand
+ke-efushi-	KFC	kana	company	hand
+ke-ehusi-	KFC	kana-kunrei	company	hand
+subway	Subway	typed	company	hand-ambiguous
+Subway	Subway	info-capital	company	hand-ambiguous
+SUBWAY	Subway	info-allcaps	company	hand-ambiguous
+sabuwei	Subway	kana	company	hand-ambiguous
+sabuuxei	Subway	kana-small-x	company	hand-ambiguous
+burgerking	Burger King	typed	company	hand
+Burgerking	Burger King	info-capital	company	hand
+BURGERKING	Burger King	info-allcaps	company	hand
+ba-ga-kinngu	Burger King	kana	company	hand
+dominos	Domino's	typed	company	hand
+Dominos	Domino's	info-capital	company	hand
+DOMINOS	Domino's	info-allcaps	company	hand
+dominopiza	Domino's	kana	company	hand
+heinz	Heinz	typed	company	hand
+Heinz	Heinz	info-capital	company	hand
+HEINZ	Heinz	info-allcaps	company	hand
+hainntsu	Heinz	kana	company	hand
+hainntu	Heinz	kana-kunrei	company	hand
+kelloggs	Kellogg's	typed	company	hand
+Kelloggs	Kellogg's	info-capital	company	hand
+KELLOGGS	Kellogg's	info-allcaps	company	hand
+keroggu	Kellogg's	kana	company	hand
+nutella	Nutella	typed	product	hand
+Nutella	Nutella	info-capital	product	hand
+NUTELLA	Nutella	info-allcaps	product	hand
+nutera	Nutella	kana	product	hand
+redbull	Red Bull	typed	product	hand
+Redbull	Red Bull	info-capital	product	hand
+REDBULL	Red Bull	info-allcaps	product	hand
+reddoburu	Red Bull	kana	product	hand
+monsterenergy	Monster Energy	typed	product	hand
+Monsterenergy	Monster Energy	info-capital	product	hand
+MONSTERENERGY	Monster Energy	info-allcaps	product	hand
+monnsuta-enaji-	Monster Energy	kana	product	hand
+monnsuta-enazi-	Monster Energy	kana-kunrei	product	hand
+fanta	Fanta	typed	product	hand
+Fanta	Fanta	info-capital	product	hand
+FANTA	Fanta	info-allcaps	product	hand
+fannta	Fanta	kana	product	hand
+fuxannta	Fanta	kana-small-x	product	hand
+sprite	Sprite	typed	product	hand
+Sprite	Sprite	info-capital	product	hand
+SPRITE	Sprite	info-allcaps	product	hand
+supuraito	Sprite	kana	product	hand
+gatorade	Gatorade	typed	product	hand
+Gatorade	Gatorade	info-capital	product	hand
+GATORADE	Gatorade	info-allcaps	product	hand
+ge-tare-do	Gatorade	kana	product	hand
+kitkat	Kit Kat	typed	product	hand
+Kitkat	Kit Kat	info-capital	product	hand
+KITKAT	Kit Kat	info-allcaps	product	hand
+kittokatto	Kit Kat	kana	product	hand
+oreo	Oreo	typed	product	hand
+Oreo	Oreo	info-capital	product	hand
+OREO	Oreo	info-allcaps	product	hand
+oreo	Oreo	kana	product	hand
+pringles	Pringles	typed	product	hand
+Pringles	Pringles	info-capital	product	hand
+PRINGLES	Pringles	info-allcaps	product	hand
+purinnguruzu	Pringles	kana	product	hand
+prius	Prius	typed	product	hand
+Prius	Prius	info-capital	product	hand
+PRIUS	Prius	info-allcaps	product	hand
+puriusu	Prius	kana	product	hand
+mustang	Mustang	typed	product	hand
+Mustang	Mustang	info-capital	product	hand
+MUSTANG	Mustang	info-allcaps	product	hand
+masutanngu	Mustang	kana	product	hand
+cybertruck	Cybertruck	typed	product	hand
+Cybertruck	Cybertruck	info-capital	product	hand
+CYBERTRUCK	Cybertruck	info-allcaps	product	hand
+saiba-torakku	Cybertruck	kana	product	hand
+galaxy	Galaxy	typed	product	hand-ambiguous
+Galaxy	Galaxy	info-capital	product	hand-ambiguous
+GALAXY	Galaxy	info-allcaps	product	hand-ambiguous
+gyarakushi-	Galaxy	kana	product	hand-ambiguous
+gyarakusi-	Galaxy	kana-kunrei	product	hand-ambiguous
+gixyarakushi-	Galaxy	kana-small-x	product	hand-ambiguous
+pixel	Pixel	typed	product	hand
+Pixel	Pixel	info-capital	product	hand
+PIXEL	Pixel	info-allcaps	product	hand
+pikuseru	Pixel	kana	product	hand
+surface	Surface	typed	product	hand-ambiguous
+Surface	Surface	info-capital	product	hand-ambiguous
+SURFACE	Surface	info-allcaps	product	hand-ambiguous
+sa-fesu	Surface	kana	product	hand-ambiguous
+sa-fuxesu	Surface	kana-small-x	product	hand-ambiguous
+thinkpad	ThinkPad	typed	product	hand
+Thinkpad	ThinkPad	info-capital	product	hand
+THINKPAD	ThinkPad	info-allcaps	product	hand
+shinnkupaddo	ThinkPad	kana	product	hand
+sinnkupaddo	ThinkPad	kana-kunrei	product	hand
+raspberrypi	Raspberry Pi	typed	product	hand
+Raspberrypi	Raspberry Pi	info-capital	product	hand
+RASPBERRYPI	Raspberry Pi	info-allcaps	product	hand
+razuberi-pai	Raspberry Pi	kana	product	hand
+arduino	Arduino	typed	product	hand
+Arduino	Arduino	info-capital	product	hand
+ARDUINO	Arduino	info-allcaps	product	hand
+arudwui-no	Arduino	kana	product	hand
+arudoxui-no	Arduino	kana-small-x	product	hand
+oculus	Oculus	typed	product	hand
+Oculus	Oculus	info-capital	product	hand
+OCULUS	Oculus	info-allcaps	product	hand
+okyurasu	Oculus	kana	product	hand
+okixyurasu	Oculus	kana-small-x	product	hand
+gopro	GoPro	typed	product	hand
+Gopro	GoPro	info-capital	product	hand
+GOPRO	GoPro	info-allcaps	product	hand
+go-puro	GoPro	kana	product	hand
+fitbit	Fitbit	typed	product	hand
+Fitbit	Fitbit	info-capital	product	hand
+FITBIT	Fitbit	info-allcaps	product	hand
+fittobitto	Fitbit	kana	product	hand
+fuxittobitto	Fitbit	kana-small-x	product	hand
+roomba	Roomba	typed	product	hand
+Roomba	Roomba	info-capital	product	hand
+ROOMBA	Roomba	info-allcaps	product	hand
+runnba	Roomba	kana	product	hand
+dyson	Dyson	typed	company	hand
+Dyson	Dyson	info-capital	company	hand
+DYSON	Dyson	info-allcaps	company	hand
+daisonn	Dyson	kana	company	hand
+bose	Bose	typed	company	hand
+Bose	Bose	info-capital	company	hand
+BOSE	Bose	info-allcaps	company	hand
+bo-zu	Bose	kana	company	hand
+sennheiser	Sennheiser	typed	company	hand
+Sennheiser	Sennheiser	info-capital	company	hand
+SENNHEISER	Sennheiser	info-allcaps	company	hand
+zennhaiza-	Sennheiser	kana	company	hand
+spotifypremium	Spotify Premium	typed	product	hand
+Spotifypremium	Spotify Premium	info-capital	product	hand
+SPOTIFYPREMIUM	Spotify Premium	info-allcaps	product	hand
+supothifaipuremiamu	Spotify Premium	kana	product	hand
+supotexifuxaipuremiamu	Spotify Premium	kana-small-x	product	hand
+googlemaps	Google Maps	typed	product	hand
+Googlemaps	Google Maps	info-capital	product	hand
+GOOGLEMAPS	Google Maps	info-allcaps	product	hand
+gu-gurumappu	Google Maps	kana	product	hand
+googledrive	Google Drive	typed	product	hand
+Googledrive	Google Drive	info-capital	product	hand
+GOOGLEDRIVE	Google Drive	info-allcaps	product	hand
+gu-gurudoraibu	Google Drive	kana	product	hand
+googledocs	Google Docs	typed	product	hand
+Googledocs	Google Docs	info-capital	product	hand
+GOOGLEDOCS	Google Docs	info-allcaps	product	hand
+gu-gurudokyumennto	Google Docs	kana	product	hand
+gu-gurudokixyumennto	Google Docs	kana-small-x	product	hand
+googlechrome	Google Chrome	typed	product	hand
+Googlechrome	Google Chrome	info-capital	product	hand
+GOOGLECHROME	Google Chrome	info-allcaps	product	hand
+gu-gurukuro-mu	Google Chrome	kana	product	hand
+microsoftteams	Microsoft Teams	typed	product	hand
+Microsoftteams	Microsoft Teams	info-capital	product	hand
+MICROSOFTTEAMS	Microsoft Teams	info-allcaps	product	hand
+maikurosofutochi-muzu	Microsoft Teams	kana	product	hand
+maikurosohutoti-muzu	Microsoft Teams	kana-kunrei	product	hand
+microsoftoffice	Microsoft Office	typed	product	hand
+Microsoftoffice	Microsoft Office	info-capital	product	hand
+MICROSOFTOFFICE	Microsoft Office	info-allcaps	product	hand
+maikurosofutoofisu	Microsoft Office	kana	product	hand
+maikurosohutoofisu	Microsoft Office	kana-kunrei	product	hand
+maikurosofutoofuxisu	Microsoft Office	kana-small-x	product	hand
+visualstudio	Visual Studio	typed	software	hand
+Visualstudio	Visual Studio	info-capital	software	hand
+VISUALSTUDIO	Visual Studio	info-allcaps	software	hand
+bijuarusutajio	Visual Studio	kana	software	hand
+bizyuarusutazio	Visual Studio	kana-kunrei	software	hand
+bijixyuarusutajio	Visual Studio	kana-small-x	software	hand
+visualstudiocode	Visual Studio Code	typed	software	hand
+Visualstudiocode	Visual Studio Code	info-capital	software	hand
+VISUALSTUDIOCODE	Visual Studio Code	info-allcaps	software	hand
+bijuarusutajioko-do	Visual Studio Code	kana	software	hand
+bizyuarusutazioko-do	Visual Studio Code	kana-kunrei	software	hand
+bijixyuarusutajioko-do	Visual Studio Code	kana-small-x	software	hand
+intellijidea	IntelliJ IDEA	typed	software	hand
+Intellijidea	IntelliJ IDEA	info-capital	software	hand
+INTELLIJIDEA	IntelliJ IDEA	info-allcaps	software	hand
+innterijeiaidea	IntelliJ IDEA	kana	software	hand
+innterijixeiaidea	IntelliJ IDEA	kana-small-x	software	hand
+eclipse	Eclipse	typed	software	hand
+Eclipse	Eclipse	info-capital	software	hand
+ECLIPSE	Eclipse	info-allcaps	software	hand
+ekuripusu	Eclipse	kana	software	hand
+vim	Vim	typed	software	hand
+Vim	Vim	info-capital	software	hand
+VIM	Vim	info-allcaps	software	hand
+vimu	Vim	kana	software	hand
+vuximu	Vim	kana-small-x	software	hand
+emacs	Emacs	typed	software	hand
+Emacs	Emacs	info-capital	software	hand
+EMACS	Emacs	info-allcaps	software	hand
+i-makkusu	Emacs	kana	software	hand
+homebrew	Homebrew	typed	software	hand
+Homebrew	Homebrew	info-capital	software	hand
+HOMEBREW	Homebrew	info-allcaps	software	hand
+ho-muburu-	Homebrew	kana	software	hand
+npm	npm	typed	software	hand
+Npm	npm	info-capital	software	hand
+NPM	npm	info-allcaps	software	hand
+enupi-emu	npm	kana	software	hand
+webpack	Webpack	typed	software	hand
+Webpack	Webpack	info-capital	software	hand
+WEBPACK	Webpack	info-allcaps	software	hand
+webupakku	Webpack	kana	software	hand
+uxebupakku	Webpack	kana-small-x	software	hand
+vite	Vite	typed	software	hand
+Vite	Vite	info-capital	software	hand
+VITE	Vite	info-allcaps	software	hand
+vi-to	Vite	kana	software	hand
+vuxi-to	Vite	kana-small-x	software	hand
+nextjs	Next.js	typed	software	hand
+Nextjs	Next.js	info-capital	software	hand
+NEXTJS	Next.js	info-allcaps	software	hand
+nekusutojeiesu	Next.js	kana	software	hand
+nekusutojixeiesu	Next.js	kana-small-x	software	hand
+django	Django	typed	software	hand
+Django	Django	info-capital	software	hand
+DJANGO	Django	info-allcaps	software	hand
+janngo	Django	kana	software	hand
+zyanngo	Django	kana-kunrei	software	hand
+jixyanngo	Django	kana-small-x	software	hand
+flask	Flask	typed	software	hand
+Flask	Flask	info-capital	software	hand
+FLASK	Flask	info-allcaps	software	hand
+furasuku	Flask	kana	software	hand
+hurasuku	Flask	kana-kunrei	software	hand
+laravel	Laravel	typed	software	hand
+Laravel	Laravel	info-capital	software	hand
+LARAVEL	Laravel	info-allcaps	software	hand
+raraberu	Laravel	kana	software	hand
+springboot	Spring Boot	typed	software	hand
+Springboot	Spring Boot	info-capital	software	hand
+SPRINGBOOT	Spring Boot	info-allcaps	software	hand
+supurinngubu-to	Spring Boot	kana	software	hand
+graphql	GraphQL	typed	software	hand
+Graphql	GraphQL	info-capital	software	hand
+GRAPHQL	GraphQL	info-allcaps	software	hand
+gurafukyu-eru	GraphQL	kana	software	hand
+gurahukyu-eru	GraphQL	kana-kunrei	software	hand
+gurafukixyu-eru	GraphQL	kana-small-x	software	hand
+prometheus	Prometheus	typed	software	hand
+Prometheus	Prometheus	info-capital	software	hand
+PROMETHEUS	Prometheus	info-allcaps	software	hand
+purometeusu	Prometheus	kana	software	hand
+grafana	Grafana	typed	software	hand
+Grafana	Grafana	info-capital	software	hand
+GRAFANA	Grafana	info-allcaps	software	hand
+gurafana	Grafana	kana	software	hand
+gurafuxana	Grafana	kana-small-x	software	hand
+nginx	Nginx	typed	software	hand
+Nginx	Nginx	info-capital	software	hand
+NGINX	Nginx	info-allcaps	software	hand
+ennjinnekkusu	Nginx	kana	software	hand
+ennzinnekkusu	Nginx	kana-kunrei	software	hand
+apache	Apache	typed	software	hand
+Apache	Apache	info-capital	software	hand
+APACHE	Apache	info-allcaps	software	hand
+apatchi	Apache	kana	software	hand
+apatti	Apache	kana-kunrei	software	hand
+kafka	Kafka	typed	software	hand
+Kafka	Kafka	info-capital	software	hand
+KAFKA	Kafka	info-allcaps	software	hand
+kafuka	Kafka	kana	software	hand
+kahuka	Kafka	kana-kunrei	software	hand
+rabbitmq	RabbitMQ	typed	software	hand
+Rabbitmq	RabbitMQ	info-capital	software	hand
+RABBITMQ	RabbitMQ	info-allcaps	software	hand
+rabittoemukyu-	RabbitMQ	kana	software	hand
+rabittoemukixyu-	RabbitMQ	kana-small-x	software	hand
+figma	Figma	typed	software	hand
+Figma	Figma	info-capital	software	hand
+FIGMA	Figma	info-allcaps	software	hand
+figuma	Figma	kana	software	hand
+fuxiguma	Figma	kana-small-x	software	hand
+sketch	Sketch	typed	software	hand-ambiguous
+Sketch	Sketch	info-capital	software	hand-ambiguous
+SKETCH	Sketch	info-allcaps	software	hand-ambiguous
+suketchi	Sketch	kana	software	hand-ambiguous
+suketti	Sketch	kana-kunrei	software	hand-ambiguous
+blender	Blender	typed	software	hand
+Blender	Blender	info-capital	software	hand
+BLENDER	Blender	info-allcaps	software	hand
+burennda-	Blender	kana	software	hand
+unity	Unity	typed	software	hand-ambiguous
+Unity	Unity	info-capital	software	hand-ambiguous
+UNITY	Unity	info-allcaps	software	hand-ambiguous
+yunithi	Unity	kana	software	hand-ambiguous
+yunitexi	Unity	kana-small-x	software	hand-ambiguous
+unrealengine	Unreal Engine	typed	software	hand
+Unrealengine	Unreal Engine	info-capital	software	hand
+UNREALENGINE	Unreal Engine	info-allcaps	software	hand
+annriaruennjinn	Unreal Engine	kana	software	hand
+annriaruennzinn	Unreal Engine	kana-kunrei	software	hand
+godot	Godot	typed	software	hand
+Godot	Godot	info-capital	software	hand
+GODOT	Godot	info-allcaps	software	hand
+godo-	Godot	kana	software	hand
+archlinux	Arch Linux	typed	software	hand
+Archlinux	Arch Linux	info-capital	software	hand
+ARCHLINUX	Arch Linux	info-allcaps	software	hand
+a-chirinakkusu	Arch Linux	kana	software	hand
+a-tirinakkusu	Arch Linux	kana-kunrei	software	hand
+redhat	Red Hat	typed	software	hand
+Redhat	Red Hat	info-capital	software	hand
+REDHAT	Red Hat	info-allcaps	software	hand
+reddohatto	Red Hat	kana	software	hand
+chromium	Chromium	typed	software	hand
+Chromium	Chromium	info-capital	software	hand
+CHROMIUM	Chromium	info-allcaps	software	hand
+kuromiumu	Chromium	kana	software	hand
+opera	Opera	typed	software	hand-ambiguous
+Opera	Opera	info-capital	software	hand-ambiguous
+OPERA	Opera	info-allcaps	software	hand-ambiguous
+opera	Opera	kana	software	hand-ambiguous
+brave	Brave	typed	software	hand-ambiguous
+Brave	Brave	info-capital	software	hand-ambiguous
+BRAVE	Brave	info-allcaps	software	hand-ambiguous
+bureibu	Brave	kana	software	hand-ambiguous
+tor	Tor	typed	software	hand
+Tor	Tor	info-capital	software	hand
+TOR	Tor	info-allcaps	software	hand
+to-a	Tor	kana	software	hand
+dogecoin	Dogecoin	typed	software	hand
+Dogecoin	Dogecoin	info-capital	software	hand
+DOGECOIN	Dogecoin	info-allcaps	software	hand
+do-jikoinn	Dogecoin	kana	software	hand
+do-zikoinn	Dogecoin	kana-kunrei	software	hand
+ripple	Ripple	typed	software	hand
+Ripple	Ripple	info-capital	software	hand
+RIPPLE	Ripple	info-allcaps	software	hand
+rippuru	Ripple	kana	software	hand
+cardano	Cardano	typed	software	hand
+Cardano	Cardano	info-capital	software	hand
+CARDANO	Cardano	info-allcaps	software	hand
+karudano	Cardano	kana	software	hand
+polkadot	Polkadot	typed	software	hand
+Polkadot	Polkadot	info-capital	software	hand
+POLKADOT	Polkadot	info-allcaps	software	hand
+porukadotto	Polkadot	kana	software	hand
+chainlink	Chainlink	typed	software	hand
+Chainlink	Chainlink	info-capital	software	hand
+CHAINLINK	Chainlink	info-allcaps	software	hand
+che-nnrinnku	Chainlink	kana	software	hand
+chixe-nnrinnku	Chainlink	kana-small-x	software	hand
+uniswap	Uniswap	typed	software	hand
+Uniswap	Uniswap	info-capital	software	hand
+UNISWAP	Uniswap	info-allcaps	software	hand
+yunisuwappu	Uniswap	kana	software	hand
+metamask	MetaMask	typed	software	hand
+Metamask	MetaMask	info-capital	software	hand
+METAMASK	MetaMask	info-allcaps	software	hand
+metamasuku	MetaMask	kana	software	hand
+ledger	Ledger	typed	software	hand
+Ledger	Ledger	info-capital	software	hand
+LEDGER	Ledger	info-allcaps	software	hand
+reja-	Ledger	kana	software	hand
+rezya-	Ledger	kana-kunrei	software	hand
+rejixya-	Ledger	kana-small-x	software	hand
+washington	Washington	typed	place	hand
+Washington	Washington	info-capital	place	hand
+WASHINGTON	Washington	info-allcaps	place	hand
+washinntonn	Washington	kana	place	hand
+wasinntonn	Washington	kana-kunrei	place	hand
+philadelphia	Philadelphia	typed	place	hand
+Philadelphia	Philadelphia	info-capital	place	hand
+PHILADELPHIA	Philadelphia	info-allcaps	place	hand
+firaderufia	Philadelphia	kana	place	hand
+fuxiraderufuxia	Philadelphia	kana-small-x	place	hand
+miami	Miami	typed	place	hand
+Miami	Miami	info-capital	place	hand
+MIAMI	Miami	info-allcaps	place	hand
+maiami	Miami	kana	place	hand
+denver	Denver	typed	place	hand
+Denver	Denver	info-capital	place	hand
+DENVER	Denver	info-allcaps	place	hand
+dennba-	Denver	kana	place	hand
+houston	Houston	typed	place	hand
+Houston	Houston	info-capital	place	hand
+HOUSTON	Houston	info-allcaps	place	hand
+hyu-sutonn	Houston	kana	place	hand
+hixyu-sutonn	Houston	kana-small-x	place	hand
+detroit	Detroit	typed	place	hand
+Detroit	Detroit	info-capital	place	hand
+DETROIT	Detroit	info-allcaps	place	hand
+detoroito	Detroit	kana	place	hand
+manchester	Manchester	typed	place	hand
+Manchester	Manchester	info-capital	place	hand
+MANCHESTER	Manchester	info-allcaps	place	hand
+mannchesuta-	Manchester	kana	place	hand
+mannchixesuta-	Manchester	kana-small-x	place	hand
+liverpool	Liverpool	typed	place	hand
+Liverpool	Liverpool	info-capital	place	hand
+LIVERPOOL	Liverpool	info-allcaps	place	hand
+ribapu-ru	Liverpool	kana	place	hand
+edinburgh	Edinburgh	typed	place	hand
+Edinburgh	Edinburgh	info-capital	place	hand
+EDINBURGH	Edinburgh	info-allcaps	place	hand
+edhinnbara	Edinburgh	kana	place	hand
+edexinnbara	Edinburgh	kana-small-x	place	hand
+dublin	Dublin	typed	place	hand
+Dublin	Dublin	info-capital	place	hand
+DUBLIN	Dublin	info-allcaps	place	hand
+daburinn	Dublin	kana	place	hand
+lisbon	Lisbon	typed	place	hand
+Lisbon	Lisbon	info-capital	place	hand
+LISBON	Lisbon	info-allcaps	place	hand
+risubonn	Lisbon	kana	place	hand
+venice	Venice	typed	place	hand
+Venice	Venice	info-capital	place	hand
+VENICE	Venice	info-allcaps	place	hand
+benechia	Venice	kana	place	hand
+benetia	Venice	kana-kunrei	place	hand
+florence	Florence	typed	place	hand
+Florence	Florence	info-capital	place	hand
+FLORENCE	Florence	info-allcaps	place	hand
+firenntse	Florence	kana	place	hand
+fuxirenntsuxe	Florence	kana-small-x	place	hand
+naples	Naples	typed	place	hand
+Naples	Naples	info-capital	place	hand
+NAPLES	Naples	info-allcaps	place	hand
+napori	Naples	kana	place	hand
+munich	Munich	typed	place	hand
+Munich	Munich	info-capital	place	hand
+MUNICH	Munich	info-allcaps	place	hand
+myunnhenn	Munich	kana	place	hand
+mixyunnhenn	Munich	kana-small-x	place	hand
+hamburg	Hamburg	typed	place	hand
+Hamburg	Hamburg	info-capital	place	hand
+HAMBURG	Hamburg	info-allcaps	place	hand
+hannburuku	Hamburg	kana	place	hand
+frankfurt	Frankfurt	typed	place	hand
+Frankfurt	Frankfurt	info-capital	place	hand
+FRANKFURT	Frankfurt	info-allcaps	place	hand
+furannkufuruto	Frankfurt	kana	place	hand
+hurannkuhuruto	Frankfurt	kana-kunrei	place	hand
+zurich	Zurich	typed	place	hand
+Zurich	Zurich	info-capital	place	hand
+ZURICH	Zurich	info-allcaps	place	hand
+chu-rihhi	Zurich	kana	place	hand
+tyu-rihhi	Zurich	kana-kunrei	place	hand
+chixyu-rihhi	Zurich	kana-small-x	place	hand
+geneva	Geneva	typed	place	hand
+Geneva	Geneva	info-capital	place	hand
+GENEVA	Geneva	info-allcaps	place	hand
+june-bu	Geneva	kana	place	hand
+zyune-bu	Geneva	kana-kunrei	place	hand
+jixyune-bu	Geneva	kana-small-x	place	hand
+brussels	Brussels	typed	place	hand
+Brussels	Brussels	info-capital	place	hand
+BRUSSELS	Brussels	info-allcaps	place	hand
+buryusseru	Brussels	kana	place	hand
+burixyusseru	Brussels	kana-small-x	place	hand
+copenhagen	Copenhagen	typed	place	hand
+Copenhagen	Copenhagen	info-capital	place	hand
+COPENHAGEN	Copenhagen	info-allcaps	place	hand
+kopennha-genn	Copenhagen	kana	place	hand
+stockholm	Stockholm	typed	place	hand
+Stockholm	Stockholm	info-capital	place	hand
+STOCKHOLM	Stockholm	info-allcaps	place	hand
+sutokkuhorumu	Stockholm	kana	place	hand
+oslo	Oslo	typed	place	hand
+Oslo	Oslo	info-capital	place	hand
+OSLO	Oslo	info-allcaps	place	hand
+osuro	Oslo	kana	place	hand
+helsinki	Helsinki	typed	place	hand
+Helsinki	Helsinki	info-capital	place	hand
+HELSINKI	Helsinki	info-allcaps	place	hand
+herushinnki	Helsinki	kana	place	hand
+herusinnki	Helsinki	kana-kunrei	place	hand
+warsaw	Warsaw	typed	place	hand
+Warsaw	Warsaw	info-capital	place	hand
+WARSAW	Warsaw	info-allcaps	place	hand
+warushawa	Warsaw	kana	place	hand
+warusyawa	Warsaw	kana-kunrei	place	hand
+warushixyawa	Warsaw	kana-small-x	place	hand
+budapest	Budapest	typed	place	hand
+Budapest	Budapest	info-capital	place	hand
+BUDAPEST	Budapest	info-allcaps	place	hand
+budapesuto	Budapest	kana	place	hand
+athens	Athens	typed	place	hand
+Athens	Athens	info-capital	place	hand
+ATHENS	Athens	info-allcaps	place	hand
+atene	Athens	kana	place	hand
+cairo	Cairo	typed	place	hand
+Cairo	Cairo	info-capital	place	hand
+CAIRO	Cairo	info-allcaps	place	hand
+kairo	Cairo	kana	place	hand
+nairobi	Nairobi	typed	place	hand
+Nairobi	Nairobi	info-capital	place	hand
+NAIROBI	Nairobi	info-allcaps	place	hand
+nairobi	Nairobi	kana	place	hand
+mumbai	Mumbai	typed	place	hand
+Mumbai	Mumbai	info-capital	place	hand
+MUMBAI	Mumbai	info-allcaps	place	hand
+munnbai	Mumbai	kana	place	hand
+delhi	Delhi	typed	place	hand
+Delhi	Delhi	info-capital	place	hand
+DELHI	Delhi	info-allcaps	place	hand
+deri-	Delhi	kana	place	hand
+kathmandu	Kathmandu	typed	place	hand
+Kathmandu	Kathmandu	info-capital	place	hand
+KATHMANDU	Kathmandu	info-allcaps	place	hand
+katomannzu	Kathmandu	kana	place	hand
+hanoi	Hanoi	typed	place	hand
+Hanoi	Hanoi	info-capital	place	hand
+HANOI	Hanoi	info-allcaps	place	hand
+hanoi	Hanoi	kana	place	hand
+manila	Manila	typed	place	hand
+Manila	Manila	info-capital	place	hand
+MANILA	Manila	info-allcaps	place	hand
+manira	Manila	kana	place	hand
+jakarta	Jakarta	typed	place	hand
+Jakarta	Jakarta	info-capital	place	hand
+JAKARTA	Jakarta	info-allcaps	place	hand
+jakaruta	Jakarta	kana	place	hand
+zyakaruta	Jakarta	kana-kunrei	place	hand
+jixyakaruta	Jakarta	kana-small-x	place	hand
+taipei	Taipei	typed	place	hand
+Taipei	Taipei	info-capital	place	hand
+TAIPEI	Taipei	info-allcaps	place	hand
+taipei	Taipei	kana	place	hand
+kualalumpur	Kuala Lumpur	typed	place	hand
+Kualalumpur	Kuala Lumpur	info-capital	place	hand
+KUALALUMPUR	Kuala Lumpur	info-allcaps	place	hand
+kuararunnpu-ru	Kuala Lumpur	kana	place	hand
+auckland	Auckland	typed	place	hand
+Auckland	Auckland	info-capital	place	hand
+AUCKLAND	Auckland	info-allcaps	place	hand
+o-kuranndo	Auckland	kana	place	hand
+santiago	Santiago	typed	place	hand
+Santiago	Santiago	info-capital	place	hand
+SANTIAGO	Santiago	info-allcaps	place	hand
+sannthiago	Santiago	kana	place	hand
+sanntexiago	Santiago	kana-small-x	place	hand
+lima	Lima	typed	place	hand
+Lima	Lima	info-capital	place	hand
+LIMA	Lima	info-allcaps	place	hand
+havana	Havana	typed	place	hand
+Havana	Havana	info-capital	place	hand
+HAVANA	Havana	info-allcaps	place	hand
+habana	Havana	kana	place	hand
+jamaica	Jamaica	typed	place	hand
+Jamaica	Jamaica	info-capital	place	hand
+JAMAICA	Jamaica	info-allcaps	place	hand
+jamaika	Jamaica	kana	place	hand
+zyamaika	Jamaica	kana-kunrei	place	hand
+jixyamaika	Jamaica	kana-small-x	place	hand
+iceland	Iceland	typed	place	hand
+Iceland	Iceland	info-capital	place	hand
+ICELAND	Iceland	info-allcaps	place	hand
+aisuranndo	Iceland	kana	place	hand
+ireland	Ireland	typed	place	hand
+Ireland	Ireland	info-capital	place	hand
+IRELAND	Ireland	info-allcaps	place	hand
+airuranndo	Ireland	kana	place	hand
+portugal	Portugal	typed	place	hand
+Portugal	Portugal	info-capital	place	hand
+PORTUGAL	Portugal	info-allcaps	place	hand
+porutogaru	Portugal	kana	place	hand
+greece	Greece	typed	place	hand
+Greece	Greece	info-capital	place	hand
+GREECE	Greece	info-allcaps	place	hand
+girisha	Greece	kana	place	hand
+girisya	Greece	kana-kunrei	place	hand
+girishixya	Greece	kana-small-x	place	hand
+turkey	Turkey	typed	place	hand
+Turkey	Turkey	info-capital	place	hand
+TURKEY	Turkey	info-allcaps	place	hand
+toruko	Turkey	kana	place	hand
+morocco	Morocco	typed	place	hand
+Morocco	Morocco	info-capital	place	hand
+MOROCCO	Morocco	info-allcaps	place	hand
+morokko	Morocco	kana	place	hand
+alaska	Alaska	typed	place	hand
+Alaska	Alaska	info-capital	place	hand
+ALASKA	Alaska	info-allcaps	place	hand
+arasuka	Alaska	kana	place	hand
+colorado	Colorado	typed	place	hand
+Colorado	Colorado	info-capital	place	hand
+COLORADO	Colorado	info-allcaps	place	hand
+kororado	Colorado	kana	place	hand
+arizona	Arizona	typed	place	hand
+Arizona	Arizona	info-capital	place	hand
+ARIZONA	Arizona	info-allcaps	place	hand
+arizona	Arizona	kana	place	hand
+kilimanjaro	Kilimanjaro	typed	place	hand
+Kilimanjaro	Kilimanjaro	info-capital	place	hand
+KILIMANJARO	Kilimanjaro	info-allcaps	place	hand
+kirimannjaro	Kilimanjaro	kana	place	hand
+kirimannzyaro	Kilimanjaro	kana-kunrei	place	hand
+kirimannjixyaro	Kilimanjaro	kana-small-x	place	hand
+sahara	Sahara	typed	place	hand
+Sahara	Sahara	info-capital	place	hand
+SAHARA	Sahara	info-allcaps	place	hand
+sahara	Sahara	kana	place	hand
+yellowstone	Yellowstone	typed	place	hand
+Yellowstone	Yellowstone	info-capital	place	hand
+YELLOWSTONE	Yellowstone	info-allcaps	place	hand
+iero-suto-nn	Yellowstone	kana	place	hand
+marktwain	Mark Twain	typed	person	hand
+Marktwain	Mark Twain	info-capital	person	hand
+MARKTWAIN	Mark Twain	info-allcaps	person	hand
+ma-kutoweinn	Mark Twain	kana	person	hand
+ma-kutouxeinn	Mark Twain	kana-small-x	person	hand
+ernesthemingway	Ernest Hemingway	typed	person	hand
+Ernesthemingway	Ernest Hemingway	info-capital	person	hand
+ERNESTHEMINGWAY	Ernest Hemingway	info-allcaps	person	hand
+a-nesutoheminnguwei	Ernest Hemingway	kana	person	hand
+a-nesutoheminnguuxei	Ernest Hemingway	kana-small-x	person	hand
+agathachristie	Agatha Christie	typed	person	hand
+Agathachristie	Agatha Christie	info-capital	person	hand
+AGATHACHRISTIE	Agatha Christie	info-allcaps	person	hand
+agasakurisuthi	Agatha Christie	kana	person	hand
+agasakurisutexi	Agatha Christie	kana-small-x	person	hand
+stephenking	Stephen King	typed	person	hand
+Stephenking	Stephen King	info-capital	person	hand
+STEPHENKING	Stephen King	info-allcaps	person	hand
+suthi-vunnkinngu	Stephen King	kana	person	hand
+sutexi-vunnkinngu	Stephen King	kana-small-x	person	hand
+pablopicasso	Pablo Picasso	typed	person	hand
+Pablopicasso	Pablo Picasso	info-capital	person	hand
+PABLOPICASSO	Pablo Picasso	info-allcaps	person	hand
+paburopikaso	Pablo Picasso	kana	person	hand
+vincentvangogh	Vincent van Gogh	typed	person	hand
+Vincentvangogh	Vincent van Gogh	info-capital	person	hand
+VINCENTVANGOGH	Vincent van Gogh	info-allcaps	person	hand
+finnsenntofanngohho	Vincent van Gogh	kana	person	hand
+fuxinnsenntofuxanngohho	Vincent van Gogh	kana-small-x	person	hand
+leonardodavinci	Leonardo da Vinci	typed	person	hand
+Leonardodavinci	Leonardo da Vinci	info-capital	person	hand
+LEONARDODAVINCI	Leonardo da Vinci	info-allcaps	person	hand
+reonarudodavinnchi	Leonardo da Vinci	kana	person	hand
+reonarudodavinnti	Leonardo da Vinci	kana-kunrei	person	hand
+reonarudodavuxinnchi	Leonardo da Vinci	kana-small-x	person	hand
+wolfgangamadeusmozart	Wolfgang Amadeus Mozart	typed	person	hand
+Wolfgangamadeusmozart	Wolfgang Amadeus Mozart	info-capital	person	hand
+WOLFGANGAMADEUSMOZART	Wolfgang Amadeus Mozart	info-allcaps	person	hand
+vorufugannguamadeusumo-tsaruto	Wolfgang Amadeus Mozart	kana	person	hand
+voruhugannguamadeusumo-tsaruto	Wolfgang Amadeus Mozart	kana-kunrei	person	hand
+vuxorufugannguamadeusumo-tsuxaruto	Wolfgang Amadeus Mozart	kana-small-x	person	hand
+ludwigvanbeethoven	Ludwig van Beethoven	typed	person	hand
+Ludwigvanbeethoven	Ludwig van Beethoven	info-capital	person	hand
+LUDWIGVANBEETHOVEN	Ludwig van Beethoven	info-allcaps	person	hand
+ru-tovihifannbe-to-venn	Ludwig van Beethoven	kana	person	hand
+ru-tovuxihifuxannbe-to-vuxenn	Ludwig van Beethoven	kana-small-x	person	hand
+mariecurie	Marie Curie	typed	person	hand
+Mariecurie	Marie Curie	info-capital	person	hand
+MARIECURIE	Marie Curie	info-allcaps	person	hand
+mari-kyuri-	Marie Curie	kana	person	hand
+mari-kixyuri-	Marie Curie	kana-small-x	person	hand
+nikolatesla	Nikola Tesla	typed	person	hand
+Nikolatesla	Nikola Tesla	info-capital	person	hand
+NIKOLATESLA	Nikola Tesla	info-allcaps	person	hand
+nikoratesura	Nikola Tesla	kana	person	hand
+stephenhawking	Stephen Hawking	typed	person	hand
+Stephenhawking	Stephen Hawking	info-capital	person	hand
+STEPHENHAWKING	Stephen Hawking	info-allcaps	person	hand
+suthi-vunnho-kinngu	Stephen Hawking	kana	person	hand
+sutexi-vunnho-kinngu	Stephen Hawking	kana-small-x	person	hand
+alanturing	Alan Turing	typed	person	hand
+Alanturing	Alan Turing	info-capital	person	hand
+ALANTURING	Alan Turing	info-allcaps	person	hand
+arannchu-rinngu	Alan Turing	kana	person	hand
+aranntyu-rinngu	Alan Turing	kana-kunrei	person	hand
+arannchixyu-rinngu	Alan Turing	kana-small-x	person	hand
+linustorvalds	Linus Torvalds	typed	person	hand
+Linustorvalds	Linus Torvalds	info-capital	person	hand
+LINUSTORVALDS	Linus Torvalds	info-allcaps	person	hand
+ri-nasuto-baruzu	Linus Torvalds	kana	person	hand
+guidovanrossum	Guido van Rossum	typed	person	hand
+Guidovanrossum	Guido van Rossum	info-capital	person	hand
+GUIDOVANROSSUM	Guido van Rossum	info-allcaps	person	hand
+guidovannrossamu	Guido van Rossum	kana	person	hand
+guidovuxannrossamu	Guido van Rossum	kana-small-x	person	hand
+satoshinakamoto	Satoshi Nakamoto	typed	person	hand
+Satoshinakamoto	Satoshi Nakamoto	info-capital	person	hand
+SATOSHINAKAMOTO	Satoshi Nakamoto	info-allcaps	person	hand
+satoshinakamoto	Satoshi Nakamoto	kana	person	hand
+satosinakamoto	Satoshi Nakamoto	kana-kunrei	person	hand
+vitalikbuterin	Vitalik Buterin	typed	person	hand
+Vitalikbuterin	Vitalik Buterin	info-capital	person	hand
+VITALIKBUTERIN	Vitalik Buterin	info-allcaps	person	hand
+vitarikkubuterinn	Vitalik Buterin	kana	person	hand
+vuxitarikkubuterinn	Vitalik Buterin	kana-small-x	person	hand
+samaltman	Sam Altman	typed	person	hand
+Samaltman	Sam Altman	info-capital	person	hand
+SAMALTMAN	Sam Altman	info-allcaps	person	hand
+samuarutomann	Sam Altman	kana	person	hand
+jensenhuang	Jensen Huang	typed	person	hand
+Jensenhuang	Jensen Huang	info-capital	person	hand
+JENSENHUANG	Jensen Huang	info-allcaps	person	hand
+jennsunnfann	Jensen Huang	kana	person	hand
+jixennsunnfuxann	Jensen Huang	kana-small-x	person	hand
+warrenbuffett	Warren Buffett	typed	person	hand
+Warrenbuffett	Warren Buffett	info-capital	person	hand
+WARRENBUFFETT	Warren Buffett	info-allcaps	person	hand
+who-rennbafetto	Warren Buffett	kana	person	hand
+uxo-rennbafuxetto	Warren Buffett	kana-small-x	person	hand
+oprahwinfrey	Oprah Winfrey	typed	person	hand
+Oprahwinfrey	Oprah Winfrey	info-capital	person	hand
+OPRAHWINFREY	Oprah Winfrey	info-allcaps	person	hand
+opurawinnfuri-	Oprah Winfrey	kana	person	hand
+opurawinnhuri-	Oprah Winfrey	kana-kunrei	person	hand
+opurauxinnfuri-	Oprah Winfrey	kana-small-x	person	hand
+beyonce	Beyonce	typed	person	hand
+Beyonce	Beyonce	info-capital	person	hand
+BEYONCE	Beyonce	info-allcaps	person	hand
+biyonnse	Beyonce	kana	person	hand
+rihanna	Rihanna	typed	person	hand
+Rihanna	Rihanna	info-capital	person	hand
+RIHANNA	Rihanna	info-allcaps	person	hand
+ria-na	Rihanna	kana	person	hand
+edsheeran	Ed Sheeran	typed	person	hand
+Edsheeran	Ed Sheeran	info-capital	person	hand
+EDSHEERAN	Ed Sheeran	info-allcaps	person	hand
+edoshi-rann	Ed Sheeran	kana	person	hand
+edosi-rann	Ed Sheeran	kana-kunrei	person	hand
+justinbieber	Justin Bieber	typed	person	hand
+Justinbieber	Justin Bieber	info-capital	person	hand
+JUSTINBIEBER	Justin Bieber	info-allcaps	person	hand
+jasuthinnbi-ba-	Justin Bieber	kana	person	hand
+zyasuthinnbi-ba-	Justin Bieber	kana-kunrei	person	hand
+jixyasutexinnbi-ba-	Justin Bieber	kana-small-x	person	hand
+arianagrande	Ariana Grande	typed	person	hand
+Arianagrande	Ariana Grande	info-capital	person	hand
+ARIANAGRANDE	Ariana Grande	info-allcaps	person	hand
+arianagurannde	Ariana Grande	kana	person	hand
+billieeilish	Billie Eilish	typed	person	hand
+Billieeilish	Billie Eilish	info-capital	person	hand
+BILLIEEILISH	Billie Eilish	info-allcaps	person	hand
+biri-airisshu	Billie Eilish	kana	person	hand
+biri-airissyu	Billie Eilish	kana-kunrei	person	hand
+biri-airisshixyu	Billie Eilish	kana-small-x	person	hand
+brunomars	Bruno Mars	typed	person	hand
+Brunomars	Bruno Mars	info-capital	person	hand
+BRUNOMARS	Bruno Mars	info-allcaps	person	hand
+buru-noma-zu	Bruno Mars	kana	person	hand
+adele	Adele	typed	person	hand
+Adele	Adele	info-capital	person	hand
+ADELE	Adele	info-allcaps	person	hand
+aderu	Adele	kana	person	hand
+eminem	Eminem	typed	person	hand
+Eminem	Eminem	info-capital	person	hand
+EMINEM	Eminem	info-allcaps	person	hand
+eminemu	Eminem	kana	person	hand
+madonna	Madonna	typed	person	hand
+Madonna	Madonna	info-capital	person	hand
+MADONNA	Madonna	info-allcaps	person	hand
+madonnna	Madonna	kana	person	hand
+keanureeves	Keanu Reeves	typed	person	hand
+Keanureeves	Keanu Reeves	info-capital	person	hand
+KEANUREEVES	Keanu Reeves	info-allcaps	person	hand
+kianuri-busu	Keanu Reeves	kana	person	hand
+johnnydepp	Johnny Depp	typed	person	hand
+Johnnydepp	Johnny Depp	info-capital	person	hand
+JOHNNYDEPP	Johnny Depp	info-allcaps	person	hand
+joni-deppu	Johnny Depp	kana	person	hand
+zyoni-deppu	Johnny Depp	kana-kunrei	person	hand
+jixyoni-deppu	Johnny Depp	kana-small-x	person	hand
+scarlettjohansson	Scarlett Johansson	typed	person	hand
+Scarlettjohansson	Scarlett Johansson	info-capital	person	hand
+SCARLETTJOHANSSON	Scarlett Johansson	info-allcaps	person	hand
+suka-rettoyohannsonn	Scarlett Johansson	kana	person	hand
+emmawatson	Emma Watson	typed	person	hand
+Emmawatson	Emma Watson	info-capital	person	hand
+EMMAWATSON	Emma Watson	info-allcaps	person	hand
+emawatosonn	Emma Watson	kana	person	hand
+serenawilliams	Serena Williams	typed	person	hand
+Serenawilliams	Serena Williams	info-capital	person	hand
+SERENAWILLIAMS	Serena Williams	info-allcaps	person	hand
+seri-nawiriamuzu	Serena Williams	kana	person	hand
+seri-nauxiriamuzu	Serena Williams	kana-small-x	person	hand
+rogerfederer	Roger Federer	typed	person	hand
+Rogerfederer	Roger Federer	info-capital	person	hand
+ROGERFEDERER	Roger Federer	info-allcaps	person	hand
+roja-federa-	Roger Federer	kana	person	hand
+rozya-federa-	Roger Federer	kana-kunrei	person	hand
+rojixya-fuxedera-	Roger Federer	kana-small-x	person	hand
+rafaelnadal	Rafael Nadal	typed	person	hand
+Rafaelnadal	Rafael Nadal	info-capital	person	hand
+RAFAELNADAL	Rafael Nadal	info-allcaps	person	hand
+rafaerunadaru	Rafael Nadal	kana	person	hand
+rafuxaerunadaru	Rafael Nadal	kana-small-x	person	hand
+novakdjokovic	Novak Djokovic	typed	person	hand
+Novakdjokovic	Novak Djokovic	info-capital	person	hand
+NOVAKDJOKOVIC	Novak Djokovic	info-allcaps	person	hand
+nobakujokobitchi	Novak Djokovic	kana	person	hand
+nobakuzyokobitti	Novak Djokovic	kana-kunrei	person	hand
+nobakujixyokobitchi	Novak Djokovic	kana-small-x	person	hand
+michaeljordan	Michael Jordan	typed	person	hand
+Michaeljordan	Michael Jordan	info-capital	person	hand
+MICHAELJORDAN	Michael Jordan	info-allcaps	person	hand
+maikerujo-dann	Michael Jordan	kana	person	hand
+maikeruzyo-dann	Michael Jordan	kana-kunrei	person	hand
+maikerujixyo-dann	Michael Jordan	kana-small-x	person	hand
+lebronjames	LeBron James	typed	person	hand
+Lebronjames	LeBron James	info-capital	person	hand
+LEBRONJAMES	LeBron James	info-allcaps	person	hand
+reburonnje-muzu	LeBron James	kana	person	hand
+reburonnjixe-muzu	LeBron James	kana-small-x	person	hand
+kobebryant	Kobe Bryant	typed	person	hand
+Kobebryant	Kobe Bryant	info-capital	person	hand
+KOBEBRYANT	Kobe Bryant	info-allcaps	person	hand
+ko-bi-buraiannto	Kobe Bryant	kana	person	hand
+usainbolt	Usain Bolt	typed	person	hand
+Usainbolt	Usain Bolt	info-capital	person	hand
+USAINBOLT	Usain Bolt	info-allcaps	person	hand
+usainnboruto	Usain Bolt	kana	person	hand
+neymar	Neymar	typed	person	hand
+Neymar	Neymar	info-capital	person	hand
+NEYMAR	Neymar	info-allcaps	person	hand
+neima-ru	Neymar	kana	person	hand
+kylianmbappe	Kylian Mbappe	typed	person	hand
+Kylianmbappe	Kylian Mbappe	info-capital	person	hand
+KYLIANMBAPPE	Kylian Mbappe	info-allcaps	person	hand
+kiriannemubape	Kylian Mbappe	kana	person	hand
+jurassicpark	Jurassic Park	typed	work	hand
+Jurassicpark	Jurassic Park	info-capital	work	hand
+JURASSICPARK	Jurassic Park	info-allcaps	work	hand
+jurashikkupa-ku	Jurassic Park	kana	work	hand
+zyurasikkupa-ku	Jurassic Park	kana-kunrei	work	hand
+jixyurashikkupa-ku	Jurassic Park	kana-small-x	work	hand
+thelordoftherings	The Lord of the Rings	typed	work	hand
+Thelordoftherings	The Lord of the Rings	info-capital	work	hand
+THELORDOFTHERINGS	The Lord of the Rings	info-allcaps	work	hand
+ro-doobuzarinngu	The Lord of the Rings	kana	work	hand
+thematrix	The Matrix	typed	work	hand
+Thematrix	The Matrix	info-capital	work	hand
+THEMATRIX	The Matrix	info-allcaps	work	hand
+matorikkusu	The Matrix	kana	work	hand
+inception	Inception	typed	work	hand
+Inception	Inception	info-capital	work	hand
+INCEPTION	Inception	info-allcaps	work	hand
+innsepushonn	Inception	kana	work	hand
+innsepusyonn	Inception	kana-kunrei	work	hand
+innsepushixyonn	Inception	kana-small-x	work	hand
+interstellar	Interstellar	typed	work	hand
+Interstellar	Interstellar	info-capital	work	hand
+INTERSTELLAR	Interstellar	info-allcaps	work	hand
+innta-sutera-	Interstellar	kana	work	hand
+toystory	Toy Story	typed	work	hand
+Toystory	Toy Story	info-capital	work	hand
+TOYSTORY	Toy Story	info-allcaps	work	hand
+toisuto-ri-	Toy Story	kana	work	hand
+findingnemo	Finding Nemo	typed	work	hand
+Findingnemo	Finding Nemo	info-capital	work	hand
+FINDINGNEMO	Finding Nemo	info-allcaps	work	hand
+fainndhinngunimo	Finding Nemo	kana	work	hand
+fuxainndexinngunimo	Finding Nemo	kana-small-x	work	hand
+thelionking	The Lion King	typed	work	hand
+Thelionking	The Lion King	info-capital	work	hand
+THELIONKING	The Lion King	info-allcaps	work	hand
+raionnkinngu	The Lion King	kana	work	hand
+gameofthrones	Game of Thrones	typed	work	hand
+Gameofthrones	Game of Thrones	info-capital	work	hand
+GAMEOFTHRONES	Game of Thrones	info-allcaps	work	hand
+ge-muobusuro-nnzu	Game of Thrones	kana	work	hand
+breakingbad	Breaking Bad	typed	work	hand
+Breakingbad	Breaking Bad	info-capital	work	hand
+BREAKINGBAD	Breaking Bad	info-allcaps	work	hand
+bureikinngubaddo	Breaking Bad	kana	work	hand
+strangerthings	Stranger Things	typed	work	hand
+Strangerthings	Stranger Things	info-capital	work	hand
+STRANGERTHINGS	Stranger Things	info-allcaps	work	hand
+sutorennja-shinngusu	Stranger Things	kana	work	hand
+sutorennzya-sinngusu	Stranger Things	kana-kunrei	work	hand
+sutorennjixya-shinngusu	Stranger Things	kana-small-x	work	hand
+thesimpsons	The Simpsons	typed	work	hand
+Thesimpsons	The Simpsons	info-capital	work	hand
+THESIMPSONS	The Simpsons	info-allcaps	work	hand
+shinnpusonnzu	The Simpsons	kana	work	hand
+sinnpusonnzu	The Simpsons	kana-kunrei	work	hand
+zelda	Zelda	typed	work	hand
+Zelda	Zelda	info-capital	work	hand
+ZELDA	Zelda	info-allcaps	work	hand
+zeruda	Zelda	kana	work	hand
+tetris	Tetris	typed	work	hand
+Tetris	Tetris	info-capital	work	hand
+TETRIS	Tetris	info-allcaps	work	hand
+tetorisu	Tetris	kana	work	hand
+pacman	Pac-Man	typed	work	hand
+Pacman	Pac-Man	info-capital	work	hand
+PACMAN	Pac-Man	info-allcaps	work	hand
+pac-man	Pac-Man	info-hyphen	work	hand
+pakkumann	Pac-Man	kana	work	hand
+sonic	Sonic	typed	work	hand
+Sonic	Sonic	info-capital	work	hand
+SONIC	Sonic	info-allcaps	work	hand
+sonikku	Sonic	kana	work	hand
+callofduty	Call of Duty	typed	work	hand
+Callofduty	Call of Duty	info-capital	work	hand
+CALLOFDUTY	Call of Duty	info-allcaps	work	hand
+ko-ruobudhu-thi	Call of Duty	kana	work	hand
+ko-ruobudexyu-texi	Call of Duty	kana-small-x	work	hand
+grandtheftauto	Grand Theft Auto	typed	work	hand
+Grandtheftauto	Grand Theft Auto	info-capital	work	hand
+GRANDTHEFTAUTO	Grand Theft Auto	info-allcaps	work	hand
+guranndosefutoo-to	Grand Theft Auto	kana	work	hand
+guranndosehutoo-to	Grand Theft Auto	kana-kunrei	work	hand
+leagueoflegends	League of Legends	typed	work	hand
+Leagueoflegends	League of Legends	info-capital	work	hand
+LEAGUEOFLEGENDS	League of Legends	info-allcaps	work	hand
+ri-guoburejenndo	League of Legends	kana	work	hand
+ri-guoburejixenndo	League of Legends	kana-small-x	work	hand
+overwatch	Overwatch	typed	work	hand
+Overwatch	Overwatch	info-capital	work	hand
+OVERWATCH	Overwatch	info-allcaps	work	hand
+o-ba-whotchi	Overwatch	kana	work	hand
+o-ba-whotti	Overwatch	kana-kunrei	work	hand
+o-ba-uxotchi	Overwatch	kana-small-x	work	hand
+eldenring	Elden Ring	typed	work	hand
+Eldenring	Elden Ring	info-capital	work	hand
+ELDENRING	Elden Ring	info-allcaps	work	hand
+erudennrinngu	Elden Ring	kana	work	hand
+genshinimpact	Genshin Impact	typed	work	hand
+Genshinimpact	Genshin Impact	info-capital	work	hand
+GENSHINIMPACT	Genshin Impact	info-allcaps	work	hand
+gennshinninnpakuto	Genshin Impact	kana	work	hand
+gennsinninnpakuto	Genshin Impact	kana-kunrei	work	hand
+ledzeppelin	Led Zeppelin	typed	work	hand
+Ledzeppelin	Led Zeppelin	info-capital	work	hand
+LEDZEPPELIN	Led Zeppelin	info-allcaps	work	hand
+reddotsepperinn	Led Zeppelin	kana	work	hand
+reddotsuxepperinn	Led Zeppelin	kana-small-x	work	hand
+pinkfloyd	Pink Floyd	typed	work	hand
+Pinkfloyd	Pink Floyd	info-capital	work	hand
+PINKFLOYD	Pink Floyd	info-allcaps	work	hand
+pinnkufuroido	Pink Floyd	kana	work	hand
+pinnkuhuroido	Pink Floyd	kana-kunrei	work	hand
+therollingstones	The Rolling Stones	typed	work	hand
+Therollingstones	The Rolling Stones	info-capital	work	hand
+THEROLLINGSTONES	The Rolling Stones	info-allcaps	work	hand
+ro-rinngusuto-nnzu	The Rolling Stones	kana	work	hand
+metallica	Metallica	typed	work	hand
+Metallica	Metallica	info-capital	work	hand
+METALLICA	Metallica	info-allcaps	work	hand
+metarika	Metallica	kana	work	hand
+linkinpark	Linkin Park	typed	work	hand
+Linkinpark	Linkin Park	info-capital	work	hand
+LINKINPARK	Linkin Park	info-allcaps	work	hand
+rinnkinnpa-ku	Linkin Park	kana	work	hand
+greenday	Green Day	typed	work	hand
+Greenday	Green Day	info-capital	work	hand
+GREENDAY	Green Day	info-allcaps	work	hand
+guri-nndei	Green Day	kana	work	hand
+imaginedragons	Imagine Dragons	typed	work	hand
+Imaginedragons	Imagine Dragons	info-capital	work	hand
+IMAGINEDRAGONS	Imagine Dragons	info-allcaps	work	hand
+imajinndoragonnzu	Imagine Dragons	kana	work	hand
+imazinndoragonnzu	Imagine Dragons	kana-kunrei	work	hand
+bts	BTS	typed	work	hand
+Bts	BTS	info-capital	work	hand
+BTS	BTS	info-allcaps	work	hand
+bi-thi-esu	BTS	kana	work	hand
+bi-texi-esu	BTS	kana-small-x	work	hand
+blackpink	Blackpink	typed	work	hand
+Blackpink	Blackpink	info-capital	work	hand
+BLACKPINK	Blackpink	info-allcaps	work	hand
+burakkupinnku	Blackpink	kana	work	hand
+pixar	Pixar	typed	work	hand
+Pixar	Pixar	info-capital	work	hand
+PIXAR	Pixar	info-allcaps	work	hand
+pikusa-	Pixar	kana	work	hand
+rossisland	Ross Island	typed	place	sample
+rosutou	Ross Island	kana	place	sample
+karpacz	Karpacz	typed	place	sample
+karupachu	Karpacz	kana	place	sample
+karupatyu	Karpacz	kana-kunrei	place	sample
+karupachixyu	Karpacz	kana-small-x	place	sample
+salisbury	Salisbury	typed	place	sample
+so-ruzuberi-	Salisbury	kana	place	sample
+pristina	Pristina	typed	place	sample
+purishuthina	Pristina	kana	place	sample
+purisyuthina	Pristina	kana-kunrei	place	sample
+purishixyutexina	Pristina	kana-small-x	place	sample
+estonia	Estonia	typed	place	sample
+esutonia	Estonia	kana	place	sample
+southtangerang	South Tangerang	typed	place	sample
+tanngerannseratann	South Tangerang	kana	place	sample
+eldoret	Eldoret	typed	place	sample
+erudoretto	Eldoret	kana	place	sample
+liechtenstein	Liechtenstein	typed	place	sample
+rihitennshutainn	Liechtenstein	kana	place	sample
+rihitennsyutainn	Liechtenstein	kana-kunrei	place	sample
+rihitennshixyutainn	Liechtenstein	kana-small-x	place	sample
+hitzacker	Hitzacker	typed	place	sample
+hittsakka-	Hitzacker	kana	place	sample
+hittsuxakka-	Hitzacker	kana-small-x	place	sample
+sharmelsheikh	Sharm el-Sheikh	typed	place	sample
+sharumuerusheiku	Sharm el-Sheikh	kana	place	sample
+syarumuerusheiku	Sharm el-Sheikh	kana-kunrei	place	sample
+shixyarumuerushixeiku	Sharm el-Sheikh	kana-small-x	place	sample
+brielle	Brielle	typed	place	sample
+buri-re	Brielle	kana	place	sample
+camaiore	Camaiore	typed	place	sample
+kamaio-re	Camaiore	kana	place	sample
+sukarujisukokamyennna	Skarżysko-Kamienna	kana	place	sample
+sukaruzisukokamyennna	Skarżysko-Kamienna	kana-kunrei	place	sample
+sukarujisukokamixennna	Skarżysko-Kamienna	kana-small-x	place	sample
+pajinn	Pazin	kana	place	sample
+pazinn	Pazin	kana-kunrei	place	sample
+purusriver	Purus River	typed	place	sample
+purusugawa	Purus River	kana	place	sample
+khabarovsk	Khabarovsk	typed	place	sample
+habarofusuku	Khabarovsk	kana	place	sample
+habarohusuku	Khabarovsk	kana-kunrei	place	sample
+bukannshi	Wuhan	kana	place	sample
+bukannsi	Wuhan	kana-kunrei	place	sample
+geesthacht	Geesthacht	typed	place	sample
+ge-shutahato	Geesthacht	kana	place	sample
+ge-syutahato	Geesthacht	kana-kunrei	place	sample
+ge-shixyutahato	Geesthacht	kana-small-x	place	sample
+akhaltsikhe	Akhaltsikhe	typed	place	sample
+aharutsihe	Akhaltsikhe	kana	place	sample
+aharutsuxihe	Akhaltsikhe	kana-small-x	place	sample
+kaarst	Kaarst	typed	place	sample
+ka-rusuto	Kaarst	kana	place	sample
+khorugh	Khorugh	typed	place	sample
+horogu	Khorugh	kana	place	sample
+peru-	Peru	kana	place	sample
+jhang	Jhang	typed	place	sample
+janngu	Jhang	kana	place	sample
+zyanngu	Jhang	kana-kunrei	place	sample
+jixyanngu	Jhang	kana-small-x	place	sample
+ucayaliriver	Ucayali River	typed	place	sample
+ukayarigawa	Ucayali River	kana	place	sample
+metromanila	Metro Manila	typed	place	sample
+nashonarukyapitaruri-jonn	Metro Manila	kana	place	sample
+nasyonarukyapitaruri-zyonn	Metro Manila	kana-kunrei	place	sample
+nashixyonarukixyapitaruri-jixyonn	Metro Manila	kana-small-x	place	sample
+narew	Narew	typed	place	sample
+drobetaturnuseverin	Drobeta-Turnu Severin	typed	place	sample
+dorobetatwurunuseverinn	Drobeta-Turnu Severin	kana	place	sample
+dorobetatoxurunusevuxerinn	Drobeta-Turnu Severin	kana-small-x	place	sample
+rushunya	Lushnjë	kana	place	sample
+rusyunya	Lushnjë	kana-kunrei	place	sample
+rushixyunixya	Lushnjë	kana-small-x	place	sample
+nazareth	Nazareth	typed	place	sample
+nazare	Nazareth	kana	place	sample
+everett	Everett	typed	place	sample
+ebaretto	Everett	kana	place	sample
+schellenberg	Schellenberg	typed	place	sample
+sherennberuku	Schellenberg	kana	place	sample
+shixerennberuku	Schellenberg	kana-small-x	place	sample
+maebashishi	Maebashi	kana	place	sample
+maebasisi	Maebashi	kana-kunrei	place	sample
+gryfice	Gryfice	typed	place	sample
+gurifitse	Gryfice	kana	place	sample
+gurifuxitsuxe	Gryfice	kana-small-x	place	sample
+lommel	Lommel	typed	place	sample
+romeru	Lommel	kana	place	sample
+richmond	Richmond	typed	place	sample
+ritchimonndo	Richmond	kana	place	sample
+rittimonndo	Richmond	kana-kunrei	place	sample
+shreveport	Shreveport	typed	place	sample
+shuri-vupo-to	Shreveport	kana	place	sample
+syuri-vupo-to	Shreveport	kana-kunrei	place	sample
+shixyuri-vupo-to	Shreveport	kana-small-x	place	sample
+pohang	Pohang	typed	place	sample
+pohannshi	Pohang	kana	place	sample
+pohannsi	Pohang	kana-kunrei	place	sample
+urgench	Urgench	typed	place	sample
+urugennchi	Urgench	kana	place	sample
+urugennti	Urgench	kana-kunrei	place	sample
+riponn	Ripon	kana	place	sample
+hohnstein	Hohnstein	typed	place	sample
+ho-nnshutainn	Hohnstein	kana	place	sample
+ho-nnsyutainn	Hohnstein	kana-kunrei	place	sample
+ho-nnshixyutainn	Hohnstein	kana-small-x	place	sample
+scheibenhard	Scheibenhard	typed	place	sample
+kumashi	Kumasi	kana	place	sample
+kumasi	Kumasi	kana-kunrei	place	sample
+mallorca	Mallorca	typed	place	sample
+mayorukatou	Mallorca	kana	place	sample
+mo-ritania	Mauritania	kana	place	sample
+bitburg	Bitburg	typed	place	sample
+bittoburuku	Bitburg	kana	place	sample
+tepic	Tepic	typed	place	sample
+tepiku	Tepic	kana	place	sample
+yaruvennpa-	Järvenpää	kana	place	sample
+yaruvuxennpa-	Järvenpää	kana-small-x	place	sample
+trelew	Trelew	typed	place	sample
+torereu	Trelew	kana	place	sample
+firuzkoh	Firuzkoh	typed	place	sample
+chaguchara-nn	Firuzkoh	kana	place	sample
+tyagutyara-nn	Firuzkoh	kana-kunrei	place	sample
+chixyaguchixyara-nn	Firuzkoh	kana-small-x	place	sample
+twuamashina	Toamasina	kana	place	sample
+twuamasina	Toamasina	kana-kunrei	place	sample
+toxuamashina	Toamasina	kana-small-x	place	sample
+jejuair	Jeju Air	typed	company	sample
+chejuea-	Jeju Air	kana	company	sample
+chezyuea-	Jeju Air	kana-kunrei	company	sample
+chixejixyuea-	Jeju Air	kana-small-x	company	sample
+santamonicastudio	Santa Monica Studio	typed	company	sample
+americaninternational	American International	typed	company	sample
+amerikanninnta-nashonaruguru-pu	American International	kana	company	sample
+amerikanninnta-nasyonaruguru-pu	American International	kana-kunrei	company	sample
+amerikanninnta-nashixyonaruguru-pu	American International	kana-small-x	company	sample
+airserbia	Air Serbia	typed	company	sample
+easerubia	Air Serbia	kana	company	sample
+opel	Opel	typed	company	sample
+operu	Opel	kana	company	sample
+fairchild	Fairchild	typed	company	sample
+feachairudo	Fairchild	kana	company	sample
+featyairudo	Fairchild	kana-kunrei	company	sample
+fuxeachixyairudo	Fairchild	kana-small-x	company	sample
+irizar	Irizar	typed	company	sample
+irisa-ru	Irizar	kana	company	sample
+daimlerbenz	Daimler-Benz	typed	company	sample
+daimura-benntsu	Daimler-Benz	kana	company	sample
+daimura-benntu	Daimler-Benz	kana-kunrei	company	sample
+whiskas	Whiskas	typed	company	sample
+karukann	Whiskas	kana	company	sample
+cyrix	Cyrix	typed	company	sample
+sairikkusu	Cyrix	kana	company	sample
+universitatdandorra	Universitat d'Andorra	typed	company	sample
+dellemc	Dell EMC	typed	company	sample
+i-emushi-ko-pore-shonn	Dell EMC	kana	company	sample
+i-emusi-ko-pore-syonn	Dell EMC	kana-kunrei	company	sample
+i-emushi-ko-pore-shixyonn	Dell EMC	kana-small-x	company	sample
+darwinairline	Darwin Airline	typed	company	sample
+da-winnearainn	Darwin Airline	kana	company	sample
+da-uxinnearainn	Darwin Airline	kana-small-x	company	sample
+purada	Prada	kana	company	sample
+frederiksborgpalace	Frederiksborg Palace	typed	company	sample
+nationalsemiconductor	National Semiconductor	typed	company	sample
+nashonarusemikonndakuta-	National Semiconductor	kana	company	sample
+nasyonarusemikonndakuta-	National Semiconductor	kana-kunrei	company	sample
+nashixyonarusemikonndakuta-	National Semiconductor	kana-small-x	company	sample
+nesquik	Nesquik	typed	company	sample
+nesukuikku	Nesquik	kana	company	sample
+gearboxsoftware	Gearbox Software	typed	company	sample
+giabokkususofutowea	Gearbox Software	kana	company	sample
+giabokkususohutowea	Gearbox Software	kana-kunrei	company	sample
+giabokkususofutouxea	Gearbox Software	kana-small-x	company	sample
+vestas	Vestas	typed	company	sample
+besutasu	Vestas	kana	company	sample
+washingtonmutual	Washington Mutual	typed	company	sample
+washinntonnmyu-chuaru	Washington Mutual	kana	company	sample
+wasinntonnmyu-tyuaru	Washington Mutual	kana-kunrei	company	sample
+washinntonnmixyu-chixyuaru	Washington Mutual	kana-small-x	company	sample
+casteldelmonte	Castel del Monte	typed	company	sample
+kasuteruderumonnte	Castel del Monte	kana	company	sample
+charlesuniversity	Charles University	typed	company	sample
+severstal	Severstal	typed	company	sample
+severusuta-ri	Severstal	kana	company	sample
+sevuxerusuta-ri	Severstal	kana-small-x	company	sample
+rockwellinternational	Rockwell International	typed	company	sample
+rokkuweruinnta-nashonaru	Rockwell International	kana	company	sample
+rokkuweruinnta-nasyonaru	Rockwell International	kana-kunrei	company	sample
+rokkuuxeruinnta-nashixyonaru	Rockwell International	kana-small-x	company	sample
+egyptianmuseum	Egyptian Museum	typed	company	sample
+ejiputokoukogakuhakubutsukann	Egyptian Museum	kana	company	sample
+eziputokoukogakuhakubutukann	Egyptian Museum	kana-kunrei	company	sample
+floridapanthers	Florida Panthers	typed	company	sample
+furoridapannsa-zu	Florida Panthers	kana	company	sample
+huroridapannsa-zu	Florida Panthers	kana-kunrei	company	sample
+pallacanestrovirtusroma	Pallacanestro Virtus Roma	typed	company	sample
+parrakanesutorovirutwusuro-ma	Pallacanestro Virtus Roma	kana	company	sample
+parrakanesutorovuxirutoxusuro-ma	Pallacanestro Virtus Roma	kana-small-x	company	sample
+universityofconstantinople	University of Constantinople	typed	company	sample
+panndhidakuterionn	University of Constantinople	kana	company	sample
+panndexidakuterionn	University of Constantinople	kana-small-x	company	sample
+nationaldietlibrary	National Diet Library	typed	company	sample
+kokuritsukokkaitoshokann	National Diet Library	kana	company	sample
+kokuritukokkaitosyokann	National Diet Library	kana-kunrei	company	sample
+kokuritsukokkaitoshixyokann	National Diet Library	kana-small-x	company	sample
+jiretto	Gillette	kana	company	sample
+ziretto	Gillette	kana-kunrei	company	sample
+innsofcourt	Inns of Court	typed	company	sample
+innzuobuko-to	Inns of Court	kana	company	sample
+elilillyand	Eli Lilly and	typed	company	sample
+i-rairiri-anndokannpani-	Eli Lilly and	kana	company	sample
+usairways	US Airways	typed	company	sample
+yu-esueaweizu	US Airways	kana	company	sample
+yu-esueauxeizu	US Airways	kana-small-x	company	sample
+itariahousoukyoukai	RAI	kana	company	sample
+itariahousoukixyoukai	RAI	kana-small-x	company	sample
+abbeytheatre	Abbey Theatre	typed	company	sample
+abi-shiata-	Abbey Theatre	kana	company	sample
+abi-siata-	Abbey Theatre	kana-kunrei	company	sample
+purodwua	Perodua	kana	company	sample
+purodoxua	Perodua	kana-small-x	company	sample
+focusfeatures	Focus Features	typed	company	sample
+fo-kasufi-cha-zu	Focus Features	kana	company	sample
+fo-kasufi-tya-zu	Focus Features	kana-kunrei	company	sample
+fuxo-kasufuxi-chixya-zu	Focus Features	kana-small-x	company	sample
+enushi-a-ru	NCR	kana	company	sample
+enusi-a-ru	NCR	kana-kunrei	company	sample
+tuftsuniversity	Tufts University	typed	company	sample
+newjerseydevils	New Jersey Devils	typed	company	sample
+nyu-ja-ji-debirusu	New Jersey Devils	kana	company	sample
+nyu-zya-zi-debirusu	New Jersey Devils	kana-kunrei	company	sample
+nixyu-jixya-ji-debirusu	New Jersey Devils	kana-small-x	company	sample
+tsitsernakaberd	Tsitsernakaberd	typed	company	sample
+tsitserunakaberuto	Tsitsernakaberd	kana	company	sample
+tsuxitsuxerunakaberuto	Tsitsernakaberd	kana-small-x	company	sample
+ashmoleanmuseum	Ashmolean Museum	typed	company	sample
+cessna	Cessna	typed	company	sample
+sesuna	Cessna	kana	company	sample
+airvanuatu	Air Vanuatu	typed	company	sample
+eavanuatwu	Air Vanuatu	kana	company	sample
+eavuxanuatoxu	Air Vanuatu	kana-small-x	company	sample
+acspartaprague	AC Sparta Prague	typed	company	sample
+suparutapuraha	AC Sparta Prague	kana	company	sample
+barrandovstudios	Barrandov Studios	typed	company	sample
+yo-ropiana	Europeana	kana	company	sample
+archiecomics	Archie Comics	typed	company	sample
+a-chi-komikku	Archie Comics	kana	company	sample
+a-ti-komikku	Archie Comics	kana-kunrei	company	sample
+chinechitta	Cinecittà	kana	company	sample
+tinetitta	Cinecittà	kana-kunrei	company	sample
+kunnrunnreddosuta-	HC Kunlun Red Star	kana	company	sample
+adobecreativecloud	Adobe Creative Cloud	typed	software	sample
+adobikurieithibukuraudo	Adobe Creative Cloud	kana	software	sample
+adobikurieitexibukuraudo	Adobe Creative Cloud	kana-small-x	software	sample
+airikkusu	IRIX	kana	software	sample
+kantaicollection	Kantai Collection	typed	software	sample
+semanticweb	Semantic Web	typed	software	sample
+semannthikkuwebu	Semantic Web	kana	software	sample
+semanntexikkuuxebu	Semantic Web	kana-small-x	software	sample
+lifeisstrange	Life Is Strange	typed	software	sample
+raifuizusutorennji	Life Is Strange	kana	software	sample
+raihuizusutorennzi	Life Is Strange	kana-kunrei	software	sample
+princeofpersia	Prince of Persia	typed	software	sample
+purinnsuobuperusha	Prince of Persia	kana	software	sample
+purinnsuobuperusya	Prince of Persia	kana-kunrei	software	sample
+purinnsuobuperushixya	Prince of Persia	kana-small-x	software	sample
+ma-kyuriaru	Mercurial	kana	software	sample
+ma-kixyuriaru	Mercurial	kana-small-x	software	sample
+wiifit	Wii Fit	typed	software	sample
+wi-fitto	Wii Fit	kana	software	sample
+uxi-fuxitto	Wii Fit	kana-small-x	software	sample
+fanime-shonn	Funimation	kana	software	sample
+fanime-syonn	Funimation	kana-kunrei	software	sample
+fuxanime-shixyonn	Funimation	kana-small-x	software	sample
+activeserverpages	Active Server Pages	typed	software	sample
+mitappinventor	MIT App Inventor	typed	software	sample
+worldofwarships	World of Warships	typed	software	sample
+wa-rudoobuwho-shippusu	World of Warships	kana	software	sample
+wa-rudoobuwho-sippusu	World of Warships	kana-kunrei	software	sample
+wa-rudoobuuxo-shippusu	World of Warships	kana-small-x	software	sample
+yandextranslate	Yandex Translate	typed	software	sample
+godofwar	God of War	typed	software	sample
+goddoobuwho-	God of War	kana	software	sample
+goddoobuuxo-	God of War	kana-small-x	software	sample
+kerbalspaceprogram	Kerbal Space Program	typed	software	sample
+camino	Camino	typed	software	sample
+kamino	Camino	kana	software	sample
+gu-guruthi-vi-	Google TV	kana	software	sample
+gu-gurutexi-vuxi-	Google TV	kana-small-x	software	sample
+rokkusuta-adobannsudoge-muennjinn	Rockstar Advanced Game Engine	kana	software	sample
+rokkusuta-adobannsudoge-muennzinn	Rockstar Advanced Game Engine	kana-kunrei	software	sample
+shimyurinnku	Simulink	kana	software	sample
+simyurinnku	Simulink	kana-kunrei	software	sample
+shimixyurinnku	Simulink	kana-small-x	software	sample
+mattorabu	MATLAB	kana	software	sample
+purannkarukyu-ru	Plankalkül	kana	software	sample
+purannkarukixyu-ru	Plankalkül	kana-small-x	software	sample
+anndoroidothi-vi-	Android TV	kana	software	sample
+anndoroidotexi-vuxi-	Android TV	kana-small-x	software	sample
+chesscom	Chess.com	typed	software	sample
+chesudottokomu	Chess.com	kana	software	sample
+chixesudottokomu	Chess.com	kana-small-x	software	sample
+trisquel	Trisquel	typed	software	sample
+drmario	Dr. Mario	typed	software	sample
+dokuta-mario	Dr. Mario	kana	software	sample
+windows31x	Windows 3.1x	typed	software	sample
+theforest	The Forest	typed	software	sample
+googleshopping	Google Shopping	typed	software	sample
+worldwideweb	WorldWideWeb	typed	software	sample
+finalfantasyxv	Final Fantasy XV	typed	software	sample
+googlewebtoolkit	Google Web Toolkit	typed	software	sample
+wordperfect	WordPerfect	typed	software	sample
+wa-dopa-fekuto	WordPerfect	kana	software	sample
+wa-dopa-fuxekuto	WordPerfect	kana-small-x	software	sample
+fileexplorer	File Explorer	typed	software	sample
+ekusupuro-ra-	File Explorer	kana	software	sample
+masutodonn	Mastodon	kana	software	sample
+gu-gurukarennda-	Google Calendar	kana	software	sample
+macosbigsur	macOS Big Sur	typed	software	sample
+cydia	Cydia	typed	software	sample
+empireearth	Empire Earth	typed	software	sample
+ennpaiaa-su	Empire Earth	kana	software	sample
+maemo	Maemo	kana	software	sample
+labview	LabVIEW	typed	software	sample
+rabobyuu	LabVIEW	kana	software	sample
+rabobixyuu	LabVIEW	kana-small-x	software	sample
+wordfast	Wordfast	typed	software	sample
+supurinngufure-muwa-ku	Spring Framework	kana	software	sample
+supurinnguhure-muwa-ku	Spring Framework	kana-kunrei	software	sample
+ultimaonline	Ultima Online	typed	software	sample
+uruthimaonnrainn	Ultima Online	kana	software	sample
+uruteximaonnrainn	Ultima Online	kana-small-x	software	sample
+microsoftflightsimulator	Microsoft Flight Simulator	typed	software	sample
+raitokoinn	Litecoin	kana	software	sample
+quarkxpress	QuarkXPress	typed	software	sample
+kwo-kuekusupuresu	QuarkXPress	kana	software	sample
+kuxo-kuekusupuresu	QuarkXPress	kana-small-x	software	sample
+mappu	Apple Maps	kana	software	sample
+pclinuxos	PCLinuxOS	typed	software	sample
+pi-shi-rinakkusuo-esu	PCLinuxOS	kana	software	sample
+pi-si-rinakkusuo-esu	PCLinuxOS	kana-kunrei	software	sample
+arkanoid	Arkanoid	typed	software	sample
+arukanoido	Arkanoid	kana	software	sample
+colossalcaveadventure	Colossal Cave Adventure	typed	software	sample
+korossaruke-buadobenncha-	Colossal Cave Adventure	kana	software	sample
+korossaruke-buadobenntya-	Colossal Cave Adventure	kana-kunrei	software	sample
+korossaruke-buadobennchixya-	Colossal Cave Adventure	kana-small-x	software	sample
+glynisjohns	Glynis Johns	typed	person	sample
+gurinisujonnzu	Glynis Johns	kana	person	sample
+gurinisuzyonnzu	Glynis Johns	kana-kunrei	person	sample
+gurinisujixyonnzu	Glynis Johns	kana-small-x	person	sample
+bettyford	Betty Ford	typed	person	sample
+bethifo-do	Betty Ford	kana	person	sample
+betexifuxo-do	Betty Ford	kana-small-x	person	sample
+judelaw	Jude Law	typed	person	sample
+ju-dorou	Jude Law	kana	person	sample
+zyu-dorou	Jude Law	kana-kunrei	person	sample
+jixyu-dorou	Jude Law	kana-small-x	person	sample
+garyneville	Gary Neville	typed	person	sample
+gari-neviru	Gary Neville	kana	person	sample
+gari-nevuxiru	Gary Neville	kana-small-x	person	sample
+josephfiennes	Joseph Fiennes	typed	person	sample
+josefufainnzu	Joseph Fiennes	kana	person	sample
+zyosehufainnzu	Joseph Fiennes	kana-kunrei	person	sample
+jixyosefufuxainnzu	Joseph Fiennes	kana-small-x	person	sample
+louistomlinson	Louis Tomlinson	typed	person	sample
+ruitomurinnsonn	Louis Tomlinson	kana	person	sample
+abrahamlincoln	Abraham Lincoln	typed	person	sample
+eiburahamurinnka-nn	Abraham Lincoln	kana	person	sample
+bobnewhart	Bob Newhart	typed	person	sample
+bobunyu-ha-to	Bob Newhart	kana	person	sample
+bobunixyu-ha-to	Bob Newhart	kana-small-x	person	sample
+anthonydavis	Anthony Davis	typed	person	sample
+annsoni-deibisu	Anthony Davis	kana	person	sample
+saladin	Saladin	typed	person	sample
+sara-fuddhi-nn	Saladin	kana	person	sample
+sara-huddhi-nn	Saladin	kana-kunrei	person	sample
+sara-fuddexi-nn	Saladin	kana-small-x	person	sample
+krisjenner	Kris Jenner	typed	person	sample
+kurisujennna-	Kris Jenner	kana	person	sample
+kurisujixennna-	Kris Jenner	kana-small-x	person	sample
+littlerichard	Little Richard	typed	person	sample
+ritoruricha-do	Little Richard	kana	person	sample
+ritoruritya-do	Little Richard	kana-kunrei	person	sample
+ritorurichixya-do	Little Richard	kana-small-x	person	sample
+areshadhikusonn	Alesha Dixon	kana	person	sample
+aresyadhikusonn	Alesha Dixon	kana-kunrei	person	sample
+areshixyadexikusonn	Alesha Dixon	kana-small-x	person	sample
+olafscholz	Olaf Scholz	typed	person	sample
+orafushorutsu	Olaf Scholz	kana	person	sample
+orahusyorutu	Olaf Scholz	kana-kunrei	person	sample
+orafushixyorutsu	Olaf Scholz	kana-small-x	person	sample
+cormacmccarthy	Cormac McCarthy	typed	person	sample
+ko-makkumakka-shi-	Cormac McCarthy	kana	person	sample
+ko-makkumakka-si-	Cormac McCarthy	kana-kunrei	person	sample
+robinwilliams	Robin Williams	typed	person	sample
+robinnwiriamuzu	Robin Williams	kana	person	sample
+robinnuxiriamuzu	Robin Williams	kana-small-x	person	sample
+ayrtonsenna	Ayrton Senna	typed	person	sample
+airutonnsena	Ayrton Senna	kana	person	sample
+lukeperry	Luke Perry	typed	person	sample
+ru-kuperi-	Luke Perry	kana	person	sample
+madeleinestowe	Madeleine Stowe	typed	person	sample
+maderi-nnsutou	Madeleine Stowe	kana	person	sample
+guillermodeltoro	Guillermo del Toro	typed	person	sample
+girerumoderutoro	Guillermo del Toro	kana	person	sample
+juriannasannji	Julian Assange	kana	person	sample
+zyuriannasannzi	Julian Assange	kana-kunrei	person	sample
+jixyuriannasannji	Julian Assange	kana-small-x	person	sample
+richardmadden	Richard Madden	typed	person	sample
+richa-domaddenn	Richard Madden	kana	person	sample
+ritya-domaddenn	Richard Madden	kana-kunrei	person	sample
+richixya-domaddenn	Richard Madden	kana-small-x	person	sample
+jesseeisenberg	Jesse Eisenberg	typed	person	sample
+jeshi-aizennba-gu	Jesse Eisenberg	kana	person	sample
+jesi-aizennba-gu	Jesse Eisenberg	kana-kunrei	person	sample
+jixeshi-aizennba-gu	Jesse Eisenberg	kana-small-x	person	sample
+aaroncarter	Aaron Carter	typed	person	sample
+a-ronnka-ta-	Aaron Carter	kana	person	sample
+harrystyles	Harry Styles	typed	person	sample
+hari-sutairuzu	Harry Styles	kana	person	sample
+ralphmacchio	Ralph Macchio	typed	person	sample
+rarufumatchio	Ralph Macchio	kana	person	sample
+raruhumattio	Ralph Macchio	kana-kunrei	person	sample
+gabbygiffords	Gabby Giffords	typed	person	sample
+gaburierugifo-zu	Gabby Giffords	kana	person	sample
+gaburierugifuxo-zu	Gabby Giffords	kana-small-x	person	sample
+charlottegainsbourg	Charlotte Gainsbourg	typed	person	sample
+sharurottogennzubu-ru	Charlotte Gainsbourg	kana	person	sample
+syarurottogennzubu-ru	Charlotte Gainsbourg	kana-kunrei	person	sample
+shixyarurottogennzubu-ru	Charlotte Gainsbourg	kana-small-x	person	sample
+jimmykimmel	Jimmy Kimmel	typed	person	sample
+jimi-kinnmeru	Jimmy Kimmel	kana	person	sample
+zimi-kinnmeru	Jimmy Kimmel	kana-kunrei	person	sample
+re-ka-	Rekhā	kana	person	sample
+paulhogan	Paul Hogan	typed	person	sample
+po-ruho-gann	Paul Hogan	kana	person	sample
+jamalkhashoggi	Jamal Khashoggi	typed	person	sample
+jamarukashogi	Jamal Khashoggi	kana	person	sample
+zyamarukasyogi	Jamal Khashoggi	kana-kunrei	person	sample
+jixyamarukashixyogi	Jamal Khashoggi	kana-small-x	person	sample
+simoneinzaghi	Simone Inzaghi	typed	person	sample
+shimo-neinnza-gi	Simone Inzaghi	kana	person	sample
+simo-neinnza-gi	Simone Inzaghi	kana-kunrei	person	sample
+igashifionnteku	Iga Świątek	kana	person	sample
+igasifionnteku	Iga Świątek	kana-kunrei	person	sample
+igashifuxionnteku	Iga Świątek	kana-small-x	person	sample
+afrikabambaataa	Afrika Bambaataa	typed	person	sample
+afurikabannba-ta	Afrika Bambaataa	kana	person	sample
+ahurikabannba-ta	Afrika Bambaataa	kana-kunrei	person	sample
+akshaykumar	Akshay Kumar	typed	person	sample
+akushaikuma-ru	Akshay Kumar	kana	person	sample
+akusyaikuma-ru	Akshay Kumar	kana-kunrei	person	sample
+akushixyaikuma-ru	Akshay Kumar	kana-small-x	person	sample
+rosemaryclooney	Rosemary Clooney	typed	person	sample
+ro-zumari-kuru-ni-	Rosemary Clooney	kana	person	sample
+olenazelenska	Olena Zelenska	typed	person	sample
+ore-nazerennshika	Olena Zelenska	kana	person	sample
+ore-nazerennsika	Olena Zelenska	kana-kunrei	person	sample
+johnnyknoxville	Johnny Knoxville	typed	person	sample
+joni-nokkusubiru	Johnny Knoxville	kana	person	sample
+zyoni-nokkusubiru	Johnny Knoxville	kana-kunrei	person	sample
+jixyoni-nokkusubiru	Johnny Knoxville	kana-small-x	person	sample
+antoniobanderas	Antonio Banderas	typed	person	sample
+anntoniobannderasu	Antonio Banderas	kana	person	sample
+xherdanshaqiri	Xherdan Shaqiri	typed	person	sample
+jerudannshachiri	Xherdan Shaqiri	kana	person	sample
+jerudannsyatiri	Xherdan Shaqiri	kana-kunrei	person	sample
+jixerudannshixyachiri	Xherdan Shaqiri	kana-small-x	person	sample
+imanekhelif	Imane Khelif	typed	person	sample
+imanekerifu	Imane Khelif	kana	person	sample
+imanekerihu	Imane Khelif	kana-kunrei	person	sample
+jasonsudeikis	Jason Sudeikis	typed	person	sample
+jeisonnsadaikisu	Jason Sudeikis	kana	person	sample
+jixeisonnsadaikisu	Jason Sudeikis	kana-small-x	person	sample
+britneyspears	Britney Spears	typed	person	sample
+buritoni-supia-zu	Britney Spears	kana	person	sample
+rufussewell	Rufus Sewell	typed	person	sample
+ru-fasushi-weru	Rufus Sewell	kana	person	sample
+ru-fasusi-weru	Rufus Sewell	kana-kunrei	person	sample
+ru-fuxasushi-uxeru	Rufus Sewell	kana-small-x	person	sample
+patriciaarquette	Patricia Arquette	typed	person	sample
+patorishiaa-kuetto	Patricia Arquette	kana	person	sample
+patorisiaa-kuetto	Patricia Arquette	kana-kunrei	person	sample
+alicewalker	Alice Walker	typed	person	sample
+arisuwho-ka-	Alice Walker	kana	person	sample
+arisuuxo-ka-	Alice Walker	kana-small-x	person	sample
+helenmccrory	Helen McCrory	typed	person	sample
+herennmakkurori-	Helen McCrory	kana	person	sample
+brendalee	Brenda Lee	typed	person	sample
+burenndari-	Brenda Lee	kana	person	sample
+bernardarnault	Bernard Arnault	typed	person	sample
+beruna-ruaruno-	Bernard Arnault	kana	person	sample
+furo-raovuno-suamerika	Flora of North America	kana	product	sample
+huro-raovuno-suamerika	Flora of North America	kana-kunrei	product	sample
+astonmartindb9	Aston Martin DB9	typed	product	sample
+renaultzoe	Renault Zoe	typed	product	sample
+runo-zoe	Renault Zoe	kana	product	sample
+opelmokka	Opel Mokka	typed	product	sample
+operumokka	Opel Mokka	kana	product	sample
+joystiq	Joystiq	typed	product	sample
+joisuthikku	Joystiq	kana	product	sample
+zyoisuthikku	Joystiq	kana-kunrei	product	sample
+jixyoisutexikku	Joystiq	kana-small-x	product	sample
+lexuslfa	Lexus LFA	typed	product	sample
+mercedesbenzmclass	Mercedes-Benz M-Class	typed	product	sample
+echoofmoscow	Echo of Moscow	typed	product	sample
+e-homosukuvi	Echo of Moscow	kana	product	sample
+e-homosukuvuxi	Echo of Moscow	kana-small-x	product	sample
+breitbartnews	Breitbart News	typed	product	sample
+buraitoba-tonyu-sunettowa-ku	Breitbart News	kana	product	sample
+buraitoba-tonixyu-sunettowa-ku	Breitbart News	kana-small-x	product	sample
+bigguka-twu-nnde-tabe-su	The Big Cartoon DataBase	kana	product	sample
+bigguka-toxu-nnde-tabe-su	The Big Cartoon DataBase	kana-small-x	product	sample
+daewoolanos	Daewoo Lanos	typed	product	sample
+ranosu	Daewoo Lanos	kana	product	sample
+rollingstone	Rolling Stone	typed	product	sample
+ro-rinngusuto-nn	Rolling Stone	kana	product	sample
+audiv8	Audi V8	typed	product	sample
+fordcapri	Ford Capri	typed	product	sample
+fo-dokapuri	Ford Capri	kana	product	sample
+fuxo-dokapuri	Ford Capri	kana-small-x	product	sample
+indexfungorum	Index Fungorum	typed	product	sample
+chevroletvolt	Chevrolet Volt	typed	product	sample
+shibore-boruto	Chevrolet Volt	kana	product	sample
+sibore-boruto	Chevrolet Volt	kana-kunrei	product	sample
+mazdacx5	Mazda CX-5	typed	product	sample
+bentleybentayga	Bentley Bentayga	typed	product	sample
+benntore-bennteiga	Bentley Bentayga	kana	product	sample
+lexusrx	Lexus RX	typed	product	sample
+fordsmax	Ford S-Max	typed	product	sample
+gu-guruara-to	Google Alerts	kana	product	sample
+teslaroadster	Tesla Roadster	typed	product	sample
+tesuraro-dosuta-	Tesla Roadster	kana	product	sample
+vaz2103	VAZ-2103	typed	product	sample
+bmwz3	BMW Z3	typed	product	sample
+wikifeet	wikiFeet	typed	product	sample
+volvos60	Volvo S60	typed	product	sample
+ra-dari-va	Lada Riva	kana	product	sample
+ra-dari-vuxa	Lada Riva	kana-small-x	product	sample
+volvoxc90	Volvo XC90	typed	product	sample
+audiq2	Audi Q2	typed	product	sample
+audiquattro	Audi Quattro	typed	product	sample
+audhikuwatoro	Audi Quattro	kana	product	sample
+audexikuwatoro	Audi Quattro	kana-small-x	product	sample
+conservapedia	Conservapedia	typed	product	sample
+konnsa-vapedhia	Conservapedia	kana	product	sample
+konnsa-vuxapedexia	Conservapedia	kana-small-x	product	sample
+fiattothi-po	Fiat Tipo	kana	product	sample
+fuxiattotexi-po	Fiat Tipo	kana-small-x	product	sample
+ferrarif40	Ferrari F40	typed	product	sample
+dbpedia	DBpedia	typed	product	sample
+fordorion	Ford Orion	typed	product	sample
+shinaweibo	Weibo	kana	product	sample
+sinaweibo	Weibo	kana-kunrei	product	sample
+shinauxeibo	Weibo	kana-small-x	product	sample
+shukodaokutavia	Škoda Octavia	kana	product	sample
+syukodaokutavia	Škoda Octavia	kana-kunrei	product	sample
+shixyukodaokutavuxia	Škoda Octavia	kana-small-x	product	sample
+lincolntowncar	Lincoln Town Car	typed	product	sample
+rinnka-nntaunnka-	Lincoln Town Car	kana	product	sample
+mercedesbenzw123	Mercedes-Benz W123	typed	product	sample
+jaguaretype	Jaguar E-Type	typed	product	sample
+shukodaru-musuta-	Škoda Roomster	kana	product	sample
+syukodaru-musuta-	Škoda Roomster	kana-kunrei	product	sample
+shixyukodaru-musuta-	Škoda Roomster	kana-small-x	product	sample
+deviantart	DeviantArt	typed	product	sample
+devianntoa-to	DeviantArt	kana	product	sample
+devuxianntoa-to	DeviantArt	kana-small-x	product	sample
+vaz2101	VAZ-2101	typed	product	sample
+lamborghiniestoque	Lamborghini Estoque	typed	product	sample
+rannborugi-niesuto-ke	Lamborghini Estoque	kana	product	sample
+wa-rudofuttobo-ruirore-thinngu	World Football Elo Ratings	kana	product	sample
+wa-rudohuttobo-ruirore-thinngu	World Football Elo Ratings	kana-kunrei	product	sample
+wa-rudofuttobo-ruirore-texinngu	World Football Elo Ratings	kana-small-x	product	sample
+alfaromeomito	Alfa Romeo MiTo	typed	product	sample
+arufaromeomito	Alfa Romeo MiTo	kana	product	sample
+arufuxaromeomito	Alfa Romeo MiTo	kana-small-x	product	sample
+1upnetwork	1Up Network	typed	product	sample
+wannappudottokomu	1Up Network	kana	product	sample
+teslacybertruck	Tesla Cybertruck	typed	product	sample
+tesurasaiba-torakku	Tesla Cybertruck	kana	product	sample
+opeladam	Opel Adam	typed	product	sample
+operuadamu	Opel Adam	kana	product	sample
+mclarenf1	McLaren F1	typed	product	sample
+davinnchiko-do	The Da Vinci Code	kana	work	sample
+davinntiko-do	The Da Vinci Code	kana-kunrei	work	sample
+davuxinnchiko-do	The Da Vinci Code	kana-small-x	work	sample
+rakkanokaibougaku	Anatomy of a Fall	kana	work	sample
+manndhinnga	Mandinga	kana	work	sample
+manndexinnga	Mandinga	kana-small-x	work	sample
+hausuobuzadoragonn	House of the Dragon	kana	work	sample
+dirtyharry	Dirty Harry	typed	work	sample
+da-thihari-	Dirty Harry	kana	work	sample
+da-texihari-	Dirty Harry	kana-small-x	work	sample
+nostringsattached	No Strings Attached	typed	work	sample
+thriller	Thriller	typed	work	sample
+surira-	Thriller	kana	work	sample
+ilvolo	Il Volo	typed	work	sample
+iruvo-ro	Il Volo	kana	work	sample
+iruvuxo-ro	Il Volo	kana-small-x	work	sample
+nature	Nature	typed	work	sample
+neicha-	Nature	kana	work	sample
+neitya-	Nature	kana-kunrei	work	sample
+neichixya-	Nature	kana-small-x	work	sample
+tropicthunder	Tropic Thunder	typed	work	sample
+toropikkusannda-	Tropic Thunder	kana	work	sample
+americanhorrorstory	American Horror Story	typed	work	sample
+amerikannhora-suto-ri-	American Horror Story	kana	work	sample
+thebatman	The Batman	typed	work	sample
+zabattomann	The Batman	kana	work	sample
+aclockworkorange	A Clockwork Orange	typed	work	sample
+tokeijikakenoorennji	A Clockwork Orange	kana	work	sample
+tokeizikakenoorennzi	A Clockwork Orange	kana-kunrei	work	sample
+savagegarden	Savage Garden	typed	work	sample
+save-jiga-denn	Savage Garden	kana	work	sample
+save-ziga-denn	Savage Garden	kana-kunrei	work	sample
+savuxe-jiga-denn	Savage Garden	kana-small-x	work	sample
+deiafuta-twumoro-	The Day After Tomorrow	kana	work	sample
+deiahuta-twumoro-	The Day After Tomorrow	kana-kunrei	work	sample
+deiafuta-toxumoro-	The Day After Tomorrow	kana-small-x	work	sample
+rasutoobuasu	The Last of Us	kana	work	sample
+thesacrifice	The Sacrifice	typed	work	sample
+sakurifaisu	The Sacrifice	kana	work	sample
+sakurifuxaisu	The Sacrifice	kana-small-x	work	sample
+oldtestament	Old Testament	typed	work	sample
+kyuuyakuseisho	Old Testament	kana	work	sample
+kyuuyakuseisyo	Old Testament	kana-kunrei	work	sample
+kixyuuyakuseishixyo	Old Testament	kana-small-x	work	sample
+midnights	Midnights	typed	work	sample
+middonaitsu	Midnights	kana	work	sample
+middonaitu	Midnights	kana-kunrei	work	sample
+aphrodite	Aphrodite	typed	work	sample
+afurodhi-te	Aphrodite	kana	work	sample
+ahurodhi-te	Aphrodite	kana-kunrei	work	sample
+afurodexi-te	Aphrodite	kana-small-x	work	sample
+romancingthestone	Romancing the Stone	typed	work	sample
+baberu	Babel	kana	work	sample
+sannraizuabenyu-	Sunrise Avenue	kana	work	sample
+sannraizuabenixyu-	Sunrise Avenue	kana-small-x	work	sample
+thegreatwall	The Great Wall	typed	work	sample
+gure-towho-ru	The Great Wall	kana	work	sample
+gure-touxo-ru	The Great Wall	kana-small-x	work	sample
+taiyounoteikoku	Empire of the Sun	kana	work	sample
+thegreatdictator	The Great Dictator	typed	work	sample
+zagure-todhikute-ta-	The Great Dictator	kana	work	sample
+zagure-todexikute-ta-	The Great Dictator	kana-small-x	work	sample
+thepianoteacher	The Piano Teacher	typed	work	sample
+pianisuto	The Piano Teacher	kana	work	sample
+soratobumonnthipaisonn	Monty Python's Flying Circus	kana	work	sample
+soratobumonntexipaisonn	Monty Python's Flying Circus	kana-small-x	work	sample
+kindergartencop	Kindergarten Cop	typed	work	sample
+kinndaga-tonnkoppu	Kindergarten Cop	kana	work	sample
+theknife	The Knife	typed	work	sample
+zanaifu	The Knife	kana	work	sample
+zanaihu	The Knife	kana-kunrei	work	sample
+thecosbyshow	The Cosby Show	typed	work	sample
+kosubi-sho-	The Cosby Show	kana	work	sample
+kosubi-syo-	The Cosby Show	kana-kunrei	work	sample
+kosubi-shixyo-	The Cosby Show	kana-small-x	work	sample
+shinnpi	A Saucerful of Secrets	kana	work	sample
+sinnpi	A Saucerful of Secrets	kana-kunrei	work	sample
+urbansymphony	Urban Symphony	typed	work	sample
+a-bannshinnfoni-	Urban Symphony	kana	work	sample
+a-bannsinnfoni-	Urban Symphony	kana-kunrei	work	sample
+a-bannshinnfuxoni-	Urban Symphony	kana-small-x	work	sample
+cuttingcrew	Cutting Crew	typed	work	sample
+katthinngukuru-	Cutting Crew	kana	work	sample
+kattexinngukuru-	Cutting Crew	kana-small-x	work	sample
+booksofkings	Books of Kings	typed	work	sample
+kinglear	King Lear	typed	work	sample
+riaou	King Lear	kana	work	sample
+rockyiv	Rocky IV	typed	work	sample
+nibelungenlied	Nibelungenlied	typed	work	sample
+ni-berunngu	Nibelungenlied	kana	work	sample
+cheburashka	Cheburashka	typed	work	sample
+chebura-shika	Cheburashka	kana	work	sample
+chebura-sika	Cheburashka	kana-kunrei	work	sample
+chixebura-shika	Cheburashka	kana-small-x	work	sample
+pitchblack	Pitch Black	typed	work	sample
+pitchiburakku	Pitch Black	kana	work	sample
+pittiburakku	Pitch Black	kana-kunrei	work	sample
+basicinstinct	Basic Instinct	typed	work	sample
+koorinobishou	Basic Instinct	kana	work	sample
+koorinobisyou	Basic Instinct	kana-kunrei	work	sample
+koorinobishixyou	Basic Instinct	kana-small-x	work	sample
+pe-rugorio	Père Goriot	kana	work	sample
+lisasimpson	Lisa Simpson	typed	work	sample
+risashinnpusonn	Lisa Simpson	kana	work	sample
+risasinnpusonn	Lisa Simpson	kana-kunrei	work	sample
+lacunacoil	Lacuna Coil	typed	work	sample
+raku-nakoiru	Lacuna Coil	kana	work	sample
+sukizu	Stray Kids	kana	work	sample
+cradleoffilth	Cradle of Filth	typed	work	sample
+kureidoruobufirusu	Cradle of Filth	kana	work	sample
+kureidoruobufuxirusu	Cradle of Filth	kana-small-x	work	sample
+withoutatrace	Without a Trace	typed	work	sample
+skunkanansie	Skunk Anansie	typed	work	sample
+areyouexperienced	Are You Experienced	typed	work	sample
+a-yu-ekusuperiennsuto	Are You Experienced	kana	work	sample
+appetitefordestruction	Appetite for Destruction	typed	work	sample
+apetaitofo-dhisutorakushonn	Appetite for Destruction	kana	work	sample
+apetaitofo-dhisutorakusyonn	Appetite for Destruction	kana-kunrei	work	sample
+apetaitofuxo-dexisutorakushixyonn	Appetite for Destruction	kana-small-x	work	sample

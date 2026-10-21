@@ -1,0 +1,963 @@
+# 英単語と重なるローマ字の試験（英語にしたい文）。tools/make_allenglish_tests.py で作成（手で書いた語のつなぎ合わせ、実装を見ない打ち方）。
+# 列: ローマ字<TAB>期待する文<TAB>区分<TAB>英語の部分（空白は語の間）<TAB>連番。区分: phrase paired rare sentence alone（alone は記録用で採点しない）
+kondosametimewoshiraberu	今度same timeを調べる	phrase	same time	m0001
+sametimenohougaii	same timeのほうがいい	phrase	same time	m0002
+samenamekarahajimeyou	same nameから始めよう	phrase	same name	m0003
+konosamenamewotsukau	このsame nameを使う	phrase	same name	m0004
+samesizenohougaii	same sizeのほうがいい	phrase	same size	m0005
+sorehaonajisamesizedesu	それは同じsame sizeです	phrase	same size	m0006
+sonosamepagewosagashiteiru	そのsame pageを探している	phrase	same page	m0007
+konoapurinosamepagewokaeta	このアプリのsame pageを変えた	phrase	same page	m0008
+konoapurinosamesitewokaeta	このアプリのsame siteを変えた	phrase	same site	m0009
+samesitedehanaku	same siteではなく	phrase	same site	m0010
+watashinosamemodehadokodesuka	私のsame modeはどこですか	phrase	same mode	m0011
+samemodenohougaii	same modeのほうがいい	phrase	same mode	m0012
+samedatanohougaii	same dataのほうがいい	phrase	same data	m0013
+konosamedatawotsukau	このsame dataを使う	phrase	same data	m0014
+samebasedehanaku	same baseではなく	phrase	same base	m0015
+konosamebasewotsukau	このsame baseを使う	phrase	same base	m0016
+konosamehousewotsukau	このsame houseを使う	phrase	same house	m0017
+konoapurinosamehousewokaeta	このアプリのsame houseを変えた	phrase	same house	m0018
+homepagekarahajimeyou	home pageから始めよう	phrase	home page	m0019
+sorehaonajihomepagedesu	それは同じhome pageです	phrase	home page	m0020
+konoapurinohomemodewokaeta	このアプリのhome modeを変えた	phrase	home mode	m0021
+konohomemodewotsukau	このhome modeを使う	phrase	home mode	m0022
+homesitegaarimasu	home siteがあります	phrase	home site	m0023
+watashinohomesitehadokodesuka	私のhome siteはどこですか	phrase	home site	m0024
+homeregionnohougaii	home regionのほうがいい	phrase	home region	m0025
+homeregiongaarimasu	home regionがあります	phrase	home region	m0026
+homeimagegaarimasu	home imageがあります	phrase	home image	m0027
+kyouhahomeimagenitsuitekangaeru	今日はhome imageについて考える	phrase	home image	m0028
+konoapurinohomemediawokaeta	このアプリのhome mediaを変えた	phrase	home media	m0029
+kyouhahomemedianitsuitekangaeru	今日はhome mediaについて考える	phrase	home media	m0030
+ashitanohomemenuwokakuninshite	明日のhome menuを確認して	phrase	home menu	m0031
+sorehaonajihomemenudesu	それは同じhome menuです	phrase	home menu	m0032
+ashitanogamemodewokakuninshite	明日のgame modeを確認して	phrase	game mode	m0033
+gamemodegaarimasu	game modeがあります	phrase	game mode	m0034
+konoapurinogamenamewokaeta	このアプリのgame nameを変えた	phrase	game name	m0035
+konogamenamewotsukau	このgame nameを使う	phrase	game name	m0036
+gametimegaarimasu	game timeがあります	phrase	game time	m0037
+konogametimewotsukau	このgame timeを使う	phrase	game time	m0038
+sorehaonajigamemenudesu	それは同じgame menuです	phrase	game menu	m0039
+kyouhagamemenunitsuitekangaeru	今日はgame menuについて考える	phrase	game menu	m0040
+ashitanogamemediawokakuninshite	明日のgame mediaを確認して	phrase	game media	m0041
+sonogamemediawosagashiteiru	そのgame mediaを探している	phrase	game media	m0042
+sorehaonajigamedatadesu	それは同じgame dataです	phrase	game data	m0043
+konogamedatawotsukau	このgame dataを使う	phrase	game data	m0044
+gamebasekarahajimeyou	game baseから始めよう	phrase	game base	m0045
+kondogamebasewoshiraberu	今度game baseを調べる	phrase	game base	m0046
+sonotimezonewosagashiteiru	そのtime zoneを探している	phrase	time zone	m0047
+kyouhatimezonenitsuitekangaeru	今日はtime zoneについて考える	phrase	time zone	m0048
+kondotimenamewoshiraberu	今度time nameを調べる	phrase	time name	m0049
+timenamegaarimasu	time nameがあります	phrase	time name	m0050
+ashitanotimemodewokakuninshite	明日のtime modeを確認して	phrase	time mode	m0051
+timemodegaarimasu	time modeがあります	phrase	time mode	m0052
+kyouhatimedatanitsuitekangaeru	今日はtime dataについて考える	phrase	time data	m0053
+watashinotimedatahadokodesuka	私のtime dataはどこですか	phrase	time data	m0054
+timebasegaarimasu	time baseがあります	phrase	time base	m0055
+sorehaonajitimebasedesu	それは同じtime baseです	phrase	time base	m0056
+timeregionkarahajimeyou	time regionから始めよう	phrase	time region	m0057
+timeregiondehanaku	time regionではなく	phrase	time region	m0058
+timesessionkarahajimeyou	time sessionから始めよう	phrase	time session	m0059
+timesessionnohougaii	time sessionのほうがいい	phrase	time session	m0060
+konoapurinonametagwokaeta	このアプリのname tagを変えた	phrase	name tag	m0061
+nametaggaarimasu	name tagがあります	phrase	name tag	m0062
+namepagenohougaii	name pageのほうがいい	phrase	name page	m0063
+sorehaonajinamepagedesu	それは同じname pageです	phrase	name page	m0064
+namedatadehanaku	name dataではなく	phrase	name data	m0065
+konoapurinonamedatawokaeta	このアプリのname dataを変えた	phrase	name data	m0066
+kononamemodewotsukau	このname modeを使う	phrase	name mode	m0067
+ashitanonamemodewokakuninshite	明日のname modeを確認して	phrase	name mode	m0068
+sononamebasewosagashiteiru	そのname baseを探している	phrase	name base	m0069
+kondonamebasewoshiraberu	今度name baseを調べる	phrase	name base	m0070
+konoapurinonamespacewokaeta	このアプリのname spaceを変えた	phrase	name space	m0071
+sorehaonajinamespacedesu	それは同じname spaceです	phrase	name space	m0072
+kyouhanotenamenitsuitekangaeru	今日はnote nameについて考える	phrase	note name	m0073
+konoapurinonotenamewokaeta	このアプリのnote nameを変えた	phrase	note name	m0074
+sorehaonajinotedatadesu	それは同じnote dataです	phrase	note data	m0075
+notedatakarahajimeyou	note dataから始めよう	phrase	note data	m0076
+notepagekarahajimeyou	note pageから始めよう	phrase	note page	m0077
+kononotepagewotsukau	このnote pageを使う	phrase	note page	m0078
+notemodegaarimasu	note modeがあります	phrase	note mode	m0079
+kyouhanotemodenitsuitekangaeru	今日はnote modeについて考える	phrase	note mode	m0080
+kondonotemenuwoshiraberu	今度note menuを調べる	phrase	note menu	m0081
+notemenudehanaku	note menuではなく	phrase	note menu	m0082
+sorehaonajibasenamedesu	それは同じbase nameです	phrase	base name	m0083
+basenamekarahajimeyou	base nameから始めよう	phrase	base name	m0084
+sonobasemodewosagashiteiru	そのbase modeを探している	phrase	base mode	m0085
+kyouhabasemodenitsuitekangaeru	今日はbase modeについて考える	phrase	base mode	m0086
+sonobasedatawosagashiteiru	そのbase dataを探している	phrase	base data	m0087
+ashitanobasedatawokakuninshite	明日のbase dataを確認して	phrase	base data	m0088
+konobaseimagewotsukau	このbase imageを使う	phrase	base image	m0089
+kondobaseimagewoshiraberu	今度base imageを調べる	phrase	base image	m0090
+kyouhabaseregionnitsuitekangaeru	今日はbase regionについて考える	phrase	base region	m0091
+sorehaonajibaseregiondesu	それは同じbase regionです	phrase	base region	m0092
+basepagegaarimasu	base pageがあります	phrase	base page	m0093
+kondobasepagewoshiraberu	今度base pageを調べる	phrase	base page	m0094
+sonoonemorewosagashiteiru	そのone moreを探している	phrase	one more	m0095
+onemoregaarimasu	one moreがあります	phrase	one more	m0096
+onetimekarahajimeyou	one timeから始めよう	phrase	one time	m0097
+kondoonetimewoshiraberu	今度one timeを調べる	phrase	one time	m0098
+onemoretimedehanaku	one more timeではなく	phrase	one more time	m0099
+kyouhaonemoretimenitsuitekangaeru	今日はone more timeについて考える	phrase	one more time	m0100
+konoapurinoonenamewokaeta	このアプリのone nameを変えた	phrase	one name	m0101
+onenamedehanaku	one nameではなく	phrase	one name	m0102
+onenotedehanaku	one noteではなく	phrase	one note	m0103
+konoonenotewotsukau	このone noteを使う	phrase	one note	m0104
+konoonepagewotsukau	このone pageを使う	phrase	one page	m0105
+kondoonepagewoshiraberu	今度one pageを調べる	phrase	one page	m0106
+watashinoonemodehadokodesuka	私のone modeはどこですか	phrase	one mode	m0107
+onemodedehanaku	one modeではなく	phrase	one mode	m0108
+ashitanoonezonewokakuninshite	明日のone zoneを確認して	phrase	one zone	m0109
+sorehaonajionezonedesu	それは同じone zoneです	phrase	one zone	m0110
+ashitanoonegamewokakuninshite	明日のone gameを確認して	phrase	one game	m0111
+kondoonegamewoshiraberu	今度one gameを調べる	phrase	one game	m0112
+watashinosometimehadokodesuka	私のsome timeはどこですか	phrase	some time	m0113
+kondosometimewoshiraberu	今度some timeを調べる	phrase	some time	m0114
+sonosomemorewosagashiteiru	そのsome moreを探している	phrase	some more	m0115
+ashitanosomemorewokakuninshite	明日のsome moreを確認して	phrase	some more	m0116
+kondosomedatawoshiraberu	今度some dataを調べる	phrase	some data	m0117
+kyouhasomedatanitsuitekangaeru	今日はsome dataについて考える	phrase	some data	m0118
+somenamenohougaii	some nameのほうがいい	phrase	some name	m0119
+somenamedehanaku	some nameではなく	phrase	some name	m0120
+watashinosomenoteshadokodesuka	私のsome notesはどこですか	phrase	some notes	m0121
+somenoteskarahajimeyou	some notesから始めよう	phrase	some notes	m0122
+kondodatabasewoshiraberu	今度data baseを調べる	phrase	data base	m0123
+sonodatabasewosagashiteiru	そのdata baseを探している	phrase	data base	m0124
+sorehaonajidatanamedesu	それは同じdata nameです	phrase	data name	m0125
+watashinodatanamehadokodesuka	私のdata nameはどこですか	phrase	data name	m0126
+konodatamodewotsukau	このdata modeを使う	phrase	data mode	m0127
+ashitanodatamodewokakuninshite	明日のdata modeを確認して	phrase	data mode	m0128
+datapagenohougaii	data pageのほうがいい	phrase	data page	m0129
+datapagedehanaku	data pageではなく	phrase	data page	m0130
+kyouhadataregionnitsuitekangaeru	今日はdata regionについて考える	phrase	data region	m0131
+sorehaonajidataregiondesu	それは同じdata regionです	phrase	data region	m0132
+ashitanodatasessionwokakuninshite	明日のdata sessionを確認して	phrase	data session	m0133
+sonodatasessionwosagashiteiru	そのdata sessionを探している	phrase	data session	m0134
+watashinodatetimehadokodesuka	私のdate timeはどこですか	phrase	date time	m0135
+konoapurinodatetimewokaeta	このアプリのdate timeを変えた	phrase	date time	m0136
+sorehaonajidatemodedesu	それは同じdate modeです	phrase	date mode	m0137
+datemodegaarimasu	date modeがあります	phrase	date mode	m0138
+kyouhadatenamenitsuitekangaeru	今日はdate nameについて考える	phrase	date name	m0139
+watashinodatenamehadokodesuka	私のdate nameはどこですか	phrase	date name	m0140
+konoapurinodatezonewokaeta	このアプリのdate zoneを変えた	phrase	date zone	m0141
+sonodatezonewosagashiteiru	そのdate zoneを探している	phrase	date zone	m0142
+ashitanocodenamewokakuninshite	明日のcode nameを確認して	phrase	code name	m0143
+codenamedehanaku	code nameではなく	phrase	code name	m0144
+sonocodebasewosagashiteiru	そのcode baseを探している	phrase	code base	m0145
+konocodebasewotsukau	このcode baseを使う	phrase	code base	m0146
+codemodedehanaku	code modeではなく	phrase	code mode	m0147
+sonocodemodewosagashiteiru	そのcode modeを探している	phrase	code mode	m0148
+konoapurinocodepagewokaeta	このアプリのcode pageを変えた	phrase	code page	m0149
+sorehaonajicodepagedesu	それは同じcode pageです	phrase	code page	m0150
+kyouhacodedatanitsuitekangaeru	今日はcode dataについて考える	phrase	code data	m0151
+kondocodedatawoshiraberu	今度code dataを調べる	phrase	code data	m0152
+kononodenamewotsukau	このnode nameを使う	phrase	node name	m0153
+kondonodenamewoshiraberu	今度node nameを調べる	phrase	node name	m0154
+konoapurinonodemodewokaeta	このアプリのnode modeを変えた	phrase	node mode	m0155
+ashitanonodemodewokakuninshite	明日のnode modeを確認して	phrase	node mode	m0156
+konoapurinonodedatawokaeta	このアプリのnode dataを変えた	phrase	node data	m0157
+sorehaonajinodedatadesu	それは同じnode dataです	phrase	node data	m0158
+sorehaonajinodezonedesu	それは同じnode zoneです	phrase	node zone	m0159
+nodezonedehanaku	node zoneではなく	phrase	node zone	m0160
+tonemodegaarimasu	tone modeがあります	phrase	tone mode	m0161
+kyouhatonemodenitsuitekangaeru	今日はtone modeについて考える	phrase	tone mode	m0162
+konotonezonewotsukau	このtone zoneを使う	phrase	tone zone	m0163
+kondotonezonewoshiraberu	今度tone zoneを調べる	phrase	tone zone	m0164
+tonedatagaarimasu	tone dataがあります	phrase	tone data	m0165
+tonedatadehanaku	tone dataではなく	phrase	tone data	m0166
+zonenamekarahajimeyou	zone nameから始めよう	phrase	zone name	m0167
+zonenamegaarimasu	zone nameがあります	phrase	zone name	m0168
+zonemodegaarimasu	zone modeがあります	phrase	zone mode	m0169
+zonemodenohougaii	zone modeのほうがいい	phrase	zone mode	m0170
+zonedatakarahajimeyou	zone dataから始めよう	phrase	zone data	m0171
+sorehaonajizonedatadesu	それは同じzone dataです	phrase	zone data	m0172
+kondozoneregionwoshiraberu	今度zone regionを調べる	phrase	zone region	m0173
+sonozoneregionwosagashiteiru	そのzone regionを探している	phrase	zone region	m0174
+housenamekarahajimeyou	house nameから始めよう	phrase	house name	m0175
+housenamenohougaii	house nameのほうがいい	phrase	house name	m0176
+sonohousemodewosagashiteiru	そのhouse modeを探している	phrase	house mode	m0177
+kondohousemodewoshiraberu	今度house modeを調べる	phrase	house mode	m0178
+kyouhamousemodenitsuitekangaeru	今日はmouse modeについて考える	phrase	mouse mode	m0179
+sonomousemodewosagashiteiru	そのmouse modeを探している	phrase	mouse mode	m0180
+sonomousenamewosagashiteiru	そのmouse nameを探している	phrase	mouse name	m0181
+mousenamegaarimasu	mouse nameがあります	phrase	mouse name	m0182
+konomousezonewotsukau	このmouse zoneを使う	phrase	mouse zone	m0183
+kyouhamousezonenitsuitekangaeru	今日はmouse zoneについて考える	phrase	mouse zone	m0184
+konositenamewotsukau	このsite nameを使う	phrase	site name	m0185
+kondositenamewoshiraberu	今度site nameを調べる	phrase	site name	m0186
+sitemodenohougaii	site modeのほうがいい	phrase	site mode	m0187
+sitemodedehanaku	site modeではなく	phrase	site mode	m0188
+watashinositedatahadokodesuka	私のsite dataはどこですか	phrase	site data	m0189
+kyouhasitedatanitsuitekangaeru	今日はsite dataについて考える	phrase	site data	m0190
+sitemenukarahajimeyou	site menuから始めよう	phrase	site menu	m0191
+sitemenudehanaku	site menuではなく	phrase	site menu	m0192
+konositepagewotsukau	このsite pageを使う	phrase	site page	m0193
+sonositepagewosagashiteiru	そのsite pageを探している	phrase	site page	m0194
+sizenamekarahajimeyou	size nameから始めよう	phrase	size name	m0195
+konoapurinosizenamewokaeta	このアプリのsize nameを変えた	phrase	size name	m0196
+sizemodenohougaii	size modeのほうがいい	phrase	size mode	m0197
+sizemodegaarimasu	size modeがあります	phrase	size mode	m0198
+sizedatagaarimasu	size dataがあります	phrase	size data	m0199
+sorehaonajisizedatadesu	それは同じsize dataです	phrase	size data	m0200
+ashitanosizezonewokakuninshite	明日のsize zoneを確認して	phrase	size zone	m0201
+sizezonegaarimasu	size zoneがあります	phrase	size zone	m0202
+kononationnamewotsukau	このnation nameを使う	phrase	nation name	m0203
+ashitanonationnamewokakuninshite	明日のnation nameを確認して	phrase	nation name	m0204
+kondonationmodewoshiraberu	今度nation modeを調べる	phrase	nation mode	m0205
+ashitanonationmodewokakuninshite	明日のnation modeを確認して	phrase	nation mode	m0206
+regionnamegaarimasu	region nameがあります	phrase	region name	m0207
+regionnamekarahajimeyou	region nameから始めよう	phrase	region name	m0208
+kyouharegionmodenitsuitekangaeru	今日はregion modeについて考える	phrase	region mode	m0209
+regionmodenohougaii	region modeのほうがいい	phrase	region mode	m0210
+watashinoregionzonehadokodesuka	私のregion zoneはどこですか	phrase	region zone	m0211
+ashitanoregionzonewokakuninshite	明日のregion zoneを確認して	phrase	region zone	m0212
+sorehaonajiregiondatadesu	それは同じregion dataです	phrase	region data	m0213
+konoregiondatawotsukau	このregion dataを使う	phrase	region data	m0214
+sorehaonajisessionnamedesu	それは同じsession nameです	phrase	session name	m0215
+kyouhasessionnamenitsuitekangaeru	今日はsession nameについて考える	phrase	session name	m0216
+sessionmodenohougaii	session modeのほうがいい	phrase	session mode	m0217
+sessionmodedehanaku	session modeではなく	phrase	session mode	m0218
+konosessiondatawotsukau	このsession dataを使う	phrase	session data	m0219
+ashitanosessiondatawokakuninshite	明日のsession dataを確認して	phrase	session data	m0220
+konoapurinosessiontimewokaeta	このアプリのsession timeを変えた	phrase	session time	m0221
+watashinosessiontimehadokodesuka	私のsession timeはどこですか	phrase	session time	m0222
+sessionzonenohougaii	session zoneのほうがいい	phrase	session zone	m0223
+sessionzonedehanaku	session zoneではなく	phrase	session zone	m0224
+ashitanotokennamewokakuninshite	明日のtoken nameを確認して	phrase	token name	m0225
+watashinotokennamehadokodesuka	私のtoken nameはどこですか	phrase	token name	m0226
+watashinotokendatahadokodesuka	私のtoken dataはどこですか	phrase	token data	m0227
+tokendatadehanaku	token dataではなく	phrase	token data	m0228
+tokenmodekarahajimeyou	token modeから始めよう	phrase	token mode	m0229
+sorehaonajitokenmodedesu	それは同じtoken modeです	phrase	token mode	m0230
+sonothemenamewosagashiteiru	そのtheme nameを探している	phrase	theme name	m0231
+themenamegaarimasu	theme nameがあります	phrase	theme name	m0232
+konoapurinothememodewokaeta	このアプリのtheme modeを変えた	phrase	theme mode	m0233
+ashitanothememodewokakuninshite	明日のtheme modeを確認して	phrase	theme mode	m0234
+kondothemedatawoshiraberu	今度theme dataを調べる	phrase	theme data	m0235
+themedatanohougaii	theme dataのほうがいい	phrase	theme data	m0236
+sonoimagenamewosagashiteiru	そのimage nameを探している	phrase	image name	m0237
+imagenamegaarimasu	image nameがあります	phrase	image name	m0238
+konoapurinoimagedatawokaeta	このアプリのimage dataを変えた	phrase	image data	m0239
+watashinoimagedatahadokodesuka	私のimage dataはどこですか	phrase	image data	m0240
+imagemodedehanaku	image modeではなく	phrase	image mode	m0241
+konoapurinoimagemodewokaeta	このアプリのimage modeを変えた	phrase	image mode	m0242
+imagebasenohougaii	image baseのほうがいい	phrase	image base	m0243
+sonoimagebasewosagashiteiru	そのimage baseを探している	phrase	image base	m0244
+imageregionnohougaii	image regionのほうがいい	phrase	image region	m0245
+imageregionkarahajimeyou	image regionから始めよう	phrase	image region	m0246
+menunamegaarimasu	menu nameがあります	phrase	menu name	m0247
+ashitanomenunamewokakuninshite	明日のmenu nameを確認して	phrase	menu name	m0248
+sorehaonajimenumodedesu	それは同じmenu modeです	phrase	menu mode	m0249
+kyouhamenumodenitsuitekangaeru	今日はmenu modeについて考える	phrase	menu mode	m0250
+menudatanohougaii	menu dataのほうがいい	phrase	menu data	m0251
+sonomenudatawosagashiteiru	そのmenu dataを探している	phrase	menu data	m0252
+kondomenupagewoshiraberu	今度menu pageを調べる	phrase	menu page	m0253
+menupagedehanaku	menu pageではなく	phrase	menu page	m0254
+konoapurinomenuzonewokaeta	このアプリのmenu zoneを変えた	phrase	menu zone	m0255
+sorehaonajimenuzonedesu	それは同じmenu zoneです	phrase	menu zone	m0256
+medianamekarahajimeyou	media nameから始めよう	phrase	media name	m0257
+medianamegaarimasu	media nameがあります	phrase	media name	m0258
+kyouhamediamodenitsuitekangaeru	今日はmedia modeについて考える	phrase	media mode	m0259
+mediamodegaarimasu	media modeがあります	phrase	media mode	m0260
+ashitanomediadatawokakuninshite	明日のmedia dataを確認して	phrase	media data	m0261
+konoapurinomediadatawokaeta	このアプリのmedia dataを変えた	phrase	media data	m0262
+konomediazonewotsukau	このmedia zoneを使う	phrase	media zone	m0263
+mediazonenohougaii	media zoneのほうがいい	phrase	media zone	m0264
+kondomediabasewoshiraberu	今度media baseを調べる	phrase	media base	m0265
+kyouhamediabasenitsuitekangaeru	今日はmedia baseについて考える	phrase	media base	m0266
+kyouhamemonamenitsuitekangaeru	今日はmemo nameについて考える	phrase	memo name	m0267
+kondomemonamewoshiraberu	今度memo nameを調べる	phrase	memo name	m0268
+memodatakarahajimeyou	memo dataから始めよう	phrase	memo data	m0269
+memodatagaarimasu	memo dataがあります	phrase	memo data	m0270
+memopagedehanaku	memo pageではなく	phrase	memo page	m0271
+kondomemopagewoshiraberu	今度memo pageを調べる	phrase	memo page	m0272
+kondodemomodewoshiraberu	今度demo modeを調べる	phrase	demo mode	m0273
+demomodedehanaku	demo modeではなく	phrase	demo mode	m0274
+konoapurinodemonamewokaeta	このアプリのdemo nameを変えた	phrase	demo name	m0275
+kondodemonamewoshiraberu	今度demo nameを調べる	phrase	demo name	m0276
+kondodemodatawoshiraberu	今度demo dataを調べる	phrase	demo data	m0277
+demodatakarahajimeyou	demo dataから始めよう	phrase	demo data	m0278
+kondodemopagewoshiraberu	今度demo pageを調べる	phrase	demo page	m0279
+konodemopagewotsukau	このdemo pageを使う	phrase	demo page	m0280
+demozonegaarimasu	demo zoneがあります	phrase	demo zone	m0281
+konoapurinodemozonewokaeta	このアプリのdemo zoneを変えた	phrase	demo zone	m0282
+domainnamenohougaii	domain nameのほうがいい	phrase	domain name	m0283
+ashitanodomainnamewokakuninshite	明日のdomain nameを確認して	phrase	domain name	m0284
+kyouhadomaindatanitsuitekangaeru	今日はdomain dataについて考える	phrase	domain data	m0285
+konodomaindatawotsukau	このdomain dataを使う	phrase	domain data	m0286
+domainmodenohougaii	domain modeのほうがいい	phrase	domain mode	m0287
+sonodomainmodewosagashiteiru	そのdomain modeを探している	phrase	domain mode	m0288
+domainzonegaarimasu	domain zoneがあります	phrase	domain zone	m0289
+domainzonekarahajimeyou	domain zoneから始めよう	phrase	domain zone	m0290
+watashinoenginemodehadokodesuka	私のengine modeはどこですか	phrase	engine mode	m0291
+kyouhaenginemodenitsuitekangaeru	今日はengine modeについて考える	phrase	engine mode	m0292
+enginenamekarahajimeyou	engine nameから始めよう	phrase	engine name	m0293
+sonoenginenamewosagashiteiru	そのengine nameを探している	phrase	engine name	m0294
+kondoenginedatawoshiraberu	今度engine dataを調べる	phrase	engine data	m0295
+konoapurinoenginedatawokaeta	このアプリのengine dataを変えた	phrase	engine data	m0296
+humannamekarahajimeyou	human nameから始めよう	phrase	human name	m0297
+humannamegaarimasu	human nameがあります	phrase	human name	m0298
+humanmodedehanaku	human modeではなく	phrase	human mode	m0299
+humanmodenohougaii	human modeのほうがいい	phrase	human mode	m0300
+humandatadehanaku	human dataではなく	phrase	human data	m0301
+kyouhahumandatanitsuitekangaeru	今日はhuman dataについて考える	phrase	human data	m0302
+kyouhahumanzonenitsuitekangaeru	今日はhuman zoneについて考える	phrase	human zone	m0303
+humanzonegaarimasu	human zoneがあります	phrase	human zone	m0304
+kondoiconnamewoshiraberu	今度icon nameを調べる	phrase	icon name	m0305
+watashinoiconnamehadokodesuka	私のicon nameはどこですか	phrase	icon name	m0306
+iconmodedehanaku	icon modeではなく	phrase	icon mode	m0307
+sonoiconmodewosagashiteiru	そのicon modeを探している	phrase	icon mode	m0308
+watashinoicondatahadokodesuka	私のicon dataはどこですか	phrase	icon data	m0309
+konoapurinoicondatawokaeta	このアプリのicon dataを変えた	phrase	icon data	m0310
+infopagekarahajimeyou	info pageから始めよう	phrase	info page	m0311
+konoapurinoinfopagewokaeta	このアプリのinfo pageを変えた	phrase	info page	m0312
+konoapurinoinfomodewokaeta	このアプリのinfo modeを変えた	phrase	info mode	m0313
+sorehaonajiinfomodedesu	それは同じinfo modeです	phrase	info mode	m0314
+kyouhainfodatanitsuitekangaeru	今日はinfo dataについて考える	phrase	info data	m0315
+kondoinfodatawoshiraberu	今度info dataを調べる	phrase	info data	m0316
+infozonenohougaii	info zoneのほうがいい	phrase	info zone	m0317
+ashitanoinfozonewokakuninshite	明日のinfo zoneを確認して	phrase	info zone	m0318
+kyouhafuturemodenitsuitekangaeru	今日はfuture modeについて考える	phrase	future mode	m0319
+futuremodekarahajimeyou	future modeから始めよう	phrase	future mode	m0320
+futurenamenohougaii	future nameのほうがいい	phrase	future name	m0321
+futurenamegaarimasu	future nameがあります	phrase	future name	m0322
+futuredatagaarimasu	future dataがあります	phrase	future data	m0323
+kyouhafuturedatanitsuitekangaeru	今日はfuture dataについて考える	phrase	future data	m0324
+futurezonegaarimasu	future zoneがあります	phrase	future zone	m0325
+ashitanofuturezonewokakuninshite	明日のfuture zoneを確認して	phrase	future zone	m0326
+konoapurinofuturetimewokaeta	このアプリのfuture timeを変えた	phrase	future time	m0327
+sonofuturetimewosagashiteiru	そのfuture timeを探している	phrase	future time	m0328
+visionmodekarahajimeyou	vision modeから始めよう	phrase	vision mode	m0329
+konovisionmodewotsukau	このvision modeを使う	phrase	vision mode	m0330
+kondovisiondatawoshiraberu	今度vision dataを調べる	phrase	vision data	m0331
+sonovisiondatawosagashiteiru	そのvision dataを探している	phrase	vision data	m0332
+ashitanoreasonnamewokakuninshite	明日のreason nameを確認して	phrase	reason name	m0333
+sonoreasonnamewosagashiteiru	そのreason nameを探している	phrase	reason name	m0334
+reasondatanohougaii	reason dataのほうがいい	phrase	reason data	m0335
+watashinoreasondatahadokodesuka	私のreason dataはどこですか	phrase	reason data	m0336
+konoreasonmodewotsukau	このreason modeを使う	phrase	reason mode	m0337
+reasonmodenohougaii	reason modeのほうがいい	phrase	reason mode	m0338
+sonoroutenamewosagashiteiru	そのroute nameを探している	phrase	route name	m0339
+kyouharoutenamenitsuitekangaeru	今日はroute nameについて考える	phrase	route name	m0340
+watashinoroutedatahadokodesuka	私のroute dataはどこですか	phrase	route data	m0341
+routedatakarahajimeyou	route dataから始めよう	phrase	route data	m0342
+ashitanoroutemodewokakuninshite	明日のroute modeを確認して	phrase	route mode	m0343
+kyouharoutemodenitsuitekangaeru	今日はroute modeについて考える	phrase	route mode	m0344
+konopagenamewotsukau	このpage nameを使う	phrase	page name	m0345
+konoapurinopagenamewokaeta	このアプリのpage nameを変えた	phrase	page name	m0346
+pagemodedehanaku	page modeではなく	phrase	page mode	m0347
+ashitanopagemodewokakuninshite	明日のpage modeを確認して	phrase	page mode	m0348
+pagedatakarahajimeyou	page dataから始めよう	phrase	page data	m0349
+sorehaonajipagedatadesu	それは同じpage dataです	phrase	page data	m0350
+konopagezonewotsukau	このpage zoneを使う	phrase	page zone	m0351
+kondopagezonewoshiraberu	今度page zoneを調べる	phrase	page zone	m0352
+konoapurinopagebasewokaeta	このアプリのpage baseを変えた	phrase	page base	m0353
+ashitanopagebasewokakuninshite	明日のpage baseを確認して	phrase	page base	m0354
+pageregiongaarimasu	page regionがあります	phrase	page region	m0355
+kondopageregionwoshiraberu	今度page regionを調べる	phrase	page region	m0356
+makesureshitekudasai	make sureしてください	phrase	make sure	m0357
+makesureshinaito	make sureしないと	phrase	make sure	m0358
+kyouhatakecaresurutsumorida	今日はtake careするつもりだ	phrase	take care	m0359
+kanarazutakecareshimasu	必ずtake careします	phrase	take care	m0360
+takenotesurukotoga	take noteすることが	phrase	take note	m0361
+kanarazutakenoteshimasu	必ずtake noteします	phrase	take note	m0362
+taketimeshinaito	take timeしないと	phrase	take time	m0363
+kyouhataketimesurutsumorida	今日はtake timeするつもりだ	phrase	take time	m0364
+maketimesurukotoga	make timeすることが	phrase	make time	m0365
+kyouhamaketimesurutsumorida	今日はmake timeするつもりだ	phrase	make time	m0366
+takemoretimesurukotoga	take more timeすることが	phrase	take more time	m0367
+takemoretimeshitekudasai	take more timeしてください	phrase	take more time	m0368
+makesometimeshitekudasai	make some timeしてください	phrase	make some time	m0369
+tabunmakesometimeshimasu	たぶんmake some timeします	phrase	make some time	m0370
+kyouhatakesometimesurutsumorida	今日はtake some timeするつもりだ	phrase	take some time	m0371
+takesometimeshinaito	take some timeしないと	phrase	take some time	m0372
+usesomeshinaito	use someしないと	phrase	use some	m0373
+tabunusesomeshimasu	たぶんuse someします	phrase	use some	m0374
+seemoresurukotoga	see moreすることが	phrase	see more	m0375
+kanarazuseemoreshimasu	必ずsee moreします	phrase	see more	m0376
+seesomesurukotoga	see someすることが	phrase	see some	m0377
+seesomeshinaito	see someしないと	phrase	see some	m0378
+tabunseeoneshimasu	たぶんsee oneします	phrase	see one	m0379
+seeoneshinaito	see oneしないと	phrase	see one	m0380
+kyouhaseesamesurutsumorida	今日はsee sameするつもりだ	phrase	see same	m0381
+seesameshinaito	see sameしないと	phrase	see same	m0382
+useonesurukotoga	use oneすることが	phrase	use one	m0383
+tabunuseoneshimasu	たぶんuse oneします	phrase	use one	m0384
+usesameshinaito	use sameしないと	phrase	use same	m0385
+kanarazuusesameshimasu	必ずuse sameします	phrase	use same	m0386
+kanarazumakeoneshimasu	必ずmake oneします	phrase	make one	m0387
+makeonesurukotoga	make oneすることが	phrase	make one	m0388
+kyouhatakeonesurutsumorida	今日はtake oneするつもりだ	phrase	take one	m0389
+kanarazutakeoneshimasu	必ずtake oneします	phrase	take one	m0390
+makesameshinaito	make sameしないと	phrase	make same	m0391
+makesamesurukotoga	make sameすることが	phrase	make same	m0392
+kanarazumakenameshimasu	必ずmake nameします	phrase	make name	m0393
+tabunmakenameshimasu	たぶんmake nameします	phrase	make name	m0394
+tabunmakenoteshimasu	たぶんmake noteします	phrase	make note	m0395
+kanarazumakenoteshimasu	必ずmake noteします	phrase	make note	m0396
+kyouhatakenamesurutsumorida	今日はtake nameするつもりだ	phrase	take name	m0397
+takenameshitekudasai	take nameしてください	phrase	take name	m0398
+takehomeshinaito	take homeしないと	phrase	take home	m0399
+takehomesurukotoga	take homeすることが	phrase	take home	m0400
+takesomeshitekudasai	take someしてください	phrase	take some	m0401
+takesomeshinaito	take someしないと	phrase	take some	m0402
+takedatashinaito	take dataしないと	phrase	take data	m0403
+takedatashitekudasai	take dataしてください	phrase	take data	m0404
+makedatashinaito	make dataしないと	phrase	make data	m0405
+makedatasurukotoga	make dataすることが	phrase	make data	m0406
+tabunusedatashimasu	たぶんuse dataします	phrase	use data	m0407
+usedatashitekudasai	use dataしてください	phrase	use data	m0408
+makemodeshinaito	make modeしないと	phrase	make mode	m0409
+makemodesurukotoga	make modeすることが	phrase	make mode	m0410
+tabunusemoreshimasu	たぶんuse moreします	phrase	use more	m0411
+usemoresurukotoga	use moreすることが	phrase	use more	m0412
+makemoreshitekudasai	make moreしてください	phrase	make more	m0413
+makemoresurukotoga	make moreすることが	phrase	make more	m0414
+takemoreshitekudasai	take moreしてください	phrase	take more	m0415
+tabuntakemoreshimasu	たぶんtake moreします	phrase	take more	m0416
+raisemoreshitekudasai	raise moreしてください	phrase	raise more	m0417
+raisemoreshinaito	raise moreしないと	phrase	raise more	m0418
+kyouhausenamesurutsumorida	今日はuse nameするつもりだ	phrase	use name	m0419
+usenameshinaito	use nameしないと	phrase	use name	m0420
+usetimeshitekudasai	use timeしてください	phrase	use time	m0421
+usetimesurukotoga	use timeすることが	phrase	use time	m0422
+tabunusemodeshimasu	たぶんuse modeします	phrase	use mode	m0423
+usemodeshitekudasai	use modeしてください	phrase	use mode	m0424
+seetimeshinaito	see timeしないと	phrase	see time	m0425
+seetimeshitekudasai	see timeしてください	phrase	see time	m0426
+seenamesurukotoga	see nameすることが	phrase	see name	m0427
+tabunseenameshimasu	たぶんsee nameします	phrase	see name	m0428
+makeanotesurukotoga	make a noteすることが	phrase	make a note	m0429
+kyouhamakeanotesurutsumorida	今日はmake a noteするつもりだ	phrase	make a note	m0430
+kyouhatakeanotesurutsumorida	今日はtake a noteするつもりだ	phrase	take a note	m0431
+takeanoteshitekudasai	take a noteしてください	phrase	take a note	m0432
+usethesameshitekudasai	use the sameしてください	phrase	use the same	m0433
+kanarazuusethesameshimasu	必ずuse the sameします	phrase	use the same	m0434
+tabunmakethesameshimasu	たぶんmake the sameします	phrase	make the same	m0435
+makethesameshinaito	make the sameしないと	phrase	make the same	m0436
+kanarazutakethesameshimasu	必ずtake the sameします	phrase	take the same	m0437
+takethesamesurukotoga	take the sameすることが	phrase	take the same	m0438
+tabunseethesameshimasu	たぶんsee the sameします	phrase	see the same	m0439
+kyouhaseethesamesurutsumorida	今日はsee the sameするつもりだ	phrase	see the same	m0440
+tabunrenameoneshimasu	たぶんrename oneします	phrase	rename one	m0441
+renameonesurukotoga	rename oneすることが	phrase	rename one	m0442
+kanarazuresumesomeshimasu	必ずresume someします	phrase	resume some	m0443
+kyouharesumesomesurutsumorida	今日はresume someするつもりだ	phrase	resume some	m0444
+erasesomesurukotoga	erase someすることが	phrase	erase some	m0445
+kanarazuerasesomeshimasu	必ずerase someします	phrase	erase some	m0446
+eraseoneshinaito	erase oneしないと	phrase	erase one	m0447
+kanarazueraseoneshimasu	必ずerase oneします	phrase	erase one	m0448
+erasesamesurukotoga	erase sameすることが	phrase	erase same	m0449
+kanarazuerasesameshimasu	必ずerase sameします	phrase	erase same	m0450
+kyouhaerasedatasurutsumorida	今日はerase dataするつもりだ	phrase	erase data	m0451
+erasedatashinaito	erase dataしないと	phrase	erase data	m0452
+erasenamesurukotoga	erase nameすることが	phrase	erase name	m0453
+kanarazuerasenameshimasu	必ずerase nameします	phrase	erase name	m0454
+kanarazureusesomeshimasu	必ずreuse someします	phrase	reuse some	m0455
+reusesomeshitekudasai	reuse someしてください	phrase	reuse some	m0456
+reusedatashitekudasai	reuse dataしてください	phrase	reuse data	m0457
+kyouhareusedatasurutsumorida	今日はreuse dataするつもりだ	phrase	reuse data	m0458
+tabunreuseoneshimasu	たぶんreuse oneします	phrase	reuse one	m0459
+reuseoneshinaito	reuse oneしないと	phrase	reuse one	m0460
+reusenameshitekudasai	reuse nameしてください	phrase	reuse name	m0461
+kyouhareusenamesurutsumorida	今日はreuse nameするつもりだ	phrase	reuse name	m0462
+kanarazudefinenameshimasu	必ずdefine nameします	phrase	define name	m0463
+definenameshinaito	define nameしないと	phrase	define name	m0464
+tabundefinemodeshimasu	たぶんdefine modeします	phrase	define mode	m0465
+kanarazudefinemodeshimasu	必ずdefine modeします	phrase	define mode	m0466
+definezoneshitekudasai	define zoneしてください	phrase	define zone	m0467
+tabundefinezoneshimasu	たぶんdefine zoneします	phrase	define zone	m0468
+defineoneshinaito	define oneしないと	phrase	define one	m0469
+tabundefineoneshimasu	たぶんdefine oneします	phrase	define one	m0470
+kanarazuensuresomeshimasu	必ずensure someします	phrase	ensure some	m0471
+ensuresomeshitekudasai	ensure someしてください	phrase	ensure some	m0472
+kanarazuensuresameshimasu	必ずensure sameします	phrase	ensure same	m0473
+ensuresameshinaito	ensure sameしないと	phrase	ensure same	m0474
+ensureoneshitekudasai	ensure oneしてください	phrase	ensure one	m0475
+ensureonesurukotoga	ensure oneすることが	phrase	ensure one	m0476
+assumesomeshinaito	assume someしないと	phrase	assume some	m0477
+assumesomesurukotoga	assume someすることが	phrase	assume some	m0478
+assumesamesurukotoga	assume sameすることが	phrase	assume same	m0479
+kyouhaassumesamesurutsumorida	今日はassume sameするつもりだ	phrase	assume same	m0480
+kanarazuassumeoneshimasu	必ずassume oneします	phrase	assume one	m0481
+assumeoneshinaito	assume oneしないと	phrase	assume one	m0482
+kyouhaassumemodesurutsumorida	今日はassume modeするつもりだ	phrase	assume mode	m0483
+assumemodeshitekudasai	assume modeしてください	phrase	assume mode	m0484
+kanarazuimagineoneshimasu	必ずimagine oneします	phrase	imagine one	m0485
+tabunimagineoneshimasu	たぶんimagine oneします	phrase	imagine one	m0486
+kyouhaimaginesomesurutsumorida	今日はimagine someするつもりだ	phrase	imagine some	m0487
+imaginesomesurukotoga	imagine someすることが	phrase	imagine some	m0488
+measuretimeshinaito	measure timeしないと	phrase	measure time	m0489
+tabunmeasuretimeshimasu	たぶんmeasure timeします	phrase	measure time	m0490
+tabunmeasuresizeshimasu	たぶんmeasure sizeします	phrase	measure size	m0491
+measuresizesurukotoga	measure sizeすることが	phrase	measure size	m0492
+measuresomesurukotoga	measure someすることが	phrase	measure some	m0493
+measuresomeshitekudasai	measure someしてください	phrase	measure some	m0494
+tabunmeasuredatashimasu	たぶんmeasure dataします	phrase	measure data	m0495
+kyouhameasuredatasurutsumorida	今日はmeasure dataするつもりだ	phrase	measure data	m0496
+kanarazumanagedatashimasu	必ずmanage dataします	phrase	manage data	m0497
+kyouhamanagedatasurutsumorida	今日はmanage dataするつもりだ	phrase	manage data	m0498
+kanarazumanagetimeshimasu	必ずmanage timeします	phrase	manage time	m0499
+managetimeshitekudasai	manage timeしてください	phrase	manage time	m0500
+tabunmanagenameshimasu	たぶんmanage nameします	phrase	manage name	m0501
+managenameshinaito	manage nameしないと	phrase	manage name	m0502
+kanarazumanagesomeshimasu	必ずmanage someします	phrase	manage some	m0503
+managesomeshinaito	manage someしないと	phrase	manage some	m0504
+kyouhamentionnamesurutsumorida	今日はmention nameするつもりだ	phrase	mention name	m0505
+mentionnameshitekudasai	mention nameしてください	phrase	mention name	m0506
+kanarazumentiontimeshimasu	必ずmention timeします	phrase	mention time	m0507
+mentiontimesurukotoga	mention timeすることが	phrase	mention time	m0508
+kyouhamentionsomesurutsumorida	今日はmention someするつもりだ	phrase	mention some	m0509
+mentionsomesurukotoga	mention someすることが	phrase	mention some	m0510
+mentiononesurukotoga	mention oneすることが	phrase	mention one	m0511
+tabunmentiononeshimasu	たぶんmention oneします	phrase	mention one	m0512
+operatemodeshitekudasai	operate modeしてください	phrase	operate mode	m0513
+operatemodeshinaito	operate modeしないと	phrase	operate mode	m0514
+operatesomeshitekudasai	operate someしてください	phrase	operate some	m0515
+operatesomeshinaito	operate someしないと	phrase	operate some	m0516
+watashinotheretohadokodesuka	私のtheretoはどこですか	rare	thereto	m0517
+theretogaarimasu	theretoがあります	rare	thereto	m0518
+intonegaarimasu	intoneがあります	rare	intone	m0519
+watashinointonehadokodesuka	私のintoneはどこですか	rare	intone	m0520
+sonopatinawosagashiteiru	そのpatinaを探している	rare	patina	m0521
+konopatinawotsukau	このpatinaを使う	rare	patina	m0522
+retakekarahajimeyou	retakeから始めよう	rare	retake	m0523
+konoretakewotsukau	このretakeを使う	rare	retake	m0524
+konoonsidewotsukau	このonsideを使う	rare	onside	m0525
+kyouhaonsidenitsuitekangaeru	今日はonsideについて考える	rare	onside	m0526
+sonomontagewosagashiteiru	そのmontageを探している	rare	montage	m0527
+kyouhamontagenitsuitekangaeru	今日はmontageについて考える	rare	montage	m0528
+watashinomorainehadokodesuka	私のmoraineはどこですか	rare	moraine	m0529
+sorehaonajimorainedesu	それは同じmoraineです	rare	moraine	m0530
+kyouhaententenitsuitekangaeru	今日はententeについて考える	rare	entente	m0531
+ententenohougaii	ententeのほうがいい	rare	entente	m0532
+pinaforedehanaku	pinaforeではなく	rare	pinafore	m0533
+sorehaonajipinaforedesu	それは同じpinaforeです	rare	pinafore	m0534
+ashitanodotagewokakuninshite	明日のdotageを確認して	rare	dotage	m0535
+watashinodotagehadokodesuka	私のdotageはどこですか	rare	dotage	m0536
+sonobegoniawosagashiteiru	そのbegoniaを探している	rare	begonia	m0537
+konobegoniawotsukau	このbegoniaを使う	rare	begonia	m0538
+kondosetteewoshiraberu	今度setteeを調べる	rare	settee	m0539
+setteekarahajimeyou	setteeから始めよう	rare	settee	m0540
+sorehaonajiattunedesu	それは同じattuneです	rare	attune	m0541
+attunenohougaii	attuneのほうがいい	rare	attune	m0542
+ashitanoantedatewokakuninshite	明日のantedateを確認して	rare	antedate	m0543
+kondoantedatewoshiraberu	今度antedateを調べる	rare	antedate	m0544
+sonogeodewosagashiteiru	そのgeodeを探している	rare	geode	m0545
+konoapurinogeodewokaeta	このアプリのgeodeを変えた	rare	geode	m0546
+ashitanorupeewokakuninshite	明日のrupeeを確認して	rare	rupee	m0547
+kondorupeewoshiraberu	今度rupeeを調べる	rare	rupee	m0548
+konoapurinopupatewokaeta	このアプリのpupateを変えた	rare	pupate	m0549
+konopupatewotsukau	このpupateを使う	rare	pupate	m0550
+sonosanguinewosagashiteiru	そのsanguineを探している	rare	sanguine	m0551
+watashinosanguinehadokodesuka	私のsanguineはどこですか	rare	sanguine	m0552
+watashinoeffetehadokodesuka	私のeffeteはどこですか	rare	effete	m0553
+effetegaarimasu	effeteがあります	rare	effete	m0554
+sonoderrierewosagashiteiru	そのderriereを探している	rare	derriere	m0555
+ashitanoderrierewokakuninshite	明日のderriereを確認して	rare	derriere	m0556
+sorehaonajiterrazzodesu	それは同じterrazzoです	rare	terrazzo	m0557
+terrazzokarahajimeyou	terrazzoから始めよう	rare	terrazzo	m0558
+serranokarahajimeyou	serranoから始めよう	rare	serrano	m0559
+konoserranowotsukau	このserranoを使う	rare	serrano	m0560
+kyouhabazookanitsuitekangaeru	今日はbazookaについて考える	rare	bazooka	m0561
+ashitanobazookawokakuninshite	明日のbazookaを確認して	rare	bazooka	m0562
+kondoangorawoshiraberu	今度angoraを調べる	rare	angora	m0563
+watashinoangorahadokodesuka	私のangoraはどこですか	rare	angora	m0564
+manateedehanaku	manateeではなく	rare	manatee	m0565
+sonomanateewosagashiteiru	そのmanateeを探している	rare	manatee	m0566
+watashinoreggaehadokodesuka	私のreggaeはどこですか	rare	reggae	m0567
+konoapurinoreggaewokaeta	このアプリのreggaeを変えた	rare	reggae	m0568
+watashinofoodiehadokodesuka	私のfoodieはどこですか	rare	foodie	m0569
+foodienohougaii	foodieのほうがいい	rare	foodie	m0570
+sorehaonajitonsuredesu	それは同じtonsureです	rare	tonsure	m0571
+tonsuregaarimasu	tonsureがあります	rare	tonsure	m0572
+konomakeprojectwokaeru	このmake projectを変える	paired	make project	m0573
+konoprojectmakewokaeru	このproject makeを変える	paired	project make	m0574
+sonomakeuploadnitsuite	そのmake uploadについて	paired	make upload	m0575
+ashitanouploadmakewokakunin	明日のupload makeを確認	paired	upload make	m0576
+takeupdategaaru	take updateがある	paired	take update	m0577
+sonoupdatetakenitsuite	そのupdate takeについて	paired	update take	m0578
+takegithubgaaru	take githubがある	paired	take github	m0579
+konogithubtakewokaeru	このgithub takeを変える	paired	github take	m0580
+ashitanosameaccountwokakunin	明日のsame accountを確認	paired	same account	m0581
+ashitanoaccountsamewokakunin	明日のaccount sameを確認	paired	account same	m0582
+samelibrarygaaru	same libraryがある	paired	same library	m0583
+sonolibrarysamenitsuite	そのlibrary sameについて	paired	library same	m0584
+namebrowsergaaru	name browserがある	paired	name browser	m0585
+browsernamegaaru	browser nameがある	paired	browser name	m0586
+namescreenshotgaaru	name screenshotがある	paired	name screenshot	m0587
+ashitanoscreenshotnamewokakunin	明日のscreenshot nameを確認	paired	screenshot name	m0588
+konohomedatabasewokaeru	このhome databaseを変える	paired	home database	m0589
+databasehomegaaru	database homeがある	paired	database home	m0590
+ashitanohomedownloadwokakunin	明日のhome downloadを確認	paired	home download	m0591
+konodownloadhomewokaeru	このdownload homeを変える	paired	download home	m0592
+ashitanogamebuttonwokakunin	明日のgame buttonを確認	paired	game button	m0593
+buttongamegaaru	button gameがある	paired	button game	m0594
+sonogamepasswordnitsuite	そのgame passwordについて	paired	game password	m0595
+konopasswordgamewokaeru	このpassword gameを変える	paired	password game	m0596
+ashitanooneuploadwokakunin	明日のone uploadを確認	paired	one upload	m0597
+ashitanouploadonewokakunin	明日のupload oneを確認	paired	upload one	m0598
+ashitanooneselectwokakunin	明日のone selectを確認	paired	one select	m0599
+konoselectonewokaeru	このselect oneを変える	paired	select one	m0600
+konotimegithubwokaeru	このtime githubを変える	paired	time github	m0601
+githubtimegaaru	github timeがある	paired	github time	m0602
+sonotimekeyboardnitsuite	そのtime keyboardについて	paired	time keyboard	m0603
+keyboardtimegaaru	keyboard timeがある	paired	keyboard time	m0604
+ashitanosomelibrarywokakunin	明日のsome libraryを確認	paired	some library	m0605
+konolibrarysomewokaeru	このlibrary someを変える	paired	library some	m0606
+konosomewindowwokaeru	このsome windowを変える	paired	some window	m0607
+windowsomegaaru	window someがある	paired	window some	m0608
+ashitanonotescreenshotwokakunin	明日のnote screenshotを確認	paired	note screenshot	m0609
+sonoscreenshotnotenitsuite	そのscreenshot noteについて	paired	screenshot note	m0610
+notebackupgaaru	note backupがある	paired	note backup	m0611
+konobackupnotewokaeru	このbackup noteを変える	paired	backup note	m0612
+sonomodedownloadnitsuite	そのmode downloadについて	paired	mode download	m0613
+ashitanodownloadmodewokakunin	明日のdownload modeを確認	paired	download mode	m0614
+konomodegooglewokaeru	このmode googleを変える	paired	mode google	m0615
+konogooglemodewokaeru	このgoogle modeを変える	paired	google mode	m0616
+datapasswordgaaru	data passwordがある	paired	data password	m0617
+konopassworddatawokaeru	このpassword dataを変える	paired	password data	m0618
+konodataandroidwokaeru	このdata androidを変える	paired	data android	m0619
+ashitanoandroiddatawokakunin	明日のandroid dataを確認	paired	android data	m0620
+sonodateselectnitsuite	そのdate selectについて	paired	date select	m0621
+sonoselectdatenitsuite	そのselect dateについて	paired	select date	m0622
+ashitanodateserverwokakunin	明日のdate serverを確認	paired	date server	m0623
+serverdategaaru	server dateがある	paired	server date	m0624
+basekeyboardgaaru	base keyboardがある	paired	base keyboard	m0625
+sonokeyboardbasenitsuite	そのkeyboard baseについて	paired	keyboard base	m0626
+konobasefolderwokaeru	このbase folderを変える	paired	base folder	m0627
+ashitanofolderbasewokakunin	明日のfolder baseを確認	paired	folder base	m0628
+sonositewindownitsuite	そのsite windowについて	paired	site window	m0629
+sonowindowsitenitsuite	そのwindow siteについて	paired	window site	m0630
+konositechromewokaeru	このsite chromeを変える	paired	site chrome	m0631
+konochromesitewokaeru	このchrome siteを変える	paired	chrome site	m0632
+sonosizebackupnitsuite	そのsize backupについて	paired	size backup	m0633
+backupsizegaaru	backup sizeがある	paired	backup size	m0634
+sonosizeloginnitsuite	そのsize loginについて	paired	size login	m0635
+loginsizegaaru	login sizeがある	paired	login size	m0636
+konotonegooglewokaeru	このtone googleを変える	paired	tone google	m0637
+sonogoogletonenitsuite	そのgoogle toneについて	paired	google tone	m0638
+tonescreengaaru	tone screenがある	paired	tone screen	m0639
+sonoscreentonenitsuite	そのscreen toneについて	paired	screen tone	m0640
+ashitanozoneandroidwokakunin	明日のzone androidを確認	paired	zone android	m0641
+konoandroidzonewokaeru	このandroid zoneを変える	paired	android zone	m0642
+ashitanozonebookmarkwokakunin	明日のzone bookmarkを確認	paired	zone bookmark	m0643
+konobookmarkzonewokaeru	このbookmark zoneを変える	paired	bookmark zone	m0644
+sonohouseservernitsuite	そのhouse serverについて	paired	house server	m0645
+ashitanoserverhousewokakunin	明日のserver houseを確認	paired	server house	m0646
+ashitanohousebranchwokakunin	明日のhouse branchを確認	paired	house branch	m0647
+konobranchhousewokaeru	このbranch houseを変える	paired	branch house	m0648
+mousefoldergaaru	mouse folderがある	paired	mouse folder	m0649
+sonofoldermousenitsuite	そのfolder mouseについて	paired	folder mouse	m0650
+konomousenetworkwokaeru	このmouse networkを変える	paired	mouse network	m0651
+ashitanonetworkmousewokakunin	明日のnetwork mouseを確認	paired	network mouse	m0652
+konoregionchromewokaeru	このregion chromeを変える	paired	region chrome	m0653
+konochromeregionwokaeru	このchrome regionを変える	paired	chrome region	m0654
+sonoregionwindowsnitsuite	そのregion windowsについて	paired	region windows	m0655
+konowindowsregionwokaeru	このwindows regionを変える	paired	windows region	m0656
+sessionlogingaaru	session loginがある	paired	session login	m0657
+loginsessiongaaru	login sessionがある	paired	login session	m0658
+sonosessionfilenitsuite	そのsession fileについて	paired	session file	m0659
+ashitanofilesessionwokakunin	明日のfile sessionを確認	paired	file session	m0660
+sonotokenscreennitsuite	そのtoken screenについて	paired	token screen	m0661
+screentokengaaru	screen tokenがある	paired	screen token	m0662
+konotokensettingwokaeru	このtoken settingを変える	paired	token setting	m0663
+konosettingtokenwokaeru	このsetting tokenを変える	paired	setting token	m0664
+konothemebookmarkwokaeru	このtheme bookmarkを変える	paired	theme bookmark	m0665
+konobookmarkthemewokaeru	このbookmark themeを変える	paired	bookmark theme	m0666
+themepythongaaru	theme pythonがある	paired	theme python	m0667
+pythonthemegaaru	python themeがある	paired	python theme	m0668
+konoimagebranchwokaeru	このimage branchを変える	paired	image branch	m0669
+sonobranchimagenitsuite	そのbranch imageについて	paired	branch image	m0670
+sonoimageprogramnitsuite	そのimage programについて	paired	image program	m0671
+programimagegaaru	program imageがある	paired	program image	m0672
+sonodomainnetworknitsuite	そのdomain networkについて	paired	domain network	m0673
+kononetworkdomainwokaeru	このnetwork domainを変える	paired	network domain	m0674
+ashitanodomainprojectwokakunin	明日のdomain projectを確認	paired	domain project	m0675
+konoprojectdomainwokaeru	このproject domainを変える	paired	project domain	m0676
+ashitanoenginewindowswokakunin	明日のengine windowsを確認	paired	engine windows	m0677
+windowsenginegaaru	windows engineがある	paired	windows engine	m0678
+konoengineupdatewokaeru	このengine updateを変える	paired	engine update	m0679
+updateenginegaaru	update engineがある	paired	update engine	m0680
+menufilegaaru	menu fileがある	paired	menu file	m0681
+konofilemenuwokaeru	このfile menuを変える	paired	file menu	m0682
+ashitanomenuaccountwokakunin	明日のmenu accountを確認	paired	menu account	m0683
+konoaccountmenuwokaeru	このaccount menuを変える	paired	account menu	m0684
+pagesettinggaaru	page settingがある	paired	page setting	m0685
+konosettingpagewokaeru	このsetting pageを変える	paired	setting page	m0686
+pagebrowsergaaru	page browserがある	paired	page browser	m0687
+ashitanobrowserpagewokakunin	明日のbrowser pageを確認	paired	browser page	m0688
+pleasehideonepassageagain	please hide one passage again	sentence	please hide one passage again	m0689
+thatissomeinfo	that is some info	sentence	that is some info	m0690
+thatisoneicon	that is one icon	sentence	that is one icon	m0691
+hereismoremenu	here is more menu	sentence	here is more menu	m0692
+wewanttorenamemoresizehere	we want to rename more size here	sentence	we want to rename more size here	m0693
+pleasemeasureonegamemore	please measure one game more	sentence	please measure one game more	m0694
+pleasejointhemediawithin	please join the media within	sentence	please join the media within	m0695
+hereisthepage	here is the page	sentence	here is the page	m0696
+weneedtoresumemorezonewithin	we need to resume more zone within	sentence	we need to resume more zone within	m0697
+iwanttoassumesamezone	i want to assume same zone	sentence	i want to assume same zone	m0698
+pleaseassumeaminute	please assume a minute	sentence	please assume a minute	m0699
+theywanttomentionsameinfo	they want to mention same info	sentence	they want to mention same info	m0700
+thisismoresolution	this is more solution	sentence	this is more solution	m0701
+hereisanode	here is a node	sentence	here is a node	m0702
+hereissametape	here is same tape	sentence	here is same tape	m0703
+pleaserenameoneimagewithin	please rename one image within	sentence	please rename one image within	m0704
+wecanensuremorehumaninside	we can ensure more human inside	sentence	we can ensure more human inside	m0705
+hereisonenature	here is one nature	sentence	here is one nature	m0706
+pleasejointhememoagain	please join the memo again	sentence	please join the memo again	m0707
+icandefinesomeorangethere	i can define some orange there	sentence	i can define some orange there	m0708
+hereissamedata	here is same data	sentence	here is same data	m0709
+weneedtoerasesomeorangethere	we need to erase some orange there	sentence	we need to erase some orange there	m0710
+wecouldwaketheonionbefore	we could wake the onion before	sentence	we could wake the onion before	m0711
+thisisamode	this is a mode	sentence	this is a mode	m0712
+youwanttoseeonehouse	you want to see one house	sentence	you want to see one house	m0713
+pleaseassumeoneimageinside	please assume one image inside	sentence	please assume one image inside	m0714
+ineedtosharemorepositionagain	i need to share more position again	sentence	i need to share more position again	m0715
+pleasemanageonetokensoon	please manage one token soon	sentence	please manage one token soon	m0716
+hereismoreminute	here is more minute	sentence	here is more minute	m0717
+thisissomemountain	this is some mountain	sentence	this is some mountain	m0718
+heshouldassumesamesessionoutside	he should assume same session outside	sentence	he should assume same session outside	m0719
+pleaseeraseonetimemore	please erase one time more	sentence	please erase one time more	m0720
+thatissamezone	that is same zone	sentence	that is same zone	m0721
+youneedtojoinmorehouseonce	you need to join more house once	sentence	you need to join more house once	m0722
+hereissamemouse	here is same mouse	sentence	here is same mouse	m0723
+wewanttoshakesometokenmore	we want to shake some token more	sentence	we want to shake some token more	m0724
+pleasementiononeminutewithin	please mention one minute within	sentence	please mention one minute within	m0725
+youwanttoraisesomesessioninside	you want to raise some session inside	sentence	you want to raise some session inside	m0726
+weneedtowipesomereason	we need to wipe some reason	sentence	we need to wipe some reason	m0727
+thisisthenoise	this is the noise	sentence	this is the noise	m0728
+pleaseensuresomepassagethere	please ensure some passage there	sentence	please ensure some passage there	m0729
+thatisoneorigin	that is one origin	sentence	that is one origin	m0730
+thisisthename	this is the name	sentence	this is the name	m0731
+theywouldrenamemoreonionthere	they would rename more onion there	sentence	they would rename more onion there	m0732
+youwanttorenamesamemessagesoon	you want to rename same message soon	sentence	you want to rename same message soon	m0733
+pleaseusesamehumanoutside	please use same human outside	sentence	please use same human outside	m0734
+sheshouldwakemoreimagebefore	she should wake more image before	sentence	she should wake more image before	m0735
+hereisoneorigin	here is one origin	sentence	here is one origin	m0736
+thatismoremedia	that is more media	sentence	that is more media	m0737
+weneedtoseetheoriginhere	we need to see the origin here	sentence	we need to see the origin here	m0738
+thatisthename	that is the name	sentence	that is the name	m0739
+youneedtoresumeonetoneonce	you need to resume one tone once	sentence	you need to resume one tone once	m0740
+pleasedefineonenodebefore	please define one node before	sentence	please define one node before	m0741
+iwanttoresumesomevisioninside	i want to resume some vision inside	sentence	i want to resume some vision inside	m0742
+youwillseesomehouseonce	you will see some house once	sentence	you will see some house once	m0743
+pleasemakesamemenuhere	please make same menu here	sentence	please make same menu here	m0744
+iwouldmeasureonesessionagain	i would measure one session again	sentence	i would measure one session again	m0745
+thatismorepage	that is more page	sentence	that is more page	m0746
+itcanwakeavisioninside	it can wake a vision inside	sentence	it can wake a vision inside	m0747
+theywanttodefinesomemediahere	they want to define some media here	sentence	they want to define some media here	m0748
+hereisanorigin	here is an origin	sentence	here is an origin	m0749
+thatisanicon	that is an icon	sentence	that is an icon	m0750
+pleasemeasurethemenuoutside	please measure the menu outside	sentence	please measure the menu outside	m0751
+hewillhideamenusoon	he will hide a menu soon	sentence	he will hide a menu soon	m0752
+youneedtomakesameoriginonce	you need to make same origin once	sentence	you need to make same origin once	m0753
+youmaywakesamedatewithin	you may wake same date within	sentence	you may wake same date within	m0754
+thisisonehouse	this is one house	sentence	this is one house	m0755
+hereismorenoise	here is more noise	sentence	here is more noise	m0756
+ishouldreusesomemouseinside	i should reuse some mouse inside	sentence	i should reuse some mouse inside	m0757
+thatisabase	that is a base	sentence	that is a base	m0758
+pleasemanagesomenotewithin	please manage some note within	sentence	please manage some note within	m0759
+ineedtoreusesomemediasoon	i need to reuse some media soon	sentence	i need to reuse some media soon	m0760
+wewouldseemoresolutionsoon	we would see more solution soon	sentence	we would see more solution soon	m0761
+theyneedtousetherain	they need to use the rain	sentence	they need to use the rain	m0762
+thatistheinfo	that is the info	sentence	that is the info	m0763
+imustmeasureamodewithin	i must measure a mode within	sentence	i must measure a mode within	m0764
+wewanttohidesamehumanoutside	we want to hide same human outside	sentence	we want to hide same human outside	m0765
+hereismoretime	here is more time	sentence	here is more time	m0766
+theymustseesometonemore	they must see some tone more	sentence	they must see some tone more	m0767
+pleaseresumeaminuteoutside	please resume a minute outside	sentence	please resume a minute outside	m0768
+pleaseerasesomemodethere	please erase some mode there	sentence	please erase some mode there	m0769
+pleaseshakesamepagesoon	please shake same page soon	sentence	please shake same page soon	m0770
+hereisamemo	here is a memo	sentence	here is a memo	m0771
+itwoulderaseoneonioninside	it would erase one onion inside	sentence	it would erase one onion inside	m0772
+itcandefinemorehomebefore	it can define more home before	sentence	it can define more home before	m0773
+thatissamemessage	that is same message	sentence	that is same message	m0774
+youmustassumesomenodeinside	you must assume some node inside	sentence	you must assume some node inside	m0775
+theywanttoensuresamesiteagain	they want to ensure same site again	sentence	they want to ensure same site again	m0776
+hereisoneicon	here is one icon	sentence	here is one icon	m0777
+theyshoulderaseonethemebefore	they should erase one theme before	sentence	they should erase one theme before	m0778
+thisissamenature	this is same nature	sentence	this is same nature	m0779
+hereismoresolution	here is more solution	sentence	here is more solution	m0780
+wewanttoraiseatape	we want to raise a tape	sentence	we want to raise a tape	m0781
+itmustmentionsamedemobefore	it must mention same demo before	sentence	it must mention same demo before	m0782
+theyneedtowaketheonioninside	they need to wake the onion inside	sentence	they need to wake the onion inside	m0783
+thatismorevision	that is more vision	sentence	that is more vision	m0784
+thisisthemountain	this is the mountain	sentence	this is the mountain	m0785
+youwanttomanagemorenatureinside	you want to manage more nature inside	sentence	you want to manage more nature inside	m0786
+wemayoperatesomedatemore	we may operate some date more	sentence	we may operate some date more	m0787
+hereismoretone	here is more tone	sentence	here is more tone	m0788
+itwillmeasuresomemouseoutside	it will measure some mouse outside	sentence	it will measure some mouse outside	m0789
+thatisthetheme	that is the theme	sentence	that is the theme	m0790
+shemustraiseanimageagain	she must raise an image again	sentence	she must raise an image again	m0791
+hereismorehuman	here is more human	sentence	here is more human	m0792
+thatismoretime	that is more time	sentence	that is more time	m0793
+youneedtoerasemorepageonce	you need to erase more page once	sentence	you need to erase more page once	m0794
+hereissamedemo	here is same demo	sentence	here is same demo	m0795
+thisissomeonion	this is some onion	sentence	this is some onion	m0796
+youneedtohidemorenotehere	you need to hide more note here	sentence	you need to hide more note here	m0797
+thisissamehouse	this is same house	sentence	this is same house	m0798
+pleasemakesomeregionwithin	please make some region within	sentence	please make some region within	m0799
+pleasewakethemenuoutside	please wake the menu outside	sentence	please wake the menu outside	m0800
+thatistheicon	that is the icon	sentence	that is the icon	m0801
+weneedtoensureonemodehere	we need to ensure one mode here	sentence	we need to ensure one mode here	m0802
+thatismoresite	that is more site	sentence	that is more site	m0803
+thatissameimage	that is same image	sentence	that is same image	m0804
+thisisonenoise	this is one noise	sentence	this is one noise	m0805
+pleasetakeonepipeoutside	please take one pipe outside	sentence	please take one pipe outside	m0806
+theywanttoresumesamepassagemore	they want to resume same passage more	sentence	they want to resume same passage more	m0807
+hereisoneonion	here is one onion	sentence	here is one onion	m0808
+hereissamenature	here is same nature	sentence	here is same nature	m0809
+thisisapage	this is a page	sentence	this is a page	m0810
+thatistheorigin	that is the origin	sentence	that is the origin	m0811
+heshouldtakeareasonbefore	he should take a reason before	sentence	he should take a reason before	m0812
+pleaseassumesomemediaonce	please assume some media once	sentence	please assume some media once	m0813
+thatisarain	that is a rain	sentence	that is a rain	m0814
+weneedtomentionsamepositionoutside	we need to mention same position outside	sentence	we need to mention same position outside	m0815
+theywanttomeasuresomesitemore	they want to measure some site more	sentence	they want to measure some site more	m0816
+thatismorereason	that is more reason	sentence	that is more reason	m0817
+ishouldjointhesitewithin	i should join the site within	sentence	i should join the site within	m0818
+pleasemakemoreroutewithin	please make more route within	sentence	please make more route within	m0819
+pleasehidemoresizewithin	please hide more size within	sentence	please hide more size within	m0820
+heshouldshareonetimeoutside	he should share one time outside	sentence	he should share one time outside	m0821
+pleasemanagesomeregionsoon	please manage some region soon	sentence	please manage some region soon	m0822
+wewanttorenamesometokenwithin	we want to rename some token within	sentence	we want to rename some token within	m0823
+hereisanature	here is a nature	sentence	here is a nature	m0824
+pleasetaketheonionmore	please take the onion more	sentence	please take the onion more	m0825
+thisissomeicon	this is some icon	sentence	this is some icon	m0826
+thisisonedata	this is one data	sentence	this is one data	m0827
+pleasereusesomebasesoon	please reuse some base soon	sentence	please reuse some base soon	m0828
+hereisthevision	here is the vision	sentence	here is the vision	m0829
+youwanttoassumesomemenuhere	you want to assume some menu here	sentence	you want to assume some menu here	m0830
+pleasemanagesameiconmore	please manage same icon more	sentence	please manage same icon more	m0831
+wemustrenamemorerainagain	we must rename more rain again	sentence	we must rename more rain again	m0832
+pleaseassumesamegamemore	please assume same game more	sentence	please assume same game more	m0833
+hewilltakeonenaturethere	he will take one nature there	sentence	he will take one nature there	m0834
+hereismorereason	here is more reason	sentence	here is more reason	m0835
+hereissamemenu	here is same menu	sentence	here is same menu	m0836
+thisistheicon	this is the icon	sentence	this is the icon	m0837
+imaytakeonemountainsoon	i may take one mountain soon	sentence	i may take one mountain soon	m0838
+hereismoremessage	here is more message	sentence	here is more message	m0839
+youwanttomentionthetimeonce	you want to mention the time once	sentence	you want to mention the time once	m0840
+thisisonenature	this is one nature	sentence	this is one nature	m0841
+hereissameminute	here is same minute	sentence	here is same minute	m0842
+pleasetakeatimewithin	please take a time within	sentence	please take a time within	m0843
+youshouldmakeonesizehere	you should make one size here	sentence	you should make one size here	m0844
+wemustraisesamedemoinside	we must raise same demo inside	sentence	we must raise same demo inside	m0845
+thisisanoise	this is a noise	sentence	this is a noise	m0846
+thatissomeorigin	that is some origin	sentence	that is some origin	m0847
+thatissomesize	that is some size	sentence	that is some size	m0848
+ishouldsharesameinfo	i should share same info	sentence	i should share same info	m0849
+thatisanimage	that is an image	sentence	that is an image	m0850
+weshouldseetheroutewithin	we should see the route within	sentence	we should see the route within	m0851
+pleasemakeonemenuwithin	please make one menu within	sentence	please make one menu within	m0852
+weneedtoresumeonedatamore	we need to resume one data more	sentence	we need to resume one data more	m0853
+hereissameimage	here is same image	sentence	here is same image	m0854
+hereisamessage	here is a message	sentence	here is a message	m0855
+wemustensuresomedateonce	we must ensure some date once	sentence	we must ensure some date once	m0856
+pleaseraisesomebasethere	please raise some base there	sentence	please raise some base there	m0857
+pleasemakesamenamemore	please make same name more	sentence	please make same name more	m0858
+ineedtoshakeoneorangehere	i need to shake one orange here	sentence	i need to shake one orange here	m0859
+hereisonesolution	here is one solution	sentence	here is one solution	m0860
+hereissomezone	here is some zone	sentence	here is some zone	m0861
+thatisadata	that is a data	sentence	that is a data	m0862
+pleasehideonemediahere	please hide one media here	sentence	please hide one media here	m0863
+pleasehideonenoiseonce	please hide one noise once	sentence	please hide one noise once	m0864
+thisismoremode	this is more mode	sentence	this is more mode	m0865
+hereisonehouse	here is one house	sentence	here is one house	m0866
+thisissamemessage	this is same message	sentence	this is same message	m0867
+hereisasize	here is a size	sentence	here is a size	m0868
+theywanttowakemoredemoonce	they want to wake more demo once	sentence	they want to wake more demo once	m0869
+thatisthedate	that is the date	sentence	that is the date	m0870
+weneedtoshakethethemeagain	we need to shake the theme again	sentence	we need to shake the theme again	m0871
+thisissomehome	this is some home	sentence	this is some home	m0872
+thisisonetone	this is one tone	sentence	this is one tone	m0873
+wewilldefineonememoonce	we will define one memo once	sentence	we will define one memo once	m0874
+hereissomebase	here is some base	sentence	here is some base	m0875
+thisisthetape	this is the tape	sentence	this is the tape	m0876
+pleaseoperateanicon	please operate an icon	sentence	please operate an icon	m0877
+hereissamegame	here is same game	sentence	here is same game	m0878
+hereisthenature	here is the nature	sentence	here is the nature	m0879
+youwanttoraiseasizeinside	you want to raise a size inside	sentence	you want to raise a size inside	m0880
+hereisoneregion	here is one region	sentence	here is one region	m0881
+theyneedtomeasuresamehumanonce	they need to measure same human once	sentence	they need to measure same human once	m0882
+youneedtomanagesamesizesoon	you need to manage same size soon	sentence	you need to manage same size soon	m0883
+thatisanorange	that is an orange	sentence	that is an orange	m0884
+thatissometime	that is some time	sentence	that is some time	m0885
+weshouldoperatemoreorangeagain	we should operate more orange again	sentence	we should operate more orange again	m0886
+pleaseeraseamemooutside	please erase a memo outside	sentence	please erase a memo outside	m0887
+pleasemanageanatureoutside	please manage a nature outside	sentence	please manage a nature outside	m0888
+watashinonamehadokodesuka	私のnameはどこですか	alone	name	m0889
+konoapurinonamewokaeta	このアプリのnameを変えた	alone	name	m0890
+sorehaonajigamedesu	それは同じgameです	alone	game	m0891
+kondogamewoshiraberu	今度gameを調べる	alone	game	m0892
+ashitanotimewokakuninshite	明日のtimeを確認して	alone	time	m0893
+timenohougaii	timeのほうがいい	alone	time	m0894
+ashitanohomewokakuninshite	明日のhomeを確認して	alone	home	m0895
+homenohougaii	homeのほうがいい	alone	home	m0896
+sononotewosagashiteiru	そのnoteを探している	alone	note	m0897
+kondonotewoshiraberu	今度noteを調べる	alone	note	m0898
+konoapurinomodewokaeta	このアプリのmodeを変えた	alone	mode	m0899
+modekarahajimeyou	modeから始めよう	alone	mode	m0900
+kyouhanodenitsuitekangaeru	今日はnodeについて考える	alone	node	m0901
+ashitanonodewokakuninshite	明日のnodeを確認して	alone	node	m0902
+ashitanodatewokakuninshite	明日のdateを確認して	alone	date	m0903
+basedehanaku	baseではなく	alone	base	m0904
+kondobasewoshiraberu	今度baseを調べる	alone	base	m0905
+ashitanositewokakuninshite	明日のsiteを確認して	alone	site	m0906
+kondositewoshiraberu	今度siteを調べる	alone	site	m0907
+sonosizewosagashiteiru	そのsizeを探している	alone	size	m0908
+sizenohougaii	sizeのほうがいい	alone	size	m0909
+sonotonewosagashiteiru	そのtoneを探している	alone	tone	m0910
+kyouhatonenitsuitekangaeru	今日はtoneについて考える	alone	tone	m0911
+konozonewotsukau	このzoneを使う	alone	zone	m0912
+zonedehanaku	zoneではなく	alone	zone	m0913
+watashinohousehadokodesuka	私のhouseはどこですか	alone	house	m0914
+sonohousewosagashiteiru	そのhouseを探している	alone	house	m0915
+kondomousewoshiraberu	今度mouseを調べる	alone	mouse	m0916
+mousenohougaii	mouseのほうがいい	alone	mouse	m0917
+sorehaonajipagedesu	それは同じpageです	alone	page	m0918
+pagegaarimasu	pageがあります	alone	page	m0919
+watashinopipehadokodesuka	私のpipeはどこですか	alone	pipe	m0920
+pipegaarimasu	pipeがあります	alone	pipe	m0921
+tapekarahajimeyou	tapeから始めよう	alone	tape	m0922
+ashitanotapewokakuninshite	明日のtapeを確認して	alone	tape	m0923
+watashinotokenhadokodesuka	私のtokenはどこですか	alone	token	m0924
+sonotokenwosagashiteiru	そのtokenを探している	alone	token	m0925
+konoapurinothemewokaeta	このアプリのthemeを変えた	alone	theme	m0926
+themegaarimasu	themeがあります	alone	theme	m0927
+regionkarahajimeyou	regionから始めよう	alone	region	m0928
+sonoregionwosagashiteiru	そのregionを探している	alone	region	m0929
+kondosessionwoshiraberu	今度sessionを調べる	alone	session	m0930
+konoapurinosessionwokaeta	このアプリのsessionを変えた	alone	session	m0931
+routedehanaku	routeではなく	alone	route	m0932
+konoroutewotsukau	このrouteを使う	alone	route	m0933
+kondoimagewoshiraberu	今度imageを調べる	alone	image	m0934
+sorehaonajimenudesu	それは同じmenuです	alone	menu	m0935
+sonomenuwosagashiteiru	そのmenuを探している	alone	menu	m0936
+konomediawotsukau	このmediaを使う	alone	media	m0937
+mediagaarimasu	mediaがあります	alone	media	m0938
+memonohougaii	memoのほうがいい	alone	memo	m0939
+memogaarimasu	memoがあります	alone	memo	m0940
+sorehaonajidemodesu	それは同じdemoです	alone	demo	m0941
+konoapurinodemowokaeta	このアプリのdemoを変えた	alone	demo	m0942
+domainkarahajimeyou	domainから始めよう	alone	domain	m0943
+konodomainwotsukau	このdomainを使う	alone	domain	m0944
+enginegaarimasu	engineがあります	alone	engine	m0945
+kondoenginewoshiraberu	今度engineを調べる	alone	engine	m0946
+kyouhahumannitsuitekangaeru	今日はhumanについて考える	alone	human	m0947
+watashinoiconhadokodesuka	私のiconはどこですか	alone	icon	m0948
+sonoiconwosagashiteiru	そのiconを探している	alone	icon	m0949
+konoapurinoinfowokaeta	このアプリのinfoを変えた	alone	info	m0950
+konoinfowotsukau	このinfoを使う	alone	info	m0951
+ashitanomakewokakuninshite	明日のmakeを確認して	alone	make	m0952
+watashinomakehadokodesuka	私のmakeはどこですか	alone	make	m0953
+konoapurinotakewokaeta	このアプリのtakeを変えた	alone	take	m0954
+ashitanotakewokakuninshite	明日のtakeを確認して	alone	take	m0955
+ashitanousewokakuninshite	明日のuseを確認して	alone	use	m0956
+sorehaonajiusedesu	それは同じuseです	alone	use	m0957
+sorehaonajisharedesu	それは同じshareです	alone	share	m0958
+sharedehanaku	shareではなく	alone	share	m0959
+kyouhahidenitsuitekangaeru	今日はhideについて考える	alone	hide	m0960
+watashinohidehadokodesuka	私のhideはどこですか	alone	hide	m0961

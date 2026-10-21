@@ -1,0 +1,21 @@
+# 開発の道具の名前の候補の試験。名前だけを小文字のローマ字で打って変換したとき、公式の書き方が候補に出るか（tools/tool_names_test.py と同じ名前）。列は proper-nouns-cand.tsv と同じ
+opencode	opencode	typed	tools	hand
+claudecode	Claude Code	typed	tools	hand
+codex	Codex	typed	tools	hand
+cursor	Cursor	typed	tools	hand
+ollama	Ollama	typed	tools	hand
+llamacpp	llama.cpp	typed	tools	hand
+huggingface	Hugging Face	typed	tools	hand
+langchain	LangChain	typed	tools	hand
+openai	OpenAI	typed	tools	hand
+anthropic	Anthropic	typed	tools	hand
+geminicli	Gemini CLI	typed	tools	hand
+copilot	Copilot	typed	tools	hand
+vscode	VS Code	typed	tools	hand
+neovim	Neovim	typed	tools	hand
+tmux	tmux	typed	tools	hand
+wsl	WSL	typed	tools	hand
+powershell	PowerShell	typed	tools	hand
+windsurf	Windsurf	typed	tools	hand
+aider	Aider	typed	tools	hand
+lmstudio	LM Studio	typed	tools	hand

@@ -9,7 +9,16 @@
 #   h: 話し言葉の文をローマ字で打ち込む（tests/conversion/colloquial.tsv。tools/colloquial_text.py）
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
-#   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv。tools/domain_typing_test.py）
+#   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv、道具の名前の domain-tools.tsv。tools/domain_typing_test.py）
+#   m: 英単語と重なるローマ字（tests/conversion/allenglish-mixed.tsv の英語にしたい文、allenglish-ja.tsv の日本語だけの文。
+#      tools/make_allenglish_tests.py、tools/score_allenglish.py）。文脈で英語にする段を使う版と、止めた版（MYIME_ALL_ENGLISH=off）の両方
+#   n: 英語の文を1語ずつ確定しながら打つ場面（直前の確定が英字の語で終わるとき、次の変換を英語寄りにする。docs/english-follow.md）。
+#      tests/conversion/english-follow-{word,ja,control,bare}.tsv を前の文を渡す形で（tools/context_convert.sh）、-history.tsv を前の語をキーで
+#      打って確定する形で（tools/english_follow_history.sh）流す。既定の版と、止めた版（MYIME_ENGLISH_FOLLOW=off）の両方。
+#      tools/make_english_follow_tests.py、tools/score_english_follow.py
+#   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
+#   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
+#      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
@@ -99,12 +108,81 @@ e1|e2)
 g)
   # 分野の文（プログラミング 300、仮想通貨 200 ほど）をローマ字で打つ。英字の言葉（git、npm、Python、DeFi、NFT など）は
   # 打ったまま元の文どおり出ることを期待する。採点はまとめの段で（tools/score_wiki_typing.py）
-  for field in prog crypto; do
+  for field in prog crypto tools; do
     if [ -f $T/domain-$field.tsv ]; then
       grep -v '^#' $T/domain-$field.tsv | cut -f1 > $W/domain-$field.txt
       $BATCH $W/domain-$field.txt $OUT/domain-$field.tsv 4
     fi
   done
+  ;;
+k)
+  # 大文字で始まる英字の固有名詞（Google、GitHub、New York、Elon Musk、iPhone ...）。文の中に小文字で打った名前を入れた文と、
+  # 名前だけを打って（英字、または読みのかな）変換したときの候補。採点はまとめの段で（tools/score_proper_nouns.py）
+  if [ -f $T/proper-nouns.tsv ]; then
+    grep -v '^#' $T/proper-nouns.tsv | cut -f1 > $W/proper-nouns.txt
+    $BATCH $W/proper-nouns.txt $OUT/proper-nouns.tsv 4
+  fi
+  if [ -f $T/proper-nouns-cand.tsv ]; then
+    grep -v '^#' $T/proper-nouns-cand.tsv | cut -f1 > $W/proper-nouns-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
+  fi
+  ;;
+m)
+  # 英単語と重なるローマ字: ローマ字として日本語に読める英単語（made、take、same、one）を日本語の文にはさんだ文と英語だけの文（英語に
+  # したい）、英単語と同じ綴りの日本語の語だけの文（英語にしてはいけない）。既定の版と、文脈の段を止めた版（off）の両方を流して比べる
+  for f in mixed ja; do
+    if [ -f $T/allenglish-$f.tsv ]; then
+      grep -v '^#' $T/allenglish-$f.tsv | cut -f1 > $W/allenglish-$f.txt
+      $BATCH $W/allenglish-$f.txt $OUT/allenglish-$f.tsv 4
+      MYIME_ALL_ENGLISH=off $BATCH $W/allenglish-$f.txt $OUT/allenglish-$f-off.tsv 4
+    fi
+  done
+  ;;
+n)
+  # 英語の文を1語ずつ確定しながら打つ場面。前の文（英字の語で終わる）を入力欄の前の文として渡して1語を変換する形（word: 英語になるべき、
+  # ja: 英語の語のあとの日本語の文、control: 日本語のあとの英単語1語、bare: 英単語と綴りが同じ日本語の語を1語で）と、前の語をキーで打って
+  # 確定する形（history: 変換の履歴から直前を取る道）。既定の版と、寄せを止めた版（off）の両方を流して比べる
+  for f in word ja control bare; do
+    if [ -f $T/english-follow-$f.tsv ]; then
+      CTXF="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/english-follow-$f.tsv"
+      $CTXF $OUT/english-follow-$f.tsv with 4
+      MYIME_ENGLISH_FOLLOW=off $CTXF $OUT/english-follow-$f-off.tsv with 4
+    fi
+  done
+  if [ -f $T/english-follow-history.tsv ]; then
+    HISTF="bash $REPO/tools/english_follow_history.sh $E/session_handler_main $E $MODEL $T/english-follow-history.tsv"
+    $HISTF $OUT/english-follow-history.tsv 4
+    MYIME_ENGLISH_FOLLOW=off $HISTF $OUT/english-follow-history-off.tsv 4
+  fi
+  ;;
+r)
+  # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、
+  # 型 b（ai: あい、ui: うい: 日本語に読める）は、略語のあとに助詞と技術の語が続くときだけ略語を先頭にする（native/jaen-detector/jaen_detector.cc）。
+  # 日本語の語が重なる文（acronyms-ja.tsv）は、略語に取らず日本語のまま出ることを期待する。採点はまとめの段で（tools/score_proper_nouns.py）
+  for f in acronyms acronyms-ja; do
+    if [ -f $T/$f.tsv ]; then
+      grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt
+      $BATCH $W/$f.txt $OUT/$f.tsv 4
+    fi
+  done
+  if [ -f $T/acronyms-cand.tsv ]; then
+    grep -v '^#' $T/acronyms-cand.tsv | cut -f1 > $W/acronyms-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/acronyms-cand.txt $OUT/acronyms-cand.tsv 4
+  fi
+  ;;
+q)
+  # 開発の道具の名前（opencode ...）: 名前だけを打って変換したときの候補の並び（採点は tools/score_proper_nouns.py candidates）と、
+  # 英字で打ち続けたいときの操作（F10、Shift で始める）が今の版で効くかの記録（tools-keys.txt）
+  if [ -f $T/domain-tools-cand.tsv ]; then
+    grep -v '^#' $T/domain-tools-cand.tsv | cut -f1 > $W/tools-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/tools-cand.txt $OUT/domain-tools-cand.tsv 4
+  fi
+  for r in opencode opencodewotsukau. kyouhaopencodewotsukau. Opencode Opencodewotsukau. kyouhaOpencodewotsukau. claudecode geminicli; do
+    for how in F10 F9 Space Enter; do
+      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\t%s\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" "$how" > $W/key.tsv
+      echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
+    done
+  done | tee $OUT/tools-keys.txt
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
@@ -349,5 +427,5 @@ PY
   ) || true
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、p、x のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、p、q、r、x、y のどれか" >&2; exit 2 ;;
 esac

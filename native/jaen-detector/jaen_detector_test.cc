@@ -7,6 +7,7 @@
 #include "correction_log.h"
 #include "jaen_typo.h"
 
+#include <algorithm>
 #include <chrono>
 #include <cmath>
 #include <filesystem>
@@ -227,6 +228,70 @@ int main() {
     with_joined.AddJoined("download");
     const auto one = jaen::SplitEnglish(Parse("downloadshita"), with_joined, Parse);
     Expect(!one.empty() && one[0].english && one[0].spaces.empty(), "a joined word keeps no space");
+  }
+
+  {
+    // 文脈で決める段（JapaneseModel）: ローマ字として日本語に読める英単語は、前後の読みが日本語として
+    // 自然なら日本語のまま、読みが不自然なら（英単語のつながり、英語の隣）英語にする。
+    // 辞書は小さな代わり（かな→費用）、接続の費用は 0。
+    const std::map<std::string, int> costs = {{"きょう", 3000}, {"は", 500}, {"さめ", 6000}, {"たけ", 6000},
+                                              {"を", 300}, {"みた", 3000}, {"で", 300}, {"です", 300}, {"きょうは", 3500}};
+    jaen::JapaneseModel model;
+    model.prefix_words = [&](std::string_view kana, std::vector<jaen::JapaneseWord>* words) {
+      for (const auto& [reading, cost] : costs) {
+        if (kana.substr(0, reading.size()) == reading) words->push_back({reading.size(), 1, 1, cost});
+      }
+    };
+    model.transition = [](uint16_t, uint16_t) { return 0; };
+    jaen::Lexicon context = lexicon;
+    context.Add("time");
+    context.Add("take");
+    context.Add("google", true);
+    const auto decided = [&](std::string_view raw) {
+      return jaen::SplitEnglish(Parse(raw), context, Parse, nullptr, nullptr, nullptr, &model);
+    };
+    const auto decided_text = [&](std::string_view raw) { return Text(raw, decided(raw), true); };
+    Expect(decided_text("samewomita").empty(), "文脈: 助詞が続いて自然に読める same は日本語のまま");
+    Expect(decided_text("kyouhasamewomita").empty(), "文脈: 文の中の same + を は日本語のまま");
+    Expect(decided_text("takewomita").empty(), "文脈: take + を は日本語のまま");
+    Expect(decided_text("kyouhasame").empty(), "文脈: 日本語の文の中の1語だけの same は日本語のまま");
+    Expect(decided_text("sametime") == "sametime|", "文脈: 読みが不自然な2語のつながりは英語");
+    {
+      const auto pieces = decided("sametime");
+      Expect(pieces.size() == 1 && pieces[0].spaces == std::vector<size_t>{4}, "文脈: つながりの語の間に空白");
+    }
+    Expect(decided_text("kyouhasamegoogledesu") == "samegoogle|", "文脈: 英語の隣の same は英語（google の隣）");
+    Expect(english("sametime").empty() && Text("sametime", jaen::SplitEnglish(Parse("sametime"), lexicon, Parse), true).empty(),
+           "文脈の段は、辞書の費用を渡さなければ働かない");
+    Expect(Text("kyouhasamegoogledesu", jaen::SplitEnglish(Parse("kyouhasamegoogledesu"), context, Parse), true) == "google|",
+           "文脈の段を使わないときは今までどおり（same は日本語）");
+
+    // 直前に確定した文字が英字の語で終わるとき（make →変換→確定→空白→ sure の1語ずつ打つ人）。
+    const auto after_english = [&](std::string_view raw, bool previous_english, const jaen::ContextCosts* costs = nullptr) {
+      return Text(raw, jaen::SplitEnglish(Parse(raw), context, Parse, nullptr, nullptr, nullptr, &model, costs, previous_english), true);
+    };
+    Expect(after_english("same", false).empty(), "直前なし: 日本語に読める1語 same は日本語のまま");
+    Expect(after_english("same", true) == "same|", "直前が英語: 1語の same は英語");
+    Expect(after_english("take", true) == "take|", "直前が英語: 1語の take は英語");
+    Expect(after_english("samewomita", true).empty(), "直前が英語でも、助詞が続いて日本語として自然な並びは日本語");
+    Expect(after_english("takewomita", true).empty(), "直前が英語でも、take + を は日本語");
+    Expect(after_english("kyouhasame", true).empty(), "直前が英語でも、入力の途中の1語は今までどおり日本語");
+    Expect(after_english("kyouhasamewomita", true).empty(), "直前が英語でも、文の中の same + を は日本語");
+    Expect(after_english("sametime", true) == "sametime|", "直前が英語: 2語のつながりは今までどおり英語");
+    {
+      jaen::ContextCosts off = jaen::DefaultContextCosts();
+      off.follow_margin = 0;
+      Expect(after_english("same", true, &off).empty(), "follow_margin が 0 なら直前を見ない");
+      jaen::ContextCosts strict = jaen::DefaultContextCosts();
+      strict.follow_margin = 3000;  // 6000 - 3700 = 2300 の差には届かない
+      Expect(after_english("same", true, &strict).empty(), "follow_margin を大きくすると寄せが弱まる");
+    }
+    Expect(jaen::EndsWithEnglishWord("make") && jaen::EndsWithEnglishWord("make ") && jaen::EndsWithEnglishWord("I want to ") &&
+               jaen::EndsWithEnglishWord("今日は Slack ") && jaen::EndsWithEnglishWord("iPhone"),
+           "直前が英字の語で終わる");
+    Expect(!jaen::EndsWithEnglishWord("") && !jaen::EndsWithEnglishWord("今日は") && !jaen::EndsWithEnglishWord("Hello, ") &&
+               !jaen::EndsWithEnglishWord("2024 ") && !jaen::EndsWithEnglishWord("   ") && !jaen::EndsWithEnglishWord("Slackで"),
+           "直前が日本語・記号・数・空で終わる");
   }
 
   Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");
@@ -567,6 +632,43 @@ int main() {
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");
+  }
+
+  {
+    // 日本語に読める略語（ai: あい、ui: うい、ime: いめ）。打った並びに英字が残らない。
+    // 助詞と技術の語が続くときだけ英語にする（tools/data/acronyms.tsv、acronym-cues.tsv）。
+    Expect(english("aiwotsukau") == "ai|", "ai + を + 使う は AI（aiwotsukau）");
+    Expect(english("kyouhaaiwotsukau") == "ai|", "文の途中でも AI を使う");
+    Expect(english("aigakaihatsu") == "ai|", "ai + が + 開発");
+    Expect(english("aiwokanjiru").empty(), "愛を感じる は日本語のまま");
+    Expect(english("ainiikuru").empty(), "会いに行る（手がかりなし）は日本語のまま");
+    Expect(english("aitoheiwa").empty(), "愛と平和 は日本語のまま");
+    Expect(english("aiwo").empty() && english("ai").empty() && english("aiwotsu").empty(), "手がかりが出そろう前は日本語のまま");
+    Expect(english("aiga").empty(), "ai + が だけ（手がかりなし）は日本語のまま");
+    Expect(english("ainotsukai") == "ai|", "ai + の + 使い は AI");
+    Expect(english("naiwotsukau").empty(), "略語は打った文字の区切りから始まる（nai の ai は取らない）");
+    Expect(english("uiwotsukau") == "ui|", "ui + を + 使う は UI");
+    Expect(english("kouiwotsukau") == "ui|", "辞書がないときは行為を使う も取る（下は辞書があるとき）");
+    {
+      const jaen::ReadingCheck is_reading = [](std::string_view kana) { return kana == "こうい"; };
+      const auto pieces = jaen::SplitEnglish(Parse("kouiwotsukau"), lexicon, Parse, nullptr, &is_reading);
+      Expect(Text("kouiwotsukau", pieces, true).empty(), "行為（こうい）の途中の ui は取らない");
+      const auto taken = jaen::SplitEnglish(Parse("aiwotsukau"), lexicon, Parse, nullptr, &is_reading);
+      Expect(Text("aiwotsukau", taken, true) == "ai|", "辞書があっても AI を使う は取る");
+    }
+    {
+      jaen::Choices choices;
+      choices.japanese.insert("ai");
+      const auto pieces = jaen::SplitEnglish(Parse("aiwotsukau"), lexicon, Parse, &choices);
+      Expect(Text("aiwotsukau", pieces, true).empty(), "利用者が日本語に戻した ai は取らない");
+    }
+    // 日本語の語としては使わない並び（方式 plain: seo）は、助詞か文の終わりが続けばよい。
+    Expect(english("seowomita") == "seo|" && english("seodesu") == "seo|" && english("seo") == "seo|", "seo は助詞か文の終わりで取る");
+    Expect(english("seoi").empty(), "せおい（背負い）の seo は取らない（助詞も文の終わりも続かない）");
+    // ime、gui は日本語の語の中にもある（三回目の の ime、手ぬぐいの の gui）ので、手がかりが要る。
+    Expect(english("imewokirikaeru") == "ime|", "ime + を + 切り替え は IME");
+    Expect(english("sannkaimeno").empty(), "三回目の の ime は取らない（辞書がなくても、手がかりがない）");
+    Expect(english("imeji").empty(), "イメージ の ime は取らない");
   }
 
   std::cout << "SUMMARY\t" << failures << '\n';
