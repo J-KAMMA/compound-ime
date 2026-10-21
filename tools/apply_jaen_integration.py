@@ -3643,6 +3643,26 @@ edit("converter/converter.cc",
 edit("converter/converter.cc",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally);",
      "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);")
+# 英語の文を1語ずつ打つ人（make →変換→確定→空白→ sure →変換）: 節: 直前に確定した文字が英字の語で終わっているとき、
+# 次の変換の英語の判定を英語寄りにする。直前の文字は、入力欄の前の文（request.GetSurroundingContext() の左、
+# クライアントが preceding_text で渡したもの）から、空なら変換の履歴（Segments の履歴の最後の文節の先頭の候補）から取る。
+# 英字の語（空白を除いた最後の文字が A-Z、a-z）で終わるなら、入力の最初から終わりまでがまるごと一覧の英単語1語で読める
+# ときだけ、日本語から英語への切り替えの費用を払わず、差 2000（follow_margin）で英語にする。助詞・活用が続く並び
+# （takewotabeta）、入力の途中の語、直前が日本語のときは今までどおり。中身は native/jaen-detector
+# （jaen_detector.cc の EndsWithEnglishWord と decide の follows_text）、converter_reading_check.inc の PreviousEndsInEnglish。
+# MYIME_ENGLISH_FOLLOW=off で止める（既定は有効）。
+edit("converter/converter.cc",
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n",
+     "  const jaen::JapaneseModel* context_model = AllEnglishContextEnabled() ? &japanese_model : nullptr;\n"
+     "  // Whether the text committed just before ends in an English word (typing English one word at a time).\n"
+     "  const bool previous_english = context_model != nullptr && PreviousEndsInEnglish(request, *segments);\n")
+edit("converter/converter.cc",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);",
+     "      jaen::SplitEnglish(chunks, EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model, nullptr, previous_english);")
+edit("converter/converter.cc",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model);",
+     "        jaen::SplitEnglish(parse(fixed_raw), EnglishLexicon(), parse, choices.get(), &is_reading, &reads_naturally, context_model, nullptr, previous_english);")
+
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_reading_check.inc").read_text(encoding="utf-8") + "\n")

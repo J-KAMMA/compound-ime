@@ -69,4 +69,27 @@ bool AllEnglishContextEnabled() {
   }();
   return enabled;
 }
+
+// MYIME_ENGLISH_FOLLOW=off で、直前に確定した文字が英語の語で終わるときの英語寄せ（docs/english-follow.md）を止める。
+bool EnglishFollowEnabled() {
+  static const bool enabled = [] {
+    const char* value = std::getenv("MYIME_ENGLISH_FOLLOW");
+    return value == nullptr || std::string_view(value) != "off";
+  }();
+  return enabled;
+}
+
+// 直前に確定した文字が英字の語で終わっているか。入力欄の前の文（クライアントが渡した preceding_text）があれば
+// それを、なければ変換の履歴（直前に確定した文節の先頭の候補）を見る。
+bool PreviousEndsInEnglish(const ConversionRequest& request, const Segments& segments) {
+  if (!EnglishFollowEnabled()) return false;
+  const auto [left, right] = request.GetSurroundingContext();
+  static_cast<void>(right);
+  if (!left.empty()) return jaen::EndsWithEnglishWord(left);
+  const size_t history = segments.history_segments_size();
+  if (history == 0) return false;
+  const Segment& last = segments.history_segment(history - 1);
+  if (last.candidates_size() == 0) return false;
+  return jaen::EndsWithEnglishWord(last.candidate(0).value);
+}
 }  // namespace

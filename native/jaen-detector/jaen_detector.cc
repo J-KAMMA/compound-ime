@@ -282,8 +282,13 @@ bool InsideNormalSpelling(std::string_view raw, size_t begin, size_t end, const 
 // ---- 文脈で決める段（|japanese| を渡されたとき）----
 const ContextCosts& DefaultContextCosts() {
   static const ContextCosts costs{/*word_base=*/2500, /*per_letter=*/300, /*rare_extra=*/3000, /*common_bonus=*/800,
-                                  /*run_start=*/2000, /*run_end=*/0, /*short_extra=*/1000, /*particle_extra=*/2000, /*one_letter_extra=*/3000, /*margin=*/2000, /*alone_margin=*/3500};
+                                  /*run_start=*/2000, /*run_end=*/0, /*short_extra=*/1000, /*particle_extra=*/2000, /*one_letter_extra=*/3000, /*margin=*/2000, /*alone_margin=*/3500, /*follow_margin=*/2000};
   return costs;
+}
+
+bool EndsWithEnglishWord(std::string_view text) {
+  while (!text.empty() && (text.back() == ' ' || text.back() == '\t')) text.remove_suffix(1);
+  return !text.empty() && IsAsciiAlpha(text.back());
 }
 
 namespace {
@@ -492,7 +497,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
                                 const ReadingCheck* is_reading,
                                 const ReadingCheck* reads_naturally,
                                 const JapaneseModel* japanese_model,
-                                const ContextCosts* context_costs) {
+                                const ContextCosts* context_costs, bool previous_english) {
   ChunkMarks marks = MarkChunks(chunks);
   const std::string& raw = marks.raw;
   const std::vector<bool>& boundary = marks.boundary;
@@ -842,7 +847,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       size_t begin = 0, end = 0;  // gap の中の打った文字の位置
       std::vector<size_t> cuts;   // 語の境（begin より後、end より前）
     };
-    const auto decide = [&](const Piece& gap, bool after_english, bool before_english) -> std::vector<Piece> {
+    // follows_text: この部分は入力の最初で、直前に確定した文字が英語の語で終わっている（英語の隣として扱う）。
+    const auto decide = [&](const Piece& gap, bool after_english, bool before_english, bool follows_text) -> std::vector<Piece> {
       const size_t len = gap.end - gap.begin;
       const std::string sub = raw.substr(gap.begin, len);
       const ChunkMarks local = MarkChunks(parse(sub));
@@ -922,14 +928,31 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       for (size_t p = 0; p + 1 < off.size(); ++p) {
         japanese_model->prefix_words(std::string_view(text).substr(off[p]), &dictionary_words[p]);
       }
-      const LatticeResult plain =
-          RunLattice(*japanese_model, text, off, dictionary_words, {}, after_english, before_english, costs.run_start, costs.run_end);
-      const LatticeResult mixed =
-          RunLattice(*japanese_model, text, off, dictionary_words, edges, after_english, before_english, costs.run_start, costs.run_end);
+      const auto both = [&](bool after) {
+        return std::pair{RunLattice(*japanese_model, text, off, dictionary_words, {}, after, before_english, costs.run_start, costs.run_end),
+                         RunLattice(*japanese_model, text, off, dictionary_words, edges, after, before_english, costs.run_start, costs.run_end)};
+      };
+      std::pair<LatticeResult, LatticeResult> costs_pair = both(after_english);
+      // 直前に確定した文字が英語の語で終わっているとき: 入力の最初から終わりまでがまるごと一覧の語で
+      // 読める1語の走りは、英語の隣として比べる（日本語から英語への切り替えの費用を払わず、差は follow_margin）。
+      // 英語の語のあとに助詞・活用が続く（takenituite、samewomita）なら、日本語の部分が残るので当てはまらず、
+      // 今までどおりの比べ方になる（日本語の文のまま）。
+      bool follow_taken = false;
+      if (follows_text) {
+        auto follow = both(true);
+        if (follow.second.used.size() == 1 && runs[follow.second.used[0]].begin == 0 && runs[follow.second.used[0]].end == len &&
+            runs[follow.second.used[0]].cuts.empty() &&
+            follow.second.cost + costs.follow_margin < follow.first.cost) {
+          costs_pair = std::move(follow);
+          follow_taken = true;
+        }
+      }
+      const LatticeResult& plain = costs_pair.first;
+      const LatticeResult& mixed = costs_pair.second;
       if (mixed.used.empty()) return {gap};
       // 英単語1語だけで、英語の隣でもない（日本語の文の中の1語）なら、日本語としても読めるので、決め手を厳しくする。
       const bool alone = mixed.used.size() == 1 && runs[mixed.used[0]].cuts.empty() && !after_english && !before_english;
-      if (mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
+      if (!follow_taken && mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
       std::vector<Piece> result;
       size_t at = 0;
       for (const size_t e : mixed.used) {
@@ -951,6 +974,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       if (at < len) result.push_back({gap.begin + at, gap.end, false, {}});
       return result;
     };
+    const int costs_follow = costs.follow_margin;
     std::vector<Piece> out;
     for (size_t k = 0; k < pieces.size(); ++k) {
       if (pieces[k].english) {
@@ -959,7 +983,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       }
       const bool after_english = !out.empty() && out.back().english;
       const bool before_english = k + 1 < pieces.size() && pieces[k + 1].english;
-      for (Piece& piece : decide(pieces[k], after_english, before_english)) out.push_back(std::move(piece));
+      const bool follows_text = k == 0 && previous_english && costs_follow > 0;
+      for (Piece& piece : decide(pieces[k], after_english, before_english, follows_text)) out.push_back(std::move(piece));
     }
     // 隣り合う英語をつなぐ。つないだ形が単語でなければ、つなぎ目に空白を入れる。
     pieces.clear();

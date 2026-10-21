@@ -1,0 +1,949 @@
+# 英語の語のあとに日本語の文を打つ場面。日本語のままであること（英字に化けない）を期待する。tools/make_english_follow_tests.py で作成。列: ローマ字<TAB>期待する文<TAB>前の文
+watashihatakegasukidesu	私は竹が好きです	Slack 
+watashihatakegasukidesu	私は竹が好きです	今日は meeting 
+takenituiteshirabeta	竹について調べた	I want to 
+takenituiteshirabeta	竹について調べた	Google
+kyouhatakenokotowokangaeteiru	今日は竹のことを考えている	make 
+kyouhatakenokotowokangaeteiru	今日は竹のことを考えている	iPhone 
+sorehaonajitakedesu	それは同じ竹です	今日は meeting 
+sorehaonajitakedesu	それは同じ竹です	Please
+takegaarimasu	竹があります	Google
+takegaarimasu	竹があります	Notion 
+sakekarahajimeyou	酒から始めよう	iPhone 
+sakekarahajimeyou	酒から始めよう	Slack 
+sakedehanaku	酒ではなく	Please
+sakedehanaku	酒ではなく	I want to 
+sakenituiteshirabeta	酒について調べた	Notion 
+sakenituiteshirabeta	酒について調べた	make 
+ashitamosakewotsukau	明日も酒を使う	Slack 
+ashitamosakewotsukau	明日も酒を使う	今日は meeting 
+watashihasakegasukidesu	私は酒が好きです	I want to 
+watashihasakegasukidesu	私は酒が好きです	Google
+kanenituiteshirabeta	金について調べた	make 
+kanenituiteshirabeta	金について調べた	iPhone 
+kanegaarimasu	金があります	今日は meeting 
+kanegaarimasu	金があります	Please
+kanedehanaku	金ではなく	Google
+kanedehanaku	金ではなく	Notion 
+kinounokanehadokodesuka	昨日の金はどこですか	iPhone 
+kinounokanehadokodesuka	昨日の金はどこですか	Slack 
+sorehaonajikanedesu	それは同じ金です	Please
+sorehaonajikanedesu	それは同じ金です	I want to 
+watashihasamegasukidesu	私は鮫が好きです	Notion 
+watashihasamegasukidesu	私は鮫が好きです	make 
+sorehaonajisamedesu	それは同じ鮫です	Slack 
+sorehaonajisamedesu	それは同じ鮫です	今日は meeting 
+samewokaimashita	鮫を買いました	I want to 
+samewokaimashita	鮫を買いました	Google
+samegaarimasu	鮫があります	make 
+samegaarimasu	鮫があります	iPhone 
+samedehanaku	鮫ではなく	今日は meeting 
+samedehanaku	鮫ではなく	Please
+hatekarahajimeyou	果てから始めよう	Google
+hatekarahajimeyou	果てから始めよう	Notion 
+hatenituiteshirabeta	果てについて調べた	iPhone 
+hatenituiteshirabeta	果てについて調べた	Slack 
+hatedehanaku	果てではなく	Please
+hatedehanaku	果てではなく	I want to 
+ashitamohatewotsukau	明日も果てを使う	Notion 
+ashitamohatewotsukau	明日も果てを使う	make 
+hategaarimasu	果てがあります	Slack 
+hategaarimasu	果てがあります	今日は meeting 
+ashitamohonwotsukau	明日も本を使う	I want to 
+ashitamohonwotsukau	明日も本を使う	Google
+honkarahajimeyou	本から始めよう	make 
+honkarahajimeyou	本から始めよう	iPhone 
+honwokaimashita	本を買いました	今日は meeting 
+honwokaimashita	本を買いました	Please
+sorehaonajihondesu	それは同じ本です	Google
+sorehaonajihondesu	それは同じ本です	Notion 
+honnituiteshirabeta	本について調べた	iPhone 
+honnituiteshirabeta	本について調べた	Slack 
+menkarahajimeyou	麺から始めよう	Please
+menkarahajimeyou	麺から始めよう	I want to 
+kyouhamennokotowokangaeteiru	今日は麺のことを考えている	Notion 
+kyouhamennokotowokangaeteiru	今日は麺のことを考えている	make 
+watashihamengasukidesu	私は麺が好きです	Slack 
+watashihamengasukidesu	私は麺が好きです	今日は meeting 
+mennituiteshirabeta	麺について調べた	I want to 
+mennituiteshirabeta	麺について調べた	Google
+kinounomenhadokodesuka	昨日の麺はどこですか	make 
+kinounomenhadokodesuka	昨日の麺はどこですか	iPhone 
+watashihakengasukidesu	私は県が好きです	今日は meeting 
+watashihakengasukidesu	私は県が好きです	Please
+kenwokaimashita	県を買いました	Google
+kenwokaimashita	県を買いました	Notion 
+ashitamokenwotsukau	明日も県を使う	iPhone 
+ashitamokenwotsukau	明日も県を使う	Slack 
+kinounokenhadokodesuka	昨日の県はどこですか	Please
+kinounokenhadokodesuka	昨日の県はどこですか	I want to 
+kendehanaku	県ではなく	Notion 
+kendehanaku	県ではなく	make 
+senkarahajimeyou	線から始めよう	Slack 
+senkarahajimeyou	線から始めよう	今日は meeting 
+sengaarimasu	線があります	I want to 
+sengaarimasu	線があります	Google
+ashitamosenwotsukau	明日も線を使う	make 
+ashitamosenwotsukau	明日も線を使う	iPhone 
+kinounosenhadokodesuka	昨日の線はどこですか	今日は meeting 
+kinounosenhadokodesuka	昨日の線はどこですか	Please
+sennituiteshirabeta	線について調べた	Google
+sennituiteshirabeta	線について調べた	Notion 
+sonwokaimashita	損を買いました	iPhone 
+sonwokaimashita	損を買いました	Slack 
+kyouhasonnokotowokangaeteiru	今日は損のことを考えている	Please
+kyouhasonnokotowokangaeteiru	今日は損のことを考えている	I want to 
+sondehanaku	損ではなく	Notion 
+sondehanaku	損ではなく	make 
+songaarimasu	損があります	Slack 
+songaarimasu	損があります	今日は meeting 
+watashihasongasukidesu	私は損が好きです	I want to 
+watashihasongasukidesu	私は損が好きです	Google
+banwokaimashita	番を買いました	make 
+banwokaimashita	番を買いました	iPhone 
+kinounobanhadokodesuka	昨日の番はどこですか	今日は meeting 
+kinounobanhadokodesuka	昨日の番はどこですか	Please
+kyouhabannokotowokangaeteiru	今日は番のことを考えている	Google
+kyouhabannokotowokangaeteiru	今日は番のことを考えている	Notion 
+bankarahajimeyou	番から始めよう	iPhone 
+bankarahajimeyou	番から始めよう	Slack 
+watashihabangasukidesu	私は番が好きです	Please
+watashihabangasukidesu	私は番が好きです	I want to 
+kinounosanhadokodesuka	昨日の三はどこですか	Notion 
+kinounosanhadokodesuka	昨日の三はどこですか	make 
+sangaarimasu	三があります	Slack 
+sangaarimasu	三があります	今日は meeting 
+ashitamosanwotsukau	明日も三を使う	I want to 
+ashitamosanwotsukau	明日も三を使う	Google
+sankarahajimeyou	三から始めよう	make 
+sankarahajimeyou	三から始めよう	iPhone 
+sanwokaimashita	三を買いました	今日は meeting 
+sanwokaimashita	三を買いました	Please
+tendehanaku	点ではなく	Google
+tendehanaku	点ではなく	Notion 
+tengaarimasu	点があります	iPhone 
+tengaarimasu	点があります	Slack 
+sorehaonajitendesu	それは同じ点です	Please
+sorehaonajitendesu	それは同じ点です	I want to 
+ashitamotenwotsukau	明日も点を使う	Notion 
+ashitamotenwotsukau	明日も点を使う	make 
+tennituiteshirabeta	点について調べた	Slack 
+tennituiteshirabeta	点について調べた	今日は meeting 
+jinwokaimashita	人を買いました	I want to 
+jinwokaimashita	人を買いました	Google
+jingaarimasu	人があります	make 
+jingaarimasu	人があります	iPhone 
+kinounojinhadokodesuka	昨日の人はどこですか	今日は meeting 
+kinounojinhadokodesuka	昨日の人はどこですか	Please
+watashihajingasukidesu	私は人が好きです	Google
+watashihajingasukidesu	私は人が好きです	Notion 
+jinkarahajimeyou	人から始めよう	iPhone 
+jinkarahajimeyou	人から始めよう	Slack 
+sorehaonajimindesu	それは同じ民です	Please
+sorehaonajimindesu	それは同じ民です	I want to 
+mindehanaku	民ではなく	Notion 
+mindehanaku	民ではなく	make 
+ashitamominwotsukau	明日も民を使う	Slack 
+ashitamominwotsukau	明日も民を使う	今日は meeting 
+minkarahajimeyou	民から始めよう	I want to 
+minkarahajimeyou	民から始めよう	Google
+kyouhaminnokotowokangaeteiru	今日は民のことを考えている	make 
+kyouhaminnokotowokangaeteiru	今日は民のことを考えている	iPhone 
+hennituiteshirabeta	辺について調べた	今日は meeting 
+hennituiteshirabeta	辺について調べた	Please
+hendehanaku	辺ではなく	Google
+hendehanaku	辺ではなく	Notion 
+kyouhahennokotowokangaeteiru	今日は辺のことを考えている	iPhone 
+kyouhahennokotowokangaeteiru	今日は辺のことを考えている	Slack 
+watashihahengasukidesu	私は辺が好きです	Please
+watashihahengasukidesu	私は辺が好きです	I want to 
+kinounohenhadokodesuka	昨日の辺はどこですか	Notion 
+kinounohenhadokodesuka	昨日の辺はどこですか	make 
+ashitamobinwotsukau	明日も瓶を使う	Slack 
+ashitamobinwotsukau	明日も瓶を使う	今日は meeting 
+binwokaimashita	瓶を買いました	I want to 
+binwokaimashita	瓶を買いました	Google
+bingaarimasu	瓶があります	make 
+bingaarimasu	瓶があります	iPhone 
+kinounobinhadokodesuka	昨日の瓶はどこですか	今日は meeting 
+kinounobinhadokodesuka	昨日の瓶はどこですか	Please
+watashihabingasukidesu	私は瓶が好きです	Google
+watashihabingasukidesu	私は瓶が好きです	Notion 
+sorehaonajikindesu	それは同じ金です	iPhone 
+sorehaonajikindesu	それは同じ金です	Slack 
+watashihakingasukidesu	私は金が好きです	Please
+watashihakingasukidesu	私は金が好きです	I want to 
+kinkarahajimeyou	金から始めよう	Notion 
+kinkarahajimeyou	金から始めよう	make 
+kindehanaku	金ではなく	Slack 
+kindehanaku	金ではなく	今日は meeting 
+kingaarimasu	金があります	I want to 
+kingaarimasu	金があります	Google
+minegaarimasu	峰があります	make 
+minegaarimasu	峰があります	iPhone 
+minekarahajimeyou	峰から始めよう	今日は meeting 
+minekarahajimeyou	峰から始めよう	Please
+kyouhaminenokotowokangaeteiru	今日は峰のことを考えている	Google
+kyouhaminenokotowokangaeteiru	今日は峰のことを考えている	Notion 
+minewokaimashita	峰を買いました	iPhone 
+minewokaimashita	峰を買いました	Slack 
+kinounominehadokodesuka	昨日の峰はどこですか	Please
+kinounominehadokodesuka	昨日の峰はどこですか	I want to 
+watashihamaregasukidesu	私は稀が好きです	Notion 
+watashihamaregasukidesu	私は稀が好きです	make 
+marewokaimashita	稀を買いました	Slack 
+marewokaimashita	稀を買いました	今日は meeting 
+marekarahajimeyou	稀から始めよう	I want to 
+marekarahajimeyou	稀から始めよう	Google
+sorehaonajimaredesu	それは同じ稀です	make 
+sorehaonajimaredesu	それは同じ稀です	iPhone 
+kinounomarehadokodesuka	昨日の稀はどこですか	今日は meeting 
+kinounomarehadokodesuka	昨日の稀はどこですか	Please
+sorehaonajikaredesu	それは同じ彼です	Google
+sorehaonajikaredesu	それは同じ彼です	Notion 
+karenituiteshirabeta	彼について調べた	iPhone 
+karenituiteshirabeta	彼について調べた	Slack 
+kinounokarehadokodesuka	昨日の彼はどこですか	Please
+kinounokarehadokodesuka	昨日の彼はどこですか	I want to 
+karewokaimashita	彼を買いました	Notion 
+karewokaimashita	彼を買いました	make 
+karegaarimasu	彼があります	Slack 
+karegaarimasu	彼があります	今日は meeting 
+kyouhadarenokotowokangaeteiru	今日は誰のことを考えている	I want to 
+kyouhadarenokotowokangaeteiru	今日は誰のことを考えている	Google
+ashitamodarewotsukau	明日も誰を使う	make 
+ashitamodarewotsukau	明日も誰を使う	iPhone 
+watashihadaregasukidesu	私は誰が好きです	今日は meeting 
+watashihadaregasukidesu	私は誰が好きです	Please
+darekarahajimeyou	誰から始めよう	Google
+darekarahajimeyou	誰から始めよう	Notion 
+sorehaonajidaredesu	それは同じ誰です	iPhone 
+sorehaonajidaredesu	それは同じ誰です	Slack 
+honenituiteshirabeta	骨について調べた	Please
+honenituiteshirabeta	骨について調べた	I want to 
+watashihahonegasukidesu	私は骨が好きです	Notion 
+watashihahonegasukidesu	私は骨が好きです	make 
+honedehanaku	骨ではなく	Slack 
+honedehanaku	骨ではなく	今日は meeting 
+kyouhahonenokotowokangaeteiru	今日は骨のことを考えている	I want to 
+kyouhahonenokotowokangaeteiru	今日は骨のことを考えている	Google
+sorehaonajihonedesu	それは同じ骨です	make 
+sorehaonajihonedesu	それは同じ骨です	iPhone 
+kyouhaagonokotowokangaeteiru	今日は顎のことを考えている	今日は meeting 
+kyouhaagonokotowokangaeteiru	今日は顎のことを考えている	Please
+agowokaimashita	顎を買いました	Google
+agowokaimashita	顎を買いました	Notion 
+agokarahajimeyou	顎から始めよう	iPhone 
+agokarahajimeyou	顎から始めよう	Slack 
+agogaarimasu	顎があります	Please
+agogaarimasu	顎があります	I want to 
+agonituiteshirabeta	顎について調べた	Notion 
+agonituiteshirabeta	顎について調べた	make 
+sorehaonajinumadesu	それは同じ沼です	Slack 
+sorehaonajinumadesu	それは同じ沼です	今日は meeting 
+kinounonumahadokodesuka	昨日の沼はどこですか	I want to 
+kinounonumahadokodesuka	昨日の沼はどこですか	Google
+kyouhanumanokotowokangaeteiru	今日は沼のことを考えている	make 
+kyouhanumanokotowokangaeteiru	今日は沼のことを考えている	iPhone 
+numadehanaku	沼ではなく	今日は meeting 
+numadehanaku	沼ではなく	Please
+numakarahajimeyou	沼から始めよう	Google
+numakarahajimeyou	沼から始めよう	Notion 
+tunagaarimasu	綱があります	iPhone 
+tunagaarimasu	綱があります	Slack 
+ashitamotunawotsukau	明日も綱を使う	Please
+ashitamotunawotsukau	明日も綱を使う	I want to 
+kinounotunahadokodesuka	昨日の綱はどこですか	Notion 
+kinounotunahadokodesuka	昨日の綱はどこですか	make 
+tunawokaimashita	綱を買いました	Slack 
+tunawokaimashita	綱を買いました	今日は meeting 
+tunakarahajimeyou	綱から始めよう	I want to 
+tunakarahajimeyou	綱から始めよう	Google
+tubawokaimashita	唾を買いました	make 
+tubawokaimashita	唾を買いました	iPhone 
+ashitamotubawotsukau	明日も唾を使う	今日は meeting 
+ashitamotubawotsukau	明日も唾を使う	Please
+sorehaonajitubadesu	それは同じ唾です	Google
+sorehaonajitubadesu	それは同じ唾です	Notion 
+kyouhatubanokotowokangaeteiru	今日は唾のことを考えている	iPhone 
+kyouhatubanokotowokangaeteiru	今日は唾のことを考えている	Slack 
+tubanituiteshirabeta	唾について調べた	Please
+tubanituiteshirabeta	唾について調べた	I want to 
+kyouhaisonokotowokangaeteiru	今日は磯のことを考えている	Notion 
+kyouhaisonokotowokangaeteiru	今日は磯のことを考えている	make 
+isogaarimasu	磯があります	Slack 
+isogaarimasu	磯があります	今日は meeting 
+isonituiteshirabeta	磯について調べた	I want to 
+isonituiteshirabeta	磯について調べた	Google
+isowokaimashita	磯を買いました	make 
+isowokaimashita	磯を買いました	iPhone 
+sorehaonajiisodesu	それは同じ磯です	今日は meeting 
+sorehaonajiisodesu	それは同じ磯です	Please
+kinounosagahadokodesuka	昨日の佐賀はどこですか	Google
+kinounosagahadokodesuka	昨日の佐賀はどこですか	Notion 
+sagakarahajimeyou	佐賀から始めよう	iPhone 
+sagakarahajimeyou	佐賀から始めよう	Slack 
+watashihasagagasukidesu	私は佐賀が好きです	Please
+watashihasagagasukidesu	私は佐賀が好きです	I want to 
+ashitamosagawotsukau	明日も佐賀を使う	Notion 
+ashitamosagawotsukau	明日も佐賀を使う	make 
+kyouhasaganokotowokangaeteiru	今日は佐賀のことを考えている	Slack 
+kyouhasaganokotowokangaeteiru	今日は佐賀のことを考えている	今日は meeting 
+tangonituiteshirabeta	丹後について調べた	I want to 
+tangonituiteshirabeta	丹後について調べた	Google
+kyouhatangonokotowokangaeteiru	今日は丹後のことを考えている	make 
+kyouhatangonokotowokangaeteiru	今日は丹後のことを考えている	iPhone 
+tangogaarimasu	丹後があります	今日は meeting 
+tangogaarimasu	丹後があります	Please
+tangowokaimashita	丹後を買いました	Google
+tangowokaimashita	丹後を買いました	Notion 
+sorehaonajitangodesu	それは同じ丹後です	iPhone 
+sorehaonajitangodesu	それは同じ丹後です	Slack 
+bingowokaimashita	備後を買いました	Please
+bingowokaimashita	備後を買いました	I want to 
+bingodehanaku	備後ではなく	Notion 
+bingodehanaku	備後ではなく	make 
+sorehaonajibingodesu	それは同じ備後です	Slack 
+sorehaonajibingodesu	それは同じ備後です	今日は meeting 
+bingokarahajimeyou	備後から始めよう	I want to 
+bingokarahajimeyou	備後から始めよう	Google
+kinounobingohadokodesuka	昨日の備後はどこですか	make 
+kinounobingohadokodesuka	昨日の備後はどこですか	iPhone 
+ashitamokimonowotsukau	明日も着物を使う	今日は meeting 
+ashitamokimonowotsukau	明日も着物を使う	Please
+kimonogaarimasu	着物があります	Google
+kimonogaarimasu	着物があります	Notion 
+sorehaonajikimonodesu	それは同じ着物です	iPhone 
+sorehaonajikimonodesu	それは同じ着物です	Slack 
+kyouhakimononokotowokangaeteiru	今日は着物のことを考えている	Please
+kyouhakimononokotowokangaeteiru	今日は着物のことを考えている	I want to 
+kimonodehanaku	着物ではなく	Notion 
+kimonodehanaku	着物ではなく	make 
+karatenituiteshirabeta	空手について調べた	Slack 
+karatenituiteshirabeta	空手について調べた	今日は meeting 
+sorehaonajikaratedesu	それは同じ空手です	I want to 
+sorehaonajikaratedesu	それは同じ空手です	Google
+kyouhakaratenokotowokangaeteiru	今日は空手のことを考えている	make 
+kyouhakaratenokotowokangaeteiru	今日は空手のことを考えている	iPhone 
+karatekarahajimeyou	空手から始めよう	今日は meeting 
+karatekarahajimeyou	空手から始めよう	Please
+kinounokaratehadokodesuka	昨日の空手はどこですか	Google
+kinounokaratehadokodesuka	昨日の空手はどこですか	Notion 
+kohakukarahajimeyou	琥珀から始めよう	iPhone 
+kohakukarahajimeyou	琥珀から始めよう	Slack 
+kohakudehanaku	琥珀ではなく	Please
+kohakudehanaku	琥珀ではなく	I want to 
+watashihakohakugasukidesu	私は琥珀が好きです	Notion 
+watashihakohakugasukidesu	私は琥珀が好きです	make 
+kohakunituiteshirabeta	琥珀について調べた	Slack 
+kohakunituiteshirabeta	琥珀について調べた	今日は meeting 
+kyouhakohakunokotowokangaeteiru	今日は琥珀のことを考えている	I want to 
+kyouhakohakunokotowokangaeteiru	今日は琥珀のことを考えている	Google
+watashihadotegasukidesu	私は土手が好きです	make 
+watashihadotegasukidesu	私は土手が好きです	iPhone 
+kyouhadotenokotowokangaeteiru	今日は土手のことを考えている	今日は meeting 
+kyouhadotenokotowokangaeteiru	今日は土手のことを考えている	Please
+dotegaarimasu	土手があります	Google
+dotegaarimasu	土手があります	Notion 
+dotekarahajimeyou	土手から始めよう	iPhone 
+dotekarahajimeyou	土手から始めよう	Slack 
+dotenituiteshirabeta	土手について調べた	Please
+dotenituiteshirabeta	土手について調べた	I want to 
+shakegaarimasu	鮭があります	Notion 
+shakegaarimasu	鮭があります	make 
+watashihashakegasukidesu	私は鮭が好きです	Slack 
+watashihashakegasukidesu	私は鮭が好きです	今日は meeting 
+sorehaonajishakedesu	それは同じ鮭です	I want to 
+sorehaonajishakedesu	それは同じ鮭です	Google
+ashitamoshakewotsukau	明日も鮭を使う	make 
+ashitamoshakewotsukau	明日も鮭を使う	iPhone 
+shakekarahajimeyou	鮭から始めよう	今日は meeting 
+shakekarahajimeyou	鮭から始めよう	Please
+domedehanaku	度目ではなく	Google
+domedehanaku	度目ではなく	Notion 
+kyouhadomenokotowokangaeteiru	今日は度目のことを考えている	iPhone 
+kyouhadomenokotowokangaeteiru	今日は度目のことを考えている	Slack 
+domenituiteshirabeta	度目について調べた	Please
+domenituiteshirabeta	度目について調べた	I want to 
+domewokaimashita	度目を買いました	Notion 
+domewokaimashita	度目を買いました	make 
+domegaarimasu	度目があります	Slack 
+domegaarimasu	度目があります	今日は meeting 
+mamawokaimashita	ままを買いました	I want to 
+mamawokaimashita	ままを買いました	Google
+sorehaonajimamadesu	それは同じままです	make 
+sorehaonajimamadesu	それは同じままです	iPhone 
+kyouhamamanokotowokangaeteiru	今日はままのことを考えている	今日は meeting 
+kyouhamamanokotowokangaeteiru	今日はままのことを考えている	Please
+mamadehanaku	ままではなく	Google
+mamadehanaku	ままではなく	Notion 
+ashitamomamawotsukau	明日もままを使う	iPhone 
+ashitamomamawotsukau	明日もままを使う	Slack 
+hobodehanaku	ほぼではなく	Please
+hobodehanaku	ほぼではなく	I want to 
+hobowokaimashita	ほぼを買いました	Notion 
+hobowokaimashita	ほぼを買いました	make 
+kinounohobohadokodesuka	昨日のほぼはどこですか	Slack 
+kinounohobohadokodesuka	昨日のほぼはどこですか	今日は meeting 
+hobokarahajimeyou	ほぼから始めよう	I want to 
+hobokarahajimeyou	ほぼから始めよう	Google
+ashitamohobowotsukau	明日もほぼを使う	make 
+ashitamohobowotsukau	明日もほぼを使う	iPhone 
+kyouhasonatanokotowokangaeteiru	今日はそなたのことを考えている	今日は meeting 
+kyouhasonatanokotowokangaeteiru	今日はそなたのことを考えている	Please
+sonatakarahajimeyou	そなたから始めよう	Google
+sonatakarahajimeyou	そなたから始めよう	Notion 
+sonatawokaimashita	そなたを買いました	iPhone 
+sonatawokaimashita	そなたを買いました	Slack 
+sonatanituiteshirabeta	そなたについて調べた	Please
+sonatanituiteshirabeta	そなたについて調べた	I want to 
+sonatagaarimasu	そなたがあります	Notion 
+sonatagaarimasu	そなたがあります	make 
+kanarazuhometai	必ず褒めたい	Slack 
+kanarazuhometai	必ず褒めたい	今日は meeting 
+kyouhahomerareru	今日は褒められる	I want to 
+kyouhahomerareru	今日は褒められる	Google
+kyouhahomemasu	今日は褒めます	make 
+kyouhahomemasu	今日は褒めます	iPhone 
+hometa	褒めた	今日は meeting 
+hometa	褒めた	Please
+kanarazumaketai	必ず負けたい	Google
+kanarazumaketai	必ず負けたい	Notion 
+kanarazumakete	必ず負けて	iPhone 
+kanarazumakete	必ず負けて	Slack 
+kanarazumaketa	必ず負けた	Please
+kanarazumaketa	必ず負けた	I want to 
+makeru	負ける	Notion 
+makeru	負ける	make 
+sameta	冷めた	Slack 
+sameta	冷めた	今日は meeting 
+samerareru	冷められる	I want to 
+samerareru	冷められる	Google
+kinousamemasuka	昨日冷めますか	make 
+kinousamemasuka	昨日冷めますか	iPhone 
+kanarazusametai	必ず冷めたい	今日は meeting 
+kanarazusametai	必ず冷めたい	Please
+kanarazutaketai	必ず炊けたい	Google
+kanarazutaketai	必ず炊けたい	Notion 
+kinoutakerareru	昨日炊けられる	iPhone 
+kinoutakerareru	昨日炊けられる	Slack 
+kyouhatakeru	今日は炊ける	Please
+kyouhatakeru	今日は炊ける	I want to 
+takemasu	炊けます	Notion 
+takemasu	炊けます	make 
+kyouhamoreru	今日は漏れる	Slack 
+kyouhamoreru	今日は漏れる	今日は meeting 
+kanarazumoremasuka	必ず漏れますか	I want to 
+kanarazumoremasuka	必ず漏れますか	Google
+moremasu	漏れます	make 
+moremasu	漏れます	iPhone 
+kyouhamoretai	今日は漏れたい	今日は meeting 
+kyouhamoretai	今日は漏れたい	Please
+kyouhatoretai	今日は取れたい	Google
+kyouhatoretai	今日は取れたい	Notion 
+kyouhatorerareru	今日は取れられる	iPhone 
+kyouhatorerareru	今日は取れられる	Slack 
+kinoutorete	昨日取れて	Please
+kinoutorete	昨日取れて	I want to 
+kanarazutoreta	必ず取れた	Notion 
+kanarazutoreta	必ず取れた	make 
+kinoutomemasu	昨日止めます	Slack 
+kinoutomemasu	昨日止めます	今日は meeting 
+kanarazutomerareru	必ず止められる	I want to 
+kanarazutomerareru	必ず止められる	Google
+kanarazutomemasuka	必ず止めますか	make 
+kanarazutomemasuka	必ず止めますか	iPhone 
+kinoutomenai	昨日止めない	今日は meeting 
+kinoutomenai	昨日止めない	Please
+mazemasu	混ぜます	Google
+mazemasu	混ぜます	Notion 
+kanarazumazeru	必ず混ぜる	iPhone 
+kanarazumazeru	必ず混ぜる	Slack 
+kanarazumazerareru	必ず混ぜられる	Please
+kanarazumazerareru	必ず混ぜられる	I want to 
+kinoumazenai	昨日混ぜない	Notion 
+kinoumazenai	昨日混ぜない	make 
+kanarazuatetai	必ず当てたい	Slack 
+kanarazuatetai	必ず当てたい	今日は meeting 
+kyouhaaterareru	今日は当てられる	I want to 
+kyouhaaterareru	今日は当てられる	Google
+ateta	当てた	make 
+ateta	当てた	iPhone 
+kinouateru	昨日当てる	今日は meeting 
+kinouateru	昨日当てる	Please
+noseta	乗せた	Google
+noseta	乗せた	Notion 
+nosete	乗せて	iPhone 
+nosete	乗せて	Slack 
+kinounoserareru	昨日乗せられる	Please
+kinounoserareru	昨日乗せられる	I want to 
+kinounosenai	昨日乗せない	Notion 
+kinounosenai	昨日乗せない	make 
+yokenai	避けない	Slack 
+yokenai	避けない	今日は meeting 
+kyouhayokete	今日は避けて	I want to 
+kyouhayokete	今日は避けて	Google
+yokemasu	避けます	make 
+yokemasu	避けます	iPhone 
+kanarazuyoketa	必ず避けた	今日は meeting 
+kanarazuyoketa	必ず避けた	Please
+kanarazusageru	必ず下げる	Google
+kanarazusageru	必ず下げる	Notion 
+kyouhasagetai	今日は下げたい	iPhone 
+kyouhasagetai	今日は下げたい	Slack 
+kinousagemasu	昨日下げます	Please
+kinousagemasu	昨日下げます	I want to 
+kinousagerareru	昨日下げられる	Notion 
+kinousagerareru	昨日下げられる	make 
+kyouhabaketa	今日は化けた	Slack 
+kyouhabaketa	今日は化けた	今日は meeting 
+bakeru	化ける	I want to 
+bakeru	化ける	Google
+kinoubakenai	昨日化けない	make 
+kinoubakenai	昨日化けない	iPhone 
+baketai	化けたい	今日は meeting 
+baketai	化けたい	Please
+kinouhoeta	昨日吠えた	Google
+kinouhoeta	昨日吠えた	Notion 
+hoemasuka	吠えますか	iPhone 
+hoemasuka	吠えますか	Slack 
+hoete	吠えて	Please
+hoete	吠えて	I want to 
+kanarazuhoeru	必ず吠える	Notion 
+kanarazuhoeru	必ず吠える	make 
+kyouhahuemasu	今日は増えます	Slack 
+kyouhahuemasu	今日は増えます	今日は meeting 
+huemasuka	増えますか	I want to 
+huemasuka	増えますか	Google
+kinouhuerareru	昨日増えられる	make 
+kinouhuerareru	昨日増えられる	iPhone 
+kyouhahuenai	今日は増えない	今日は meeting 
+kyouhahuenai	今日は増えない	Please
+kyouhafumetai	今日は踏めたい	Google
+kyouhafumetai	今日は踏めたい	Notion 
+kinoufumemasu	昨日踏めます	iPhone 
+kinoufumemasu	昨日踏めます	Slack 
+fumemasuka	踏めますか	Please
+fumemasuka	踏めますか	I want to 
+fumeru	踏める	Notion 
+fumeru	踏める	make 
+kyouhamanemasu	今日は真似ます	Slack 
+kyouhamanemasu	今日は真似ます	今日は meeting 
+kanarazumanerareru	必ず真似られる	I want to 
+kanarazumanerareru	必ず真似られる	Google
+kinoumanenai	昨日真似ない	make 
+kinoumanenai	昨日真似ない	iPhone 
+kyouhamanetai	今日は真似たい	今日は meeting 
+kyouhamanetai	今日は真似たい	Please
+kyouhanameta	今日は舐めた	Google
+kyouhanameta	今日は舐めた	Notion 
+kanarazunamenai	必ず舐めない	iPhone 
+kanarazunamenai	必ず舐めない	Slack 
+kanarazunamemasu	必ず舐めます	Please
+kanarazunamemasu	必ず舐めます	I want to 
+kanarazunameru	必ず舐める	Notion 
+kanarazunameru	必ず舐める	make 
+kanarazusomemasuka	必ず染めますか	Slack 
+kanarazusomemasuka	必ず染めますか	今日は meeting 
+kanarazusomeru	必ず染める	I want to 
+kanarazusomeru	必ず染める	Google
+somemasu	染めます	make 
+somemasu	染めます	iPhone 
+somete	染めて	今日は meeting 
+somete	染めて	Please
+kinouboremasuka	昨日惚れますか	Google
+kinouboremasuka	昨日惚れますか	Notion 
+borerareru	惚れられる	iPhone 
+borerareru	惚れられる	Slack 
+kanarazuborenai	必ず惚れない	Please
+kanarazuborenai	必ず惚れない	I want to 
+kanarazuboreru	必ず惚れる	Notion 
+kanarazuboreru	必ず惚れる	make 
+kanarazuhikerareru	必ず引けられる	Slack 
+kanarazuhikerareru	必ず引けられる	今日は meeting 
+hikete	引けて	I want to 
+hikete	引けて	Google
+kinouhikemasuka	昨日引けますか	make 
+kinouhikemasuka	昨日引けますか	iPhone 
+kinouhikenai	昨日引けない	今日は meeting 
+kinouhikenai	昨日引けない	Please
+kinouabite	昨日浴びて	Google
+kinouabite	昨日浴びて	Notion 
+kyouhaabimasu	今日は浴びます	iPhone 
+kyouhaabimasu	今日は浴びます	Slack 
+kinouabitai	昨日浴びたい	Please
+kinouabitai	昨日浴びたい	I want to 
+kyouhaabirareru	今日は浴びられる	Notion 
+kyouhaabirareru	今日は浴びられる	make 
+kanarazutameta	必ず貯めた	Slack 
+kanarazutameta	必ず貯めた	今日は meeting 
+kyouhatamerareru	今日は貯められる	I want to 
+kyouhatamerareru	今日は貯められる	Google
+tameru	貯める	make 
+tameru	貯める	iPhone 
+tamemasu	貯めます	今日は meeting 
+tamemasu	貯めます	Please
+kanarazuhatemasu	必ず果てます	Google
+kanarazuhatemasu	必ず果てます	Notion 
+hateta	果てた	iPhone 
+hateta	果てた	Slack 
+kyouhahaterareru	今日は果てられる	Please
+kyouhahaterareru	今日は果てられる	I want to 
+kyouhahatetai	今日は果てたい	Notion 
+kyouhahatetai	今日は果てたい	make 
+kinoumateta	昨日待てた	Slack 
+kinoumateta	昨日待てた	今日は meeting 
+kinoumatete	昨日待てて	I want to 
+kinoumatete	昨日待てて	Google
+kyouhamatenai	今日は待てない	make 
+kyouhamatenai	今日は待てない	iPhone 
+kanarazumateru	必ず待てる	今日は meeting 
+kanarazumateru	必ず待てる	Please
+kyouhahareru	今日は晴れる	Google
+kyouhahareru	今日は晴れる	Notion 
+kinouharetai	昨日晴れたい	iPhone 
+kinouharetai	昨日晴れたい	Slack 
+kyouhaharete	今日は晴れて	Please
+kyouhaharete	今日は晴れて	I want to 
+haremasu	晴れます	Notion 
+haremasu	晴れます	make 
+urirareru	売りられる	Slack 
+urirareru	売りられる	今日は meeting 
+uriru	売りる	I want to 
+uriru	売りる	Google
+urinai	売りない	make 
+urinai	売りない	iPhone 
+kinouuritai	昨日売りたい	今日は meeting 
+kinouuritai	昨日売りたい	Please
+hosenai	干せない	Google
+hosenai	干せない	Notion 
+kanarazuhosemasuka	必ず干せますか	iPhone 
+kanarazuhosemasuka	必ず干せますか	Slack 
+kanarazuhoserareru	必ず干せられる	Please
+kanarazuhoserareru	必ず干せられる	I want to 
+kyouhahoseta	今日は干せた	Notion 
+kyouhahoseta	今日は干せた	make 
+fusete	付せて	Slack 
+fusete	付せて	今日は meeting 
+fusenai	付せない	I want to 
+fusenai	付せない	Google
+kyouhafuseru	今日は付せる	make 
+kyouhafuseru	今日は付せる	iPhone 
+kinoufusemasu	昨日付せます	今日は meeting 
+kinoufusemasu	昨日付せます	Please
+oboenai	覚えない	Google
+oboenai	覚えない	Notion 
+kyouhaoboemasuka	今日は覚えますか	iPhone 
+kyouhaoboemasuka	今日は覚えますか	Slack 
+kanarazuoboemasu	必ず覚えます	Please
+kanarazuoboemasu	必ず覚えます	I want to 
+oboete	覚えて	Notion 
+oboete	覚えて	make 
+gojimadehatarakimasu	5時まで働きます	Slack 
+gojimadehatarakimasu	5時まで働きます	今日は meeting 
+tokyomadeikimasu	東京まで行きます	I want to 
+tokyomadeikimasu	東京まで行きます	Google
+ashitamadenimatteite	明日までに待っていて	make 
+ashitamadenimatteite	明日までに待っていて	iPhone 
+kyoumadedekitara	今日までできたら	今日は meeting 
+kyoumadedekitara	今日までできたら	Please
+kenkounotameniarukimasu	健康のために歩きます	Google
+kenkounotameniarukimasu	健康のために歩きます	Notion 
+kazokunotamenihatarakou	家族のために働こう	iPhone 
+kazokunotamenihatarakou	家族のために働こう	Slack 
+sonotameniikimasu	そのために行きます	Please
+sonotameniikimasu	そのために行きます	I want to 
+gakumonnotameda	学問のためだ	Notion 
+gakumonnotameda	学問のためだ	make 
+madewomatsu	までを待つ	Slack 
+madewomatsu	までを待つ	今日は meeting 
+kurumadeiku	車で行く	I want to 
+kurumadeiku	車で行く	Google
+denshamadeiku	電車で行く	make 
+denshamadeiku	電車で行く	iPhone 
+amedanodeikimasen	雨なので行きません	今日は meeting 
+amedanodeikimasen	雨なので行きません	Please
+kyouhayasumidanodekonai	今日は休みなのでこない	Google
+kyouhayasumidanodekonai	今日は休みなのでこない	Notion 
+nodedekimasen	のでできません	iPhone 
+nodedekimasen	のでできません	Slack 
+tanoshiinodeaso	楽しいので遊	Please
+tanoshiinodeaso	楽しいので遊	I want to 
+kaigigaarunode	会議があるので	Notion 
+kaigigaarunode	会議があるので	make 
+kyoudemoii	今日でもいい	Slack 
+kyoudemoii	今日でもいい	今日は meeting 
+demoikimasu	でも行きます	I want to 
+demoikimasu	でも行きます	Google
+ashitademomatsu	明日でも待つ	make 
+ashitademomatsu	明日でも待つ	iPhone 
+sonomamadeikimasu	そのままで行きます	今日は meeting 
+sonomamadeikimasu	そのままで行きます	Please
+mamadeiiyo	ままでいいよ	Google
+mamadeiiyo	ままでいいよ	Notion 
+kinomamanihanasu	気のままに話す	iPhone 
+kinomamanihanasu	気のままに話す	Slack 
+mainichigotonikaeru	毎日ごとに変える	Please
+mainichigotonikaeru	毎日ごとに変える	I want to 
+nanigotonimo	何ごとにも	Notion 
+nanigotonimo	何ごとにも	make 
+kotogotoku	ことごとく	Slack 
+kotogotoku	ことごとく	今日は meeting 
+iyouda	いようだ	I want to 
+iyouda	いようだ	Google
+souiyounakoto	そういうようなこと	make 
+souiyounakoto	そういうようなこと	iPhone 
+youdearu	ようである	今日は meeting 
+youdearu	ようである	Please
+wakegawakaranai	わけがわからない	Google
+wakegawakaranai	わけがわからない	Notion 
+sonowakeha	そのわけは	iPhone 
+sonowakeha	そのわけは	Slack 
+iwakeniha	言い訳には	Please
+iwakeniha	言い訳には	I want to 
+soregasukida	それが好きだ	Notion 
+soregasukida	それが好きだ	make 
+soreyorimotto	それよりもっと	Slack 
+soreyorimotto	それよりもっと	今日は meeting 
+mottotakusan	もっとたくさん	I want to 
+mottotakusan	もっとたくさん	Google
+daregaikuka	誰が行くか	make 
+daregaikuka	誰が行くか	iPhone 
+daremoinai	誰もいない	今日は meeting 
+daremoinai	誰もいない	Please
+aregaarimasu	あれがあります	Google
+aregaarimasu	あれがあります	Notion 
+oregaikuyo	俺が行くよ	iPhone 
+oregaikuyo	俺が行くよ	Slack 
+oretachino	俺たちの	Please
+oretachino	俺たちの	I want to 
+arekoreshite	あれこれして	Notion 
+arekoreshite	あれこれして	make 
+onegaishimasu	お願いします	Slack 
+onegaishimasu	お願いします	今日は meeting 
+onegaiganaru	お願いがある	I want to 
+onegaiganaru	お願いがある	Google
+mouonegaishimasen	もうお願いしません	make 
+mouonegaishimasen	もうお願いしません	iPhone 
+minnadeonegaishimasu	みんなでお願いします	今日は meeting 
+minnadeonegaishimasu	みんなでお願いします	Please
+madadamedesu	まだだめです	Google
+madadamedesu	まだだめです	Notion 
+sorehamadamadadesu	それはまだまだです	iPhone 
+sorehamadamadadesu	それはまだまだです	Slack 
+kanemochinohitoga	金持ちの人が	Please
+kanemochinohitoga	金持ちの人が	I want to 
+sakeonomu	酒を飲む	Notion 
+sakeonomu	酒を飲む	make 
+takenokowomitai	竹の子を見たい	Slack 
+takenokowomitai	竹の子を見たい	今日は meeting 
+takenoko	竹の子	I want to 
+takenoko	竹の子	Google
+sakenomise	酒の店	make 
+sakenomise	酒の店	iPhone 
+kanenohanashi	金の話	今日は meeting 
+kanenohanashi	金の話	Please
+matenakattano	待てなかったの	Google
+matenakattano	待てなかったの	Notion 
+sameganaiteiru	鮫が泣いている	iPhone 
+sameganaiteiru	鮫が泣いている	Slack 
+hanahaharetekita	花は晴れてきた	Please
+hanahaharetekita	花は晴れてきた	I want to 
+ameganaharete	雨が晴れて	Notion 
+ameganaharete	雨が晴れて	make 
+tamenitenarunara	ためになるなら	Slack 
+tamenitenarunara	ためになるなら	今日は meeting 
+honnotameni	本のために	I want to 
+honnotameni	本のために	Google
+tamenoonegai	ためのお願い	make 
+tamenoonegai	ためのお願い	iPhone 
+toumorokoshimo	とうもろこしも	今日は meeting 
+toumorokoshimo	とうもろこしも	Please
+sonnamononodemo	そんなものでも	Google
+sonnamononodemo	そんなものでも	Notion 
+anatamoiku	あなたも行く	iPhone 
+anatamoiku	あなたも行く	Slack 
+watashimoikitai	私も行きたい	Please
+watashimoikitai	私も行きたい	I want to 
+penwokaimashita	ペンを買いました	Notion 
+penwokaimashita	ペンを買いました	make 
+pengasukidesu	ペンが好きです	Slack 
+pengasukidesu	ペンが好きです	今日は meeting 
+penhadokodesuka	ペンはどこですか	I want to 
+penhadokodesuka	ペンはどこですか	Google
+bananahadokodesuka	バナナはどこですか	make 
+bananahadokodesuka	バナナはどこですか	iPhone 
+bananawokaimashita	バナナを買いました	今日は meeting 
+bananawokaimashita	バナナを買いました	Please
+bananagasukidesu	バナナが好きです	Google
+bananagasukidesu	バナナが好きです	Notion 
+kyouhapianonitsuiteshirabeta	今日はピアノについて調べた	iPhone 
+kyouhapianonitsuiteshirabeta	今日はピアノについて調べた	Slack 
+pianowokaimashita	ピアノを買いました	Please
+pianowokaimashita	ピアノを買いました	I want to 
+pianohadokodesuka	ピアノはどこですか	Notion 
+pianohadokodesuka	ピアノはどこですか	make 
+memohadokodesuka	メモはどこですか	Slack 
+memohadokodesuka	メモはどこですか	今日は meeting 
+memowokaimashita	メモを買いました	I want to 
+memowokaimashita	メモを買いました	Google
+kyouhamemonitsuiteshirabeta	今日はメモについて調べた	make 
+kyouhamemonitsuiteshirabeta	今日はメモについて調べた	iPhone 
+demogasukidesu	デモが好きです	今日は meeting 
+demogasukidesu	デモが好きです	Please
+demowokaimashita	デモを買いました	Google
+demowokaimashita	デモを買いました	Notion 
+demohadokodesuka	デモはどこですか	iPhone 
+demohadokodesuka	デモはどこですか	Slack 
+tomatowokaimashita	トマトを買いました	Please
+tomatowokaimashita	トマトを買いました	I want to 
+tomatogasukidesu	トマトが好きです	Notion 
+tomatogasukidesu	トマトが好きです	make 
+kyouhatomatonitsuiteshirabeta	今日はトマトについて調べた	Slack 
+kyouhatomatonitsuiteshirabeta	今日はトマトについて調べた	今日は meeting 
+miniwokaimashita	ミニを買いました	I want to 
+miniwokaimashita	ミニを買いました	Google
+minihadokodesuka	ミニはどこですか	make 
+minihadokodesuka	ミニはどこですか	iPhone 
+kyouhamininitsuiteshirabeta	今日はミニについて調べた	今日は meeting 
+kyouhamininitsuiteshirabeta	今日はミニについて調べた	Please
+mamahadokodesuka	ママはどこですか	Google
+mamahadokodesuka	ママはどこですか	Notion 
+kyouhamamanitsuiteshirabeta	今日はママについて調べた	iPhone 
+kyouhamamanitsuiteshirabeta	今日はママについて調べた	Slack 
+papahadokodesuka	パパはどこですか	Please
+papahadokodesuka	パパはどこですか	I want to 
+kyouhapapanitsuiteshirabeta	今日はパパについて調べた	Notion 
+kyouhapapanitsuiteshirabeta	今日はパパについて調べた	make 
+papagasukidesu	パパが好きです	Slack 
+papagasukidesu	パパが好きです	今日は meeting 
+zerowokaimashita	ゼロを買いました	I want to 
+zerowokaimashita	ゼロを買いました	Google
+zerogasukidesu	ゼロが好きです	make 
+zerogasukidesu	ゼロが好きです	iPhone 
+kyouhazeronitsuiteshirabeta	今日はゼロについて調べた	今日は meeting 
+kyouhazeronitsuiteshirabeta	今日はゼロについて調べた	Please
+dominogasukidesu	ドミノが好きです	Google
+dominogasukidesu	ドミノが好きです	Notion 
+dominowokaimashita	ドミノを買いました	iPhone 
+dominowokaimashita	ドミノを買いました	Slack 
+dominohadokodesuka	ドミノはどこですか	Please
+dominohadokodesuka	ドミノはどこですか	I want to 
+kyouhananonitsuiteshirabeta	今日はナノについて調べた	Notion 
+kyouhananonitsuiteshirabeta	今日はナノについて調べた	make 
+nanogasukidesu	ナノが好きです	Slack 
+nanogasukidesu	ナノが好きです	今日は meeting 
+nanowokaimashita	ナノを買いました	I want to 
+nanowokaimashita	ナノを買いました	Google
+tunahadokodesuka	ツナはどこですか	make 
+tunahadokodesuka	ツナはどこですか	iPhone 
+tunagasukidesu	ツナが好きです	今日は meeting 
+tunagasukidesu	ツナが好きです	Please
+maniahadokodesuka	マニアはどこですか	Google
+maniahadokodesuka	マニアはどこですか	Notion 
+kyouhamanianitsuiteshirabeta	今日はマニアについて調べた	iPhone 
+kyouhamanianitsuiteshirabeta	今日はマニアについて調べた	Slack 
+maniagasukidesu	マニアが好きです	Please
+maniagasukidesu	マニアが好きです	I want to 
+pandagasukidesu	パンダが好きです	Notion 
+pandagasukidesu	パンダが好きです	make 
+pandawokaimashita	パンダを買いました	Slack 
+pandawokaimashita	パンダを買いました	今日は meeting 
+kyouhapandanitsuiteshirabeta	今日はパンダについて調べた	I want to 
+kyouhapandanitsuiteshirabeta	今日はパンダについて調べた	Google
+kyouhatangonitsuiteshirabeta	今日はタンゴについて調べた	make 
+kyouhatangonitsuiteshirabeta	今日はタンゴについて調べた	iPhone 
+tangogasukidesu	タンゴが好きです	今日は meeting 
+tangogasukidesu	タンゴが好きです	Please
+bingohadokodesuka	ビンゴはどこですか	Google
+bingohadokodesuka	ビンゴはどこですか	Notion 
+kyouhabingonitsuiteshirabeta	今日はビンゴについて調べた	iPhone 
+kyouhabingonitsuiteshirabeta	今日はビンゴについて調べた	Slack 
+kyouhapanamanitsuiteshirabeta	今日はパナマについて調べた	Please
+kyouhapanamanitsuiteshirabeta	今日はパナマについて調べた	I want to 
+panamagasukidesu	パナマが好きです	Notion 
+panamagasukidesu	パナマが好きです	make 
+panamawokaimashita	パナマを買いました	Slack 
+panamawokaimashita	パナマを買いました	今日は meeting 
+sonatagasukidesu	ソナタが好きです	I want to 
+sonatagasukidesu	ソナタが好きです	Google
+sonatahadokodesuka	ソナタはどこですか	make 
+sonatahadokodesuka	ソナタはどこですか	iPhone 
+kyouhasonatanitsuiteshirabeta	今日はソナタについて調べた	今日は meeting 
+kyouhasonatanitsuiteshirabeta	今日はソナタについて調べた	Please
+kyouhapinonitsuiteshirabeta	今日はピノについて調べた	Google
+kyouhapinonitsuiteshirabeta	今日はピノについて調べた	Notion 
+pinohadokodesuka	ピノはどこですか	iPhone 
+pinohadokodesuka	ピノはどこですか	Slack 
+pinowokaimashita	ピノを買いました	Please
+pinowokaimashita	ピノを買いました	I want to 
+derenrakushimasu	で連絡します	Notion 
+derenrakushimasu	で連絡します	make 
+dekakuninshimasu	で確認します	Slack 
+dekakuninshimasu	で確認します	今日は meeting 
+detsukaimasu	で使います	I want to 
+detsukaimasu	で使います	Google
+deshirabeta	で調べた	make 
+deshirabeta	で調べた	iPhone 
+wotsukau	を使う	今日は meeting 
+wotsukau	を使う	Please
+wokaeta	を変えた	Google
+wokaeta	を変えた	Notion 
+woshirabeta	を調べた	iPhone 
+woshirabeta	を調べた	Slack 
+wookurimasu	を送ります	Please
+wookurimasu	を送ります	I want to 
+wokakuninshite	を確認して	Notion 
+wokakuninshite	を確認して	make 
+gadekimasu	ができます	Slack 
+gadekimasu	ができます	今日は meeting 
+gaarimasu	があります	I want to 
+gaarimasu	があります	Google
+gahitsuyoudesu	が必要です	make 
+gahitsuyoudesu	が必要です	iPhone 
+gasukidesu	が好きです	今日は meeting 
+gasukidesu	が好きです	Please
+niokurimasu	に送ります	Google
+niokurimasu	に送ります	Notion 
+nitsuite	について	iPhone 
+nitsuite	について	Slack 
+nishimashita	にしました	Please
+nishimashita	にしました	I want to 
+nikimemashita	に決めました	Notion 
+nikimemashita	に決めました	make 
+hadokodesuka	はどこですか	Slack 
+hadokodesuka	はどこですか	今日は meeting 
+hatsukaemasen	は使えません	I want to 
+hatsukaemasen	は使えません	Google
+habenridesu	は便利です	make 
+habenridesu	は便利です	iPhone 
+haonajidesu	は同じです	今日は meeting 
+haonajidesu	は同じです	Please
+torenrakushimasu	と連絡します	Google
+torenrakushimasu	と連絡します	Notion 
+tohanashimashita	と話しました	iPhone 
+tohanashimashita	と話しました	Slack 
+tokuraberu	と比べる	Please
+tokuraberu	と比べる	I want to 
+nohougaii	のほうがいい	Notion 
+nohougaii	のほうがいい	make 
+nohanashidesu	の話です	Slack 
+nohanashidesu	の話です	今日は meeting 
+nokotowokangaeru	のことを考える	I want to 
+nokotowokangaeru	のことを考える	Google
+motsukaemasu	も使えます	make 
+motsukaemasu	も使えます	iPhone 
+moonegaishimasu	もお願いします	今日は meeting 
+moonegaishimasu	もお願いします	Please
+mokakuninshimasu	も確認します	Google
+mokakuninshimasu	も確認します	Notion 
+karahajimeyou	から始めよう	iPhone 
+karahajimeyou	から始めよう	Slack 
+karaokutta	から送った	Please
+karaokutta	から送った	I want to 
+karakimasu	から来ます	Notion 
+karakimasu	から来ます	make 
+nitsuiteshirabeta	について調べた	Slack 
+nitsuiteshirabeta	について調べた	今日は meeting 
+nitsuitehanashimasu	について話します	I want to 
+nitsuitehanashimasu	について話します	Google

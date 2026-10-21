@@ -11,7 +11,7 @@
 // 出力: 入力の行<TAB>英語として切り出した部分（コンマ区切り、2語の間は空白）。
 // 環境変数 JAEN_DICT=<Mozc の data/dictionary_oss> で、本物と同じ読みの費用（自然な読みの判定）が使える。
 // さらに CONTEXT=1 で、ローマ字として日本語に読める英単語を文脈で決める段（docs/all-english.md）も動く。
-// CTX=名前=値,... でその段の費用を替える。READ_COST=1 なら、入力のかなの読みの費用を出す。
+// CTX=名前=値,... でその段の費用を替える。入力の行は「ローマ字<TAB>直前に確定した文字」でもよい（FOLLOW_OFF=1 で直前を無視）。READ_COST=1 なら、入力のかなの読みの費用を出す。
 #include <algorithm>
 #include <cstdint>
 #include <cstdlib>
@@ -320,18 +320,27 @@ int main(int argc, char** argv) {
         else if (k == "one_letter_extra") ctx.one_letter_extra = v;
         else if (k == "margin") ctx.margin = v;
         else if (k == "alone_margin") ctx.alone_margin = v;
+        else if (k == "follow_margin") ctx.follow_margin = v;
       }
     }
   }
   const bool dump_chunks = getenv("DUMP_CHUNKS");
   for (std::string line; std::getline(std::cin, line);) {
     if (!line.empty() && line.back() == '\r') line.pop_back();
+    // 「ローマ字<TAB>直前に確定した文字」の形なら、直前が英字の語で終わるとして英語寄りにする（docs/english-follow.md）。
+    // FOLLOW=off なら直前を見ない（前後の比べ用）。
+    std::string before;
+    if (const size_t tab = line.find('\t'); tab != std::string::npos) {
+      before = line.substr(tab + 1);
+      line.resize(tab);
+    }
+    const bool previous_english = !getenv("FOLLOW_OFF") && jaen::EndsWithEnglishWord(before);
     const auto chunks = Parse(line);
     if (dump_chunks) {
       for (const auto& c : chunks) std::cout << "[" << c.raw << "|" << c.conversion << "|" << c.pending << "]";
       std::cout << "\n";
     }
-    const auto pieces = use_reading ? jaen::SplitEnglish(chunks, lex, parse, nullptr, &is_reading, &natural, use_context ? &model : nullptr, &ctx)
+    const auto pieces = use_reading ? jaen::SplitEnglish(chunks, lex, parse, nullptr, &is_reading, &natural, use_context ? &model : nullptr, &ctx, previous_english)
                                     : jaen::SplitEnglish(chunks, lex, parse);
     std::cout << line << '\t';
     const char* sep = "";
