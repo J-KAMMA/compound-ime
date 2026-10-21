@@ -1,4 +1,4 @@
 # 辞書の更新の署名の公開鍵（16進の小文字64文字）。本体に焼き込まれ、これで目録の署名を確かめる。
 # まだ決まっていない間は UNSET（本体は辞書の更新をしない）。
 # 鍵の作り方: python tools/make_dict_release.py keygen（秘密鍵は GitHub の secret DICT_SIGNING_KEY に置き、公開鍵だけをここに書く）
-UNSET
+255bc003c1f2e7dccb306b5b3ca08dc888488038fb6156ef6f8dcd7e631d73e3
