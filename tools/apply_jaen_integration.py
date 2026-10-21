@@ -163,6 +163,18 @@ edit("converter/converter.h", """  void CompletePosIds(Candidate* candidate) con
   void PutTypedValueFirst(absl::string_view value, Segment* segment) const;
 """)
 
+# PreferTypedDigits is called from engine.cc, so declare it in the public part
+# of Converter (CompletePosIds above sits in the private part).
+edit("converter/converter.h", """  void RewriteAsyncCandidates(const ConversionRequest& request,
+                              Segments* segments) const override;
+""", """  void RewriteAsyncCandidates(const ConversionRequest& request,
+                              Segments* segments) const override;
+
+  // Typed Arabic digits in a key stay Arabic in the first candidate (980, not
+  // 九百八十). A kana word with no typed digit (hitotsu -> 一つ) is untouched.
+  static void PreferTypedDigits(Segments* segments);
+""")
+
 edit("converter/converter.cc", """#include "converter/converter_util.h"
 """, """#include "converter/converter_util.h"
 #include "converter/english_lexicon.h"
@@ -211,6 +223,44 @@ void Converter::PutTypedValueFirst(absl::string_view value,
   candidate->value = candidate->content_value = std::string(value);
   candidate->lid = candidate->rid = general_noun_id_;
   candidate->attributes |= Attribute::NO_VARIANTS_EXPANSION;
+}
+
+void Converter::PreferTypedDigits(Segments* segments) {
+  if (segments == nullptr) return;
+  for (Segment& segment : segments->conversion_segments()) {
+    if (segment.candidates_size() == 0 ||
+        !typed_digits::HasTypedDigit(segment.key()) ||
+        typed_digits::KeepsTypedDigits(segment.key(), segment.candidate(0).value)) {
+      continue;
+    }
+    // Another candidate may already spell the typed number (980 / 4.1); put it
+    // first and leave the kanji spelling (九百八十 / 四点一) behind it.
+    bool moved = false;
+    for (size_t i = 1; i < segment.candidates_size(); ++i) {
+      if (typed_digits::KeepsTypedDigits(segment.key(), segment.candidate(i).value)) {
+        segment.move_candidate(static_cast<int>(i), 0);
+        moved = true;
+        break;
+      }
+    }
+    if (moved) continue;
+    // No such candidate: put the typed number back into the first one.
+    std::string fixed;
+    if (!typed_digits::ReplaceWithTypedDigits(
+            segment.key(), segment.candidate(0).value, &fixed)) {
+      continue;
+    }
+    Candidate* candidate = segment.mutable_candidate(0);
+    candidate->value = fixed;
+    candidate->content_value = fixed;
+    for (int i = 1; i < static_cast<int>(segment.candidates_size());) {
+      if (segment.candidate(i).value == fixed) {
+        segment.erase_candidate(i);
+      } else {
+        ++i;
+      }
+    }
+  }
 }
 
 std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(
@@ -1611,6 +1661,7 @@ edit(E, r'''    if (compare_context)
       return !value || std::string_view(value) != "0";
     }();
     if (homophone_cues) ApplyHomophoneCues(segments, left_context, right_context);
+    converter::Converter::PreferTypedDigits(segments);
     return true;
   }
 ''')
@@ -3166,12 +3217,19 @@ edit("engine/engine.cc", "        PreferWholePhrase(options, mozc, azoo, prefetc
 # 変換後の数字は半角: 節: 人工知能の候補は数字が全角（１０月１０日）のことが多い。漢字やかなと
 # 混ざった候補の数字を、変換の最後に半角（10月10日）にする。数字だけの候補（１０）は
 # そのまま残す。中身は native/jaen-detector/converter_halfwidth_digits.inc。
+# 打った算用数字は漢数字にしない（980 → 九百八十、10 → 十、4.1 → 4.一）。中身は
+# native/jaen-detector/typed_digits.inc。文節の鍵に算用数字がある所だけを直す。
+edit("converter/converter.cc", "#include \"converter/converter_util.h\"\n",
+     "#include <cstddef>\n#include <string>\n#include <string_view>\n#include <utility>\n#include <vector>\n"
+     "#include \"converter/converter_util.h\"\n")
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
+     + (REPO / "native/jaen-detector/typed_digits.inc").read_text(encoding="utf-8") + "\n"
      + (REPO / "native/jaen-detector/converter_halfwidth_digits.inc").read_text(encoding="utf-8") + "\n")
 edit("converter/converter.cc", "  RewriteAndSuppressCandidates(request, segments);\n  TrimCandidates(request, segments);\n",
      "  RewriteAndSuppressCandidates(request, segments);\n  TrimCandidates(request, segments);\n"
-     "  HalfWidthDigitsInText(segments);\n")
+     "  HalfWidthDigitsInText(segments);\n"
+     "  PreferTypedDigits(segments);\n")
 
 # 数の読みは数字: 節: 「にじゅうよっか」「しちがつはつか」「にせんにじゅうろくねん」のような
 # 数の読み＋単位（native/jaen-detector/jaen_number の FindNumbers）を、日本語の部分の中で

@@ -502,7 +502,8 @@ SELECTOR = consts + r'''  static std::vector<char32_t> SelectorCodepoints(std::s
 E = "engine/engine.cc"
 edit(mozc, E, "    ScoreCandidates(*segments, left_context, right_context);\n",
      "    ScoreCandidates(*segments, left_context, right_context);\n"
-     "    ApplySelector(segments, left_context, right_context);\n")
+     "    ApplySelector(segments, left_context, right_context);\n"
+     "    converter::Converter::PreferTypedDigits(segments);\n")
 edit(mozc, E, "  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。",
      SELECTOR + "  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。")
 edit(mozc, E, "#include <chrono>\n#include <cmath>\n", "#include <array>\n#include <chrono>\n#include <cmath>\n")

@@ -87,6 +87,8 @@ jobs:
           cp $W/repo/native/precision117/engine.cc $S/engine/engine.cc
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
+          $PY $W/repo/tools/apply_decimal_point.py $S
+          $PY $W/repo/tools/decimal_transform_test.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
           # 選び手の段階2b: Zenzai の計算済みの分布の記録（MYIME_SELECTOR_FEATURES のときだけ動く）
           $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
@@ -169,7 +171,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","r"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","r","s"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
