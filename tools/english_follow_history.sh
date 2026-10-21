@@ -1,7 +1,9 @@
 #!/bin/bash
 # english_follow_history.sh <session_handler_main> <engine dir> <model.gguf> <english-follow-history.tsv> <out.tsv> [並列数]
 # 英語の文を1語ずつ打つ場面を、入力欄の前の文を渡さずに流す。前の語（3列目）をキーで打ち、変換して確定し、
-# 空白を打ってから、次の語（1列目）を打って変換・確定する。直前の確定が変換の履歴にだけ残る場合の確かめ。
+# 空白を打ってから、次の語（1列目）を打って変換・確定する。空白は session が変換を通さずアプリへ返すキーで、Mozc はそこで変換の
+# 履歴を消す（docs/english-follow.md「履歴の道が効かなかった理由」）。そのため、この表で英語が増えるのは session の記憶
+# （直前の確定と空白を覚える）が働くとき。最初の版（記憶なし）では、止めた版と全行同じだった。
 # 出力: ローマ字<TAB>文節|…<TAB>確定（次の語を確定した結果）。環境変数 MYIME_ENGLISH_FOLLOW=off で寄せを止められる。
 set -e
 EXE=$1; ENGINE=$2; MODEL=$3; IN=$4; OUT=$5; P=${6:-4}
