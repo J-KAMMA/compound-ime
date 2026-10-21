@@ -1,0 +1,161 @@
+# 開発の道具・サービスの名前の試験。tools/tool_names_test.py で作成（手で書いた、実装を見ない打ち方）。名前は小文字のローマ字のまま打ち、公式の書き方で出ることを期待する。
+opencode	opencode	tools
+opencodewotsukaimasu.	opencodeを使います。	tools
+opencodedejikkoushimasu.	opencodeで実行します。	tools
+kinouopencodewotsukaimashita.	昨日opencodeを使いました。	tools
+opencodehasaikoudesu.	opencodeは最高です。	tools
+watashihaopencodegasukidesu.	私はopencodeが好きです。	tools
+kyouhaopencodewo	今日はopencodeを	tools
+korekaraopencodenitsuiteshirabemasu.	これからopencodeについて調べます。	tools
+claudecode	Claude Code	tools
+claudecodewotsukaimasu.	Claude Codeを使います。	tools
+claudecodedejikkoushimasu.	Claude Codeで実行します。	tools
+kinouclaudecodewotsukaimashita.	昨日Claude Codeを使いました。	tools
+claudecodehasaikoudesu.	Claude Codeは最高です。	tools
+watashihaclaudecodegasukidesu.	私はClaude Codeが好きです。	tools
+kyouhaclaudecodewo	今日はClaude Codeを	tools
+korekaraclaudecodenitsuiteshirabemasu.	これからClaude Codeについて調べます。	tools
+codex	Codex	tools
+codexwotsukaimasu.	Codexを使います。	tools
+codexdejikkoushimasu.	Codexで実行します。	tools
+kinoucodexwotsukaimashita.	昨日Codexを使いました。	tools
+codexhasaikoudesu.	Codexは最高です。	tools
+watashihacodexgasukidesu.	私はCodexが好きです。	tools
+kyouhacodexwo	今日はCodexを	tools
+korekaracodexnitsuiteshirabemasu.	これからCodexについて調べます。	tools
+cursor	Cursor	tools
+cursorwotsukaimasu.	Cursorを使います。	tools
+cursordejikkoushimasu.	Cursorで実行します。	tools
+kinoucursorwotsukaimashita.	昨日Cursorを使いました。	tools
+cursorhasaikoudesu.	Cursorは最高です。	tools
+watashihacursorgasukidesu.	私はCursorが好きです。	tools
+kyouhacursorwo	今日はCursorを	tools
+korekaracursornitsuiteshirabemasu.	これからCursorについて調べます。	tools
+ollama	Ollama	tools
+ollamawotsukaimasu.	Ollamaを使います。	tools
+ollamadejikkoushimasu.	Ollamaで実行します。	tools
+kinouollamawotsukaimashita.	昨日Ollamaを使いました。	tools
+ollamahasaikoudesu.	Ollamaは最高です。	tools
+watashihaollamagasukidesu.	私はOllamaが好きです。	tools
+kyouhaollamawo	今日はOllamaを	tools
+korekaraollamanitsuiteshirabemasu.	これからOllamaについて調べます。	tools
+llamacpp	llama.cpp	tools
+llamacppwotsukaimasu.	llama.cppを使います。	tools
+llamacppdejikkoushimasu.	llama.cppで実行します。	tools
+kinoullamacppwotsukaimashita.	昨日llama.cppを使いました。	tools
+llamacpphasaikoudesu.	llama.cppは最高です。	tools
+watashihallamacppgasukidesu.	私はllama.cppが好きです。	tools
+kyouhallamacppwo	今日はllama.cppを	tools
+korekarallamacppnitsuiteshirabemasu.	これからllama.cppについて調べます。	tools
+huggingface	Hugging Face	tools
+huggingfacewotsukaimasu.	Hugging Faceを使います。	tools
+huggingfacedejikkoushimasu.	Hugging Faceで実行します。	tools
+kinouhuggingfacewotsukaimashita.	昨日Hugging Faceを使いました。	tools
+huggingfacehasaikoudesu.	Hugging Faceは最高です。	tools
+watashihahuggingfacegasukidesu.	私はHugging Faceが好きです。	tools
+kyouhahuggingfacewo	今日はHugging Faceを	tools
+korekarahuggingfacenitsuiteshirabemasu.	これからHugging Faceについて調べます。	tools
+langchain	LangChain	tools
+langchainwotsukaimasu.	LangChainを使います。	tools
+langchaindejikkoushimasu.	LangChainで実行します。	tools
+kinoulangchainwotsukaimashita.	昨日LangChainを使いました。	tools
+langchainhasaikoudesu.	LangChainは最高です。	tools
+watashihalangchaingasukidesu.	私はLangChainが好きです。	tools
+kyouhalangchainwo	今日はLangChainを	tools
+korekaralangchainnitsuiteshirabemasu.	これからLangChainについて調べます。	tools
+openai	OpenAI	tools
+openaiwotsukaimasu.	OpenAIを使います。	tools
+openaidejikkoushimasu.	OpenAIで実行します。	tools
+kinouopenaiwotsukaimashita.	昨日OpenAIを使いました。	tools
+openaihasaikoudesu.	OpenAIは最高です。	tools
+watashihaopenaigasukidesu.	私はOpenAIが好きです。	tools
+kyouhaopenaiwo	今日はOpenAIを	tools
+korekaraopenainitsuiteshirabemasu.	これからOpenAIについて調べます。	tools
+anthropic	Anthropic	tools
+anthropicwotsukaimasu.	Anthropicを使います。	tools
+anthropicdejikkoushimasu.	Anthropicで実行します。	tools
+kinouanthropicwotsukaimashita.	昨日Anthropicを使いました。	tools
+anthropichasaikoudesu.	Anthropicは最高です。	tools
+watashihaanthropicgasukidesu.	私はAnthropicが好きです。	tools
+kyouhaanthropicwo	今日はAnthropicを	tools
+korekaraanthropicnitsuiteshirabemasu.	これからAnthropicについて調べます。	tools
+geminicli	Gemini CLI	tools
+geminicliwotsukaimasu.	Gemini CLIを使います。	tools
+geminiclidejikkoushimasu.	Gemini CLIで実行します。	tools
+kinougeminicliwotsukaimashita.	昨日Gemini CLIを使いました。	tools
+geminiclihasaikoudesu.	Gemini CLIは最高です。	tools
+watashihageminicligasukidesu.	私はGemini CLIが好きです。	tools
+kyouhageminicliwo	今日はGemini CLIを	tools
+korekarageminiclinitsuiteshirabemasu.	これからGemini CLIについて調べます。	tools
+copilot	Copilot	tools
+copilotwotsukaimasu.	Copilotを使います。	tools
+copilotdejikkoushimasu.	Copilotで実行します。	tools
+kinoucopilotwotsukaimashita.	昨日Copilotを使いました。	tools
+copilothasaikoudesu.	Copilotは最高です。	tools
+watashihacopilotgasukidesu.	私はCopilotが好きです。	tools
+kyouhacopilotwo	今日はCopilotを	tools
+korekaracopilotnitsuiteshirabemasu.	これからCopilotについて調べます。	tools
+vscode	VS Code	tools
+vscodewotsukaimasu.	VS Codeを使います。	tools
+vscodedejikkoushimasu.	VS Codeで実行します。	tools
+kinouvscodewotsukaimashita.	昨日VS Codeを使いました。	tools
+vscodehasaikoudesu.	VS Codeは最高です。	tools
+watashihavscodegasukidesu.	私はVS Codeが好きです。	tools
+kyouhavscodewo	今日はVS Codeを	tools
+korekaravscodenitsuiteshirabemasu.	これからVS Codeについて調べます。	tools
+neovim	Neovim	tools
+neovimwotsukaimasu.	Neovimを使います。	tools
+neovimdejikkoushimasu.	Neovimで実行します。	tools
+kinouneovimwotsukaimashita.	昨日Neovimを使いました。	tools
+neovimhasaikoudesu.	Neovimは最高です。	tools
+watashihaneovimgasukidesu.	私はNeovimが好きです。	tools
+kyouhaneovimwo	今日はNeovimを	tools
+korekaraneovimnitsuiteshirabemasu.	これからNeovimについて調べます。	tools
+tmux	tmux	tools
+tmuxwotsukaimasu.	tmuxを使います。	tools
+tmuxdejikkoushimasu.	tmuxで実行します。	tools
+kinoutmuxwotsukaimashita.	昨日tmuxを使いました。	tools
+tmuxhasaikoudesu.	tmuxは最高です。	tools
+watashihatmuxgasukidesu.	私はtmuxが好きです。	tools
+kyouhatmuxwo	今日はtmuxを	tools
+korekaratmuxnitsuiteshirabemasu.	これからtmuxについて調べます。	tools
+wsl	WSL	tools
+wslwotsukaimasu.	WSLを使います。	tools
+wsldejikkoushimasu.	WSLで実行します。	tools
+kinouwslwotsukaimashita.	昨日WSLを使いました。	tools
+wslhasaikoudesu.	WSLは最高です。	tools
+watashihawslgasukidesu.	私はWSLが好きです。	tools
+kyouhawslwo	今日はWSLを	tools
+korekarawslnitsuiteshirabemasu.	これからWSLについて調べます。	tools
+powershell	PowerShell	tools
+powershellwotsukaimasu.	PowerShellを使います。	tools
+powershelldejikkoushimasu.	PowerShellで実行します。	tools
+kinoupowershellwotsukaimashita.	昨日PowerShellを使いました。	tools
+powershellhasaikoudesu.	PowerShellは最高です。	tools
+watashihapowershellgasukidesu.	私はPowerShellが好きです。	tools
+kyouhapowershellwo	今日はPowerShellを	tools
+korekarapowershellnitsuiteshirabemasu.	これからPowerShellについて調べます。	tools
+windsurf	Windsurf	tools
+windsurfwotsukaimasu.	Windsurfを使います。	tools
+windsurfdejikkoushimasu.	Windsurfで実行します。	tools
+kinouwindsurfwotsukaimashita.	昨日Windsurfを使いました。	tools
+windsurfhasaikoudesu.	Windsurfは最高です。	tools
+watashihawindsurfgasukidesu.	私はWindsurfが好きです。	tools
+kyouhawindsurfwo	今日はWindsurfを	tools
+korekarawindsurfnitsuiteshirabemasu.	これからWindsurfについて調べます。	tools
+aider	Aider	tools
+aiderwotsukaimasu.	Aiderを使います。	tools
+aiderdejikkoushimasu.	Aiderで実行します。	tools
+kinouaiderwotsukaimashita.	昨日Aiderを使いました。	tools
+aiderhasaikoudesu.	Aiderは最高です。	tools
+watashihaaidergasukidesu.	私はAiderが好きです。	tools
+kyouhaaiderwo	今日はAiderを	tools
+korekaraaidernitsuiteshirabemasu.	これからAiderについて調べます。	tools
+lmstudio	LM Studio	tools
+lmstudiowotsukaimasu.	LM Studioを使います。	tools
+lmstudiodejikkoushimasu.	LM Studioで実行します。	tools
+kinoulmstudiowotsukaimashita.	昨日LM Studioを使いました。	tools
+lmstudiohasaikoudesu.	LM Studioは最高です。	tools
+watashihalmstudiogasukidesu.	私はLM Studioが好きです。	tools
+kyouhalmstudiowo	今日はLM Studioを	tools
+korekaralmstudionitsuiteshirabemasu.	これからLM Studioについて調べます。	tools

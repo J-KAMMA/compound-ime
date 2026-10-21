@@ -246,11 +246,11 @@ jobs:
             python3 repo/tools/score_wiki_typing.py repo/tests/conversion/wiki-typing.tsv results/wiki-typing.tsv | tee results/wiki-typing-score.txt | head -40
           fi
           # 分野の打ち込み試験（プログラミング、仮想通貨）の採点
-          for f in prog crypto; do
+          for f in prog crypto tools; do
             if [ -f results/domain-$f.tsv ] && [ -f repo/tests/conversion/domain-$f.tsv ]; then
-              case $f in prog) label="分野の打ち込み（プログラミング）";; *) label="分野の打ち込み（仮想通貨）";; esac
+              case $f in prog) label="分野の打ち込み（プログラミング）";; tools) label="分野の打ち込み（開発の道具の名前）";; *) label="分野の打ち込み（仮想通貨）";; esac
               python3 repo/tools/score_wiki_typing.py repo/tests/conversion/domain-$f.tsv results/domain-$f.tsv "$label" > results/domain-$f-score.txt
-              head -12 results/domain-$f-score.txt
+              head -40 results/domain-$f-score.txt
             fi
           done
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
