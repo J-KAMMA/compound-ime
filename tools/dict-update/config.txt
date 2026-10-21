@@ -1,0 +1,4 @@
+# 辞書の更新の取る先（本体に焼き込まれる）。
+# 目録は固定の配布ページ dict-latest に置き、辞書のファイルは dict-YYYYMMDD の配布ページにある（目録がその URL を持つ）。
+manifest_url=https://github.com/J-KAMMA/compound-ime/releases/download/dict-latest/manifest.txt
+url_prefix=https://github.com/J-KAMMA/compound-ime/releases/download/

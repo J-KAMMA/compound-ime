@@ -16,6 +16,23 @@ on:
       groups:
         description: 流す試験の組（JSON の配列。空なら全部。例 ["k"]）
         default: ''
+  # 辞書の月1回の自動更新（dict-update.yml）から呼ぶ。dict_candidate に、署名つきの配布物を入れた成果物の名前を渡すと、
+  # 試験の組ごとに「いまの辞書（base）」と「新しい辞書（cand）」の両方を流す（同じ変換エンジン）。結果は
+  # linux-results（いまの辞書）と linux-results-cand（新しい辞書）。
+  workflow_call:
+    inputs:
+      model_release:
+        type: string
+        default: ''
+      model_file:
+        type: string
+        default: ''
+      groups:
+        type: string
+        default: ''
+      dict_candidate:
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -42,6 +59,14 @@ jobs:
           curl -fsSL -o /tmp/swift.tar.gz https://download.swift.org/swift-6.3.3-release/ubuntu2404/swift-6.3.3-RELEASE/swift-6.3.3-RELEASE-ubuntu24.04.tar.gz
           mkdir -p $HOME/swift && tar -xzf /tmp/swift.tar.gz -C $HOME/swift --strip-components=1 && rm /tmp/swift.tar.gz
           $HOME/swift/usr/bin/swift --version
+
+      # 辞書の更新の仕組みの単体試験（Mozc なし。数分。通信は手元の 127.0.0.1 だけ）。ここで落ちたら、長い組み立てに入らない
+      - name: 辞書の更新の単体試験
+        run: |
+          set -eo pipefail
+          python3 -m venv $GITHUB_WORKSPACE/venv-dict && $GITHUB_WORKSPACE/venv-dict/bin/pip -q install cryptography
+          bash $GITHUB_WORKSPACE/repo/tools/run_dict_update_unit_tests.sh $GITHUB_WORKSPACE/venv-dict/bin/python $RUNNER_TEMP/dict-update-test
+          python3 $GITHUB_WORKSPACE/repo/tools/test_dict_quality_gate.py
 
       - name: 上流のソースと土台の改修
         run: |
@@ -89,6 +114,8 @@ jobs:
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_decimal_point.py $S
           $PY $W/repo/tools/decimal_transform_test.py $S
+          # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
+          $PY $W/repo/tools/apply_dict_update.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
           # 選び手の段階2b: Zenzai の計算済みの分布の記録（MYIME_SELECTOR_FEATURES のときだけ動く）
           $PY $W/repo/tools/apply_selector_trace.py $W/myime/src
@@ -171,7 +198,9 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","r","s"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","r","s","u"]') }}
+        # dict_candidate があるときだけ、新しい辞書（cand）でも流す
+        variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -180,9 +209,15 @@ jobs:
         with:
           name: linux-bin
           path: bin
-      - name: 変換の試験（組 ${{ matrix.group }}）
+      - uses: actions/download-artifact@v4
+        if: matrix.variant == 'cand'
+        with:
+          name: ${{ inputs.dict_candidate }}
+          path: dict-candidate
+      - name: 変換の試験（組 ${{ matrix.group }}、${{ matrix.variant == 'cand' && '新しい辞書' || 'いまの辞書' }}）
         env:
           GH_TOKEN: ${{ github.token }}
+          DICT_CANDIDATE_DIR: ${{ matrix.variant == 'cand' && format('{0}/dict-candidate', github.workspace) || '' }}
         run: |
           set -eo pipefail
           W=$GITHUB_WORKSPACE
@@ -201,7 +236,7 @@ jobs:
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: results-${{ matrix.group }}
+          name: ${{ matrix.variant == 'cand' && format('cand-{0}', matrix.group) || format('results-{0}', matrix.group) }}
           path: results/
           if-no-files-found: ignore
 
@@ -210,13 +245,17 @@ jobs:
     needs: test
     if: always()
     runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
           path: repo
       - uses: actions/download-artifact@v4
         with:
-          pattern: results-*
+          pattern: ${{ matrix.variant == 'cand' && 'cand-*' || 'results-*' }}
           path: results
           merge-multiple: true
       - name: 1,298文と打ち方の揺れの前半と後半をつなぐ
@@ -332,6 +371,6 @@ jobs:
           ls results
       - uses: actions/upload-artifact@v4
         with:
-          name: linux-results
+          name: ${{ matrix.variant == 'cand' && 'linux-results-cand' || 'linux-results' }}
           path: results/
           if-no-files-found: ignore
