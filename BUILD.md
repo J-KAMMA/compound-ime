@@ -59,6 +59,8 @@ python tools/build_ut_dictionary.py --mozc <src> --ut <ut-dir> --sources sudachi
 
 英語の切り分けだけを手元で動かす（Mozc なし）: `g++ -std=c++20 -O2 -I native/jaen-detector native/jaen-detector/jaen_trial.cc native/jaen-detector/jaen_detector.cc -o jaen_trial`、続けて `JAEN_DICT=<mozc>/src/data/dictionary_oss CONTEXT=1 ./jaen_trial <romaji.tsv と readings.txt の場所> <一覧の場所> < ローマ字の行`（`CONTEXT=1` で、ローマ字として日本語に読める英単語を文脈で決める段まで動く。詳しくは [docs/all-english.md](docs/all-english.md)）。英単語と重なるローマ字の試験の文は `tools/make_allenglish_tests.py` で作り、組 `m` で流す。
 
+小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）: 一覧は `tools/data/acronyms.tsv`（型 a: ローマ字として読めない並び、型 b: 日本語に読める並び）、型 b を文の中で先頭にする手がかりは `tools/data/acronym-cues.tsv`。型 b の表は `python tools/build_acronym_table.py` が `native/jaen-detector/jaen_detector.cc` に書く（`--check` で一覧との食い違いを確かめる）。読みの候補への入れ方は `build_proper_noun_dictionary.py --acronyms`（作り物の辞書の試験は `python tools/acronym_dictionary_test.py`）。試験の文は `python tools/make_acronym_tests.py` で作り直す（`tests/conversion/acronyms*.tsv`、流す組は `tools/run_tests.sh` の `r`）。Mozc なしの前後比べは `python tools/acronym_probe.py --before <git の版>`（検出器の単体試験は `native/jaen-detector/jaen_detector_test.cc`。g++ なら `g++ -std=c++20 -include algorithm -I native/jaen-detector native/jaen-detector/{jaen_detector,jaen_choices,correction_log,jaen_typo,jaen_detector_test}.cc`）。
+
 ## 4. precision117 エンジンを重ねる
 
 ```

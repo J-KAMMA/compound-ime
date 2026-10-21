@@ -5782,3 +5782,28 @@ cursor	Cursor
 windsurf	Windsurf
 openhands	OpenHands
 kilocode	Kilo Code
+# 2026-10-21 足した略語（tools/data/acronyms.tsv の型 a。tools/build_acronym_table.py --check が一覧との食い違いを確かめる）
+bcm	BCM
+byod	BYOD
+dl	DL
+docx	DOCX
+jlpt	JLPT
+lol	LOL
+mdm	MDM
+ng	NG
+ott	OTT
+plc	PLC
+pm	PM
+pptx	PPTX
+rl	RL
+roas	ROAS
+sdg	SDG
+sos	SOS
+spi	SPI
+tv	TV
+uk	UK
+ups	UPS
+utf	UTF
+vod	VOD
+xlsx	XLSX
+uae	UAE

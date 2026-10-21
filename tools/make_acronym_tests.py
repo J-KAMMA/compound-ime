@@ -1,0 +1,360 @@
+"""略語の試験（tests/conversion/acronyms*.tsv）を作る。
+
+  python tools/make_acronym_tests.py [--out-dir tests/conversion]
+
+手で書いた句（読みのかなと、書いた形）を組み合わせる。変換の結果は見ていない（Mozc も人工知能も動かしていない）。
+ローマ字は、かなから規則で作り（tools/make_test_romaji_table.py の表で、かなに読み戻せるか確かめる）、
+略語は小文字で、文の中ではつなげて打つ（aiwotsukau.）。書く3つの表:
+
+acronyms.tsv（文）: ローマ字<TAB>期待する文<TAB>型<TAB>名前<TAB>由来
+  略語（大文字の書き方）が入った文。型は tools/data/acronyms.tsv と同じ（a: 英字が残る、b: 日本語に読める）。
+  由来: a-class = 型 a の語に、語の分野の句をつける、a-doubled = 型 a の語に、同じ子音で始まる助詞をつける（idde、ngga。っ が混ざる）、b-cue = 型 b（手がかり方式）の語に、手がかりの語が続く句をつける
+  （略語を先に取るはず）、b-plain = 型 b（日本語の語としては使わない並び）、b-nocue = 型 b の語に手がかりにない技術の句
+  （規則の外。略語は先に取れない。どれだけ取りこぼすかを見るための組。候補の中には出る）。
+acronyms-ja.tsv（日本語の文）: ローマ字<TAB>期待する文<TAB>型<TAB>名前<TAB>由来
+  略語と同じ並びが日本語の語（愛を、会いに、憂いを、磯の ...）になる文。略語に取らず日本語のまま出るのが正解。
+  名前は重なる日本語の語（愛を）。由来: ja-plain = 手がかりの語が続かない、ja-hard = 手がかりの語が続く
+  （愛を使って ... 規則が略語に取ってしまうはずの文。壊れる例の数を見るための組）、ja-inside = 並びが日本語の語の中にある
+  （イメージ、せおう）。
+acronyms-cand.tsv（候補）: ローマ字<TAB>期待する候補<TAB>方式<TAB>分野<TAB>由来
+  略語だけを小文字で打って変換したときの候補（tools/score_proper_nouns.py candidates）。
+  方式: typed = 型 a（先頭に出るはず）、overlap = 型 b（上位3つに出るはず）、info-capital = 大文字で打った形（目安）。
+"""
+import argparse
+import sys
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from make_test_romaji_table import BASE  # noqa: E402
+
+REPO = Path(__file__).resolve().parent.parent
+
+# ---- かな → ローマ字（Mozc の表で打てる形。ん は nn） ----
+ROW = {
+    "あ": "a", "い": "i", "う": "u", "え": "e", "お": "o",
+    "か": "ka", "き": "ki", "く": "ku", "け": "ke", "こ": "ko",
+    "さ": "sa", "し": "shi", "す": "su", "せ": "se", "そ": "so",
+    "た": "ta", "ち": "chi", "つ": "tsu", "て": "te", "と": "to",
+    "な": "na", "に": "ni", "ぬ": "nu", "ね": "ne", "の": "no",
+    "は": "ha", "ひ": "hi", "ふ": "fu", "へ": "he", "ほ": "ho",
+    "ま": "ma", "み": "mi", "む": "mu", "め": "me", "も": "mo",
+    "や": "ya", "ゆ": "yu", "よ": "yo",
+    "ら": "ra", "り": "ri", "る": "ru", "れ": "re", "ろ": "ro",
+    "わ": "wa", "を": "wo", "ん": "nn",
+    "が": "ga", "ぎ": "gi", "ぐ": "gu", "げ": "ge", "ご": "go",
+    "ざ": "za", "じ": "ji", "ず": "zu", "ぜ": "ze", "ぞ": "zo",
+    "だ": "da", "ぢ": "di", "づ": "du", "で": "de", "ど": "do",
+    "ば": "ba", "び": "bi", "ぶ": "bu", "べ": "be", "ぼ": "bo",
+    "ぱ": "pa", "ぴ": "pi", "ぷ": "pu", "ぺ": "pe", "ぽ": "po",
+    "ゔ": "vu", "ー": "-", "、": ",", "。": ".", "！": "!", "？": "?",
+    "ぁ": "la", "ぃ": "li", "ぅ": "lu", "ぇ": "le", "ぉ": "lo",
+}
+DIGRAPH = {"ゃ": "a", "ゅ": "u", "ょ": "o", "ぇ": "e", "ぃ": "i"}
+YOUON = {"き": "ky", "ぎ": "gy", "し": "sh", "じ": "j", "ち": "ch", "に": "ny", "ひ": "hy", "び": "by",
+         "ぴ": "py", "み": "my", "り": "ry", "ふ": "f", "て": "th", "で": "dh", "ゔ": "v"}
+
+
+def romaji(kana):
+    out, i = [], 0
+    while i < len(kana):
+        c = kana[i]
+        if c == "っ":  # 次の音の最初の子音を重ねる（sshi、cchi は使わない句にする）
+            out.append(romaji(kana[i + 1:])[0])
+            i += 1
+            continue
+        if i + 1 < len(kana) and kana[i + 1] in DIGRAPH and c in YOUON:
+            out.append(YOUON[c] + DIGRAPH[kana[i + 1]])
+            i += 2
+            continue
+        out.append(ROW[c])
+        i += 1
+    return "".join(out)
+
+
+def parse_back(text):
+    """romaji → かな（make_test_romaji_table の表で、いちばん長く合うキーから）。読めなければ None。"""
+    keys = {k: v for k, v in BASE.items()}
+    out, i = [], 0
+    while i < len(text):
+        c = text[i]
+        if i + 1 < len(text) and text[i + 1] == c and c not in "aiueonyl-,.!?":
+            out.append("っ")
+            i += 1
+            continue
+        for n in (4, 3, 2, 1):
+            if text[i:i + n] in keys:
+                out.append(keys[text[i:i + n]])
+                i += n
+                break
+        else:
+            return None
+    return "".join(out)
+
+
+# ---- 前に置く句（読み、書いた形）----
+PREFIX = [
+    ("", ""), ("きょうは", "今日は"), ("いま、", "今、"), ("さいきん、", "最近、"), ("かいしゃで", "会社で"),
+    ("あしたの", "明日の"), ("まず、", "まず、"), ("けさ", "今朝"), ("じむしょで", "事務所で"),
+    ("それから、", "それから、"), ("ぶちょうは", "部長は"), ("わたしは", "私は"),
+]
+
+# ---- 型 a: 語の分野ごとの句（助詞から始まる）----
+DEV = [("をつかう", "を使う"), ("をかくにんする", "を確認する"), ("をせっていする", "を設定する"), ("がかわった", "が変わった"),
+       ("はべんりだ", "は便利だ"), ("のしようをしらべる", "の仕様を調べる"), ("でしゅとくする", "で取得する"),
+       ("にたいおうする", "に対応する"), ("をかいぜんする", "を改善する"), ("のえらーをなおす", "のエラーを直す")]
+HARD = [("をこうかんする", "を交換する"), ("がはやい", "が速い"), ("のせいのうをみる", "の性能を見る"), ("はたかい", "は高い"),
+        ("にせつぞくする", "に接続する"), ("をかう", "を買う"), ("でうごかす", "で動かす"), ("がこわれた", "が壊れた"),
+        ("のよういをする", "の用意をする"), ("をつなぐ", "をつなぐ")]
+BIZ = [("をせっていする", "を設定する"), ("がのびている", "が伸びている"), ("はだいじだ", "は大事だ"), ("のめんだんをする", "の面談をする"),
+       ("とそうだんする", "と相談する"), ("もふえた", "も増えた"), ("をみなおす", "を見直す"), ("にちゅうもくする", "に注目する"),
+       ("のかいぎをひらく", "の会議を開く"), ("でひょうかする", "で評価する")]
+PERSON = [("がはっぴょうした", "が発表した"), ("はらいにちする", "は来日する"), ("とはなす", "と話す"), ("のはなしをきく", "の話を聞く"),
+          ("もさんかする", "も参加する"), ("にあう", "に会う")]
+MEDIA = [("をみる", "を見る"), ("がながれる", "が流れる"), ("でみる", "で見る"), ("のしちょうりつ", "の視聴率"), ("はおもしろい", "は面白い"),
+         ("をおくる", "を送る"), ("にとうこうする", "に投稿する"), ("もたのしむ", "も楽しむ")]
+GENERAL = [("をしらべる", "を調べる"), ("はなんですか", "は何ですか"), ("のいみをおしえる", "の意味を教える"), ("についてはなす", "について話す"),
+           ("をかく", "を書く"), ("がひつようだ", "が必要だ"), ("をわすれた", "を忘れた"), ("もつかえる", "も使える")]
+ECON = [("がさがった", "が下がった"), ("はあがる", "は上がる"), ("のけっかをみる", "の結果を見る"), ("をはっぴょうする", "を発表する"),
+        ("にかんするほうこく", "に関する報告"), ("とけいざい", "と経済"), ("のかいごうにでる", "の会合に出る"), ("もはいる", "も入る")]
+CLASS = {
+    "dev": "api css csv json sql sdk cli cui cdn http https ssh ssl tls tcp udp ftp xml yaml toml uri uuid guid utf php rpc grpc dns orm mvc "
+           "html docx pptx xlsx svg png jpg gif tsv pdf cgi iam gcp aws rds ecs eks vpc vps vpn dl rss etl oss pwa spa ssr tdd poc mcp rag llm nlp ocr rpa gpt ml rl rnn".split(),
+    "hard": "cpu gpu ssd hdd usb pc lan nas lcd led npu tpu hdmi hdr fhd uhd ups qr nfc ev fcv phv sim esim ar vr xr plc".split(),
+    "biz": "kpi kgi okr roas ceo cto cfo coo cio cmo hr pr qa pm erp crm sfa cms mvp mdm byod bcm sla slo dx ott spi jlpt toeic toefl mba".split(),
+    "person": "aed icu mri pcr dna rna bmi qol".split(),
+    "media": "tv cm bgm dvd vod bbs dm sms mms sns dlc fps rpg mmo npc nfl mlb nhk cnn lgbt".split(),
+    "econ": "gdp cpi etf esg sdg sdgs mba imf wto oecd opec apec ioc jal jas jis jr ntt kddi nec ibm amd bmw nvidia ibm pbr eps".split(),
+}
+
+# ---- 型 a: 助詞の頭の子音が略語の最後の子音と同じ（idde、ngga、okkara）。打つと っ+かな が混ざる ----
+DOUBLED = [("id", "ID", [("でにゅうりょくする", "で入力する"), ("でろぐいんする", "でログインする")]),
+           ("ok", "OK", [("からはじめる", "から始める"), ("からおくる", "から送る")]),
+           ("ng", "NG", [("がでた", "が出た"), ("がおおい", "が多い")]),
+           ("dm", "DM", [("もおくる", "も送る"), ("もきた", "も来た")]),
+           ("cm", "CM", [("もながれる", "も流れる"), ("もある", "もある")]),
+           ("pm", "PM", [("もくる", "も来る"), ("もいる", "もいる")]),
+           ("it", "IT", [("とかんけいする", "と関係する"), ("とよぶ", "と呼ぶ")]),
+           ("ssd", "SSD", [("でうごかす", "で動かす"), ("でおくる", "で送る")])]  # ssd は3文字（今までも取れる語の見本）
+
+# ---- 型 b: 手がかり方式（cue）の語に、手がかりの語が続く句 ----
+AI_CUE = [
+    ("をつかう", "を使う"), ("をつかって", "を使って"), ("をつかいたい", "を使いたい"), ("をどうにゅうする", "を導入する"),
+    ("をかつようする", "を活用する"), ("をかいはつする", "を開発する"), ("をがくしゅうする", "を学習する"), ("をとうさいした", "を搭載した"),
+    ("がしんかする", "が進化する"), ("がふきゅうした", "が普及した"), ("がかいとうする", "が回答する"), ("がぶんしょうをつくる", "が文章を作る"),
+    ("はぎじゅつだ", "は技術だ"), ("はべんりだ", "は便利だ"), ("はせいのうがたかい", "は性能が高い"), ("はせいどがたかい", "は精度が高い"),
+    ("でがぞうをつくる", "で画像を作る"), ("でぶんしょうをようやくする", "で文章を要約する"), ("でほんやくする", "で翻訳する"),
+    ("でかいせきする", "で解析する"), ("にしつもんする", "に質問する"), ("にそうだんする", "に相談する"), ("にたいわをさせる", "に対話をさせる"),
+    ("のしんか", "の進化"), ("のかつよう", "の活用"), ("のどうにゅう", "の導入"), ("のせいのう", "の性能"), ("のせいど", "の精度"),
+    ("のかいとう", "の回答"), ("のぎじゅつ", "の技術"), ("とたいわする", "と対話する"), ("とかいわする", "と会話する"),
+    ("もつかっている", "も使っている"), ("もしんかした", "も進化した"), ("もかつようできる", "も活用できる"),
+]
+AI_NOCUE = [
+    ("がこわい", "が怖い"), ("はすきだ", "は好きだ"), ("がしごとをうばう", "が仕事を奪う"), ("でなやむ", "で悩む"),
+    ("をしんじる", "を信じる"), ("にまかせる", "に任せる"), ("のみらい", "の未来"), ("はうそをつく", "は嘘をつく"),
+    ("のじだい", "の時代"), ("とそうぞう", "と創造"), ("をうたがう", "を疑う"), ("もわからない", "も分からない"),
+    ("にたのむ", "に頼む"), ("をもちいる", "を用いる"), ("がかく", "が書く"), ("でつくる", "で作る"),
+    ("をおぼえさせる", "を覚えさせる"), ("のこたえ", "の答え"), ("はおしえてくれる", "は教えてくれる"), ("がうごく", "が動く"),
+]
+UI_CUE = [("をかいぜんする", "を改善する"), ("のでざいん", "のデザイン"), ("がひょうじされる", "が表示される"), ("のがめん", "の画面"),
+          ("のぼたん", "のボタン"), ("をへんこうする", "を変更する"), ("でひょうじする", "で表示する"), ("はでざいんがよい", "はデザインが良い")]
+IDE_CUE = [("をせっていする", "を設定する"), ("のせっていをかえる", "の設定を変える"), ("がきどうしない", "が起動しない"),
+           ("でぷらぐいんをいれる", "でプラグインを入れる"), ("にいんすとーるする", "にインストールする"), ("のきどうがおそい", "の起動が遅い")]
+ISO_CUE = [("のにんしょうをうける", "の認証を受ける"), ("をしゅとくする", "を取得する"), ("のきかくをよむ", "の規格を読む"),
+           ("のきじゅんにそう", "の基準に沿う"), ("のしんさをうける", "の審査を受ける"), ("でにんしょうする", "で認証する")]
+ROI_CUE = [("をけいさんする", "を計算する"), ("がさんしゅつできる", "が算出できる"), ("のけいさんほうほう", "の計算方法"),
+           ("をさいだいかする", "を最大化する"), ("のとうしかいしゅう", "の投資回収")]
+IME_CUE = [("をきりかえる", "を切り替える"), ("のせっていをかえる", "の設定を変える"), ("でにゅうりょくする", "で入力する"), ("がへんかんしない", "が変換しない"),
+           ("のへんかんがおかしい", "の変換がおかしい")]
+GUI_CUE = [("でそうさする", "で操作する"), ("のひょうじがおかしい", "の表示がおかしい"), ("のせっていをかえる", "の設定を変える"), ("をさくせいする", "を作成する"),
+           ("をかいはつする", "を開発する")]
+CUE_WORDS = {"ai": AI_CUE, "ui": UI_CUE, "ide": IDE_CUE, "iso": ISO_CUE, "roi": ROI_CUE, "ime": IME_CUE, "gui": GUI_CUE}
+
+# ---- 型 b: 日本語の語としては使わない並び（plain）。助詞か文の終わり ----
+PLAIN_TAILS = [("をつかう", "を使う"), ("でにゅうりょくする", "で入力する"), ("のせっていをかえる", "の設定を変える"),
+               ("がひつようだ", "が必要だ"), ("はたいせつだ", "は大事だ"), ("もしらべる", "も調べる"), ("のはなしをする", "の話をする"),
+               ("にかんするしりょう", "に関する資料")]
+PLAIN_WORDS = ["ipo", "seo", "uae", "fifa", "gafa"]
+PLAIN_END = [("です", "です"), ("だ", "だ"), ("。", "。")]
+
+# ---- 日本語の重なる語 ----
+AI_JA = {
+    "愛": [("をかんじる", "を感じる"), ("をつたえる", "を伝える"), ("をかたる", "を語る"), ("をこめて", "を込めて"), ("をさけぶ", "を叫ぶ"),
+          ("をちかう", "を誓う"), ("をうたう", "を歌う"), ("をしる", "を知る"), ("をもとめる", "を求める"), ("をおくる", "を贈る"),
+          ("をそそぐ", "を注ぐ"), ("をはぐくむ", "を育む"), ("がふかい", "が深い"), ("がたりない", "が足りない"), ("がめばえる", "が芽生える"),
+          ("がうまれた", "が生まれた"), ("はもうもくだ", "は盲目だ"), ("はつよい", "は強い"), ("はせかいをすくう", "は世界を救う"),
+          ("でみたす", "で満たす"), ("でむすばれる", "で結ばれる"), ("でこどもをそだてる", "で子どもを育てる"), ("にみちている", "に満ちている"),
+          ("にいきる", "に生きる"), ("にうえている", "に飢えている"), ("にめざめる", "に目覚める"), ("のこくはく", "の告白"), ("のうた", "の歌"),
+          ("のかたち", "の形"), ("のあるいえ", "のある家"), ("のきもち", "の気持ち"), ("とへいわ", "と平和"), ("とゆうき", "と勇気"),
+          ("ときぼう", "と希望"), ("とにくしみ", "と憎しみ"), ("もおなじだ", "も同じだ"), ("もにくしみも", "も憎しみも")],
+    "会い": [("にいく", "に行く"), ("にきてください", "に来てください"), ("にいきます", "に行きます"), ("にいったよ", "に行ったよ"),
+            ("にいくつもり", "に行くつもり"), ("にいけない", "に行けない"), ("にいこう", "に行こう"), ("にゆく", "に行く")],
+    "藍": [("でそめる", "で染める"), ("のきもの", "の着物"), ("でそめたぬの", "で染めた布"), ("のはながさく", "の花が咲く")],
+    "合い": [("のてをいれる", "の手を入れる"), ("のてがはいる", "の手が入る")],
+}
+# 手がかりの語が続く、日本語の文（略語に取られる、壊れる例が出るはずの組）
+AI_JA_HARD = [("愛", "をつかってきもちをつたえる", "を使って気持ちを伝える"), ("愛", "をかつようしてそだてる", "を活用して育てる"),
+              ("愛", "のしんかをかんじる", "の進化を感じる"), ("愛", "とかいわする", "と会話する"), ("愛", "のぎじゅつをみがく", "の技術を磨く"),
+              ("愛", "をかいはつする", "を開発する"), ("愛", "のせいのうがたかい", "の性能が高い"), ("会い", "にいってしつもんする", "に行って質問する"),
+              ("愛", "でせいせいされる", "で生成される"), ("愛", "のふきゅうをねがう", "の普及を願う")]
+OTHER_JA = {
+    "ui": [("憂い", "をおびた", "を帯びた"), ("憂い", "をふくんだ", "を含んだ"), ("憂い", "のいろ", "の色"), ("憂い", "がのこる", "が残る"),
+           ("憂い", "にしずむ", "に沈む"), ("憂い", "もきえた", "も消えた"), ("憂い", "のひとみ", "の瞳"), ("憂い", "をたたえる", "をたたえる")],
+    "ide": [("井手", "がきた", "が来た"), ("井手", "のいえ", "の家"), ("井手", "とあう", "と会う"), ("井手", "もいく", "も行く"),
+            ("井手", "はいない", "はいない"), ("井手", "にたのむ", "に頼む")],
+    "iso": [("磯", "のかおり", "の香り"), ("磯", "でつる", "で釣る"), ("磯", "にいく", "に行く"), ("磯", "がすきだ", "が好きだ"),
+            ("磯", "をあるく", "を歩く"), ("磯", "のいわば", "の岩場")],
+}
+INSIDE_JA = [  # 並びが日本語の語の中にある（略語に取らないはず）
+    ("いめーじ", "イメージ"), ("いめーじがわく", "イメージが湧く"), ("いめちぇんをする", "イメチェンをする"), ("せおう", "背負う"),
+    ("せおっていく", "背負っていく"), ("せおいなげ", "背負い投げ"), ("えうろぱ", "エウロパ"), ("いめーじとちがう", "イメージと違う"),
+    ("ぐいっとのむ", "ぐいっと飲む"), ("ぐいぐいひっぱる", "ぐいぐい引っ張る"), ("ぐいのみ", "ぐい飲み"), ("ふぃふぁー", "ふぃふぁー"),
+]
+# 文の頭は日本語の語（こういを → 行為を）。略語に見える並びが語の途中にある
+CROSS_JA = [("こういをかさねる", "行為を重ねる"), ("こういをうける", "好意を受ける"), ("こういにあまえる", "厚意に甘える"),
+            ("さくいをつける", "作為をつける"), ("かんしょういをもつ", "感傷意を持つ")]
+# 黒い・広い・白い など -roi の形容詞に助詞が続く（roi を略語に取らないはず）
+ROI_JA = [("このいえはひろいがあつい", "この家は広いが暑い"), ("そのねこはくろいのがすき", "その猫は黒いのが好き"), ("しろいのをかう", "白いのを買う"),
+          ("へやはひろいでしょう", "部屋は広いでしょう"), ("かべがしろいとおもう", "壁が白いと思う"), ("まどのそとがくろいのでこわい", "窓の外が黒いので怖い"),
+          ("みちがひろいもんだいだ", "道が広いもんだいだ"), ("いえはひろいがたかい", "家は広いが高い"), ("かおがくろいのはひやけだ", "顔が黒いのは日焼けだ"),
+          ("ひろいのがすきだ", "広いのが好きだ"), ("しろいのでいい", "白いのでいい"), ("くろいがかっこいい", "黒いがかっこいい")]
+
+# 日本語の辞書の代わり（tools/acronym_probe.py --readings）: 試験の文に出る、略語に見える並びを含む日本語の語の読み。
+# Mozc の辞書には、これらの語（行為、広い、黒い、白い、イメージ、背負う ...）が読みとして入っている
+READINGS = ["こうい", "さくい", "ひろい", "くろい", "しろい", "いめーじ", "いめちぇん", "せおう", "せおって", "せおい",
+            "えうろぱ", "ぐいっと", "ぐいぐい", "ぐいのみ", "ふぃふぁー", "かんしょうい", "さんかいめ", "かいめ", "たいぱ", "てぬぐい", "こころえ"]
+
+PREFIX_JA = [("", ""), ("きょうは", "今日は"), ("いま、", "今、"), ("きのう、", "昨日、"), ("かのじょは", "彼女は"), ("ははは", "母は"),
+             ("あのひと", "あの人"), ("わたしは", "私は")]
+
+
+ERRORS = []
+
+
+def typed_part(kana):
+    """かな → 打つ形。かなに読み戻せなければ記録する（試験データの打ち間違いを防ぐ）"""
+    text = romaji(kana)
+    if parse_back(text) != kana:
+        ERRORS.append(f"読み戻せない: {kana} → {text} → {parse_back(text)}")
+    return text
+
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out-dir", type=Path, default=REPO / "tests/conversion")
+    args = parser.parse_args()
+
+    rows = [l.split("\t") for l in (REPO / "tools/data/acronyms.tsv").read_text(encoding="utf-8").splitlines()
+            if l and not l.startswith("#")]
+    kind_a = [(r[0], r[1]) for r in rows if r[2] == "a"]
+    kind_b = {r[0]: r for r in rows if r[2] == "b"}
+    cls_of = {}
+    for cls, words in CLASS.items():
+        for w in words:
+            cls_of.setdefault(w, cls)
+    tails_of = {"dev": DEV, "hard": HARD, "biz": BIZ, "person": PERSON, "media": MEDIA, "econ": ECON, None: GENERAL}
+
+    sentences, problems = [], []
+
+    def add(typed_acr, shown, prefix, tail, kind, origin, name, bucket):
+        typed = typed_part(prefix[0]) + typed_acr + typed_part(tail[0] + "。")
+        bucket.append([typed, prefix[1] + shown + tail[1] + "。", kind, name, origin])
+
+    acr = []
+    # 型 a: 語ごとに3文（句の分野の中を回し、前の句も回す）
+    for n, (typed_acr, shown) in enumerate(sorted(kind_a)):
+        tails = tails_of[cls_of.get(typed_acr)]
+        for k in range(3):
+            prefix = PREFIX[(n * 3 + k * 5) % len(PREFIX)]
+            tail = tails[(n + k * 3) % len(tails)]
+            add(typed_acr, shown, prefix, tail, "a", "a-class", shown, acr)
+    for n, (typed_acr, shown, tails) in enumerate(DOUBLED):
+        for k, tail in enumerate(tails):
+            for j in range(2):
+                add(typed_acr, shown, PREFIX[(n * 3 + k + j * 5) % len(PREFIX)], tail, "a", "a-doubled", shown, acr)
+    # 型 b: 手がかり方式
+    for typed_acr, tails in CUE_WORDS.items():
+        shown = kind_b[typed_acr][1]
+        for n, tail in enumerate(tails):
+            for k in range(3 if typed_acr == "ai" else 1):
+                prefix = PREFIX[(n * 2 + k * 5 + (0 if typed_acr == "ai" else 3)) % len(PREFIX)]
+                add(typed_acr, shown, prefix, tail, "b", "b-cue", shown, acr)
+    for n, typed_acr in enumerate(PLAIN_WORDS):
+        shown = kind_b[typed_acr][1]
+        for k, tail in enumerate(PLAIN_TAILS):
+            prefix = PREFIX[(n + k * 2) % len(PREFIX)]
+            add(typed_acr, shown, prefix, tail, "b", "b-plain", shown, acr)
+    # 手がかりにない技術の句（ai）
+    for n, tail in enumerate(AI_NOCUE):
+        for k in range(2):
+            add("ai", "AI", PREFIX[(n + k * 4) % len(PREFIX)], tail, "b", "b-nocue", "AI", acr)
+
+    ja = []
+    for word, tails in AI_JA.items():
+        for n, tail in enumerate(tails):
+            for k in range(2 if word == "合い" else (4 if word == "愛" else 3)):
+                prefix = PREFIX_JA[(n + k * 3) % len(PREFIX_JA)]
+                typed = typed_part(prefix[0]) + "ai" + typed_part(tail[0] + "。")
+                jp = prefix[1] + word + tail[1] + "。"
+                ja.append([typed, jp, "b", word + tail[1][:1], "ja-plain"])
+    for word, tail_kana, tail_jp in AI_JA_HARD:
+        for k in range(2):
+            prefix = PREFIX_JA[(k * 3 + len(tail_kana)) % len(PREFIX_JA)]
+            typed = typed_part(prefix[0]) + "ai" + typed_part(tail_kana + "。")
+            ja.append([typed, prefix[1] + word + tail_jp + "。", "b", word + tail_jp[:1], "ja-hard"])
+    for key, items in OTHER_JA.items():
+        for n, (word, tail_kana, tail_jp) in enumerate(items):
+            for k in range(3):
+                prefix = PREFIX_JA[(n + k * 3) % len(PREFIX_JA)]
+                reading = {"ui": "ui", "ide": "ide", "iso": "iso"}[key]
+                typed = typed_part(prefix[0]) + reading + typed_part(tail_kana + "。")
+                ja.append([typed, prefix[1] + word + tail_jp + "。", "b", word + tail_jp[:1], "ja-plain"])
+    for n, (kana, jp) in enumerate(INSIDE_JA):
+        for k in range(2):
+            prefix = PREFIX_JA[(n + k * 3) % len(PREFIX_JA)]
+            typed = typed_part(prefix[0] + kana + "。")
+            ja.append([typed, prefix[1] + jp + "。", "b", jp, "ja-inside"])
+    for n, (kana, jp) in enumerate(ROI_JA):
+        ja.append([typed_part(kana + "。"), jp + "。", "b", "広い", "ja-inside"])
+        ja.append([typed_part("きのう、" + kana + "。"), "昨日、" + jp + "。", "b", "広い", "ja-inside"])
+    for n, (kana, jp) in enumerate(CROSS_JA):
+        for k in range(2):
+            prefix = PREFIX_JA[(n + k * 3) % len(PREFIX_JA)]
+            typed = typed_part(prefix[0] + kana + "。")
+            ja.append([typed, prefix[1] + jp + "。", "b", jp[:2], "ja-inside"])
+
+    cand = []
+    for typed_acr, shown in sorted(kind_a):
+        cand.append([typed_acr, shown, "typed", "acronym-a", "list"])
+        cand.append([shown, shown, "info-capital", "acronym-a", "list"])
+    for typed_acr, r in sorted(kind_b.items()):
+        cand.append([typed_acr, r[1], "overlap", "acronym-b", f"list-{r[4]}"])
+
+    # 重複と、打った形の確かめ
+    for name, data in (("acronyms.tsv", acr), ("acronyms-ja.tsv", ja)):
+        seen = set()
+        uniq = []
+        for r in data:
+            if r[0] in seen:
+                continue
+            seen.add(r[0])
+            uniq.append(r)
+        data[:] = uniq
+
+    header_s = ("# 略語の試験（文）。tools/make_acronym_tests.py で作成（手で足さない）。変換の結果は見ずに作った。列: ローマ字<TAB>期待する文<TAB>型（a: 英字が残る略語、"
+                "b: 日本語に読める略語）<TAB>名前<TAB>由来（a-class、b-cue、b-plain、b-nocue）\n")
+    header_j = ("# 略語と同じ並びが日本語の語になる文。略語に取らず日本語のまま出るのが正解。tools/make_acronym_tests.py で作成（手で足さない）。"
+                "列: ローマ字<TAB>期待する文<TAB>型<TAB>名前（重なる日本語の語）<TAB>由来（ja-plain、ja-hard、ja-inside）\n")
+    header_c = ("# 略語の試験（候補）。tools/make_acronym_tests.py で作成（手で足さない）。略語だけを小文字で打って変換する。"
+                "列: ローマ字<TAB>期待する候補<TAB>方式（typed: 先頭に出るはず、overlap: 上位3つ、info-capital: 大文字で打った形の目安）<TAB>分野<TAB>由来\n")
+    if ERRORS:
+        sys.exit("\n".join(sorted(set(ERRORS))))
+    args.out_dir.mkdir(parents=True, exist_ok=True)
+    (args.out_dir / "acronyms-readings.txt").write_text("\n".join(sorted(set(READINGS))) + "\n", encoding="utf-8", newline="\n")
+    for name, header, data in (("acronyms.tsv", header_s, acr), ("acronyms-ja.tsv", header_j, ja), ("acronyms-cand.tsv", header_c, cand)):
+        (args.out_dir / name).write_text(header + "".join("\t".join(r) + "\n" for r in data), encoding="utf-8", newline="\n")
+        print(name, len(data))
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -607,6 +607,43 @@ int main() {
            "only keys that read as kana are edited");
   }
 
+  {
+    // 日本語に読める略語（ai: あい、ui: うい、ime: いめ）。打った並びに英字が残らない。
+    // 助詞と技術の語が続くときだけ英語にする（tools/data/acronyms.tsv、acronym-cues.tsv）。
+    Expect(english("aiwotsukau") == "ai|", "ai + を + 使う は AI（aiwotsukau）");
+    Expect(english("kyouhaaiwotsukau") == "ai|", "文の途中でも AI を使う");
+    Expect(english("aigakaihatsu") == "ai|", "ai + が + 開発");
+    Expect(english("aiwokanjiru").empty(), "愛を感じる は日本語のまま");
+    Expect(english("ainiikuru").empty(), "会いに行る（手がかりなし）は日本語のまま");
+    Expect(english("aitoheiwa").empty(), "愛と平和 は日本語のまま");
+    Expect(english("aiwo").empty() && english("ai").empty() && english("aiwotsu").empty(), "手がかりが出そろう前は日本語のまま");
+    Expect(english("aiga").empty(), "ai + が だけ（手がかりなし）は日本語のまま");
+    Expect(english("ainotsukai") == "ai|", "ai + の + 使い は AI");
+    Expect(english("naiwotsukau").empty(), "略語は打った文字の区切りから始まる（nai の ai は取らない）");
+    Expect(english("uiwotsukau") == "ui|", "ui + を + 使う は UI");
+    Expect(english("kouiwotsukau") == "ui|", "辞書がないときは行為を使う も取る（下は辞書があるとき）");
+    {
+      const jaen::ReadingCheck is_reading = [](std::string_view kana) { return kana == "こうい"; };
+      const auto pieces = jaen::SplitEnglish(Parse("kouiwotsukau"), lexicon, Parse, nullptr, &is_reading);
+      Expect(Text("kouiwotsukau", pieces, true).empty(), "行為（こうい）の途中の ui は取らない");
+      const auto taken = jaen::SplitEnglish(Parse("aiwotsukau"), lexicon, Parse, nullptr, &is_reading);
+      Expect(Text("aiwotsukau", taken, true) == "ai|", "辞書があっても AI を使う は取る");
+    }
+    {
+      jaen::Choices choices;
+      choices.japanese.insert("ai");
+      const auto pieces = jaen::SplitEnglish(Parse("aiwotsukau"), lexicon, Parse, &choices);
+      Expect(Text("aiwotsukau", pieces, true).empty(), "利用者が日本語に戻した ai は取らない");
+    }
+    // 日本語の語としては使わない並び（方式 plain: seo）は、助詞か文の終わりが続けばよい。
+    Expect(english("seowomita") == "seo|" && english("seodesu") == "seo|" && english("seo") == "seo|", "seo は助詞か文の終わりで取る");
+    Expect(english("seoi").empty(), "せおい（背負い）の seo は取らない（助詞も文の終わりも続かない）");
+    // ime、gui は日本語の語の中にもある（三回目の の ime、手ぬぐいの の gui）ので、手がかりが要る。
+    Expect(english("imewokirikaeru") == "ime|", "ime + を + 切り替え は IME");
+    Expect(english("sannkaimeno").empty(), "三回目の の ime は取らない（辞書がなくても、手がかりがない）");
+    Expect(english("imeji").empty(), "イメージ の ime は取らない");
+  }
+
   std::cout << "SUMMARY\t" << failures << '\n';
   return failures ? 1 : 0;
 }

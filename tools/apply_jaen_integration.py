@@ -1738,8 +1738,11 @@ subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py
 
 # 大文字を含む英字の固有名詞（dictionary14.txt）: ぐーぐる の候補に Google、にゅーよーく に New York など
 # （tools/data/proper-nouns.tsv。カタカナの語があればその次、なければ既存の語より後ろ）。
+# 日本語に読める略語（あい → AI、うい → UI。tools/data/acronyms.tsv の型 b）は、読みが2かなでも、読みの候補の
+# 2〜3番目に入れる（一番安い語の品詞を使うので、文の中で一番安い語に勝たない）。
 subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.py"), "--mozc", str(src),
                 "--names", str(REPO / "tools/data/proper-nouns.tsv"),
+                "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
 

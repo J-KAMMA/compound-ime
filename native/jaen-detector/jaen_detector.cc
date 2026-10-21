@@ -25,11 +25,65 @@ constexpr size_t kMinCompoundLength = 8;  // opencode: 2語（open + code）の�
 constexpr size_t kMinCompoundPart = 4;    // つながりの各語の最小の長さ
 constexpr int64_t kCompoundPenalty = 3;   // 2語ずつ取れる分け方より少し高い
 
+// 日本語に読める略語（ai: あい、ui: うい、seo: せお）。打った並びが全部かなに読めるので、
+// 英字が残る略語（api、url、html）と違い、検出器は印を見つけられない。略語の次に助詞が続き、
+// そのあとが技術の語（つかう、どうにゅう ...）のとき（型 b、方式 cue）、または日本語の語としては使わない
+// 並び（seo、ipo）に助詞か文の終わりが続くとき（方式 plain）だけ、英語にする。愛を感じる・会いに行く、は
+// 日本語のまま。表は tools/data/acronyms.tsv と acronym-cues.tsv から tools/build_acronym_table.py が書く。
+struct ReadableAcronym {
+  std::string_view typed;
+  bool plain;                  // 手がかりなしで、助詞か文の終わりが続けばよい
+  std::string_view extra_cues;  // この略語だけの手がかり（かな、コンマ区切り）
+};
+// BEGIN GENERATED acronyms (tools/build_acronym_table.py)
+constexpr ReadableAcronym kReadableAcronyms[] = {
+    {"ai", false, ""},
+    {"fifa", true, ""},
+    {"gafa", true, ""},
+    {"gui", false, "そうさ,ひょうじ,せってい,さくせい,かいはつ"},
+    {"ide", false, "せってい,きどう,ぷらぐいん,いんすとーる"},
+    {"ime", false, "きりかえ,せってい,にゅうりょく,へんかん"},
+    {"ipo", true, ""},
+    {"iso", false, "にんしょう,しゅとく,きかく,きじゅん,しんさ"},
+    {"roi", false, "けいさん,さんしゅつ,とうし,さいだいか"},
+    {"seo", true, ""},
+    {"uae", true, ""},
+    {"ui", false, "ひょうじ,でざいん,がめん,ぼたん,かいぜん,へんこう"},
+};
+constexpr std::string_view kAcronymCues =
+    "つかう,つかっ,つかい,つかわ,どうにゅう,かつよう,かいはつ,がくしゅう,せいせい,とうさい,しつもん,そうだん,しんか,はってん,ふきゅう,ぎじゅつ,せいのう,せいど,かいとう,しゅつりょく,にゅうりょく,もでる,ちゃっと,がぞう,ぶんしょう,こーど,ようやく,ほんやく,じどうか,こうりつ,べんり,かしこ,まちがえ,さくせい,はんだん,よそく,かいせき,うばう,うばわ,おきかわ,たいおう,たいわ,かいわ,そうさ,せっけい,じっそう";
+// END GENERATED acronyms
+constexpr size_t kMaxAcronymLength = 4;   // kReadableAcronyms の打つ形の最大の長さ
+constexpr size_t kAcronymCueWindow = 12;  // 助詞の次から読むかなの数（手がかりは、この先頭に合わせる）
+
 bool IsAsciiAlpha(char c) { return (c | 0x20) >= 'a' && (c | 0x20) <= 'z'; }
 char Lower(char c) { return IsAsciiAlpha(c) ? static_cast<char>(c | 0x20) : c; }
 bool IsVowel(char c) { return std::string_view("aiueo").find(Lower(c)) != std::string_view::npos; }
 
 bool IsAsciiDigit(char c) { return c >= '0' && c <= '9'; }
+
+const ReadableAcronym* FindReadableAcronym(std::string_view word) {
+  if (word.size() > kMaxAcronymLength) return nullptr;
+  for (const ReadableAcronym& acronym : kReadableAcronyms) {
+    if (acronym.typed.size() == word.size() &&
+        std::ranges::equal(acronym.typed, word, [](char a, char b) { return a == Lower(b); })) {
+      return &acronym;
+    }
+  }
+  return nullptr;
+}
+
+// |text| starts with one of the comma separated kana stems in |cues|.
+bool StartsWithCue(std::string_view text, std::string_view cues) {
+  for (size_t start = 0; start < cues.size();) {
+    size_t end = cues.find(',', start);
+    if (end == std::string_view::npos) end = cues.size();
+    const std::string_view cue = cues.substr(start, end - start);
+    if (!cue.empty() && text.starts_with(cue)) return true;
+    start = end + 1;
+  }
+  return false;
+}
 
 // Letters and ' (a word), or digits and letters with a letter in them (3d, mp3).
 std::optional<std::string> Normalize(std::string_view word) {
@@ -510,6 +564,31 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   if (n == 0 || n > kMaxRawLength) return {};
   const auto edge_cost = [&](size_t i) { return boundary[i] ? 0 : kCutCost; };
 
+  // 日本語に読める略語（kReadableAcronyms）を [i, j) で英語にしてよいか。両端は打った文字の区切りの上。
+  // 略語を含む日本語の読み（こういを の いを ではなく、行為 の こうい）の途中は、辞書があれば取らない。
+  const auto acronym_taken = [&](const ReadableAcronym& acronym, size_t i, size_t j) {
+    const size_t ka = kana_at[i];
+    const size_t kb = kana_at[j];
+    if (kb <= ka || (is_reading && crosses_reading(ka, kb))) return false;
+    struct Particle { std::string_view key; std::string_view kana; };
+    static constexpr Particle kParticles[] = {{"wo", "を"}, {"ga", "が"}, {"ha", "は"}, {"de", "で"},
+                                              {"ni", "に"}, {"no", "の"}, {"to", "と"}, {"mo", "も"}};
+    bool particle = false;
+    if (j + 2 <= n && boundary[j + 2] && kb < kana.size() && kana_at[j + 2] == kb + 1) {
+      for (const Particle& p : kParticles) {
+        if (Lower(raw[j]) == p.key[0] && Lower(raw[j + 1]) == p.key[1] && kana[kb] == p.kana) particle = true;
+      }
+    }
+    if (acronym.plain) {
+      static constexpr std::string_view kStops[] = {"。", "、", "！", "？"};
+      return particle || j == n ||
+             (kb < kana.size() && std::ranges::find(kStops, std::string_view(kana[kb])) != std::end(kStops));
+    }
+    if (!particle) return false;
+    const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
+    return StartsWithCue(after, kAcronymCues) || StartsWithCue(after, acronym.extra_cues);
+  };
+
   // Occurrences of words the user turned back into Japanese; no English word
   // is taken inside one ("ogle" in "google"), but longer words still are.
   std::vector<std::pair<size_t, size_t>> japanese;
@@ -581,6 +660,14 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           std::all_of(unread.begin() + i, unread.begin() + j, [](bool u) { return u; })) {
         english[i].emplace_back(j, kSpanCost - kLengthBonus * static_cast<int64_t>(word.size()));  // as a word with a foreign sign: a listed word wins (chatgpt)
         continue;
+      }
+      // 日本語に読める略語（ai の あい）: 助詞と技術の語が続くとき、英語の語として取る（打った並びに印がないので、
+      // 負の費用で日本語の読みに勝たせる。語は表示の形が先頭に出る: ai → AI）。
+      if (learned == 0 && boundary[i] && boundary[j] && word.size() <= kMaxAcronymLength) {
+        if (const ReadableAcronym* acronym = FindReadableAcronym(word); acronym && acronym_taken(*acronym, i, j)) {
+          english[i].emplace_back(j, -kLengthBonus * static_cast<int64_t>(word.size()) - kPhraseBonus);
+          continue;
+        }
       }
       const Lexicon::Place* place = lexicon.FindPlace(word);
       const bool signal_only = learned == 0 && !place && !lexicon.Contains(word) && lexicon.IsSignalOnly(word);
