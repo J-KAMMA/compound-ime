@@ -81,7 +81,7 @@ edit(kk, """        guard eligible.count > 1,
         // 迷うときだけ並べ替える: 候補を先頭から数個に絞り、先頭が次の候補を大きく引き離しているときは何もしない
         let gateCount = eligible.count
         if let limit = ContextPriorGate.topK, eligible.count > limit { eligible = Array(eligible.prefix(limit)) }
-        let gateGap = abs(Double(candidates[eligible[0]].value) - Double(candidates[eligible[1]].value))
+        let gateGap = Swift.abs(Double(candidates[eligible[0]].value) - Double(candidates[eligible[1]].value))
         if let maxGap = ContextPriorGate.maxGap, gateGap > maxGap { return candidates }
         let gateWinner = model.contextPriorWinner(input: reading, candidates: eligible.map { candidates[$0] }, contextualMode: contextualMode)
         ContextPriorGate.log("ctx\\tcount=\\(gateCount)\\tused=\\(eligible.count)\\tgap=\\(gateGap)\\twinner=\\(gateWinner.map { "\\($0)" } ?? "nil")")
