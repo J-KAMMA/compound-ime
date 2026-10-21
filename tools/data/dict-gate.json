@@ -1,0 +1,35 @@
+{
+  "_note": "辞書の月1回の自動更新（.github/workflows/dict-update.yml）で、配布ページに置くかどうかを決める基準。説明は docs/dict-update.md。値はこちらの案で、試験を数回流して揺れを見てから決め直す。",
+  "data": {
+    "_note": "取り直した一覧の行数が、いまのリポジトリの一覧から大きく外れたら、試験を流す前に止める（取得の失敗・出典の変更の見つけ方）。",
+    "proper-nouns.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 5000},
+    "supplement.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 5000},
+    "english-extra.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 10000}
+  },
+  "tolerance": {
+    "_note": "許す下がり（件数）は、max(min_items, 試験の総数 × percent %) の切り上げ。target は辞書を変えて直したい試験、japanese は日本語の変換を壊していないかの試験。",
+    "target": {"percent": 0.5, "min_items": 1},
+    "japanese": {"percent": 0.3, "min_items": 2}
+  },
+  "metrics": [
+    {"name": "固有名詞の文: 名前が合う", "file": "proper-nouns-score.txt", "pattern": "名前が合う (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "固有名詞の候補: 先頭", "file": "proper-nouns-cand-score.txt", "pattern": "先頭 (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "固有名詞の候補: 上位3つ", "file": "proper-nouns-cand-score.txt", "pattern": "上位3つ (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "固有名詞の候補: 候補の中", "file": "proper-nouns-cand-score.txt", "pattern": "候補の中 (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "略語の文: 名前が合う", "file": "acronyms-score.txt", "pattern": "名前が合う (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "略語の候補: 先頭", "file": "acronyms-cand-score.txt", "pattern": "先頭 (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "略語の候補: 候補の中", "file": "acronyms-cand-score.txt", "pattern": "候補の中 (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "開発の道具の候補: 先頭", "file": "domain-tools-cand-score.txt", "pattern": "先頭 (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "英単語と重なるローマ字（英語にしたい文）: 英語で出た", "file": "allenglish-mixed-score.txt", "pattern": "英語で出た (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "英単語と重なるローマ字（日本語だけの文）: 日本語のまま", "file": "allenglish-ja-score.txt", "pattern": "日本語のまま (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "略語と重なる日本語の文: 日本語のまま出た", "file": "acronyms-ja-score.txt", "pattern": "名前が合う (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "日本語だけの400文: 合計", "file": "ja400-score.txt", "pattern": "合計\\s+(\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "ウィキペディアの文: 元の文と同じ", "file": "wiki-typing-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "ウィキペディアの文: 英字が混じった", "file": "wiki-typing-score.txt", "pattern": "英字が混じった (\\d+)()", "better": "lower", "group": "japanese", "total_from": "wiki-typing-score.txt|元の文と同じ \\d+/(\\d+)"},
+    {"name": "プログラミングの文: 元の文と同じ", "file": "domain-prog-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "仮想通貨の文: 元の文と同じ", "file": "domain-crypto-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "開発の道具の名前の文: 元の文と同じ", "file": "domain-tools-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "話し言葉の打ち込み: 厳しい採点", "file": "colloquial-score.txt", "pattern": "厳しい (\\d+)/(\\d+)", "better": "higher", "group": "japanese"}
+  ],
+  "changed_sentences": {"file": "inputs.tsv", "note": "1,298文のうち、辞書を替えて結果が変わった文の数。いまは報告だけ（基準にするには、数回の実測が要る）。"}
+}

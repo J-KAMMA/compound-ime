@@ -126,6 +126,8 @@ jobs:
           cp $R/native/precision117/engine.cc $S/engine/engine.cc
           cp $R/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           python $R/tools/apply_jaen_integration.py $S $W/lex
+          # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
+          python $R/tools/apply_dict_update.py $S
           # 選び手（段階2b の記録と段階3の組み込み、MYIME_SELECTOR=0 で切る）
           python $R/tools/apply_selector_trace.py $W/myime/src
           python $R/tools/apply_selector_stage3.py $S $W/myime/src

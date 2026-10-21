@@ -15,9 +15,13 @@
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
+#   s: 辞書の更新（docs/dict-update.md）。手元の配布ページ（127.0.0.1）から取った辞書を読み直して候補が変わる、壊れた辞書（署名・ハッシュ・
+#      読めない行・品詞の表の違い）は入れない、読み直しに失敗したら前の辞書に戻る、止める設定では取りに行かない（tools/dict_update_scenarios.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
+# 環境変数 DICT_CANDIDATE_DIR（署名つきの配布物の場所）があれば、どの組も、その辞書を本体の取り込みの道（DICT_UPDATE）で入れてから流す
+# （月1回の自動更新が、新しい辞書の結果を、いまの辞書の結果と比べるため。.github/workflows/dict-update.yml）。
 set -eo pipefail
 GROUP=$1; E=$2; MODEL=$3; REPO=$4; OUT=$5
 T=$REPO/tests/conversion
@@ -34,7 +38,24 @@ run_one() {  # one input through the server; prints the output protocol text
     $E/session_handler_main --input "$1" --profile $W/p --dictionary oss < /dev/null 2>/dev/null
 }
 
+# 辞書の更新の候補（DICT_CANDIDATE_DIR）: 署名つきの配布物を、本体が週1回するのと同じ道（目録と署名の確かめ、ハッシュ、読み込み）で入れる。
+# 目録の中の URL（配布ページ）は変えずに、手元のファイルから取る（試験のときだけ効く MYIME_DICT_UPDATE_REWRITE）。
+if [ -n "${DICT_CANDIDATE_DIR:-}" ]; then
+  . "$REPO/tools/dict_candidate_env.sh"
+  dict_candidate_env "$DICT_CANDIDATE_DIR" "$REPO" "$W/dict-state"
+  printf 'DICT_UPDATE\n' > $W/dict-install.tsv
+  run_one $W/dict-install.tsv | tee "$OUT/dict-install-$GROUP.txt" | grep "DICT_UPDATE:" || true
+  grep -q "DICT_UPDATE: status=installed" "$OUT/dict-install-$GROUP.txt" || { echo "候補の辞書を入れられなかった" >&2; exit 1; }
+fi
+
 case $GROUP in
+s)
+  # 辞書の更新の端から端までの試験（本体の session_handler_main の DICT_UPDATE 命令を通す）
+  python3 -m venv $W/venv-s && $W/venv-s/bin/pip -q install cryptography
+  $W/venv-s/bin/python $REPO/tools/dict_update_scenarios.py session $E/session_handler_main \
+    --env MYIME_AZOOKEY_DLL_DIR=$E --env MYIME_AZOOKEY_ZENZAI_WEIGHT=$MODEL --env MYIME_AZOOKEY_ZENZAI_GPU=0 --env TEST_TMPDIR=$W/p \
+    | tee $OUT/dict-update-scenarios.txt
+  ;;
 a1|a2)
   # 1,298文を前半と後半に分ける（まとめの段で inputs.tsv にする）
   half=$(( ($(wc -l < $T/inputs.txt) + 1) / 2 ))
@@ -406,5 +427,5 @@ PY
   ) || true
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、p、q、r、x、y のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、m、p、q、r、s、x、y のどれか" >&2; exit 2 ;;
 esac

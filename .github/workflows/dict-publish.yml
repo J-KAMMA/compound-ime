@@ -1,0 +1,63 @@
+# 下書きの辞書の配布ページ（dict-YYYYMMDD。dict-update.yml が作る）を、中身を見たあとに公開し、
+# 固定の配布ページ dict-latest の目録を新しい版に差し替える（本体が見に行くのはこの目録）。手動。docs/dict-update.md
+#
+# 先に dict-YYYYMMDD を公開し、辞書のファイルが公開の URL で取れるようになってから、dict-latest の目録を替える。
+# 目録の版が dict-latest の今の版より新しいときだけ替える（古い版への巻き戻しはしない。本体も古い版は無視する）。
+# 公開した辞書を取り下げたいときは、取り下げたい版と同じ中身（前の辞書）に新しい版の番号を付けて、もう一度流す。
+name: Dictionary publish
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 公開する下書きの配布ページ（例 dict-20261101）
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: ${{ inputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: 道具
+        run: python3 -m venv venv && venv/bin/pip -q install cryptography
+      - name: 下書きの中身を、公開の前にもう一度確かめる（署名と、ファイルのハッシュ）
+        run: |
+          set -eo pipefail
+          echo "$TAG" | grep -Eq '^dict-[0-9]{8}$' || { echo "dict-YYYYMMDD の形ではありません: $TAG"; exit 1; }
+          [ "$(gh release view "$TAG" --json isDraft -q .isDraft)" = "true" ] || { echo "$TAG は下書きではありません"; exit 1; }
+          mkdir -p draft
+          gh release download "$TAG" --dir draft
+          PUB=$(grep -v '^#' tools/dict-update/public-key.txt | grep -v '^$' | head -1)
+          [ "$PUB" != "UNSET" ] || { echo "tools/dict-update/public-key.txt が UNSET です"; exit 1; }
+          venv/bin/python tools/make_dict_release.py verify draft --public-key "$PUB"
+          VERSION=$(awk -F'\t' '$1=="version"{print $2}' draft/manifest.txt)
+          [ "dict-$VERSION" = "$TAG" ] || { echo "目録の版（$VERSION）と配布ページの名前（$TAG）が違います"; exit 1; }
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+      - name: dict-latest の今の版より新しいことを確かめる
+        run: |
+          set -eo pipefail
+          mkdir -p current
+          if gh release download dict-latest --pattern manifest.txt --dir current 2>/dev/null; then
+            CURRENT=$(awk -F'\t' '$1=="version"{print $2}' current/manifest.txt)
+            echo "dict-latest の今の版: $CURRENT"
+            [ "$VERSION" -gt "$CURRENT" ] || { echo "$VERSION は今の版 $CURRENT より新しくありません。置き換えません。"; exit 1; }
+          else
+            echo "dict-latest はまだありません（初めての公開）"
+          fi
+      - name: 公開する
+        run: |
+          set -eo pipefail
+          gh release edit "$TAG" --draft=false --latest=false
+          if ! gh release view dict-latest > /dev/null 2>&1; then
+            gh release create dict-latest --latest=false --title "辞書の最新の目録" \
+              --notes "本体が見に行く固定の場所です。目録（manifest.txt）と署名（manifest.txt.sig）だけを置きます。辞書のファイルは dict-YYYYMMDD の配布ページにあります。"
+          fi
+          gh release upload dict-latest draft/manifest.txt draft/manifest.txt.sig --clobber
+          echo "公開しました: $TAG、dict-latest の目録は版 $VERSION" | tee -a $GITHUB_STEP_SUMMARY

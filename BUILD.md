@@ -76,6 +76,14 @@ python tools/apply_jaen_integration.py <src> <lex>
 
 日英判定（`native/jaen-detector`）、辞書、変換、製品名の変更（最後に `tools/apply_compound_branding.py`、アイコンは `tools/make_compound_icon.py`、Pillow が必要）をすべて適用します。成功すると `applied` と表示します。
 
+辞書の更新（配布ページから辞書だけを取りに行く仕組み。設計は [docs/dict-update.md](docs/dict-update.md)）は、続けて次を 1 回だけ実行します。
+
+```
+python tools/apply_dict_update.py <src>
+```
+
+本体に焼き込む値は、品詞の表（`<src>/data/dictionary_oss/id.def` の SHA-256 と行数）、署名の公開鍵（`tools/dict-update/public-key.txt`。`UNSET` の間は辞書を取りに行かない）、取る先（`tools/dict-update/config.txt`）です。Mozc なしの単体試験は `bash tools/run_dict_update_unit_tests.sh <cryptography の入った python>`（g++ が要ります）。
+
 このスクリプトは、変換エンジン（Swift）の `<work>/myime/src` にも `tools/apply_zenzai_deadline.py` で改造を足します（手順 2 のパッチを当ててあること）。変換 1 回あたりの人工知能の時間の上限（既定 1000 ミリ秒。環境変数 `MYIME_ZENZAI_TIME_LIMIT_MS`、または設定 `ZenzaiTimeLimitMs`。0 で上限なし）と、人工知能の重みのメモリ固定（既定は有効。`MYIME_ZENZAI_MLOCK=0`、または設定 `ZenzaiMemoryLock=0` でやめる）です。足したあとに変換エンジンを組み立て直してください。
 
 ## 6. azooKey 変換エンジン DLL
