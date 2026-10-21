@@ -1,0 +1,441 @@
+# 英単語と同じ綴りのローマ字を含む日本語だけの文（英語にしてはいけない文）。tools/make_allenglish_tests.py で作成。
+# 列: ローマ字<TAB>期待する文<TAB>区分<TAB>重なる英単語<TAB>連番。区分: noun verb particle loan
+watashihatakegasukidesu	私は竹が好きです	noun	take	j0001
+takenituiteshirabeta	竹について調べた	noun	take	j0002
+kyouhatakenokotowokangaeteiru	今日は竹のことを考えている	noun	take	j0003
+sorehaonajitakedesu	それは同じ竹です	noun	take	j0004
+takegaarimasu	竹があります	noun	take	j0005
+sakekarahajimeyou	酒から始めよう	noun	sake	j0006
+sakedehanaku	酒ではなく	noun	sake	j0007
+sakenituiteshirabeta	酒について調べた	noun	sake	j0008
+ashitamosakewotsukau	明日も酒を使う	noun	sake	j0009
+watashihasakegasukidesu	私は酒が好きです	noun	sake	j0010
+kanenituiteshirabeta	金について調べた	noun	kane	j0011
+kanegaarimasu	金があります	noun	kane	j0012
+kanedehanaku	金ではなく	noun	kane	j0013
+kinounokanehadokodesuka	昨日の金はどこですか	noun	kane	j0014
+sorehaonajikanedesu	それは同じ金です	noun	kane	j0015
+watashihasamegasukidesu	私は鮫が好きです	noun	same	j0016
+sorehaonajisamedesu	それは同じ鮫です	noun	same	j0017
+samewokaimashita	鮫を買いました	noun	same	j0018
+samegaarimasu	鮫があります	noun	same	j0019
+samedehanaku	鮫ではなく	noun	same	j0020
+hatekarahajimeyou	果てから始めよう	noun	hate	j0021
+hatenituiteshirabeta	果てについて調べた	noun	hate	j0022
+hatedehanaku	果てではなく	noun	hate	j0023
+ashitamohatewotsukau	明日も果てを使う	noun	hate	j0024
+hategaarimasu	果てがあります	noun	hate	j0025
+ashitamohonwotsukau	明日も本を使う	noun	hon	j0026
+honkarahajimeyou	本から始めよう	noun	hon	j0027
+honwokaimashita	本を買いました	noun	hon	j0028
+sorehaonajihondesu	それは同じ本です	noun	hon	j0029
+honnituiteshirabeta	本について調べた	noun	hon	j0030
+menkarahajimeyou	麺から始めよう	noun	men	j0031
+kyouhamennokotowokangaeteiru	今日は麺のことを考えている	noun	men	j0032
+watashihamengasukidesu	私は麺が好きです	noun	men	j0033
+mennituiteshirabeta	麺について調べた	noun	men	j0034
+kinounomenhadokodesuka	昨日の麺はどこですか	noun	men	j0035
+watashihakengasukidesu	私は県が好きです	noun	ken	j0036
+kenwokaimashita	県を買いました	noun	ken	j0037
+ashitamokenwotsukau	明日も県を使う	noun	ken	j0038
+kinounokenhadokodesuka	昨日の県はどこですか	noun	ken	j0039
+kendehanaku	県ではなく	noun	ken	j0040
+senkarahajimeyou	線から始めよう	noun	sen	j0041
+sengaarimasu	線があります	noun	sen	j0042
+ashitamosenwotsukau	明日も線を使う	noun	sen	j0043
+kinounosenhadokodesuka	昨日の線はどこですか	noun	sen	j0044
+sennituiteshirabeta	線について調べた	noun	sen	j0045
+sonwokaimashita	損を買いました	noun	son	j0046
+kyouhasonnokotowokangaeteiru	今日は損のことを考えている	noun	son	j0047
+sondehanaku	損ではなく	noun	son	j0048
+songaarimasu	損があります	noun	son	j0049
+watashihasongasukidesu	私は損が好きです	noun	son	j0050
+banwokaimashita	番を買いました	noun	ban	j0051
+kinounobanhadokodesuka	昨日の番はどこですか	noun	ban	j0052
+kyouhabannokotowokangaeteiru	今日は番のことを考えている	noun	ban	j0053
+bankarahajimeyou	番から始めよう	noun	ban	j0054
+watashihabangasukidesu	私は番が好きです	noun	ban	j0055
+kinounosanhadokodesuka	昨日の三はどこですか	noun	san	j0056
+sangaarimasu	三があります	noun	san	j0057
+ashitamosanwotsukau	明日も三を使う	noun	san	j0058
+sankarahajimeyou	三から始めよう	noun	san	j0059
+sanwokaimashita	三を買いました	noun	san	j0060
+tendehanaku	点ではなく	noun	ten	j0061
+tengaarimasu	点があります	noun	ten	j0062
+sorehaonajitendesu	それは同じ点です	noun	ten	j0063
+ashitamotenwotsukau	明日も点を使う	noun	ten	j0064
+tennituiteshirabeta	点について調べた	noun	ten	j0065
+jinwokaimashita	人を買いました	noun	jin	j0066
+jingaarimasu	人があります	noun	jin	j0067
+kinounojinhadokodesuka	昨日の人はどこですか	noun	jin	j0068
+watashihajingasukidesu	私は人が好きです	noun	jin	j0069
+jinkarahajimeyou	人から始めよう	noun	jin	j0070
+sorehaonajimindesu	それは同じ民です	noun	min	j0071
+mindehanaku	民ではなく	noun	min	j0072
+ashitamominwotsukau	明日も民を使う	noun	min	j0073
+minkarahajimeyou	民から始めよう	noun	min	j0074
+kyouhaminnokotowokangaeteiru	今日は民のことを考えている	noun	min	j0075
+hennituiteshirabeta	辺について調べた	noun	hen	j0076
+hendehanaku	辺ではなく	noun	hen	j0077
+kyouhahennokotowokangaeteiru	今日は辺のことを考えている	noun	hen	j0078
+watashihahengasukidesu	私は辺が好きです	noun	hen	j0079
+kinounohenhadokodesuka	昨日の辺はどこですか	noun	hen	j0080
+ashitamobinwotsukau	明日も瓶を使う	noun	bin	j0081
+binwokaimashita	瓶を買いました	noun	bin	j0082
+bingaarimasu	瓶があります	noun	bin	j0083
+kinounobinhadokodesuka	昨日の瓶はどこですか	noun	bin	j0084
+watashihabingasukidesu	私は瓶が好きです	noun	bin	j0085
+sorehaonajikindesu	それは同じ金です	noun	kin	j0086
+watashihakingasukidesu	私は金が好きです	noun	kin	j0087
+kinkarahajimeyou	金から始めよう	noun	kin	j0088
+kindehanaku	金ではなく	noun	kin	j0089
+kingaarimasu	金があります	noun	kin	j0090
+minegaarimasu	峰があります	noun	mine	j0091
+minekarahajimeyou	峰から始めよう	noun	mine	j0092
+kyouhaminenokotowokangaeteiru	今日は峰のことを考えている	noun	mine	j0093
+minewokaimashita	峰を買いました	noun	mine	j0094
+kinounominehadokodesuka	昨日の峰はどこですか	noun	mine	j0095
+watashihamaregasukidesu	私は稀が好きです	noun	mare	j0096
+marewokaimashita	稀を買いました	noun	mare	j0097
+marekarahajimeyou	稀から始めよう	noun	mare	j0098
+sorehaonajimaredesu	それは同じ稀です	noun	mare	j0099
+kinounomarehadokodesuka	昨日の稀はどこですか	noun	mare	j0100
+sorehaonajikaredesu	それは同じ彼です	noun	kare	j0101
+karenituiteshirabeta	彼について調べた	noun	kare	j0102
+kinounokarehadokodesuka	昨日の彼はどこですか	noun	kare	j0103
+karewokaimashita	彼を買いました	noun	kare	j0104
+karegaarimasu	彼があります	noun	kare	j0105
+kyouhadarenokotowokangaeteiru	今日は誰のことを考えている	noun	dare	j0106
+ashitamodarewotsukau	明日も誰を使う	noun	dare	j0107
+watashihadaregasukidesu	私は誰が好きです	noun	dare	j0108
+darekarahajimeyou	誰から始めよう	noun	dare	j0109
+sorehaonajidaredesu	それは同じ誰です	noun	dare	j0110
+honenituiteshirabeta	骨について調べた	noun	hone	j0111
+watashihahonegasukidesu	私は骨が好きです	noun	hone	j0112
+honedehanaku	骨ではなく	noun	hone	j0113
+kyouhahonenokotowokangaeteiru	今日は骨のことを考えている	noun	hone	j0114
+sorehaonajihonedesu	それは同じ骨です	noun	hone	j0115
+kyouhaagonokotowokangaeteiru	今日は顎のことを考えている	noun	ago	j0116
+agowokaimashita	顎を買いました	noun	ago	j0117
+agokarahajimeyou	顎から始めよう	noun	ago	j0118
+agogaarimasu	顎があります	noun	ago	j0119
+agonituiteshirabeta	顎について調べた	noun	ago	j0120
+sorehaonajinumadesu	それは同じ沼です	noun	numa	j0121
+kinounonumahadokodesuka	昨日の沼はどこですか	noun	numa	j0122
+kyouhanumanokotowokangaeteiru	今日は沼のことを考えている	noun	numa	j0123
+numadehanaku	沼ではなく	noun	numa	j0124
+numakarahajimeyou	沼から始めよう	noun	numa	j0125
+tunagaarimasu	綱があります	noun	tuna	j0126
+ashitamotunawotsukau	明日も綱を使う	noun	tuna	j0127
+kinounotunahadokodesuka	昨日の綱はどこですか	noun	tuna	j0128
+tunawokaimashita	綱を買いました	noun	tuna	j0129
+tunakarahajimeyou	綱から始めよう	noun	tuna	j0130
+tubawokaimashita	唾を買いました	noun	tuba	j0131
+ashitamotubawotsukau	明日も唾を使う	noun	tuba	j0132
+sorehaonajitubadesu	それは同じ唾です	noun	tuba	j0133
+kyouhatubanokotowokangaeteiru	今日は唾のことを考えている	noun	tuba	j0134
+tubanituiteshirabeta	唾について調べた	noun	tuba	j0135
+kyouhaisonokotowokangaeteiru	今日は磯のことを考えている	noun	iso	j0136
+isogaarimasu	磯があります	noun	iso	j0137
+isonituiteshirabeta	磯について調べた	noun	iso	j0138
+isowokaimashita	磯を買いました	noun	iso	j0139
+sorehaonajiisodesu	それは同じ磯です	noun	iso	j0140
+kinounosagahadokodesuka	昨日の佐賀はどこですか	noun	saga	j0141
+sagakarahajimeyou	佐賀から始めよう	noun	saga	j0142
+watashihasagagasukidesu	私は佐賀が好きです	noun	saga	j0143
+ashitamosagawotsukau	明日も佐賀を使う	noun	saga	j0144
+kyouhasaganokotowokangaeteiru	今日は佐賀のことを考えている	noun	saga	j0145
+tangonituiteshirabeta	丹後について調べた	noun	tango	j0146
+kyouhatangonokotowokangaeteiru	今日は丹後のことを考えている	noun	tango	j0147
+tangogaarimasu	丹後があります	noun	tango	j0148
+tangowokaimashita	丹後を買いました	noun	tango	j0149
+sorehaonajitangodesu	それは同じ丹後です	noun	tango	j0150
+bingowokaimashita	備後を買いました	noun	bingo	j0151
+bingodehanaku	備後ではなく	noun	bingo	j0152
+sorehaonajibingodesu	それは同じ備後です	noun	bingo	j0153
+bingokarahajimeyou	備後から始めよう	noun	bingo	j0154
+kinounobingohadokodesuka	昨日の備後はどこですか	noun	bingo	j0155
+ashitamokimonowotsukau	明日も着物を使う	noun	kimono	j0156
+kimonogaarimasu	着物があります	noun	kimono	j0157
+sorehaonajikimonodesu	それは同じ着物です	noun	kimono	j0158
+kyouhakimononokotowokangaeteiru	今日は着物のことを考えている	noun	kimono	j0159
+kimonodehanaku	着物ではなく	noun	kimono	j0160
+karatenituiteshirabeta	空手について調べた	noun	karate	j0161
+sorehaonajikaratedesu	それは同じ空手です	noun	karate	j0162
+kyouhakaratenokotowokangaeteiru	今日は空手のことを考えている	noun	karate	j0163
+karatekarahajimeyou	空手から始めよう	noun	karate	j0164
+kinounokaratehadokodesuka	昨日の空手はどこですか	noun	karate	j0165
+kohakukarahajimeyou	琥珀から始めよう	noun	kohaku	j0166
+kohakudehanaku	琥珀ではなく	noun	kohaku	j0167
+watashihakohakugasukidesu	私は琥珀が好きです	noun	kohaku	j0168
+kohakunituiteshirabeta	琥珀について調べた	noun	kohaku	j0169
+kyouhakohakunokotowokangaeteiru	今日は琥珀のことを考えている	noun	kohaku	j0170
+watashihadotegasukidesu	私は土手が好きです	noun	dote	j0171
+kyouhadotenokotowokangaeteiru	今日は土手のことを考えている	noun	dote	j0172
+dotegaarimasu	土手があります	noun	dote	j0173
+dotekarahajimeyou	土手から始めよう	noun	dote	j0174
+dotenituiteshirabeta	土手について調べた	noun	dote	j0175
+shakegaarimasu	鮭があります	noun	shake	j0176
+watashihashakegasukidesu	私は鮭が好きです	noun	shake	j0177
+sorehaonajishakedesu	それは同じ鮭です	noun	shake	j0178
+ashitamoshakewotsukau	明日も鮭を使う	noun	shake	j0179
+shakekarahajimeyou	鮭から始めよう	noun	shake	j0180
+domedehanaku	度目ではなく	noun	dome	j0181
+kyouhadomenokotowokangaeteiru	今日は度目のことを考えている	noun	dome	j0182
+domenituiteshirabeta	度目について調べた	noun	dome	j0183
+domewokaimashita	度目を買いました	noun	dome	j0184
+domegaarimasu	度目があります	noun	dome	j0185
+mamawokaimashita	ままを買いました	noun	mama	j0186
+sorehaonajimamadesu	それは同じままです	noun	mama	j0187
+kyouhamamanokotowokangaeteiru	今日はままのことを考えている	noun	mama	j0188
+mamadehanaku	ままではなく	noun	mama	j0189
+ashitamomamawotsukau	明日もままを使う	noun	mama	j0190
+hobodehanaku	ほぼではなく	noun	hobo	j0191
+hobowokaimashita	ほぼを買いました	noun	hobo	j0192
+kinounohobohadokodesuka	昨日のほぼはどこですか	noun	hobo	j0193
+hobokarahajimeyou	ほぼから始めよう	noun	hobo	j0194
+ashitamohobowotsukau	明日もほぼを使う	noun	hobo	j0195
+kyouhasonatanokotowokangaeteiru	今日はそなたのことを考えている	noun	sonata	j0196
+sonatakarahajimeyou	そなたから始めよう	noun	sonata	j0197
+sonatawokaimashita	そなたを買いました	noun	sonata	j0198
+sonatanituiteshirabeta	そなたについて調べた	noun	sonata	j0199
+sonatagaarimasu	そなたがあります	noun	sonata	j0200
+kanarazuhometai	必ず褒めたい	verb	home	j0201
+kyouhahomerareru	今日は褒められる	verb	home	j0202
+kyouhahomemasu	今日は褒めます	verb	home	j0203
+hometa	褒めた	verb	home	j0204
+kanarazumaketai	必ず負けたい	verb	make	j0205
+kanarazumakete	必ず負けて	verb	make	j0206
+kanarazumaketa	必ず負けた	verb	make	j0207
+makeru	負ける	verb	make	j0208
+sameta	冷めた	verb	same	j0209
+samerareru	冷められる	verb	same	j0210
+kinousamemasuka	昨日冷めますか	verb	same	j0211
+kanarazusametai	必ず冷めたい	verb	same	j0212
+kanarazutaketai	必ず炊けたい	verb	take	j0213
+kinoutakerareru	昨日炊けられる	verb	take	j0214
+kyouhatakeru	今日は炊ける	verb	take	j0215
+takemasu	炊けます	verb	take	j0216
+kyouhamoreru	今日は漏れる	verb	more	j0217
+kanarazumoremasuka	必ず漏れますか	verb	more	j0218
+moremasu	漏れます	verb	more	j0219
+kyouhamoretai	今日は漏れたい	verb	more	j0220
+kyouhatoretai	今日は取れたい	verb	tore	j0221
+kyouhatorerareru	今日は取れられる	verb	tore	j0222
+kinoutorete	昨日取れて	verb	tore	j0223
+kanarazutoreta	必ず取れた	verb	tore	j0224
+kinoutomemasu	昨日止めます	verb	tome	j0225
+kanarazutomerareru	必ず止められる	verb	tome	j0226
+kanarazutomemasuka	必ず止めますか	verb	tome	j0227
+kinoutomenai	昨日止めない	verb	tome	j0228
+mazemasu	混ぜます	verb	maze	j0229
+kanarazumazeru	必ず混ぜる	verb	maze	j0230
+kanarazumazerareru	必ず混ぜられる	verb	maze	j0231
+kinoumazenai	昨日混ぜない	verb	maze	j0232
+kanarazuatetai	必ず当てたい	verb	ate	j0233
+kyouhaaterareru	今日は当てられる	verb	ate	j0234
+ateta	当てた	verb	ate	j0235
+kinouateru	昨日当てる	verb	ate	j0236
+noseta	乗せた	verb	nose	j0237
+nosete	乗せて	verb	nose	j0238
+kinounoserareru	昨日乗せられる	verb	nose	j0239
+kinounosenai	昨日乗せない	verb	nose	j0240
+yokenai	避けない	verb	yoke	j0241
+kyouhayokete	今日は避けて	verb	yoke	j0242
+yokemasu	避けます	verb	yoke	j0243
+kanarazuyoketa	必ず避けた	verb	yoke	j0244
+kanarazusageru	必ず下げる	verb	sage	j0245
+kyouhasagetai	今日は下げたい	verb	sage	j0246
+kinousagemasu	昨日下げます	verb	sage	j0247
+kinousagerareru	昨日下げられる	verb	sage	j0248
+kyouhabaketa	今日は化けた	verb	bake	j0249
+bakeru	化ける	verb	bake	j0250
+kinoubakenai	昨日化けない	verb	bake	j0251
+baketai	化けたい	verb	bake	j0252
+kinouhoeta	昨日吠えた	verb	hoe	j0253
+hoemasuka	吠えますか	verb	hoe	j0254
+hoete	吠えて	verb	hoe	j0255
+kanarazuhoeru	必ず吠える	verb	hoe	j0256
+kyouhahuemasu	今日は増えます	verb	hue	j0257
+huemasuka	増えますか	verb	hue	j0258
+kinouhuerareru	昨日増えられる	verb	hue	j0259
+kyouhahuenai	今日は増えない	verb	hue	j0260
+kyouhafumetai	今日は踏めたい	verb	fume	j0261
+kinoufumemasu	昨日踏めます	verb	fume	j0262
+fumemasuka	踏めますか	verb	fume	j0263
+fumeru	踏める	verb	fume	j0264
+kyouhamanemasu	今日は真似ます	verb	mane	j0265
+kanarazumanerareru	必ず真似られる	verb	mane	j0266
+kinoumanenai	昨日真似ない	verb	mane	j0267
+kyouhamanetai	今日は真似たい	verb	mane	j0268
+kyouhanameta	今日は舐めた	verb	name	j0269
+kanarazunamenai	必ず舐めない	verb	name	j0270
+kanarazunamemasu	必ず舐めます	verb	name	j0271
+kanarazunameru	必ず舐める	verb	name	j0272
+kanarazusomemasuka	必ず染めますか	verb	some	j0273
+kanarazusomeru	必ず染める	verb	some	j0274
+somemasu	染めます	verb	some	j0275
+somete	染めて	verb	some	j0276
+kinouboremasuka	昨日惚れますか	verb	bore	j0277
+borerareru	惚れられる	verb	bore	j0278
+kanarazuborenai	必ず惚れない	verb	bore	j0279
+kanarazuboreru	必ず惚れる	verb	bore	j0280
+kanarazuhikerareru	必ず引けられる	verb	hike	j0281
+hikete	引けて	verb	hike	j0282
+kinouhikemasuka	昨日引けますか	verb	hike	j0283
+kinouhikenai	昨日引けない	verb	hike	j0284
+kinouabite	昨日浴びて	verb	abi	j0285
+kyouhaabimasu	今日は浴びます	verb	abi	j0286
+kinouabitai	昨日浴びたい	verb	abi	j0287
+kyouhaabirareru	今日は浴びられる	verb	abi	j0288
+kanarazutameta	必ず貯めた	verb	tame	j0289
+kyouhatamerareru	今日は貯められる	verb	tame	j0290
+tameru	貯める	verb	tame	j0291
+tamemasu	貯めます	verb	tame	j0292
+kanarazuhatemasu	必ず果てます	verb	hate	j0293
+hateta	果てた	verb	hate	j0294
+kyouhahaterareru	今日は果てられる	verb	hate	j0295
+kyouhahatetai	今日は果てたい	verb	hate	j0296
+kinoumateta	昨日待てた	verb	mate	j0297
+kinoumatete	昨日待てて	verb	mate	j0298
+kyouhamatenai	今日は待てない	verb	mate	j0299
+kanarazumateru	必ず待てる	verb	mate	j0300
+kyouhahareru	今日は晴れる	verb	hare	j0301
+kinouharetai	昨日晴れたい	verb	hare	j0302
+kyouhaharete	今日は晴れて	verb	hare	j0303
+haremasu	晴れます	verb	hare	j0304
+urirareru	売りられる	verb	uri	j0305
+uriru	売りる	verb	uri	j0306
+urinai	売りない	verb	uri	j0307
+kinouuritai	昨日売りたい	verb	uri	j0308
+hosenai	干せない	verb	hose	j0309
+kanarazuhosemasuka	必ず干せますか	verb	hose	j0310
+kanarazuhoserareru	必ず干せられる	verb	hose	j0311
+kyouhahoseta	今日は干せた	verb	hose	j0312
+fusete	付せて	verb	fuse	j0313
+fusenai	付せない	verb	fuse	j0314
+kyouhafuseru	今日は付せる	verb	fuse	j0315
+kinoufusemasu	昨日付せます	verb	fuse	j0316
+oboenai	覚えない	verb	oboe	j0317
+kyouhaoboemasuka	今日は覚えますか	verb	oboe	j0318
+kanarazuoboemasu	必ず覚えます	verb	oboe	j0319
+oboete	覚えて	verb	oboe	j0320
+gojimadehatarakimasu	5時まで働きます	particle		j0321
+tokyomadeikimasu	東京まで行きます	particle		j0322
+ashitamadenimatteite	明日までに待っていて	particle		j0323
+kyoumadedekitara	今日までできたら	particle		j0324
+kenkounotameniarukimasu	健康のために歩きます	particle		j0325
+kazokunotamenihatarakou	家族のために働こう	particle		j0326
+sonotameniikimasu	そのために行きます	particle		j0327
+gakumonnotameda	学問のためだ	particle		j0328
+madewomatsu	までを待つ	particle		j0329
+kurumadeiku	車で行く	particle		j0330
+denshamadeiku	電車で行く	particle		j0331
+amedanodeikimasen	雨なので行きません	particle		j0332
+kyouhayasumidanodekonai	今日は休みなのでこない	particle		j0333
+nodedekimasen	のでできません	particle		j0334
+tanoshiinodeaso	楽しいので遊	particle		j0335
+kaigigaarunode	会議があるので	particle		j0336
+kyoudemoii	今日でもいい	particle		j0337
+demoikimasu	でも行きます	particle		j0338
+ashitademomatsu	明日でも待つ	particle		j0339
+sonomamadeikimasu	そのままで行きます	particle		j0340
+mamadeiiyo	ままでいいよ	particle		j0341
+kinomamanihanasu	気のままに話す	particle		j0342
+mainichigotonikaeru	毎日ごとに変える	particle		j0343
+nanigotonimo	何ごとにも	particle		j0344
+kotogotoku	ことごとく	particle		j0345
+iyouda	いようだ	particle		j0346
+souiyounakoto	そういうようなこと	particle		j0347
+youdearu	ようである	particle		j0348
+wakegawakaranai	わけがわからない	particle		j0349
+sonowakeha	そのわけは	particle		j0350
+iwakeniha	言い訳には	particle		j0351
+soregasukida	それが好きだ	particle		j0352
+soreyorimotto	それよりもっと	particle		j0353
+mottotakusan	もっとたくさん	particle		j0354
+daregaikuka	誰が行くか	particle		j0355
+daremoinai	誰もいない	particle		j0356
+aregaarimasu	あれがあります	particle		j0357
+oregaikuyo	俺が行くよ	particle		j0358
+oretachino	俺たちの	particle		j0359
+arekoreshite	あれこれして	particle		j0360
+onegaishimasu	お願いします	particle		j0361
+onegaiganaru	お願いがある	particle		j0362
+mouonegaishimasen	もうお願いしません	particle		j0363
+minnadeonegaishimasu	みんなでお願いします	particle		j0364
+madadamedesu	まだだめです	particle		j0365
+sorehamadamadadesu	それはまだまだです	particle		j0366
+kanemochinohitoga	金持ちの人が	particle		j0367
+sakeonomu	酒を飲む	particle		j0368
+takenokowomitai	竹の子を見たい	particle		j0369
+takenoko	竹の子	particle		j0370
+sakenomise	酒の店	particle		j0371
+kanenohanashi	金の話	particle		j0372
+matenakattano	待てなかったの	particle		j0373
+sameganaiteiru	鮫が泣いている	particle		j0374
+hanahaharetekita	花は晴れてきた	particle		j0375
+ameganaharete	雨が晴れて	particle		j0376
+tamenitenarunara	ためになるなら	particle		j0377
+honnotameni	本のために	particle		j0378
+tamenoonegai	ためのお願い	particle		j0379
+toumorokoshimo	とうもろこしも	particle		j0380
+sonnamononodemo	そんなものでも	particle		j0381
+anatamoiku	あなたも行く	particle		j0382
+watashimoikitai	私も行きたい	particle		j0383
+penwokaimashita	ペンを買いました	loan	pen	j0384
+pengasukidesu	ペンが好きです	loan	pen	j0385
+penhadokodesuka	ペンはどこですか	loan	pen	j0386
+bananahadokodesuka	バナナはどこですか	loan	banana	j0387
+bananawokaimashita	バナナを買いました	loan	banana	j0388
+bananagasukidesu	バナナが好きです	loan	banana	j0389
+kyouhapianonitsuiteshirabeta	今日はピアノについて調べた	loan	piano	j0390
+pianowokaimashita	ピアノを買いました	loan	piano	j0391
+pianohadokodesuka	ピアノはどこですか	loan	piano	j0392
+memohadokodesuka	メモはどこですか	loan	memo	j0393
+memowokaimashita	メモを買いました	loan	memo	j0394
+kyouhamemonitsuiteshirabeta	今日はメモについて調べた	loan	memo	j0395
+demogasukidesu	デモが好きです	loan	demo	j0396
+demowokaimashita	デモを買いました	loan	demo	j0397
+demohadokodesuka	デモはどこですか	loan	demo	j0398
+tomatowokaimashita	トマトを買いました	loan	tomato	j0399
+tomatogasukidesu	トマトが好きです	loan	tomato	j0400
+kyouhatomatonitsuiteshirabeta	今日はトマトについて調べた	loan	tomato	j0401
+miniwokaimashita	ミニを買いました	loan	mini	j0402
+minihadokodesuka	ミニはどこですか	loan	mini	j0403
+kyouhamininitsuiteshirabeta	今日はミニについて調べた	loan	mini	j0404
+mamahadokodesuka	ママはどこですか	loan	mama	j0405
+kyouhamamanitsuiteshirabeta	今日はママについて調べた	loan	mama	j0406
+papahadokodesuka	パパはどこですか	loan	papa	j0407
+kyouhapapanitsuiteshirabeta	今日はパパについて調べた	loan	papa	j0408
+papagasukidesu	パパが好きです	loan	papa	j0409
+zerowokaimashita	ゼロを買いました	loan	zero	j0410
+zerogasukidesu	ゼロが好きです	loan	zero	j0411
+kyouhazeronitsuiteshirabeta	今日はゼロについて調べた	loan	zero	j0412
+dominogasukidesu	ドミノが好きです	loan	domino	j0413
+dominowokaimashita	ドミノを買いました	loan	domino	j0414
+dominohadokodesuka	ドミノはどこですか	loan	domino	j0415
+kyouhananonitsuiteshirabeta	今日はナノについて調べた	loan	nano	j0416
+nanogasukidesu	ナノが好きです	loan	nano	j0417
+nanowokaimashita	ナノを買いました	loan	nano	j0418
+tunahadokodesuka	ツナはどこですか	loan	tuna	j0419
+tunagasukidesu	ツナが好きです	loan	tuna	j0420
+maniahadokodesuka	マニアはどこですか	loan	mania	j0421
+kyouhamanianitsuiteshirabeta	今日はマニアについて調べた	loan	mania	j0422
+maniagasukidesu	マニアが好きです	loan	mania	j0423
+pandagasukidesu	パンダが好きです	loan	panda	j0424
+pandawokaimashita	パンダを買いました	loan	panda	j0425
+kyouhapandanitsuiteshirabeta	今日はパンダについて調べた	loan	panda	j0426
+kyouhatangonitsuiteshirabeta	今日はタンゴについて調べた	loan	tango	j0427
+tangogasukidesu	タンゴが好きです	loan	tango	j0428
+bingohadokodesuka	ビンゴはどこですか	loan	bingo	j0429
+kyouhabingonitsuiteshirabeta	今日はビンゴについて調べた	loan	bingo	j0430
+kyouhapanamanitsuiteshirabeta	今日はパナマについて調べた	loan	panama	j0431
+panamagasukidesu	パナマが好きです	loan	panama	j0432
+panamawokaimashita	パナマを買いました	loan	panama	j0433
+sonatagasukidesu	ソナタが好きです	loan	sonata	j0434
+sonatahadokodesuka	ソナタはどこですか	loan	sonata	j0435
+kyouhasonatanitsuiteshirabeta	今日はソナタについて調べた	loan	sonata	j0436
+kyouhapinonitsuiteshirabeta	今日はピノについて調べた	loan	pino	j0437
+pinohadokodesuka	ピノはどこですか	loan	pino	j0438
+pinowokaimashita	ピノを買いました	loan	pino	j0439
