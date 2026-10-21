@@ -1,0 +1,661 @@
+# 英語の文を1語ずつ打つ場面（前の確定は英字の語で終わる）。打った1語が英語になることを期待する。tools/make_english_follow_tests.py で作成。列: ローマ字<TAB>期待<TAB>前の文
+make	make	I want to 
+make	make	Please 
+make	make	make 
+make	make	Could you
+make	make	We should 
+make	make	This is the 
+make	make	Let me
+make	make	今日は meeting 
+make	make	Thank you for the 
+make	make	I think we can 
+take	take	I want to 
+take	take	Please 
+take	take	make 
+take	take	Could you
+take	take	We should 
+take	take	This is the 
+take	take	Let me
+take	take	今日は meeting 
+take	take	Thank you for the 
+take	take	I think we can 
+same	same	I want to 
+same	same	Please 
+same	same	make 
+same	same	Could you
+same	same	We should 
+same	same	This is the 
+same	same	Let me
+same	same	今日は meeting 
+same	same	Thank you for the 
+same	same	I think we can 
+name	name	I want to 
+name	name	Please 
+name	name	make 
+name	name	Could you
+name	name	We should 
+name	name	This is the 
+name	name	Let me
+name	name	今日は meeting 
+name	name	Thank you for the 
+name	name	I think we can 
+home	home	I want to 
+home	home	Please 
+home	home	make 
+home	home	Could you
+home	home	We should 
+home	home	This is the 
+home	home	Let me
+home	home	今日は meeting 
+home	home	Thank you for the 
+home	home	I think we can 
+game	game	I want to 
+game	game	Please 
+game	game	make 
+game	game	Could you
+game	game	We should 
+game	game	This is the 
+game	game	Let me
+game	game	今日は meeting 
+game	game	Thank you for the 
+game	game	I think we can 
+one	one	I want to 
+one	one	Please 
+one	one	make 
+one	one	Could you
+one	one	We should 
+one	one	This is the 
+one	one	Let me
+one	one	今日は meeting 
+one	one	Thank you for the 
+one	one	I think we can 
+time	time	I want to 
+time	time	Please 
+time	time	make 
+time	time	Could you
+time	time	We should 
+time	time	This is the 
+time	time	Let me
+time	time	今日は meeting 
+time	time	Thank you for the 
+time	time	I think we can 
+some	some	I want to 
+some	some	Please 
+some	some	make 
+some	some	Could you
+some	some	We should 
+some	some	This is the 
+some	some	Let me
+some	some	今日は meeting 
+some	some	Thank you for the 
+some	some	I think we can 
+note	note	I want to 
+note	note	Please 
+note	note	make 
+note	note	Could you
+note	note	We should 
+note	note	This is the 
+note	note	Let me
+note	note	今日は meeting 
+note	note	Thank you for the 
+note	note	I think we can 
+mode	mode	I want to 
+mode	mode	Please 
+mode	mode	make 
+mode	mode	Could you
+mode	mode	We should 
+mode	mode	This is the 
+mode	mode	Let me
+mode	mode	今日は meeting 
+mode	mode	Thank you for the 
+mode	mode	I think we can 
+data	data	I want to 
+data	data	Please 
+data	data	make 
+data	data	Could you
+data	data	We should 
+data	data	This is the 
+data	data	Let me
+data	data	今日は meeting 
+data	data	Thank you for the 
+data	data	I think we can 
+date	date	I want to 
+date	date	Please 
+date	date	make 
+date	date	Could you
+date	date	We should 
+date	date	This is the 
+date	date	Let me
+date	date	今日は meeting 
+date	date	Thank you for the 
+date	date	I think we can 
+base	base	I want to 
+base	base	Please 
+base	base	make 
+base	base	Could you
+base	base	We should 
+base	base	This is the 
+base	base	Let me
+base	base	今日は meeting 
+base	base	Thank you for the 
+base	base	I think we can 
+site	site	I want to 
+site	site	Please 
+site	site	make 
+site	site	Could you
+site	site	We should 
+site	site	This is the 
+site	site	Let me
+site	site	今日は meeting 
+site	site	Thank you for the 
+site	site	I think we can 
+size	size	I want to 
+size	size	Please 
+size	size	make 
+size	size	Could you
+size	size	We should 
+size	size	This is the 
+size	size	Let me
+size	size	今日は meeting 
+size	size	Thank you for the 
+size	size	I think we can 
+tone	tone	I want to 
+tone	tone	Please 
+tone	tone	make 
+tone	tone	Could you
+tone	tone	We should 
+tone	tone	This is the 
+tone	tone	Let me
+tone	tone	今日は meeting 
+tone	tone	Thank you for the 
+tone	tone	I think we can 
+zone	zone	I want to 
+zone	zone	Please 
+zone	zone	make 
+zone	zone	Could you
+zone	zone	We should 
+zone	zone	This is the 
+zone	zone	Let me
+zone	zone	今日は meeting 
+zone	zone	Thank you for the 
+zone	zone	I think we can 
+house	house	I want to 
+house	house	Please 
+house	house	make 
+house	house	Could you
+house	house	We should 
+house	house	This is the 
+house	house	Let me
+house	house	今日は meeting 
+house	house	Thank you for the 
+house	house	I think we can 
+mouse	mouse	I want to 
+mouse	mouse	Please 
+mouse	mouse	make 
+mouse	mouse	Could you
+mouse	mouse	We should 
+mouse	mouse	This is the 
+mouse	mouse	Let me
+mouse	mouse	今日は meeting 
+mouse	mouse	Thank you for the 
+mouse	mouse	I think we can 
+region	region	I want to 
+region	region	Please 
+region	region	make 
+region	region	Could you
+region	region	We should 
+region	region	This is the 
+region	region	Let me
+region	region	今日は meeting 
+region	region	Thank you for the 
+region	region	I think we can 
+session	session	I want to 
+session	session	Please 
+session	session	make 
+session	session	Could you
+session	session	We should 
+session	session	This is the 
+session	session	Let me
+session	session	今日は meeting 
+session	session	Thank you for the 
+session	session	I think we can 
+token	token	I want to 
+token	token	Please 
+token	token	make 
+token	token	Could you
+token	token	We should 
+token	token	This is the 
+token	token	Let me
+token	token	今日は meeting 
+token	token	Thank you for the 
+token	token	I think we can 
+theme	theme	I want to 
+theme	theme	Please 
+theme	theme	make 
+theme	theme	Could you
+theme	theme	We should 
+theme	theme	This is the 
+theme	theme	Let me
+theme	theme	今日は meeting 
+theme	theme	Thank you for the 
+theme	theme	I think we can 
+image	image	I want to 
+image	image	Please 
+image	image	make 
+image	image	Could you
+image	image	We should 
+image	image	This is the 
+image	image	Let me
+image	image	今日は meeting 
+image	image	Thank you for the 
+image	image	I think we can 
+domain	domain	I want to 
+domain	domain	Please 
+domain	domain	make 
+domain	domain	Could you
+domain	domain	We should 
+domain	domain	This is the 
+domain	domain	Let me
+domain	domain	今日は meeting 
+domain	domain	Thank you for the 
+domain	domain	I think we can 
+engine	engine	I want to 
+engine	engine	Please 
+engine	engine	make 
+engine	engine	Could you
+engine	engine	We should 
+engine	engine	This is the 
+engine	engine	Let me
+engine	engine	今日は meeting 
+engine	engine	Thank you for the 
+engine	engine	I think we can 
+menu	menu	I want to 
+menu	menu	Please 
+menu	menu	make 
+menu	menu	Could you
+menu	menu	We should 
+menu	menu	This is the 
+menu	menu	Let me
+menu	menu	今日は meeting 
+menu	menu	Thank you for the 
+menu	menu	I think we can 
+page	page	I want to 
+page	page	Please 
+page	page	make 
+page	page	Could you
+page	page	We should 
+page	page	This is the 
+page	page	Let me
+page	page	今日は meeting 
+page	page	Thank you for the 
+page	page	I think we can 
+use	use	I want to 
+use	use	Please 
+use	use	make 
+use	use	Could you
+use	use	We should 
+use	use	This is the 
+use	use	Let me
+use	use	今日は meeting 
+use	use	Thank you for the 
+use	use	I think we can 
+see	see	I want to 
+see	see	Please 
+see	see	make 
+see	see	Could you
+see	see	We should 
+see	see	This is the 
+see	see	Let me
+see	see	今日は meeting 
+see	see	Thank you for the 
+see	see	I think we can 
+share	share	I want to 
+share	share	Please 
+share	share	make 
+share	share	Could you
+share	share	We should 
+share	share	This is the 
+share	share	Let me
+share	share	今日は meeting 
+share	share	Thank you for the 
+share	share	I think we can 
+shake	shake	I want to 
+shake	shake	Please 
+shake	shake	make 
+shake	shake	Could you
+shake	shake	We should 
+shake	shake	This is the 
+shake	shake	Let me
+shake	shake	今日は meeting 
+shake	shake	Thank you for the 
+shake	shake	I think we can 
+wake	wake	I want to 
+wake	wake	Please 
+wake	wake	make 
+wake	wake	Could you
+wake	wake	We should 
+wake	wake	This is the 
+wake	wake	Let me
+wake	wake	今日は meeting 
+wake	wake	Thank you for the 
+wake	wake	I think we can 
+wipe	wipe	I want to 
+wipe	wipe	Please 
+wipe	wipe	make 
+wipe	wipe	Could you
+wipe	wipe	We should 
+wipe	wipe	This is the 
+wipe	wipe	Let me
+wipe	wipe	今日は meeting 
+wipe	wipe	Thank you for the 
+wipe	wipe	I think we can 
+hide	hide	I want to 
+hide	hide	Please 
+hide	hide	make 
+hide	hide	Could you
+hide	hide	We should 
+hide	hide	This is the 
+hide	hide	Let me
+hide	hide	今日は meeting 
+hide	hide	Thank you for the 
+hide	hide	I think we can 
+join	join	I want to 
+join	join	Please 
+join	join	make 
+join	join	Could you
+join	join	We should 
+join	join	This is the 
+join	join	Let me
+join	join	今日は meeting 
+join	join	Thank you for the 
+join	join	I think we can 
+raise	raise	I want to 
+raise	raise	Please 
+raise	raise	make 
+raise	raise	Could you
+raise	raise	We should 
+raise	raise	This is the 
+raise	raise	Let me
+raise	raise	今日は meeting 
+raise	raise	Thank you for the 
+raise	raise	I think we can 
+rename	rename	I want to 
+rename	rename	Please 
+rename	rename	make 
+rename	rename	Could you
+rename	rename	We should 
+rename	rename	This is the 
+rename	rename	Let me
+rename	rename	今日は meeting 
+rename	rename	Thank you for the 
+rename	rename	I think we can 
+reuse	reuse	I want to 
+reuse	reuse	Please 
+reuse	reuse	make 
+reuse	reuse	Could you
+reuse	reuse	We should 
+reuse	reuse	This is the 
+reuse	reuse	Let me
+reuse	reuse	今日は meeting 
+reuse	reuse	Thank you for the 
+reuse	reuse	I think we can 
+erase	erase	I want to 
+erase	erase	Please 
+erase	erase	make 
+erase	erase	Could you
+erase	erase	We should 
+erase	erase	This is the 
+erase	erase	Let me
+erase	erase	今日は meeting 
+erase	erase	Thank you for the 
+erase	erase	I think we can 
+resume	resume	I want to 
+resume	resume	Please 
+resume	resume	make 
+resume	resume	Could you
+resume	resume	We should 
+resume	resume	This is the 
+resume	resume	Let me
+resume	resume	今日は meeting 
+resume	resume	Thank you for the 
+resume	resume	I think we can 
+manage	manage	I want to 
+manage	manage	Please 
+manage	manage	make 
+manage	manage	Could you
+manage	manage	We should 
+manage	manage	This is the 
+manage	manage	Let me
+manage	manage	今日は meeting 
+manage	manage	Thank you for the 
+manage	manage	I think we can 
+measure	measure	I want to 
+measure	measure	Please 
+measure	measure	make 
+measure	measure	Could you
+measure	measure	We should 
+measure	measure	This is the 
+measure	measure	Let me
+measure	measure	今日は meeting 
+measure	measure	Thank you for the 
+measure	measure	I think we can 
+define	define	I want to 
+define	define	Please 
+define	define	make 
+define	define	Could you
+define	define	We should 
+define	define	This is the 
+define	define	Let me
+define	define	今日は meeting 
+define	define	Thank you for the 
+define	define	I think we can 
+ensure	ensure	I want to 
+ensure	ensure	Please 
+ensure	ensure	make 
+ensure	ensure	Could you
+ensure	ensure	We should 
+ensure	ensure	This is the 
+ensure	ensure	Let me
+ensure	ensure	今日は meeting 
+ensure	ensure	Thank you for the 
+ensure	ensure	I think we can 
+assume	assume	I want to 
+assume	assume	Please 
+assume	assume	make 
+assume	assume	Could you
+assume	assume	We should 
+assume	assume	This is the 
+assume	assume	Let me
+assume	assume	今日は meeting 
+assume	assume	Thank you for the 
+assume	assume	I think we can 
+mention	mention	I want to 
+mention	mention	Please 
+mention	mention	make 
+mention	mention	Could you
+mention	mention	We should 
+mention	mention	This is the 
+mention	mention	Let me
+mention	mention	今日は meeting 
+mention	mention	Thank you for the 
+mention	mention	I think we can 
+operate	operate	I want to 
+operate	operate	Please 
+operate	operate	make 
+operate	operate	Could you
+operate	operate	We should 
+operate	operate	This is the 
+operate	operate	Let me
+operate	operate	今日は meeting 
+operate	operate	Thank you for the 
+operate	operate	I think we can 
+human	human	I want to 
+human	human	Please 
+human	human	make 
+human	human	Could you
+human	human	We should 
+human	human	This is the 
+human	human	Let me
+human	human	今日は meeting 
+human	human	Thank you for the 
+human	human	I think we can 
+icon	icon	I want to 
+icon	icon	Please 
+icon	icon	make 
+icon	icon	Could you
+icon	icon	We should 
+icon	icon	This is the 
+icon	icon	Let me
+icon	icon	今日は meeting 
+icon	icon	Thank you for the 
+icon	icon	I think we can 
+info	info	I want to 
+info	info	Please 
+info	info	make 
+info	info	Could you
+info	info	We should 
+info	info	This is the 
+info	info	Let me
+info	info	今日は meeting 
+info	info	Thank you for the 
+info	info	I think we can 
+future	future	I want to 
+future	future	Please 
+future	future	make 
+future	future	Could you
+future	future	We should 
+future	future	This is the 
+future	future	Let me
+future	future	今日は meeting 
+future	future	Thank you for the 
+future	future	I think we can 
+vision	vision	I want to 
+vision	vision	Please 
+vision	vision	make 
+vision	vision	Could you
+vision	vision	We should 
+vision	vision	This is the 
+vision	vision	Let me
+vision	vision	今日は meeting 
+vision	vision	Thank you for the 
+vision	vision	I think we can 
+reason	reason	I want to 
+reason	reason	Please 
+reason	reason	make 
+reason	reason	Could you
+reason	reason	We should 
+reason	reason	This is the 
+reason	reason	Let me
+reason	reason	今日は meeting 
+reason	reason	Thank you for the 
+reason	reason	I think we can 
+route	route	I want to 
+route	route	Please 
+route	route	make 
+route	route	Could you
+route	route	We should 
+route	route	This is the 
+route	route	Let me
+route	route	今日は meeting 
+route	route	Thank you for the 
+route	route	I think we can 
+media	media	I want to 
+media	media	Please 
+media	media	make 
+media	media	Could you
+media	media	We should 
+media	media	This is the 
+media	media	Let me
+media	media	今日は meeting 
+media	media	Thank you for the 
+media	media	I think we can 
+memo	memo	I want to 
+memo	memo	Please 
+memo	memo	make 
+memo	memo	Could you
+memo	memo	We should 
+memo	memo	This is the 
+memo	memo	Let me
+memo	memo	今日は meeting 
+memo	memo	Thank you for the 
+memo	memo	I think we can 
+demo	demo	I want to 
+demo	demo	Please 
+demo	demo	make 
+demo	demo	Could you
+demo	demo	We should 
+demo	demo	This is the 
+demo	demo	Let me
+demo	demo	今日は meeting 
+demo	demo	Thank you for the 
+demo	demo	I think we can 
+node	node	I want to 
+node	node	Please 
+node	node	make 
+node	node	Could you
+node	node	We should 
+node	node	This is the 
+node	node	Let me
+node	node	今日は meeting 
+node	node	Thank you for the 
+node	node	I think we can 
+code	code	I want to 
+code	code	Please 
+code	code	make 
+code	code	Could you
+code	code	We should 
+code	code	This is the 
+code	code	Let me
+code	code	今日は meeting 
+code	code	Thank you for the 
+code	code	I think we can 
+server	server	I want to 
+server	server	Please 
+server	server	make 
+server	server	Could you
+server	server	We should 
+server	server	This is the 
+server	server	Let me
+server	server	今日は meeting 
+server	server	Thank you for the 
+server	server	I think we can 
+project	project	I want to 
+project	project	Please 
+project	project	make 
+project	project	Could you
+project	project	We should 
+project	project	This is the 
+project	project	Let me
+project	project	今日は meeting 
+project	project	Thank you for the 
+project	project	I think we can 
+button	button	I want to 
+button	button	Please 
+button	button	make 
+button	button	Could you
+button	button	We should 
+button	button	This is the 
+button	button	Let me
+button	button	今日は meeting 
+button	button	Thank you for the 
+button	button	I think we can 
+folder	folder	I want to 
+folder	folder	Please 
+folder	folder	make 
+folder	folder	Could you
+folder	folder	We should 
+folder	folder	This is the 
+folder	folder	Let me
+folder	folder	今日は meeting 
+folder	folder	Thank you for the 
+folder	folder	I think we can 
+update	update	I want to 
+update	update	Please 
+update	update	make 
+update	update	Could you
+update	update	We should 
+update	update	This is the 
+update	update	Let me
+update	update	今日は meeting 
+update	update	Thank you for the 
+update	update	I think we can 

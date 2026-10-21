@@ -265,6 +265,33 @@ int main() {
            "文脈の段は、辞書の費用を渡さなければ働かない");
     Expect(Text("kyouhasamegoogledesu", jaen::SplitEnglish(Parse("kyouhasamegoogledesu"), context, Parse), true) == "google|",
            "文脈の段を使わないときは今までどおり（same は日本語）");
+
+    // 直前に確定した文字が英字の語で終わるとき（make →変換→確定→空白→ sure の1語ずつ打つ人）。
+    const auto after_english = [&](std::string_view raw, bool previous_english, const jaen::ContextCosts* costs = nullptr) {
+      return Text(raw, jaen::SplitEnglish(Parse(raw), context, Parse, nullptr, nullptr, nullptr, &model, costs, previous_english), true);
+    };
+    Expect(after_english("same", false).empty(), "直前なし: 日本語に読める1語 same は日本語のまま");
+    Expect(after_english("same", true) == "same|", "直前が英語: 1語の same は英語");
+    Expect(after_english("take", true) == "take|", "直前が英語: 1語の take は英語");
+    Expect(after_english("samewomita", true).empty(), "直前が英語でも、助詞が続いて日本語として自然な並びは日本語");
+    Expect(after_english("takewomita", true).empty(), "直前が英語でも、take + を は日本語");
+    Expect(after_english("kyouhasame", true).empty(), "直前が英語でも、入力の途中の1語は今までどおり日本語");
+    Expect(after_english("kyouhasamewomita", true).empty(), "直前が英語でも、文の中の same + を は日本語");
+    Expect(after_english("sametime", true) == "sametime|", "直前が英語: 2語のつながりは今までどおり英語");
+    {
+      jaen::ContextCosts off = jaen::DefaultContextCosts();
+      off.follow_margin = 0;
+      Expect(after_english("same", true, &off).empty(), "follow_margin が 0 なら直前を見ない");
+      jaen::ContextCosts strict = jaen::DefaultContextCosts();
+      strict.follow_margin = 3000;  // 6000 - 3700 = 2300 の差には届かない
+      Expect(after_english("same", true, &strict).empty(), "follow_margin を大きくすると寄せが弱まる");
+    }
+    Expect(jaen::EndsWithEnglishWord("make") && jaen::EndsWithEnglishWord("make ") && jaen::EndsWithEnglishWord("I want to ") &&
+               jaen::EndsWithEnglishWord("今日は Slack ") && jaen::EndsWithEnglishWord("iPhone"),
+           "直前が英字の語で終わる");
+    Expect(!jaen::EndsWithEnglishWord("") && !jaen::EndsWithEnglishWord("今日は") && !jaen::EndsWithEnglishWord("Hello, ") &&
+               !jaen::EndsWithEnglishWord("2024 ") && !jaen::EndsWithEnglishWord("   ") && !jaen::EndsWithEnglishWord("Slackで"),
+           "直前が日本語・記号・数・空で終わる");
   }
 
   Expect(english("konosonggasukidesu") == "song|", "-ng before ga after Japanese text");

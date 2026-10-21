@@ -40,9 +40,13 @@
 | 英語と同じ綴りのカタカナ語 | `penwokaimashita`、`bananagasukidesu` | 日本語の辞書のカタカナ語（かなそのもののカタカナ）として自然に読める | 日本語 |
 | 文頭の短い英単語（`you`、`i`） | `youmustrenamethefile` | 先頭でも日本語から英語への切り替えの費用を払うので、日本語の語（よう、い）と競り合う | `must rename the file` は英語、`you` は日本語のまま（取りこぼし） |
 
+## 直前の確定が英語のとき
+
+英語の文を1語ずつ確定しながら打つ場合は、直前が英語であることを使って1語を英語寄りにする。[english-follow.md](english-follow.md)。
+
 ## 止める方法
 
-環境変数 `MYIME_ALL_ENGLISH=off` で文脈の段を止めます（前後の比べ用。変換エンジンを再起動する）。
+環境変数 `MYIME_ALL_ENGLISH=off` で文脈の段を止めます（前後の比べ用。変換エンジンを再起動する）。直前の確定による寄せだけを止めるなら `MYIME_ENGLISH_FOLLOW=off`。
 
 ## 手元の確かめ
 

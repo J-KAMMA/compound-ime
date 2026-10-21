@@ -169,7 +169,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","p","r"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","r"]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -271,6 +271,14 @@ jobs:
                 python3 repo/tools/score_allenglish.py $f repo/tests/conversion/allenglish-$f.tsv results/allenglish-$f-off.tsv "止めた版（MYIME_ALL_ENGLISH=off）" | head -8
                 python3 repo/tools/score_allenglish.py compare $f repo/tests/conversion/allenglish-$f.tsv results/allenglish-$f-off.tsv results/allenglish-$f.tsv | tail -30
               fi
+            fi
+          done
+          # 英語の文を1語ずつ確定しながら打つ場面（組 n）の採点: 既定の版と止めた版（MYIME_ENGLISH_FOLLOW=off）を並べる
+          for f in word history ja control bare; do
+            if [ -f results/english-follow-$f.tsv ] && [ -f repo/tests/conversion/english-follow-$f.tsv ]; then
+              off=; [ -f results/english-follow-$f-off.tsv ] && off=results/english-follow-$f-off.tsv
+              python3 repo/tools/score_english_follow.py $f repo/tests/conversion/english-follow-$f.tsv results/english-follow-$f.tsv $off > results/english-follow-$f-score.txt || true
+              head -40 results/english-follow-$f-score.txt
             fi
           done
           # 開発の道具の名前の候補（組 q）の採点と、F10・Shift の記録

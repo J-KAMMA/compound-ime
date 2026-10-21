@@ -186,8 +186,17 @@ struct ContextCosts {
   int one_letter_extra = 0;  // 1文字の語（a、i）の上乗せ（short_extra に足す）
   int margin = 0;         // 英語にするために安くなければならない差（2語以上のつながり、英語の隣）
   int alone_margin = 0;   // 同じ差を、英単語1語だけで英語の隣でもないときは、これにする（日本語としても読める）
+  // 直前に確定した文字が英字の語で終わるとき（|previous_english|）、入力の最初から始まる走りに使う値。
+  // 英語の文を1語ずつ確定しながら打つ人の make・take・same は、前が英語なので英語の隣として扱う。
+  // 日本語から英語に変わる費用（run_start）は払わず、差は follow_margin（1語だけでも alone_margin にしない）。
+  // 0 以下の値は「この寄せを使わない」。入力の途中から始まる走りには働かない。
+  int follow_margin = 0;
 };
 const ContextCosts& DefaultContextCosts();
+
+// 直前に確定した文字（空白は読み飛ばす）が英字の語で終わっているか。「make 」「I want to」「今日は Slack 」は真、
+// 「今日は」「Hello, 」「2024 」は偽。
+bool EndsWithEnglishWord(std::string_view text);
 
 std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks,
                                 const Lexicon& lexicon,
@@ -196,7 +205,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks,
                                 const ReadingCheck* is_reading = nullptr,
                                 const ReadingCheck* reads_naturally = nullptr,
                                 const JapaneseModel* japanese_model = nullptr,
-                                const ContextCosts* context_costs = nullptr);
+                                const ContextCosts* context_costs = nullptr,
+                                bool previous_english = false);
 
 }  // namespace jaen
 

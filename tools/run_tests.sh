@@ -12,6 +12,10 @@
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv、道具の名前の domain-tools.tsv。tools/domain_typing_test.py）
 #   m: 英単語と重なるローマ字（tests/conversion/allenglish-mixed.tsv の英語にしたい文、allenglish-ja.tsv の日本語だけの文。
 #      tools/make_allenglish_tests.py、tools/score_allenglish.py）。文脈で英語にする段を使う版と、止めた版（MYIME_ALL_ENGLISH=off）の両方
+#   n: 英語の文を1語ずつ確定しながら打つ場面（直前の確定が英字の語で終わるとき、次の変換を英語寄りにする。docs/english-follow.md）。
+#      tests/conversion/english-follow-{word,ja,control,bare}.tsv を前の文を渡す形で（tools/context_convert.sh）、-history.tsv を前の語をキーで
+#      打って確定する形で（tools/english_follow_history.sh）流す。既定の版と、止めた版（MYIME_ENGLISH_FOLLOW=off）の両方。
+#      tools/make_english_follow_tests.py、tools/score_english_follow.py
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
@@ -133,6 +137,23 @@ m)
       MYIME_ALL_ENGLISH=off $BATCH $W/allenglish-$f.txt $OUT/allenglish-$f-off.tsv 4
     fi
   done
+  ;;
+n)
+  # 英語の文を1語ずつ確定しながら打つ場面。前の文（英字の語で終わる）を入力欄の前の文として渡して1語を変換する形（word: 英語になるべき、
+  # ja: 英語の語のあとの日本語の文、control: 日本語のあとの英単語1語、bare: 英単語と綴りが同じ日本語の語を1語で）と、前の語をキーで打って
+  # 確定する形（history: 変換の履歴から直前を取る道）。既定の版と、寄せを止めた版（off）の両方を流して比べる
+  for f in word ja control bare; do
+    if [ -f $T/english-follow-$f.tsv ]; then
+      CTXF="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/english-follow-$f.tsv"
+      $CTXF $OUT/english-follow-$f.tsv with 4
+      MYIME_ENGLISH_FOLLOW=off $CTXF $OUT/english-follow-$f-off.tsv with 4
+    fi
+  done
+  if [ -f $T/english-follow-history.tsv ]; then
+    HISTF="bash $REPO/tools/english_follow_history.sh $E/session_handler_main $E $MODEL $T/english-follow-history.tsv"
+    $HISTF $OUT/english-follow-history.tsv 4
+    MYIME_ENGLISH_FOLLOW=off $HISTF $OUT/english-follow-history-off.tsv 4
+  fi
   ;;
 r)
   # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、
