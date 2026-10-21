@@ -6,7 +6,6 @@
 
 #include <memory>
 #include <mutex>
-#include <string>
 
 #include "absl/strings/string_view.h"
 #include "dict_update/data.h"
@@ -14,9 +13,6 @@
 
 namespace mozc {
 namespace dictionary {
-
-// 調べ用（一時）: 環境変数 MYIME_DICT_TRACE の置き場所に1行足す。
-void DictTrace(const std::string& line);
 
 class SupplementDictionary : public DictionaryInterface {
  public:

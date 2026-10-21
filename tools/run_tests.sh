@@ -59,17 +59,9 @@ case $GROUP in
 u)
   # 辞書の更新の端から端までの試験（本体の session_handler_main の DICT_UPDATE 命令を通す）
   python3 -m venv $W/venv-u && $W/venv-u/bin/pip -q install cryptography
-  # 調べ用（一時）: 直しを止めた版（MYIME_DICT_NOFIX=1）と、直した版を続けて流し、各回の出力と記録を残す
-  mkdir -p $OUT/dict-update-dump
-  for variant in nofix fixed; do
-    extra=""; [ $variant = nofix ] && extra="--env MYIME_DICT_NOFIX=1"
-    rm -f $OUT/dict-trace-$variant.txt
-    $W/venv-u/bin/python $REPO/tools/dict_update_scenarios.py session $E/session_handler_main \
-      --env MYIME_AZOOKEY_DLL_DIR=$E --env MYIME_AZOOKEY_ZENZAI_WEIGHT=$MODEL --env MYIME_AZOOKEY_ZENZAI_GPU=0 --env TEST_TMPDIR=$W/p \
-      --env MYIME_DICT_TRACE=$OUT/dict-trace-$variant.txt --dump $OUT/dict-update-dump/$variant $extra \
-      | tee $OUT/dict-update-scenarios-$variant.txt || true
-  done
-  grep -q '^all ok' $OUT/dict-update-scenarios-fixed.txt
+  $W/venv-u/bin/python $REPO/tools/dict_update_scenarios.py session $E/session_handler_main \
+    --env MYIME_AZOOKEY_DLL_DIR=$E --env MYIME_AZOOKEY_ZENZAI_WEIGHT=$MODEL --env MYIME_AZOOKEY_ZENZAI_GPU=0 --env TEST_TMPDIR=$W/p \
+    | tee $OUT/dict-update-scenarios.txt
   ;;
 a1|a2)
   # 1,298文を前半と後半に分ける（まとめの段で inputs.tsv にする）
