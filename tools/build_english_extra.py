@@ -62,8 +62,14 @@ def main():
         else:
             skipped += 1
 
-    for name in ("jaen-extra-words.txt", "jaen-brand-words.txt", "jaen-domain-words.txt"):
+    for name in ("jaen-extra-words.txt", "jaen-brand-words.txt"):
         for w in words(data / name):
+            add_word("curated", w)
+    # 分野の語は、本体の組み立て（tools/build_english_lexicon.py）と同じく 4文字以下だけ厳選にする。
+    # 5文字以上（inode、kohaku、amazon）は普通の語として焼き込み済みで、厳選にすると日本語の文
+    # （「暑いので」の「いの」→ inode）を英語にしてしまう。
+    for w in words(data / "jaen-domain-words.txt"):
+        if len(w) <= 4:
             add_word("curated", w)
     for f in rows(data / "digit-words.tsv", 2):
         add_word("curated", f[0])

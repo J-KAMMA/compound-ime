@@ -1,13 +1,15 @@
 """辞書の月1回の自動更新で、「悪くならなかったか」を決める（止める基準）。基準の値は tools/data/dict-gate.json。
 
   python tools/dict_quality_gate.py data   --old-dir <いまの一覧のある所> --new-dir <取り直した一覧のある所> [--summary out.md]
-  python tools/dict_quality_gate.py scores --base <基準の結果の所> --cand <新しい辞書の結果の所> [--summary out.md] [--json out.json]
+  python tools/dict_quality_gate.py scores --base <基準の結果の所> --cand <新しい辞書の結果の所> [--summary out.md] [--json out.json] [--identical]
 
 data:   取り直した一覧（proper-nouns.tsv、supplement.tsv、english-extra.tsv）の行数が、いまの一覧と比べて決めた幅の中か。
         外れたら、試験を流す前に止める（Wikidata の取得の失敗や出典の変更を早く見つけるため）。
 scores: 同じ変換エンジンで、いまの辞書（基準）と新しい辞書（候補）を流した試験の採点（*-score.txt）を比べる。
         正解を数える項目が、許す下がり（件数）より多く下がったら止める。許す下がりは max(min_items, 総数×percent%) の切り上げ。
         候補に採点の結果がない（試験が流れなかった）ときも止める。変わった文の数（inputs.tsv）は報告だけ。
+        --identical: 新しい辞書の中身がいまの辞書と同じはずのとき（Wikidata を取り直さない流し方）。両方の結果の
+        *.tsv が1行も違わないことを求める。違えば、差のある文を数えて止める（同じ中身なら結果は変わらないはず）。
 終了の値: 0 通ってよい、1 止める。
 """
 import argparse
@@ -116,6 +118,27 @@ def gate_scores(rules, base: Path, cand: Path):
     return rows, failures, notes, changed
 
 
+def gate_identical(base: Path, cand: Path):
+    """同じ中身の辞書なら、結果の *.tsv は1行も違わない。違う行を数える。"""
+    failures, details = [], []
+    names = sorted(p.name for p in base.glob("*.tsv"))
+    if not names:
+        return ["基準の結果の *.tsv がない"], details
+    for name in names:
+        b = (base / name).read_text(encoding="utf-8").splitlines()
+        cp = cand / name
+        if not cp.exists():
+            failures.append(f"{name}: 新しい辞書の結果がない")
+            continue
+        c = cp.read_text(encoding="utf-8").splitlines()
+        diff = [i for i in range(max(len(b), len(c))) if (b[i] if i < len(b) else None) != (c[i] if i < len(c) else None)]
+        if diff:
+            failures.append(f"{name}: {len(diff)} 行が違う（行数 {len(b)} と {len(c)}）")
+            for i in diff[:3]:
+                details.append(f"{name} {i + 1} 行目: {(b[i] if i < len(b) else '')[:90]} → {(c[i] if i < len(c) else '')[:90]}")
+    return failures, details
+
+
 def table(header, rows):
     out = ["| " + " | ".join(header) + " |", "|" + "|".join(["---"] * len(header)) + "|"]
     out += ["| " + " | ".join(str(c) for c in row) + " |" for row in rows]
@@ -135,6 +158,7 @@ def main():
         p.add_argument("--rules", type=Path, default=RULES)
         p.add_argument("--summary", type=Path)
         p.add_argument("--json", type=Path)
+    s.add_argument("--identical", action="store_true")
     args = ap.parse_args()
     rules = json.loads(args.rules.read_text(encoding="utf-8"))
     if args.cmd == "data":
@@ -148,6 +172,12 @@ def main():
             text += f"\n\n変わった文: 1,298 文の入力のうち {changed[0]} / {changed[1]} 文で結果が変わった（報告だけ）。"
         if notes:
             text += "\n\n" + "\n".join(f"- {n}" for n in notes)
+    if args.cmd == "scores" and args.identical:
+        same, details = gate_identical(args.base, args.cand)
+        text += "\n\n同じ中身の確かめ（結果の *.tsv が1行も違わないか）: " + ("全部一致" if not same else f"{len(same)} ファイルで違う")
+        if same:
+            text += "\n" + "\n".join(f"- {s}" for s in same) + "\n\n違いの例:\n" + "\n".join(f"- {d}" for d in details[:12])
+        failures += [f"同じ中身なのに結果が違う: {s}" for s in same]
     verdict = "止める" if failures else "通ってよい"
     text += f"\n\n**判定: {verdict}**"
     if failures:
