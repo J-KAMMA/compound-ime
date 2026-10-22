@@ -143,6 +143,11 @@ jobs:
           cp $T/data/proper-nouns.tsv $W/old/proper-nouns.tsv
           cp $S/data/dictionary_oss/dictionary14.txt $W/old/supplement.tsv
           $PY $T/build_english_extra.py --out $W/old/english-extra.tsv
+          # 取り直さない流し方（refetch=false）では、新しい一覧の中身はいまの一覧と同じはず。1行でも違えば、ここで止める
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.refetch }}" = "false" ]; then
+            cmp $W/old/supplement.tsv $W/new/supplement.tsv || { echo "取り直さないのに追加の辞書がいまの dictionary14 と違う"; diff $W/old/supplement.tsv $W/new/supplement.tsv | head -20; exit 1; }
+            cmp $W/old/english-extra.tsv $W/new/english-extra.tsv || { echo "取り直さないのに英語の一覧が違う"; exit 1; }
+          fi
           # 止める基準 その1（試験を流す前に）
           $PY $T/dict_quality_gate.py data --old-dir $W/old --new-dir $W/new --summary $W/gate-data.md
 
@@ -212,7 +217,10 @@ jobs:
           # 試験の組のどれかが落ちたときは、結果がそろっていない。比べる前に止める
           TEST_RESULT="${{ needs.test.result }}"
           set +e
-          python3 tools/dict_quality_gate.py scores --base base --cand cand --summary gate-report.md --json gate.json
+          # 取り直さない流し方では中身が同じはずなので、結果が1行も変わらないことも求める
+          SAME=""
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.refetch }}" = "false" ]; then SAME="--identical"; fi
+          python3 tools/dict_quality_gate.py scores --base base --cand cand --summary gate-report.md --json gate.json $SAME
           RC=$?
           set -e
           if [ "$TEST_RESULT" != "success" ]; then

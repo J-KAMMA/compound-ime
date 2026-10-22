@@ -216,7 +216,7 @@ current/   今の辞書   previous/  1つ前の辞書   staging/  取ってい�
 - **組 `u` の実機の動き**（`session_handler_main` の `DICT_UPDATE` 命令、読み込んだ追加の辞書の語が実際の候補の一覧に出る順位）。組 `u` の読みは、Mozc の辞書にない並び（ぬぬぬぬぬぬ）で、追加の辞書の1語が一番安い道になるはずだが、動かしていない。
 - **ウィンドウズ**（WinInet の取得、レジストリの設定、`%LOCALAPPDATA%` の置き場所、`mozc_server` の中のスレッド）と**マック**。コードは書いたが、組み立ても実行もしていない。
 - `dict-update.yml`、`dict-publish.yml` は YAML の構文を確かめただけで、動かしていない（Wikidata の取得、`gh` の使い方、`workflow_call` の権限など）。`actionlint` は使っていない。
-- 同じ（読み・表記）が焼き込みと追加の辞書の両方にあるとき、重複した候補が出ないか（Mozc の候補の組み立てには同じ表記を除く処理があるのをコードで確かめたが、動かしていない）。
+- 同じ（読み・表記）が焼き込みと追加の辞書の両方にあるときの二重（run 39695917459 で、中身が同じ辞書の試験が12文変わった原因の1つ）。直した: 追加の辞書は、焼き込みの `dictionary14.txt` と全く同じ行（読み・表記・品詞・費用）を出さない（`supplement_baked.inc` の印で除く）。もう1つの原因は、英語の一覧が分野の語（`jaen-domain-words.txt`）を5文字以上でも厳選にしていたこと（本体の組み立ては4文字以下だけ。inode、kohaku、amazon、basename が日本語の文を英語にした）。直した: `build_english_extra.py` も4文字以下だけ。`refetch=false` の流し方では、一覧が同じことの確かめと、結果の `*.tsv` が1行も違わないことの確かめ（`dict_quality_gate.py scores --identical`）を入れた。
 - 同じ利用者の2つのサーバー（遠隔の接続など）が同じ置き場所を使う場合。
 - GitHub の配布ページの転送先が `https` 以外になることはないとして `--proto-redir =https` にした。
 

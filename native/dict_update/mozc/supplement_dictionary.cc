@@ -1,7 +1,10 @@
 #include "dictionary/supplement_dictionary.h"
 
 #include <cstddef>
+#include <cstdint>
+#include <iterator>
 #include <string>
+#include <unordered_set>
 #include <utility>
 
 #include "absl/strings/string_view.h"
@@ -14,6 +17,37 @@ namespace {
 using ::dict_update::SupplementTable;
 using Callback = DictionaryInterface::Callback;
 
+// 本体に焼き込んだ追加の辞書（dictionary14.txt）の行の印（FNV-1a 64。tools/apply_dict_update.py が作る）。
+// 取った辞書の行がこれと同じなら、焼き込みの辞書がすでに引くので、ここでは出さない（二重にすると、
+// 同じ語が2回のり、費用が同じ候補の並びが変わる）。印の作り方は tools/apply_dict_update.py の bake_hash と同じ。
+#include "dictionary/supplement_baked.inc"  // kBakedSupplementHashes
+
+uint64_t EntryHash(const ::dict_update::SupplementEntry& e) {
+  uint64_t h = 1469598103934665603ULL;
+  auto add = [&h](const std::string& s) {
+    for (unsigned char c : s) {
+      h ^= c;
+      h *= 1099511628211ULL;
+    }
+    h ^= '\t';
+    h *= 1099511628211ULL;
+  };
+  add(e.key);
+  add(e.value);
+  add(std::to_string(e.lid));
+  add(std::to_string(e.rid));
+  add(std::to_string(e.cost));
+  return h;
+}
+
+const std::unordered_set<uint64_t>& Baked() {
+  static const std::unordered_set<uint64_t>* const set =
+      new std::unordered_set<uint64_t>(std::begin(kBakedSupplementHashes), std::end(kBakedSupplementHashes));
+  return *set;
+}
+
+bool IsBaked(const ::dict_update::SupplementEntry& e) { return Baked().count(EntryHash(e)) > 0; }
+
 // [begin, end) の行を、読みごとにまとめて callback に渡す。同じ読みの行は続いて並んでいる。
 // 返り値が false なら、callback が打ち切りを求めた（DONE）。
 bool Emit(const SupplementTable& table, size_t begin, size_t end, Callback* callback) {
@@ -22,6 +56,12 @@ bool Emit(const SupplementTable& table, size_t begin, size_t end, Callback* call
     const std::string& key = table.at(i).key;
     size_t j = i;
     while (j < end && table.at(j).key == key) ++j;
+    bool any = false;  // 焼き込みと同じ行だけの読みは、出さない
+    for (size_t k = i; k < j && !any; ++k) any = !IsBaked(table.at(k));
+    if (!any) {
+      i = j;
+      continue;
+    }
     const Callback::ResultType on_key = callback->OnKey(key);
     if (on_key == Callback::TRAVERSE_DONE) return false;
     if (on_key == Callback::TRAVERSE_NEXT_KEY || on_key == Callback::TRAVERSE_CULL) {
@@ -36,6 +76,7 @@ bool Emit(const SupplementTable& table, size_t begin, size_t end, Callback* call
     }
     for (size_t k = i; k < j; ++k) {
       const ::dict_update::SupplementEntry& e = table.at(k);
+      if (IsBaked(e)) continue;
       const Token token(e.key, e.value, e.cost, e.lid, e.rid, Token::NONE);
       const Callback::ResultType on_token = callback->OnToken(key, key, token);
       if (on_token == Callback::TRAVERSE_DONE) return false;
