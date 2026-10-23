@@ -1,4 +1,4 @@
-# 略語の試験（候補）。tools/make_acronym_tests.py で作成（手で足さない）。略語だけを小文字で打って変換する。列: ローマ字<TAB>期待する候補<TAB>方式（typed: 先頭に出るはず、overlap: 上位3つ、info-capital: 大文字で打った形の目安）<TAB>分野<TAB>由来
+# 略語の試験（候補）。tools/make_acronym_tests.py で作成（手で足さない）。略語だけを小文字で打って変換する。列: ローマ字<TAB>期待する候補<TAB>方式（typed: 先頭に出るはず（型 a と ai）、overlap: 上位3つ、info-capital: 大文字で打った形の目安）<TAB>分野<TAB>由来
 aed	AED	typed	acronym-a	list
 AED	AED	info-capital	acronym-a	list
 amd	AMD	typed	acronym-a	list
@@ -421,7 +421,7 @@ xr	XR	typed	acronym-a	list
 XR	XR	info-capital	acronym-a	list
 yaml	YAML	typed	acronym-a	list
 YAML	YAML	info-capital	acronym-a	list
-ai	AI	overlap	acronym-b	list-cue
+ai	AI	typed	acronym-b	list-plain
 ana	ANA	overlap	acronym-b	list-rank
 fifa	FIFA	overlap	acronym-b	list-plain
 gafa	GAFA	overlap	acronym-b	list-plain

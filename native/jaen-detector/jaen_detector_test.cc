@@ -37,7 +37,8 @@ const std::map<std::string, std::string> kTable = {
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
-    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"}};
+    {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"},
+    {",", "、"}, {".", "。"}, {"!", "！"}, {"?", "？"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -636,15 +637,24 @@ int main() {
 
   {
     // 日本語に読める略語（ai: あい、ui: うい、ime: いめ）。打った並びに英字が残らない。
-    // 助詞と技術の語が続くときだけ英語にする（tools/data/acronyms.tsv、acronym-cues.tsv）。
+    // ai は独立した語として打たれたら（後ろが助詞・句読点・文末）AI にする。ui、ime などは手がかり方式のまま。
     Expect(english("aiwotsukau") == "ai|", "ai + を + 使う は AI（aiwotsukau）");
     Expect(english("kyouhaaiwotsukau") == "ai|", "文の途中でも AI を使う");
     Expect(english("aigakaihatsu") == "ai|", "ai + が + 開発");
-    Expect(english("aiwokanjiru").empty(), "愛を感じる は日本語のまま");
-    Expect(english("ainiikuru").empty(), "会いに行る（手がかりなし）は日本語のまま");
-    Expect(english("aitoheiwa").empty(), "愛と平和 は日本語のまま");
-    Expect(english("aiwo").empty() && english("ai").empty() && english("aiwotsu").empty(), "手がかりが出そろう前は日本語のまま");
-    Expect(english("aiga").empty(), "ai + が だけ（手がかりなし）は日本語のまま");
+    Expect(english("aiwokanjiru") == "ai|", "愛を感じる も AI（利用者の決定）");
+    Expect(english("aigakowai") == "ai|", "AIが怖い は AI");
+    Expect(english("ainohanashi") == "ai|", "AIの話 は AI");
+    Expect(english("ainikiku") == "ai|", "AIに聞く は AI（会いに の 行く ではない）");
+    Expect(english("ainimakaseru") == "ai|", "AIに任せる は AI");
+    Expect(english("aidegazou") == "ai|", "AIで画像 は AI");
+    Expect(english("ai") == "ai|" && english("ai,") == "ai|" && english("ai.") == "ai|", "AI だけ・句読点の前も AI");
+    Expect(english("ainiiku").empty() && english("ainikita").empty() && english("ainikuru").empty() &&
+           english("ainiitta").empty(), "会いに行く・来る の活用は日本語のまま");
+    Expect(english("aishite").empty() && english("aisuru").empty(), "愛して・愛する は日本語のまま");
+    Expect(english("aite").empty() && english("aikawarazu").empty() && english("aizu").empty() &&
+           english("aida").empty(), "相手・相変わらず・合図・間 は日本語のまま");
+    Expect(english("aimai").empty() && english("aisatsu").empty(), "曖昧・あいさつ は日本語のまま");
+    Expect(english("aideru").empty(), "愛でる は日本語のまま");
     Expect(english("ainotsukai") == "ai|", "ai + の + 使い は AI");
     Expect(english("naiwotsukau").empty(), "略語は打った文字の区切りから始まる（nai の ai は取らない）");
     Expect(english("uiwotsukau") == "ui|", "ui + を + 使う は UI");
@@ -655,6 +665,19 @@ int main() {
       Expect(Text("kouiwotsukau", pieces, true).empty(), "行為（こうい）の途中の ui は取らない");
       const auto taken = jaen::SplitEnglish(Parse("aiwotsukau"), lexicon, Parse, nullptr, &is_reading);
       Expect(Text("aiwotsukau", taken, true) == "ai|", "辞書があっても AI を使う は取る");
+    }
+    {
+      const std::set<std::string> readings = {"あいにく", "ばあい", "あいのり", "あいでる", "あいであ"};
+      const jaen::ReadingCheck is_reading = [&](std::string_view kana) { return readings.contains(std::string(kana)); };
+      const auto with = [&](std::string_view raw) {
+        return Text(std::string(raw), jaen::SplitEnglish(Parse(raw), lexicon, Parse, nullptr, &is_reading), true);
+      };
+      Expect(with("ainikiku") == "ai|", "辞書の あいにく より AIに聞く を優先する");
+      Expect(with("ainimakaseru") == "ai|", "AIに任せる は辞書があっても AI");
+      Expect(with("baai").empty() && with("kyouhabaai").empty(), "場合（ばあい）の ai は日本語のまま");
+      Expect(with("ainoriyou") == "ai|", "AIの利用 は AI（相乗り より先）");
+      Expect(with("aidea").empty(), "アイデア（あいであ）は日本語のまま");
+      Expect(with("aideru").empty(), "愛でる は辞書があっても日本語のまま");
     }
     {
       jaen::Choices choices;

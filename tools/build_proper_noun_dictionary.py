@@ -18,11 +18,11 @@ It never takes the first place from what Mozc already has:
 A (reading, spelling) pair Mozc already has is skipped. Readings shorter than 3 kana are not used.
 
 --acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
-the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (2 or 3): its
-cost lies between the (rank - 1)th and the rank-th cheapest entries of the reading, with the part of speech of the
-cheapest entry, so it never wins a sentence over that entry (愛 stays first for あい). A reading no word has gets
---default-cost. (The reading あい of AI in proper-nouns.tsv is skipped by the 3-kana rule; this is what makes AI
-a candidate of あい.)
+the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (1 to 3): rank
+1 costs less than every Mozc entry of the reading, so it is the first candidate (AI for あい; 愛 follows); rank 2 or
+3 lies between the (rank - 1)th and the rank-th cheapest entries, with the part of speech of the cheapest entry, so
+it never wins a sentence over that entry. A reading no word has gets --default-cost. (The reading あい of AI in
+proper-nouns.tsv is skipped by the 3-kana rule; this is what makes AI a candidate of あい.)
 """
 import argparse
 import re
@@ -72,7 +72,7 @@ def main():
             f = line.split("\t")
             if line.startswith("#") or len(f) < 6 or f[2] != "b":
                 continue
-            if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("2", "3"):
+            if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("1", "2", "3"):
                 raise SystemExit(f"bad acronym row: {line}")
             acronyms.append((f[1], f[3], int(f[5])))
     wanted = {reading for _, reading, _ in acronyms}
@@ -131,7 +131,9 @@ def main():
             entries[(reading, shown)] = (pos, pos, args.default_cost)
             continue
         costs = [c for c, _, _ in found]
-        if len(costs) >= rank:  # between the (rank - 1)th and the rank-th cheapest
+        if rank == 1:  # cheaper than every Mozc entry of the reading: the first candidate
+            cost = max(0, costs[0] - 1)
+        elif len(costs) >= rank:  # between the (rank - 1)th and the rank-th cheapest
             lo, hi = costs[rank - 2], costs[rank - 1]
             cost = lo + (hi - lo) // 2 if hi - lo >= 2 else hi
         else:

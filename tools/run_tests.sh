@@ -199,7 +199,8 @@ n)
   ;;
 r)
   # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、
-  # 型 b（ai: あい、ui: うい: 日本語に読める）は、略語のあとに助詞と技術の語が続くときだけ略語を先頭にする（native/jaen-detector/jaen_detector.cc）。
+  # 型 b（ai: あい、ui: うい: 日本語に読める）。ai は独立した語（後ろが助詞・句読点・文末）なら AI を先頭にし、
+  # 会いに行く型だけ日本語のまま。ui などは略語のあとに助詞と技術の語が続くときだけ略語を先頭にする（native/jaen-detector/jaen_detector.cc）。
   # 日本語の語が重なる文（acronyms-ja.tsv）は、略語に取らず日本語のまま出ることを期待する。採点はまとめの段で（tools/score_proper_nouns.py）
   for f in acronyms acronyms-ja; do
     if [ -f $T/$f.tsv ]; then

@@ -28,8 +28,11 @@ constexpr int64_t kCompoundPenalty = 3;   // 2語ずつ取れる分け方より�
 // 日本語に読める略語（ai: あい、ui: うい、seo: せお）。打った並びが全部かなに読めるので、
 // 英字が残る略語（api、url、html）と違い、検出器は印を見つけられない。略語の次に助詞が続き、
 // そのあとが技術の語（つかう、どうにゅう ...）のとき（型 b、方式 cue）、または日本語の語としては使わない
-// 並び（seo、ipo）に助詞か文の終わりが続くとき（方式 plain）だけ、英語にする。愛を感じる・会いに行く、は
-// 日本語のまま。表は tools/data/acronyms.tsv と acronym-cues.tsv から tools/build_acronym_table.py が書く。
+// 並び（seo、ipo）に助詞か文の終わりが続くとき（方式 plain）だけ、英語にする。
+// ai は方式 plain で、独立した語として打たれたら（後ろが助詞・句読点・文末・空白）必ず AI を先頭にする。
+// ただし「会いに」のあとが 行く・来る の活用（いく、きた、くる、いった ...）のときと、
+// 「愛でる」の でる のときは日本語のまま。表は tools/data/acronyms.tsv と acronym-cues.tsv から
+// tools/build_acronym_table.py が書く。
 struct ReadableAcronym {
   std::string_view typed;
   bool plain;                  // 手がかりなしで、助詞か文の終わりが続けばよい
@@ -37,7 +40,7 @@ struct ReadableAcronym {
 };
 // BEGIN GENERATED acronyms (tools/build_acronym_table.py)
 constexpr ReadableAcronym kReadableAcronyms[] = {
-    {"ai", false, ""},
+    {"ai", true, ""},
     {"fifa", true, ""},
     {"gafa", true, ""},
     {"gui", false, "そうさ,ひょうじ,せってい,さくせい,かいはつ"},
@@ -535,6 +538,19 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     return false;
   };
+  // ai は、前の日本語の語の終わり（場合: ばあい、試合: しあい）と重なるときだけ日本語にする。
+  // 助詞 に・の のあとなら、ai から始まる日本語の語（あいにく、あいのり）と重なっても AI にする
+  // （AIに聞く を 生憎 に取られない、AIの利用 を 相乗り に取られない）。
+  // それ以外の助詞のあとは、アイデア（あいであ）のような語を辞書の読みで守る。
+  const auto crosses_preceding_reading = [&](size_t ka, size_t kb) {
+    constexpr size_t kLongest = 8;
+    for (size_t a = ka >= kLongest ? ka - kLongest : 0; a < ka; ++a) {
+      for (size_t b = std::max(ka + 1, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
+        if ((*is_reading)(kana_text(a, b))) return true;
+      }
+    }
+    return false;
+  };
   // Kana that reads as Japanese grammar rather than a word: を inside
   // (otowokesu: "woke"), a て-form ending (mattei: "matte"), or a reading
   // that runs in from before and leaves only a particle (kawade: "wade").
@@ -574,7 +590,12 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   const auto acronym_taken = [&](const ReadableAcronym& acronym, size_t i, size_t j) {
     const size_t ka = kana_at[i];
     const size_t kb = kana_at[j];
-    if (kb <= ka || (is_reading && crosses_reading(ka, kb))) return false;
+    if (kb <= ka) return false;
+    const bool ai_before_particle = acronym.typed == "ai" && kb < kana.size() &&
+                                     (kana[kb] == "に" || kana[kb] == "の");
+    if (is_reading && (ai_before_particle ? crosses_preceding_reading(ka, kb) : crosses_reading(ka, kb))) {
+      return false;
+    }
     struct Particle { std::string_view key; std::string_view kana; };
     static constexpr Particle kParticles[] = {{"wo", "を"}, {"ga", "が"}, {"ha", "は"}, {"de", "で"},
                                               {"ni", "に"}, {"no", "の"}, {"to", "と"}, {"mo", "も"}};
@@ -586,6 +607,25 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     }
     if (acronym.plain) {
       static constexpr std::string_view kStops[] = {"。", "、", "！", "？"};
+      if (acronym.typed == "ai") {
+        static constexpr std::string_view kAiStops[] = {"。", "、", "！", "？", ".", ",", "!", "?", " ", "　"};
+        const bool stop = kb < kana.size() &&
+            std::ranges::find(kAiStops, std::string_view(kana[kb])) != std::end(kAiStops);
+        // 「会いに」のあとが 行く・来る の活用なら日本語のまま（会いに行く）。AIに聞く（きく）、
+        // AIに任せる（まかせる）などは AI にする。
+        if (particle && kana[kb] == "に") {
+          static constexpr std::string_view kGoCome =
+              "いく,いき,いっ,いか,いけ,いこ,きた,きて,きま,くる,くれ,こな,こよ,こら,こい";
+          const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
+          if (StartsWithCue(after, kGoCome)) return false;
+        }
+        // 「愛でる」の でる は日本語のまま。
+        if (particle && kana[kb] == "で") {
+          const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
+          if (after.starts_with("る")) return false;
+        }
+        return particle || j == n || stop;
+      }
       return particle || j == n ||
              (kb < kana.size() && std::ranges::find(kStops, std::string_view(kana[kb])) != std::end(kStops));
     }

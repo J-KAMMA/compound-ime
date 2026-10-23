@@ -210,7 +210,7 @@ def main():
             for k, t in misses:
                 by_origin[t[4]].append((k, t))
             for origin, items in sorted(by_origin.items()):
-                for k, t in items[:args.show if origin in ('ja-hard', 'ja-plain', 'ja-inside', 'b-cue', 'b-plain') else 3]:
+                for k, t in items[:args.show if origin in ('ja-hard', 'ja-plain', 'ja-inside', 'b-cue', 'b-plain', 'b-standalone') else 3]:
                     print(f"    [{origin}] {t[0]} → {','.join(got[k]) or '-'}（期待: {t[1]}）")
     return 0
 

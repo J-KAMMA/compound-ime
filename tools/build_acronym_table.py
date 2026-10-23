@@ -63,7 +63,7 @@ def problems(rows, shared):
         if r["kind"] not in ("a", "b"):
             bad.append(f"型が a でも b でもない: {t}")
         if r["kind"] == "b":
-            if not HIRAGANA.fullmatch(r["reading"]) or r["mode"] not in ("cue", "plain", "rank") or r["rank"] not in ("2", "3"):
+            if not HIRAGANA.fullmatch(r["reading"]) or r["mode"] not in ("cue", "plain", "rank") or r["rank"] not in ("1", "2", "3"):
                 bad.append(f"型 b の列が正しくない: {t}")
             if len(t) > 4 and r["mode"] != "rank":
                 bad.append(f"文の中の規則で使う語は4文字まで（kMaxAcronymLength）: {t}")
