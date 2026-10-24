@@ -2,7 +2,7 @@
 
   python tools/acronym_dictionary_test.py
 
-あい に 愛・哀・藍・相・合い がある作り物の辞書で、AI が3番目に入り、一番安い語（愛）の品詞を使い、
+あい に 愛・哀・藍・相・合い がある作り物の辞書で、AI が先頭（愛より安い）に入り、一番安い語（愛）の品詞を使い、
 語が2つしかない うい では最後に、読みを持つ語がない うあえ には既定の費用で入ることを確かめる。
 """
 import subprocess
@@ -41,7 +41,7 @@ def main():
         check(ai is not None, "あい → AI が出ていない")
         if ai:
             lid, rid, cost = int(ai[0]), int(ai[1]), int(ai[2])
-            check(3600 < cost < 4200, f"AI は 哀（3600）と藍（4200）の間（3番目）のはず: {cost}")
+            check(cost == 2999, f"AI は一番安い愛（3000）より1安く、先頭のはず: {cost}")
             check((lid, rid) == (0, 0), f"AI は愛と同じ品詞のはず: {lid} {rid}")
         check(rows.get(("あい", "AI")) is not None and ("えーあい", "AI") in rows, "えーあい → AI（3かなの読み）が出ていない")
         ui = rows.get(("うい", "UI"))
