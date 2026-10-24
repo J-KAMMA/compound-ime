@@ -18,6 +18,7 @@
 #      -memory.tsv / -expire.tsv は session が覚える直前の確定の試験（tools/english_follow_memory.sh、前の文は渡さない）。
 #      tools/make_english_follow_tests.py、tools/score_english_follow.py
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
+#   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
 #   s: 数字の間の点と文末の句点（docs/decimal-point.md）と、かなで打った数＋単位（docs/kana-numbers.md）。
@@ -151,6 +152,17 @@ k)
   if [ -f $T/proper-nouns-cand.tsv ]; then
     grep -v '^#' $T/proper-nouns-cand.tsv | cut -f1 > $W/proper-nouns-cand.txt
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
+  fi
+  ;;
+l)
+  # 履歴の学習（tools/learn_respect_convert.sh）。1語の読みを変換して、人工知能なしの2番目の候補を同じ会話で4回選んで
+  # 確定したあと、同じ読みの先頭に来るかを、人工知能あり・なしで比べる（tests/conversion/learn-respect.tsv、50語以上）。
+  # 履歴で先頭になった書き方を人工知能の段が別の書き方に替えていれば失敗にする（tools/score_learn_respect.py）。
+  if [ -f $T/learn-respect.tsv ]; then
+    LEARN="bash $REPO/tools/learn_respect_convert.sh $E/session_handler_main $E"
+    $LEARN $MODEL $T/learn-respect.tsv $OUT/learn-respect 2
+    python3 $REPO/tools/score_learn_respect.py $T/learn-respect.tsv \
+      $OUT/learn-respect-on.tsv $OUT/learn-respect-off.tsv | tee $OUT/learn-respect-score.txt
   fi
   ;;
 m)
@@ -515,5 +527,5 @@ PY
   ) || true
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、m、n、p、q、r、s、u、x、y のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、u、x、y のどれか" >&2; exit 2 ;;
 esac

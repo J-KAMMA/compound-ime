@@ -198,7 +198,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","q","r","s","u"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","u"]') }}
         # dict_candidate があるときだけ、新しい辞書（cand）でも流す
         variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
@@ -294,6 +294,12 @@ jobs:
               head -40 results/domain-$f-score.txt
             fi
           done
+          # 履歴の学習の試験（組 l）: 人工知能あり・なしで、選んだ書き方が先頭に来た数を並べる
+          if [ -f results/learn-respect-on.tsv ] && [ -f results/learn-respect-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect.tsv \
+              results/learn-respect-on.tsv results/learn-respect-off.tsv > results/learn-respect-score.txt
+            cat results/learn-respect-score.txt
+          fi
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
           if [ -f results/proper-nouns.tsv ] && [ -f repo/tests/conversion/proper-nouns.tsv ]; then
             python3 repo/tools/score_proper_nouns.py sentences repo/tests/conversion/proper-nouns.tsv results/proper-nouns.tsv "固有名詞の文" > results/proper-nouns-score.txt
