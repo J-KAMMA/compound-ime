@@ -429,7 +429,6 @@ kanojohaaimaga.	彼女は合間が。	b	合間が	ja-plain
 watashihaaimaha.	私は合間は。	b	合間は	ja-plain
 ima,aimawo.	今、合間を。	b	合間を	ja-plain
 hahahaaimani.	母は合間に。	b	合間に	ja-plain
-aimade.	合間で。	b	合間で	ja-plain
 kinou,aimato.	昨日、合間と。	b	合間と	ja-plain
 anohitoaimano.	あの人合間の。	b	合間の	ja-plain
 kyouhaaimamo.	今日は合間も。	b	合間も	ja-plain
@@ -513,6 +512,18 @@ ima,ainoride.	今、相乗りで。	b	相乗りで	ja-plain
 hahahaainorito.	母は相乗りと。	b	相乗りと	ja-plain
 ainorino.	相乗りの。	b	相乗りの	ja-plain
 kinou,ainorimo.	昨日、相乗りも。	b	相乗りも	ja-plain
+ainorisuru.	相乗りする。	b	相乗りする	ja-plain
+kinou,ainorisuru.	昨日、相乗りする。	b	相乗りする	ja-plain
+anohitoainorisuru.	あの人相乗りする。	b	相乗りする	ja-plain
+kyouhaainorishita.	今日は相乗りした。	b	相乗りした	ja-plain
+kanojohaainorishita.	彼女は相乗りした。	b	相乗りした	ja-plain
+watashihaainorishita.	私は相乗りした。	b	相乗りした	ja-plain
+ima,ainote.	今、合いの手。	b	合いの手	ja-plain
+hahahaainote.	母は合いの手。	b	合いの手	ja-plain
+ainote.	合いの手。	b	合いの手	ja-plain
+kinou,aideiru.	昨日、会いでいる。	b	会いでいる	ja-plain
+anohitoaideiru.	あの人会いでいる。	b	会いでいる	ja-plain
+kyouhaaideiru.	今日は会いでいる。	b	会いでいる	ja-plain
 ima,ainiitteshitsumonnsuru.	今、会いに行って質問する。	b	会いに	ja-hard
 hahahaainiitteshitsumonnsuru.	母は会いに行って質問する。	b	会いに	ja-hard
 kyouhaainikitesoudannsuru.	今日は会いに来て相談する。	b	会いに	ja-hard

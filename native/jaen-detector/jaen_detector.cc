@@ -29,7 +29,9 @@ constexpr int64_t kCompoundPenalty = 3;   // 2語ずつ取れる分け方より�
 // 英字が残る略語（api、url、html）と違い、検出器は印を見つけられない。略語の次に助詞が続き、
 // そのあとが技術の語（つかう、どうにゅう ...）のとき（型 b、方式 cue）、または日本語の語としては使わない
 // 並び（seo、ipo）に助詞か文の終わりが続くとき（方式 plain）だけ、英語にする。
-// ai は方式 plain で、独立した語として打たれたら（後ろが助詞・句読点・文末・空白）必ず AI を先頭にする。
+// ai は方式 plain で、独立した語として打たれたら（後ろが助詞［から・まで・へ・より を含む］・
+// 句読点・文末・空白）必ず AI を先頭にする。辞書に あいで（愛で）・あいは（相葉）などの読みが
+// あっても、後ろの読みでは止めない（前の語の終わりと重なるときだけ日本語にする）。
 // ただし「会いに」のあとが 行く・来る の活用（いく、きた、くる、いった ...）のときと、
 // 「愛でる」の でる のときは日本語のまま。表は tools/data/acronyms.tsv と acronym-cues.tsv から
 // tools/build_acronym_table.py が書く。
@@ -591,9 +593,18 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     const size_t ka = kana_at[i];
     const size_t kb = kana_at[j];
     if (kb <= ka) return false;
-    const bool ai_before_particle = acronym.typed == "ai" && kb < kana.size() &&
-                                     (kana[kb] == "に" || kana[kb] == "の");
-    if (is_reading && (ai_before_particle ? crosses_preceding_reading(ka, kb) : crosses_reading(ka, kb))) {
+    // ai は、前の日本語の語の終わり（場合: ばあい、試合: しあい）と重なるときだけ日本語にする。
+    // 後ろの読み（相葉: あいは、愛で: あいで）では止めない。独立した語の ai は後ろの助詞で決め、
+    // アイデア（あいであ）のような語だけ、下の例外で守る。辞書の読みで一律に止めると、
+    // 本物の Mozc では AIは技術だ が 相葉は… に負けて 愛 になっていた。
+    // 直前が助詞（事務所でAI: であい = 出会い）のときも、前の語の終わりと重なる読みでは止めない。
+    static constexpr std::string_view kBeforeParticles[] = {"を", "が", "は", "で", "に", "の", "と", "も", "へ", "や"};
+    const bool after_particle = ka > 0 &&
+        std::ranges::find(kBeforeParticles, std::string_view(kana[ka - 1])) != std::end(kBeforeParticles);
+    if (is_reading && acronym.typed == "ai" && !after_particle && crosses_preceding_reading(ka, kb)) {
+      return false;
+    }
+    if (is_reading && acronym.typed != "ai" && crosses_reading(ka, kb)) {
       return false;
     }
     struct Particle { std::string_view key; std::string_view kana; };
@@ -616,11 +627,15 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         const bool space = j < n && (raw[j] == ' ' || raw[j] == '\t' || raw[j] == '\r' ||
                                      raw[j] == '\n' || raw.compare(j, 3, "　") == 0);
         if (kb >= kana.size() || stop || space) return true;
-        // ai の次が助詞でなければ、日本語の語の続き（相手、愛して、合図、曖昧、あいさつ ...）。
-        const bool next_particle = std::ranges::find(kParticleKana, std::string_view(kana[kb])) != std::end(kParticleKana);
-        if (!next_particle) return false;
         const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
         const size_t next = kb + 1;  // after の先頭のかな
+        // 助詞は を・が・は・で・に・の・と・も のほか、から・まで・へ・より も取る。
+        const std::string with_particle = kana[kb] + after;
+        const bool next_particle = std::ranges::find(kParticleKana, std::string_view(kana[kb])) != std::end(kParticleKana) ||
+            with_particle.starts_with("から") || with_particle.starts_with("まで") ||
+            with_particle.starts_with("へ") || with_particle.starts_with("より");
+        // ai の次が助詞でなければ、日本語の語の続き（相手、愛して、合図、曖昧、あいさつ ...）。
+        if (!next_particle) return false;
         const auto next_is = [&](std::string_view s) { return next < kana.size() && std::string_view(kana[next]) == s; };
         const auto particle_or_stop = [&](size_t at) {
           return std::ranges::find(kParticleKana, at < kana.size() ? std::string_view(kana[at]) : std::string_view()) !=
@@ -640,18 +655,28 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           // 生憎（あいにく）: に + く で終わるか、助詞・句読点が続くときだけ。
           if (next_is("く") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
         } else if (kana[kb] == "の") {
-          // 相乗り（あいのり）: の + り のあとが助詞・句読点か文末。
-          if (next_is("り") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
-          // 合いの手（あいのてを）、藍の着物（あいのきもの）。
+          // 相乗り（あいのり）・相乗りする: の + り のあとが助詞・句読点か文末、
+          // または する・した などの活用。
+          if (next_is("り") && (after.size() <= 3 || particle_or_stop(next + 1) ||
+                                after.starts_with("りす") || after.starts_with("りし") ||
+                                after.starts_with("りでき"))) return false;
+          // 合いの手（あいのて・あいのてを）、藍の着物（あいのきもの）。
+          if (next_is("て") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
           if (after.starts_with("てを") || after.starts_with("きも")) return false;
         } else if (kana[kb] == "で") {
           // 藍で染める。
           if (after.starts_with("そめ")) return false;
-          // 愛でる・愛でた・愛でます などの活用。
+          // 愛でる・愛でた・愛でます などの活用。会いでいる（あいでいる）も日本語のまま。
           if (after.starts_with("る") || after.starts_with("ます") || after.starts_with("ない") ||
-              after.starts_with("れ") || after.starts_with("よう")) return false;
+              after.starts_with("れ") || after.starts_with("よう") ||
+              after.starts_with("いる") || after.starts_with("ている")) return false;
           if ((after.starts_with("た") || after.starts_with("て")) &&
               (after.size() <= 3 || particle_or_stop(next + 1))) return false;
+          // アイデア（あいであ）・アイデンティティ（あいでん）。「AIで明日」は あした と続くので取る。
+          if (after.starts_with("あ") &&
+              (after.size() <= 6 || after.starts_with("あです") || after.starts_with("あでし") ||
+               after.starts_with("あでしょう"))) return false;
+          if (after.starts_with("あん")) return false;
         }
         return true;
       }
