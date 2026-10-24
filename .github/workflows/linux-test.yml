@@ -299,12 +299,14 @@ jobs:
           if [ -f results/learn-respect-targets.tsv ] && [ -f results/learn-respect-on.tsv ] && [ -f results/learn-respect-off.tsv ]; then
             python3 repo/tools/score_learn_respect.py results/learn-respect-targets.tsv \
               results/learn-respect-on.tsv results/learn-respect-off.tsv | tee results/learn-respect-score.txt
+            [ "${PIPESTATUS[0]}" -eq 0 ] || exit 1
           fi
           # 前の文がある複数文節の文（組 l）: 文節ごとの人工知能と全文生成を通しても、選んだ書き方が先頭か
           if [ -f results/learn-respect-context-targets.tsv ] && [ -f results/learn-respect-context-on.tsv ] && [ -f results/learn-respect-context-off.tsv ]; then
             python3 repo/tools/score_learn_respect.py results/learn-respect-context-targets.tsv \
               results/learn-respect-context-on.tsv results/learn-respect-context-off.tsv 1 \
               | tee results/learn-respect-context-score.txt
+            [ "${PIPESTATUS[0]}" -eq 0 ] || exit 1
           fi
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
           if [ -f results/proper-nouns.tsv ] && [ -f repo/tests/conversion/proper-nouns.tsv ]; then

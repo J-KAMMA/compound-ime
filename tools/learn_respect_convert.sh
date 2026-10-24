@@ -147,13 +147,14 @@ run_mode() {  # <名前> <重み> <出力> <対象の表> [行ごとに履歴を
 # 前後の文がある複数文節の文: 履歴のないときの候補（人工知能なし・あり）と、1語の変換の先頭を並べ、
 # 文脈が別の書き方を先頭にしている文だけを対象にする。対象は文節の元の先頭（2番目になっている書き方）。
 context_probe() {  # <重み> <文節ごとの人工知能 0/1> <出力>（キー<TAB>候補…）
-  local model=$1 calls=$2 output=$3 w="$TMP/cprobe-$calls"; mkdir -p "$w"
+  local model=$1 calls=$2 output=$3
+  local w="$TMP/cprobe-$calls"; mkdir -p "$w"
   split -l $(( ($(wc -l < "$TMP/context.tsv") + P - 1) / P )) "$TMP/context.tsv" "$w/part."
   for f in "$w"/part.*; do
     ( cut -f1,3 "$f" > "$f.inputs"
       { printf 'SEND_KEY\tON\n'
         while IFS=$'\t' read -r reading _ preceding; do
-          printf 'SET_PRECEDING_TEXT\t%s\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nCLEAR_ALL\nRESET_CONTEXT\nSET_PRECEDING_TEXT\nSEND_KEY\tON\n' \
+          printf 'SET_PRECEDING_TEXT\t%s\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\nCLEAR_ALL\nRESET_CONTEXT\nSET_PRECEDING_TEXT\nSEND_KEY\tON\n' \
             "$preceding" "$reading"
         done < "$f"; } > "$f.cmd"
       MYIME_CONTEXT_SEGMENT_CALLS=$calls MYIME_ZENZAI_TIME_LIMIT_MS=0 MYIME_ZENZAI_STATS_FILE="$PREFIX-context.zstats" MYIME_AI_BUDGET_MS=0 \
