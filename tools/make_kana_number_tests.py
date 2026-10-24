@@ -169,6 +169,8 @@ TIME_ROWS = [
     ("きのう", "昨日", "にじゅうにん", "20人"),
     ("あした", "明日", "にじゅうにん", "20人"),
 ]
+# 半角の ! ? のすぐあと（!にじゅうにん）は、に を助詞と見て 10人 にしない。
+PRE_BOUNDARY = [("!", "！"), ("?", "？")]
 
 
 def build():
@@ -182,6 +184,9 @@ def build():
         for after in (("。", "。"), ("!", "！"), ("?", "？")):
             rows.append((*sentence((kana, want), after), "文末"))
         rows.append((*sentence(("[", "「"), (kana, want), ("]", "」")), "文末"))
+    # 数の左にある半角の ! ?（!にじゅうにん）も、に が数の一部になる境界にする。
+    for before_kana, before_want in PRE_BOUNDARY:
+        rows.append((*sentence((before_kana, before_want), ("にじゅうにん", "20人"), ("。", "。")), "文末"))
     # 数のあとに語が続く形（40分待ちました、20年後にまた会いましょう）。
     rows.append((*sentence(("よんじゅっぷん", "40分"), ("まちました。", "待ちました。")), "数のあとの語"))
     rows.append((*sentence(("にじゅうねん", "20年"), ("ごにまたあいましょう。", "後にまた会いましょう。")), "数のあとの語"))

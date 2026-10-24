@@ -359,6 +359,7 @@ bool ParticleNi(const Text& t, size_t i) {
     case U'は': case U'が': case U'を': case U'に': case U'で': case U'と':
     case U'も': case U'へ': case U'や': case U'の':
     case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'!': case U'?':
     case U'「': case U'」': case U'『': case U'』': case U'（': case U'）':
     case U'[': case U']':
     case U' ': case U'　': case U'\n':

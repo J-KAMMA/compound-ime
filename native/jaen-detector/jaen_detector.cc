@@ -623,9 +623,20 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     // AIのあとの で + あい...（AIで愛を・AIであいさつ）は、後ろの あい を日本語の語
     // （愛・挨拶 ...）として残す。ただし「それでAI」「会社でAI」のように、助詞の前に
     // 独立した日本語の語があるときは AI のまま。直前が AI 自身（AIで愛）も日本語にする。
+    // 出会い（であい）・場合（ばあい）のように あい で終わる長い語のあとでも、
+    // その語に含まれる あい を AI と取り違えない。
     const bool de_ni_before_ai = ka > 0 && (kana[ka - 1] == "で" || kana[ka - 1] == "に");
+    const auto ai_is_the_word_before = [&](size_t at) {
+      if (at < 3 || kana_text(at - 3, at - 1) != "あい") return false;
+      const size_t end = at - 1;
+      constexpr size_t kLongest = 8;
+      for (size_t a = end >= kLongest ? end - kLongest : 0; a < end - 2; ++a) {
+        if ((*is_reading)(kana_text(a, end))) return false;
+      }
+      return true;
+    };
     if (is_reading && acronym.typed == "ai" && de_ni_before_ai &&
-        !(word_before_particle && kana_text(ka >= 3 ? ka - 3 : 0, ka - 1) != "あい")) {
+        (!word_before_particle || ai_is_the_word_before(ka))) {
       return false;
     }
     if (is_reading && acronym.typed == "ai" && crosses_preceding_reading(ka, kb) &&
@@ -685,15 +696,28 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         } else if (kana[kb] == "の") {
           // 相乗り（あいのり）は日本語の語。AIのリスク・リスト・利用 だけ AI の続きとして取る。
           // 相乗りが好き・相乗りを進める のように、後ろに語が続いても日本語のまま。
+          // AIのリーダー（りーだー）・AIの理論（りろん）のような語は AI にする。
           if (next_is("り")) {
             static constexpr std::string_view kAiRi[] = {"りすく", "りすと", "りよう"};
-            if (!std::ranges::any_of(kAiRi, [&](std::string_view s) { return after.starts_with(s); })) {
+            static constexpr std::string_view kNoruForms =
+                "りする,りした,りして,りし,りでき,りたい,りたく,りた,りながら,りません,りました";
+            const bool nori_word = after == "り" || particle_or_stop(next + 1) ||
+                after.starts_with("りから") || after.starts_with("りまで") ||
+                after.starts_with("りへ") || after.starts_with("りより") ||
+                StartsWithCue(after, kNoruForms);
+            if (!std::ranges::any_of(kAiRi, [&](std::string_view s) { return after.starts_with(s); }) &&
+                nori_word) {
               return false;
             }
           }
           // 合いの手（あいのて）は日本語の語。AIの手書き（てがき）・手順（てじゅん）だけ AI の続き。
+          // AIの展開（てんかい）・提案（ていあん）は AI にする。
           if (next_is("て")) {
-            if (!after.starts_with("てがき") && !after.starts_with("てじゅん")) return false;
+            const bool tegi = after.starts_with("てがき") || after.starts_with("てじゅん");
+            const bool te_word = after == "て" || particle_or_stop(next + 1) ||
+                after.starts_with("てから") || after.starts_with("てまで") ||
+                after.starts_with("てへ") || after.starts_with("てより");
+            if (!tegi && te_word) return false;
           }
           if (after.starts_with("きも")) return false;
         } else if (kana[kb] == "で") {
