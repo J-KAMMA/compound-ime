@@ -1,5 +1,5 @@
 #!/bin/bash
-# make_linux_bundle.sh <版> <作業フォルダ> <このリポジトリ> : コンパウンドIME の Linux 版配布物（tar.gz）を作る。
+# make_linux_bundle.sh <版> <作業フォルダ> <このリポジトリ> : 複合IME の Linux 版配布物（tar.gz）を作る。
 # <作業フォルダ> には myime/（MyIME と Mozc の木）、llama.cpp/、swift/ がある（BUILD.md の Linux 版の節）。
 # 中身: Mozc の Linux 一式（ibus 用）、変換エンジン、llama.cpp、Swift の実行部品、
 #       辞書などの資源、利用条件の表示、install.sh / uninstall.sh
@@ -46,7 +46,7 @@ cat > $OUT/files/etc/xdg/autostart/compound-ime-update-check.desktop <<'EOD'
 [Desktop Entry]
 Type=Application
 Name=CompoundIME update check
-Name[ja]=コンパウンドIME 新しい版のお知らせ
+Name[ja]=複合IME 新しい版のお知らせ
 Exec=/usr/lib/compound-ime/update_check.sh
 NoDisplay=true
 X-GNOME-Autostart-enabled=true
@@ -54,7 +54,7 @@ EOD
 
 cat > $OUT/install.sh <<'EOS'
 #!/bin/bash
-# コンパウンドIME（Linux 版）を入れる。sudo で実行する。
+# 複合IME（Linux 版）を入れる。sudo で実行する。
 set -e
 [ "$(id -u)" = 0 ] || { echo "sudo ./install.sh で実行してください"; exit 1; }
 HERE=$(cd "$(dirname "$0")" && pwd)
@@ -75,11 +75,11 @@ if ! echo "$SUM  $M/$F" | sha256sum -c --status 2>/dev/null; then
   mv $M/$F.part $M/$F
 fi
 echo "入れました。ibus を再起動してください: ibus restart"
-echo "そのあと、設定の「キーボード」または ibus-setup で「コンパウンドIME」を追加します。"
+echo "そのあと、設定の「キーボード」または ibus-setup で「複合IME」を追加します。"
 EOS
 cat > $OUT/uninstall.sh <<'EOS'
 #!/bin/bash
-# コンパウンドIME（Linux 版）を外す。学習データ（~/.config/compound-ime など）は消さない。
+# 複合IME（Linux 版）を外す。学習データ（~/.config/compound-ime など）は消さない。
 set -e
 [ "$(id -u)" = 0 ] || { echo "sudo ./uninstall.sh で実行してください"; exit 1; }
 rm -rf /usr/lib/compound-ime /usr/lib/ibus-compound-ime /usr/share/ibus-compound-ime \
