@@ -225,6 +225,18 @@ bool Lexicon::IsCurated(std::string_view word) const {
 }
 
 namespace {
+// q のあとに u 以外（a・i・e・o）が続く並び（くぁ・くぃ・くぇ・くぉ。qwa など q+w も）や、
+// 母音のない q（QR、Qt の く）は、日本語のローマ字ではまれ。英語の語（qoder、qwen、Qt）を
+// 一覧から取るとき、打った文字の区切り（qwen|wo の n と w の間）で切れなくても取れるよう、
+// 強い印にする。q+u（く。query、queue）は普通の英単語の読みなので、今までどおり弱い印。
+bool IsRareQChunk(const Chunk& chunk) {
+  const std::string_view raw = chunk.raw;
+  if (raw.empty() || Lower(raw[0]) != 'q' || chunk.conversion.starts_with("っ")) return false;
+  if (raw.size() == 1) return true;
+  const char next = Lower(raw[1]);
+  return next != 'u' && next != 'q';
+}
+
 int64_t ForeignWeight(const Chunk& chunk) {
   if (chunk.conversion.empty() && (chunk.pending == "n" || chunk.pending == "N")) return 0;
   const std::string_view raw = chunk.raw;
@@ -237,6 +249,7 @@ int64_t ForeignWeight(const Chunk& chunk) {
       std::ranges::any_of(chunk.conversion + chunk.pending, IsAsciiAlpha)) {
     return kForeignCost;
   }
+  if (IsRareQChunk(chunk)) return kForeignCost;
   // c not in ch (ca for か) is a weak sign too, but never typed for a
   // Japanese word's kana: "camera" is English, a Japanese typist types kamera.
   const bool c_key = !chunk.conversion.empty() && head == 'c' && (raw.size() < 2 || Lower(raw[1]) != 'h');

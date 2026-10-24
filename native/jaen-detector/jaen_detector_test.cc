@@ -36,6 +36,7 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"yu", "ゆ"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
+    {"q", "く"}, {"qa", "くぁ"}, {"qi", "くぃ"}, {"qe", "くぇ"}, {"qo", "くぉ"}, {"qu", "く"}, {"qwe", "くぇ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
     {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"},
     {",", "、"}, {".", "。"}, {"!", "！"}, {"?", "？"}};
@@ -89,6 +90,9 @@ int main() {
   lexicon.Add("nec", true);
   lexicon.Add("chatgpt", true);
   lexicon.Add("ntt", true);
+  lexicon.Add("qoder", true);
+  lexicon.Add("qwen", true);
+  lexicon.Add("quick");
   lexicon.AddPhrase("see you");
   lexicon.AddPhrase("made in japan");
   lexicon.AddPhrase("log in");
@@ -112,6 +116,17 @@ int main() {
   Expect(english("youtubedemita") == "youtube|", "curated plain word");
   Expect(english("okdesu") == "ok|", "short word with pending key");
   Expect(english("mailwokaku") == "mail|", "word ending in a pending key before wo");
+  Expect(english("qoderwotsukau") == "qoder|", "qo (くぉ) before a word: the curated name is taken");
+  Expect(english("qwenwotamesu") == "qwen|", "q and w before n: the curated name is taken");
+  Expect(english("quickwotsukau") == "quick|", "qu (く) stays a weak sign: an ordinary English word");
+  Expect(english("qonnikaku").empty(), "a q loanword reading not in the list stays Japanese");
+  {
+    // The composer merges n with a following w ("qwen|wo" is qwe + nwo), so qwen ends inside a chunk.
+    const std::vector<Chunk> chunks = {{"qwe", "くぇ", ""}, {"nwo", "んを", ""}, {"ta", "た", ""},
+                                       {"me", "め", ""}, {"su", "す", ""}, {"", "", ""}};
+    Expect(Text("qwenwotamesu", jaen::SplitEnglish(chunks, lexicon, Parse), true) == "qwen|",
+           "a q word may end inside the chunk nwo (qwen|wo)");
+  }
 
   Expect(english("samewomita").empty(), "romaji-readable word stays Japanese");
   Expect(english("mademachimasu").empty(), "Japanese reading stays");
@@ -313,7 +328,8 @@ int main() {
 
   // Foreign chunk shapes.
   Expect(jaen::IsForeignChunk({"gwo", "ぐぉ", ""}) && jaen::IsForeignChunk({"le", "ぇ", ""}) &&
-             jaen::IsForeignChunk({"g", "", "g"}),
+             jaen::IsForeignChunk({"g", "", "g"}) && jaen::IsForeignChunk({"qo", "くぉ", ""}) &&
+             jaen::IsForeignChunk({"q", "く", ""}),
          "foreign chunk shapes");
   Expect(!jaen::IsForeignChunk({"wo", "を", ""}) && !jaen::IsForeignChunk({"n", "", "n"}) &&
              !jaen::IsForeignChunk({"kyo", "きょ", ""}),

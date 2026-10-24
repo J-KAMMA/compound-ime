@@ -1293,6 +1293,7 @@ litellm	LiteLLM
 openrouter	OpenRouter
 weaviate	Weaviate
 qdrant	Qdrant
+qoder	Qoder
 milvus	Milvus
 chromadb	ChromaDB
 faiss	FAISS
@@ -1389,6 +1390,7 @@ ktor	Ktor
 springboot	Spring Boot
 springframework	Spring Framework
 quarkus	Quarkus
+quora	Quora
 micronaut	Micronaut
 helidon	Helidon
 vertx	Vert.x
@@ -1547,6 +1549,7 @@ jetbrains	JetBrains
 androidstudio	Android Studio
 netbeans	NetBeans
 codeblocks	Code::Blocks
+qt	Qt
 qtcreator	Qt Creator
 gtk	GTK
 wxwidgets	wxWidgets
