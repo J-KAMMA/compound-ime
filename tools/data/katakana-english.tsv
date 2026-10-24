@@ -1,4 +1,4 @@
-# katakana<TAB>english (tools/build_katakana_english.py; CMU Pronouncing Dictionary BSD, SCOWL, tools/data/loanwords.tsv)
+# katakana<TAB>english (tools/build_katakana_english.py; CMU Pronouncing Dictionary BSD, SCOWL, tools/data/loanwords.tsv; JMdict; wasei words in tools/data/wasei.tsv are left out)
 アイコン	icon
 アイサイト	eyesight
 アイス	ice
@@ -11,7 +11,7 @@
 アイデンティティ	identity
 アイドル	idol
 アイフォン	iphone
-アイボリー	eyeball
+アイボリー	ivory
 アイランド	island
 アイリス	iris
 アイロン	iron
@@ -95,7 +95,6 @@
 アバンダンス	abundance
 アパタイト	appetite
 アパタイト	apartheid
-アパート	apart
 アパートメント	apartment
 アピール	appeal
 アファメーション	affirmation
@@ -710,7 +709,6 @@
 サイドライン	sideline
 サイバー	cyber
 サイレン	siren
-サイン	sign
 サウザンド	thousand
 サウンディング	sounding
 サウンド	sound
@@ -1345,7 +1343,6 @@
 トレー	tray
 トレーディング	trading
 トレード	trade
-トレーナー	trainer
 トレーニング	training
 トン	ton
 トンネル	tunnel
@@ -1367,7 +1364,6 @@
 ドライバー	driver
 ドライバーズ	drivers
 ドライブ	drive
-ドライヤー	dryer
 ドラッグ	drag
 ドラッグ	drug
 ドラッグストア	drugstore
@@ -1640,7 +1636,6 @@
 ビット	bit
 ビデオ	video
 ビデオテープ	videotape
-ビニール	vinyl
 ビハインド	behind
 ビュッフェ	buffet
 ビュー	view
@@ -2012,7 +2007,6 @@
 ホーボー	hobo
 ホーム	home
 ホームスパン	homespun
-ホームページ	homepage
 ホームラン	home run
 ホール	hall
 ホール	hole
@@ -2050,7 +2044,6 @@
 ポジティブ	positive
 ポスター	poster
 ポスティング	posting
-ポスト	post
 ポット	pot
 ポッドキャスト	podcast
 ポップ	pop
@@ -2137,7 +2130,6 @@
 マンカインド	mankind
 マングローブ	mangrove
 マンゴー	mango
-マンション	mansion
 マーカー	marker
 マーキング	marking
 マーク	mark
@@ -2467,7 +2459,6 @@
 レモネード	lemonade
 レモン	lemon
 レングス	length
-レンジ	range
 レンタル	rental
 レンダリング	rendering
 レーザー	leather

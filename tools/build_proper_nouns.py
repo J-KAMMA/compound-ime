@@ -11,13 +11,15 @@ GitHub, New York, Elon Musk, iPhone ...) from Wikidata (CC0), with how they are 
 a lexicon directory: english-lexicon.txt curated-words.txt signal-words.txt common-words.txt joined.txt
 phrases.txt places.tsv, plus readings.txt and romaji.tsv in the working directory --trial-work).
 
-What the output line holds (shown<TAB>typed<TAB>flags<TAB>readings<TAB>kind<TAB>sitelinks):
+What the output line holds (shown<TAB>typed<TAB>flags<TAB>readings<TAB>kind<TAB>sitelinks<TAB>variants):
 - shown: the official spelling.
 - typed: how it is typed in romaji with no capitals ("github", "new york" for two words), when the
   English-word detector takes it as English on its own after the name is added to its word list
   (so a name read as plain Japanese romaji, such as amazon or nintendo, has none). Empty if not.
 - flags: "s" when the typed form is also a common English word (china, target, shell): the word
   as typed stays first and the name comes second.
+- variants: official alternative spellings (| separated, from P1448/P1476 via --official, or from
+  the checked tools/data/proper-noun-extra.tsv when that is passed to the dictionary builder).
 - readings: kana readings (| separated) from the Japanese label or alias in katakana, or from the
   Japanese label's reading in Mozc's dictionary, or from the spelling typed as plain romaji when that
   kana is a reading in Mozc's dictionary (amazon: あまぞん).
@@ -61,8 +63,9 @@ JUNK = re.compile(r"Wikipedia|Olympics|Paralympics|Template|Module|Category|Wiki
 # 1 reading of the spelling typed as plain romaji is added only for these (not people: tayloあ is no name).
 ALIAS_KINDS = {"business", "brand", "software", "app", "website", "videogame", "carmodel", "tvnetwork", "newspaper",
                "airline", "sportsteam", "country", "usstate", "city", "region", "island", "mountain", "river",
-               "lake", "band", "film", "tvseries", "album", "novel", "character", "proglang", "os", "university",
-               "museum"}
+               "lake", "band", "film", "tvseries", "tvprogram", "filmseries", "album", "novel", "lightnovel",
+               "manga", "anime", "comic", "videogame", "videogameseries", "character", "proglang", "os",
+               "university", "museum"}
 # Hand-added readings: short capital words people type as plain romaji (ai -> あい -> AI).
 EXTRA_READINGS = {"AI": ["あい"]}
 
@@ -178,12 +181,19 @@ def main():
     ap.add_argument("--corpus", type=Path, nargs="*",
                     help="romaji lines of Japanese text, with or without English words "
                          "(tools/make_japanese_romaji_corpus.py), to find new words that change what is taken as English")
+    ap.add_argument("--official", type=Path, help="official.tsv of fetch_wikidata_names.py (P1448/P1476)")
     ap.add_argument("--out", type=Path, required=True)
     ap.add_argument("--work", type=Path, required=True, help="scratch folder")
     args = ap.parse_args()
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
 
+    official = defaultdict(list)
+    if args.official:
+        for line in args.official.read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if len(f) >= 2:
+                official[f[0]] = [v for v in f[1].split("|") if v]
     table = rv.load_table(args.table)
     ordinary = set((args.lexicon / "english-lexicon.txt").read_text().split())
     common = set((args.lexicon / "common-words.txt").read_text().split())
@@ -220,20 +230,24 @@ def main():
                     readings.append(r)
             entry = found.get(shown)
             if entry is None:
-                found[shown] = entry = {"kind": kind, "sl": sitelinks, "readings": []}
+                found[shown] = entry = {"kind": kind, "sl": sitelinks, "readings": [], "variants": []}
             elif sitelinks > entry["sl"]:
                 entry["kind"], entry["sl"] = kind, sitelinks
             for r in readings:
                 if r and r not in entry["readings"]:
                     entry["readings"].append(r)
+            for variant in official.get(f[0], []):
+                cleaned = clean_english(variant)
+                if cleaned and cleaned != shown and cleaned not in entry["variants"]:
+                    entry["variants"].append(cleaned)
     # Readings of the names in Latin letters that Sudachi has (Python: ぱいそん), for the spellings Wikidata
     # has no katakana label for, and for the official spellings of the tables the detector already has
     # (brand-casing.tsv ...), which are names Japanese users type.
     if args.ut:
         ut_latin = load_ut_latin(args.ut)
-        for official in sorted(set(cased.values())):
-            if official not in found and re.sub(r"[^a-z0-9]", "", official.lower()) in ut_latin:
-                found[official] = {"kind": "other", "sl": 0, "readings": []}
+        for spelling in sorted(set(cased.values())):
+            if spelling not in found and re.sub(r"[^a-z0-9]", "", spelling.lower()) in ut_latin:
+                found[spelling] = {"kind": "other", "sl": 0, "readings": [], "variants": []}
         for shown, entry in found.items():
             for readings in ut_latin.get(re.sub(r"[^a-z0-9]", "", shown.lower()), {}).get(shown, []):
                 if readings not in entry["readings"]:
@@ -263,7 +277,8 @@ def main():
             if kana not in e["readings"]:
                 e["readings"].append(kana)
         rows.append({"shown": shown, "tokens": tokens, "key": key, "joined": joined, "flags": flags,
-                     "kind": e["kind"], "sl": e["sl"], "readings": e["readings"][:3]})
+                     "kind": e["kind"], "sl": e["sl"], "readings": e["readings"][:3],
+                     "variants": e.get("variants", [])[:3]})
     # one name per typed form: the best known
     by_key = defaultdict(list)
     for r in rows:
@@ -352,11 +367,13 @@ def main():
     with args.out.open("w", encoding="utf-8", newline="\n") as fh:
         fh.write("# 大文字を含む英字の固有名詞。tools/build_proper_nouns.py で作る（手で足さない）。出典は Wikidata（CC0）。\n")
         fh.write("# 列: 表示<TAB>打つ形（小文字、2語以上は空白で区切る。英語として取れない名前は空）<TAB>印（s: 普通の英単語でもある。"
-                 "打った形を先に、固有名詞を2番目に）<TAB>かなの読み（| 区切り）<TAB>分野<TAB>ウィキペディアの言語版の数\n")
+                 "打った形を先に、固有名詞を2番目に）<TAB>かなの読み（| 区切り）<TAB>分野<TAB>ウィキペディアの言語版の数"
+                 "<TAB>公式の別表記（P1448・P1476、| 区切り）\n")
         for r in sorted(rows, key=lambda r: (r["kind"], -r["sl"], r["shown"])):
             if not r["key"] and not r["readings"]:
                 continue
-            fh.write("\t".join([r["shown"], r["key"], r["flags"], "|".join(r["readings"]), r["kind"], str(r["sl"])]) + "\n")
+            fh.write("\t".join([r["shown"], r["key"], r["flags"], "|".join(r["readings"]), r["kind"], str(r["sl"]),
+                                 "|".join(r["variants"])]) + "\n")
     print("written", args.out)
 
 

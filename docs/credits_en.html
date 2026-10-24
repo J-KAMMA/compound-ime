@@ -762,7 +762,7 @@ All rights reserved.
 <div class="product"><span class="title">Additional components</span>
 <div class="licence">
 <h3>Software and data added to Mozc in CompoundIME</h3>
-<p>The sections below list the further third-party software and data that are included in the CompoundIME installer, in this order: MyIME and azooKey (engine, dictionaries, tokenizer), the Swift packages and Swift runtime that the engine is built with, llama.cpp/ggml, the Apache License 2.0 and Unicode License v3 texts, Qt, and the data added to the Mozc dictionary by CompoundIME (SudachiDict, SCOWL, Wikidata). The full text of the Apache License 2.0 is given once, in the section "Apache License 2.0"; each Apache-2.0 component lists its own copyright line.</p>
+<p>The sections below list the further third-party software and data that are included in the CompoundIME installer, in this order: MyIME and azooKey (engine, dictionaries, tokenizer), the Swift packages and Swift runtime that the engine is built with, llama.cpp/ggml, the Apache License 2.0 and Unicode License v3 texts, Qt, and the data added to the Mozc dictionary by CompoundIME (SudachiDict, SCOWL, JMdict, Wikidata). The full text of the Apache License 2.0 is given once, in the section "Apache License 2.0"; each Apache-2.0 component lists its own copyright line.</p>
 </div></div>
 <div class="product">
 <span class="title">MyIME</span>
@@ -5500,12 +5500,21 @@ and Australian word list.  It is under the following copyright:
 </div>
 </div>
 <div class="product">
+<span class="title">JMdict (Japanese-Multi-Lingual Dictionary)</span>
+<span class="homepage">
+<a href="https://www.edrdg.org/jmdict/j_jmdict.html">homepage</a></span>
+<div class="licence">
+<h3>JMdict is released under the Creative Commons Attribution-ShareAlike 4.0 International License</h3>
+<p>The original English spelling of katakana loanwords (コーヒー → coffee, スマートフォン → smartphone, アップデート → update), which CompoundIME adds to the Mozc dictionary (data/dictionary_oss/dictionary12.txt), was taken from <b>JMdict</b>, the Japanese-Multi-Lingual Dictionary of the <b>Electronic Dictionary Research and Development Group (EDRDG)</b>, through its English edition JMdict_e.gz, distributed at <a href="https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz">https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz</a>. The dictionary is the work of <b>Jim Breen</b> and the EDRDG and its contributors; its copyright and licence are stated by EDRDG at <a href="https://www.edrdg.org/edrdg/licence.html">https://www.edrdg.org/edrdg/licence.html</a>. JMdict is licensed under the <a href="https://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License (CC BY-SA 4.0)</a>. <b>Changes made by CompoundIME:</b> only the loanword-source spellings (lsource) and simple English glosses of entries whose headword is katakana were selected; entries marked wasei (Japanese-made words whose meaning differs, such as マンション and サラリーマン) were left out, spellings were normalized to Unicode NFC, and the pairs are stored as a tab-separated table. The selected pairs are distributed under CC BY-SA 4.0; this license does not apply to the rest of CompoundIME.</p>
+</div>
+</div>
+<div class="product">
 <span class="title">Wikidata (proper nouns)</span>
 <span class="homepage">
 <a href="https://www.wikidata.org/">homepage</a></span>
 <div class="licence">
 <h3>Wikidata is released under the Creative Commons CC0 1.0 Universal Public Domain Dedication</h3>
-<p>The spellings of proper nouns written with capital letters (companies, products, software, places, people, works: Google, GitHub, New York, Elon Musk, iPhone ...), and the Japanese readings that go with them, which CompoundIME adds to its English-word detection and to the Mozc dictionary (data/dictionary_oss/dictionary14.txt), were taken from <b>Wikidata</b> (labels and aliases in English and Japanese, and the number of Wikipedia language editions of each item) through the Wikidata Query Service and the MediaWiki and Wikimedia pageviews APIs. The titles in the lists of the most viewed Wikipedia articles were used only to choose which people to look up. Wikidata's structured data is dedicated to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a> (<a href="https://www.wikidata.org/wiki/Wikidata:Licensing">https://www.wikidata.org/wiki/Wikidata:Licensing</a>); no permission or attribution is required, and this notice is given as a courtesy. <b>Changes made by CompoundIME:</b> only a selection of names was used, their spelling was cleaned (company suffixes such as Inc. removed), and readings were converted to hiragana.</p>
+<p>The spellings of proper nouns written with capital letters (companies, brands, products, software, places, people, and works such as manga, anime, video games, films, television programmes, novels, characters and music: Google, GitHub, New York, Elon Musk, iPhone, Dragon Ball, One Piece, Pokémon ...), and the Japanese readings that go with them, which CompoundIME adds to its English-word detection and to the Mozc dictionary (data/dictionary_oss/dictionary14.txt), were taken from <b>Wikidata</b> (labels and aliases in English and Japanese, and the number of Wikipedia language editions of each item) through the Wikidata Query Service and the MediaWiki and Wikimedia pageviews APIs (including official names P1448 and official titles P1476 where they are given). The titles in the lists of the most viewed Wikipedia articles were used only to choose which people to look up. Wikidata's structured data is dedicated to the public domain under <a href="https://creativecommons.org/publicdomain/zero/1.0/">CC0 1.0</a> (<a href="https://www.wikidata.org/wiki/Wikidata:Licensing">https://www.wikidata.org/wiki/Wikidata:Licensing</a>); no permission or attribution is required, and this notice is given as a courtesy. <b>Changes made by CompoundIME:</b> only a selection of names was used, their spelling was cleaned (company suffixes such as Inc. removed), readings were converted to hiragana, and a small hand-checked table (tools/data/proper-noun-extra.tsv) adds the official alternative spellings of well-known works and brands (DRAGON BALL, NIKE, adidas) that the labels alone do not give.</p>
 </div>
 </div>
 </body></html>

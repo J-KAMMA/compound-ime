@@ -66,8 +66,10 @@ TEMPLATES = [
 KIND_OF = {"business": "company", "brand": "company", "airline": "company", "tvnetwork": "company",
            "newspaper": "company", "university": "company", "sportsteam": "company", "museum": "company",
            "software": "software", "app": "software", "proglang": "software", "os": "software",
-           "website": "product", "videogame": "work", "carmodel": "product", "film": "work",
-           "tvseries": "work", "album": "work", "band": "work", "novel": "work", "character": "work",
+           "website": "product", "videogame": "work", "videogameseries": "work", "carmodel": "product",
+           "film": "work", "filmseries": "work", "tvseries": "work", "tvprogram": "work",
+           "album": "work", "band": "work", "novel": "work", "lightnovel": "work",
+           "manga": "work", "anime": "work", "comic": "work", "character": "work",
            "country": "place", "usstate": "place", "city": "place", "island": "place", "mountain": "place",
            "river": "place", "lake": "place", "people": "person"}
 
