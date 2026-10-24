@@ -15,7 +15,17 @@ NAMES = [
     ("anthropic", "Anthropic"), ("geminicli", "Gemini CLI"), ("copilot", "Copilot"),
     ("vscode", "VS Code"), ("neovim", "Neovim"), ("tmux", "tmux"), ("wsl", "WSL"),
     ("powershell", "PowerShell"), ("windsurf", "Windsurf"), ("aider", "Aider"),
-    ("lmstudio", "LM Studio"),
+    ("lmstudio", "LM Studio"), ("qoder", "Qoder"), ("qiita", "Qiita"), ("qwen", "Qwen"),
+    ("quora", "Quora"), ("qt", "Qt"), ("qemu", "QEMU"), ("qualcomm", "Qualcomm"),
+]
+# q + a/i/e/o は日本語のローマ字ではまれ（くぁ、くぉ）。q で始まる名前を、文頭・文中・
+# 助詞の前後と、QR コード・QA の担当のような言い方で確かめる。
+EXTRA = [
+    ("qoderwotsukau.", "Qoderを使う。"),
+    ("qiitanikakimasu.", "Qiitaに書きます。"),
+    ("qwenwotameshimasu.", "Qwenを試します。"),
+    ("qrko-dowotsukau.", "QRコードを使う。"),
+    ("qatantouwomakaseta.", "QAの担当を任された。"),
 ]
 TEMPLATES = [
     ("{r}", "{e}"),
@@ -33,3 +43,5 @@ if __name__ == "__main__":
     for raw, official in NAMES:
         for t_raw, t_exp in TEMPLATES:
             print(f"{t_raw.format(r=raw)}\t{t_exp.format(e=official)}\ttools")
+    for raw, expected in EXTRA:
+        print(f"{raw}\t{expected}\ttools")

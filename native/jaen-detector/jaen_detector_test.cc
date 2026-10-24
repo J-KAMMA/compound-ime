@@ -36,6 +36,7 @@ const std::map<std::string, std::string> kTable = {
     {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"yu", "ゆ"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
+    {"q", "く"}, {"qa", "くぁ"}, {"qi", "くぃ"}, {"qe", "くぇ"}, {"qo", "くぉ"}, {"qu", "く"}, {"qwe", "くぇ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
     {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"},
     {",", "、"}, {".", "。"}, {"!", "！"}, {"?", "？"}, {"-", "ー"}};
@@ -89,6 +90,12 @@ int main() {
   lexicon.Add("nec", true);
   lexicon.Add("chatgpt", true);
   lexicon.Add("ntt", true);
+  lexicon.Add("qoder", true);
+  lexicon.Add("qwen", true);
+  lexicon.Add("qt", true);
+  lexicon.Add("qa", true);
+  lexicon.Add("quora", true);
+  lexicon.Add("quick");
   lexicon.AddPhrase("see you");
   lexicon.AddPhrase("made in japan");
   lexicon.AddPhrase("log in");
@@ -112,6 +119,17 @@ int main() {
   Expect(english("youtubedemita") == "youtube|", "curated plain word");
   Expect(english("okdesu") == "ok|", "short word with pending key");
   Expect(english("mailwokaku") == "mail|", "word ending in a pending key before wo");
+  Expect(english("qoderwotsukau") == "qoder|", "qo (くぉ) before a word: the curated name is taken");
+  Expect(english("qwenwotamesu") == "qwen|", "q and w before n: the curated name is taken");
+  Expect(english("quickwotsukau") == "quick|", "qu (く) stays a weak sign: an ordinary English word");
+  Expect(english("qonnikaku").empty(), "a q loanword reading not in the list stays Japanese");
+  {
+    // The composer merges n with a following w ("qwen|wo" is qwe + nwo), so qwen ends inside a chunk.
+    const std::vector<Chunk> chunks = {{"qwe", "くぇ", ""}, {"nwo", "んを", ""}, {"ta", "た", ""},
+                                       {"me", "め", ""}, {"su", "す", ""}, {"", "", ""}};
+    Expect(Text("qwenwotamesu", jaen::SplitEnglish(chunks, lexicon, Parse), true) == "qwen|",
+           "a q word may end inside the chunk nwo (qwen|wo)");
+  }
 
   Expect(english("samewomita").empty(), "romaji-readable word stays Japanese");
   Expect(english("mademachimasu").empty(), "Japanese reading stays");
@@ -172,7 +190,7 @@ int main() {
   Expect(jaen::NormalizeWord("3d") == "3d" && jaen::NormalizeWord("123").empty(), "digits need a letter to be a word");
   {
     // Readings in the Japanese dictionary (toy): only these count as Japanese.
-    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい", "ふぁいる", "ゔぁいおりん", "へゔぃめたる"};
+    const std::set<std::string> readings = {"きて", "この", "てがみ", "かいぎ", "で", "はれ", "かわ", "うぉれっと", "ばせい", "ふぁいる", "ゔぁいおりん", "へゔぃめたる", "はく", "からく", "よく", "すごく"};
     const jaen::ReadingCheck is_reading = [&](std::string_view kana) {
       return readings.contains(std::string(kana));
     };
@@ -198,6 +216,16 @@ int main() {
     Expect(english("atoulorettoga") == "lore|", "without the reading check a small kana is a sign (lore)");
     Expect(unread("atoulorettoga").empty(), "a small kana typed for a Japanese word is no sign (ulo of うぉれっと)");
     Expect(unread("londonheikimasu") == "london|", "a small kana in no reading is still a sign (london)");
+    // q の語の直前の読みが く で終わる偶然の一致（はく、からく）でも、助詞・文末の直前なら英語。
+    Expect(unread("watashihaqodergasukidesu.") == "qoder|", "qoder after はく: the q word is taken");
+    Expect(unread("kyouhaqoderwo") == "qoder|", "Qoder before the particle wo after はく");
+    Expect(unread("korekaraqoderni") == "qoder|", "Qoder after からく: a long q word is taken");
+    Expect(unread("watashihaqwengasukidesu.") == "qwen|", "Qwen after はく: the q word is taken");
+    Expect(unread("watashihaqtgasukidesu.") == "qt|", "Qt after は: a short q word after a particle is taken");
+    Expect(unread("kyouhaqtwo") == "qt|", "Qt before wo (qtwo) after は");
+    Expect(unread("watashihaquoragasukidesu.") == "quora|", "Quora after はく: qu stays a weak sign and is taken");
+    // q が日本語の く の打ち方のままの文は英語にしない。
+    Expect(unread("sugoqamaiyo").empty(), "q for く inside すごく stays Japanese");
     // 厳選した3文字の語（api、dao）: かなが辞書にないか、辞書にあっても自然な読みでないときだけ英語
     jaen::Lexicon short_words = lexicon;
     short_words.Add("dai", true);
@@ -313,7 +341,8 @@ int main() {
 
   // Foreign chunk shapes.
   Expect(jaen::IsForeignChunk({"gwo", "ぐぉ", ""}) && jaen::IsForeignChunk({"le", "ぇ", ""}) &&
-             jaen::IsForeignChunk({"g", "", "g"}),
+             jaen::IsForeignChunk({"g", "", "g"}) && jaen::IsForeignChunk({"qo", "くぉ", ""}) &&
+             jaen::IsForeignChunk({"q", "く", ""}),
          "foreign chunk shapes");
   Expect(!jaen::IsForeignChunk({"wo", "を", ""}) && !jaen::IsForeignChunk({"n", "", "n"}) &&
              !jaen::IsForeignChunk({"kyo", "きょ", ""}),

@@ -225,6 +225,18 @@ bool Lexicon::IsCurated(std::string_view word) const {
 }
 
 namespace {
+// q のあとに u 以外（a・i・e・o）が続く並び（くぁ・くぃ・くぇ・くぉ。qwa など q+w も）や、
+// 母音のない q（QR、Qt の く）は、日本語のローマ字ではまれ。英語の語（qoder、qwen、Qt）を
+// 一覧から取るとき、打った文字の区切り（qwen|wo の n と w の間）で切れなくても取れるよう、
+// 強い印にする。q+u（く。query、queue）は普通の英単語の読みなので、今までどおり弱い印。
+bool IsRareQChunk(const Chunk& chunk) {
+  const std::string_view raw = chunk.raw;
+  if (raw.empty() || Lower(raw[0]) != 'q' || chunk.conversion.starts_with("っ")) return false;
+  if (raw.size() == 1) return true;
+  const char next = Lower(raw[1]);
+  return next != 'u' && next != 'q';
+}
+
 int64_t ForeignWeight(const Chunk& chunk) {
   if (chunk.conversion.empty() && (chunk.pending == "n" || chunk.pending == "N")) return 0;
   const std::string_view raw = chunk.raw;
@@ -237,6 +249,7 @@ int64_t ForeignWeight(const Chunk& chunk) {
       std::ranges::any_of(chunk.conversion + chunk.pending, IsAsciiAlpha)) {
     return kForeignCost;
   }
+  if (IsRareQChunk(chunk)) return kForeignCost;
   // c not in ch (ca for か) is a weak sign too, but never typed for a
   // Japanese word's kana: "camera" is English, a Japanese typist types kamera.
   const bool c_key = !chunk.conversion.empty() && head == 'c' && (raw.size() < 2 || Lower(raw[1]) != 'h');
@@ -758,6 +771,23 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     return StartsWithCue(after, kAcronymCues) || StartsWithCue(after, acronym.extra_cues);
   };
 
+  // q の語（Qoder・Qt・QA ...）が助詞・句読点・空白・文末の直前にあり、英語の語として
+  // 日本語の文に埋め込まれているか。直前の日本語の読みが く で終わる偶然の一致で、
+  // q の語を捨てないために使う（qoder の前の はく、からく など）。4文字以上の語は
+  // 名前として十分長いので取り、短い語（Qt・QA・QR）は直前のかなが助詞のときだけ取る。
+  const auto q_before_break = [&](size_t i, size_t j) {
+    if (Lower(raw[i]) != 'q') return false;
+    if (j < n) {
+      const char c = raw[j];
+      if (!(c == '.' || c == ',' || c == '!' || c == '?' || c == ' ' || c == '\t' ||
+            c == '\r' || c == '\n') && !BeforeParticleOrEnd(raw, j)) return false;
+    }
+    if (j - i >= 4) return true;
+    static constexpr std::string_view kParticles[] = {"は", "が", "を", "に", "の", "で", "と", "も", "へ", "や"};
+    const size_t k = kana_at[i];
+    return k > 0 && std::ranges::find(kParticles, std::string_view(kana[k - 1])) != std::end(kParticles);
+  };
+
   // Occurrences of words the user turned back into Japanese; no English word
   // is taken inside one ("ogle" in "google"), but longer words still are.
   std::vector<std::pair<size_t, size_t>> japanese;
@@ -871,7 +901,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         // 厳選した語（ブランド名など）が7文字以上なら、前の助詞とのかな（は + ぁ + ん）に取られない
         // （halangchain: langchain）。偶然の一致は、これだけ長いと起きにくい。
         const bool vetted_long = word.size() >= 7 && lexicon.IsCurated(word);
-        if (!vetted_long && (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese))) continue;
+        if (!vetted_long && !q_before_break(i, j) &&
+            (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese))) continue;
       }
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
