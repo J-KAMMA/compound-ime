@@ -1,4 +1,5 @@
-"""数字の間の点と文末の句点の試験（tests/conversion/decimal.tsv、decimal-ja.tsv）の採点。
+"""数字の間の点と文末の句点、かなで打った数＋単位の試験
+（tests/conversion/decimal.tsv、decimal-ja.tsv、kana-numbers.tsv、kana-numbers-ja.tsv）の採点。
 
   python tools/score_decimal.py <試験の tsv> <結果の tsv> [ラベル] [--halfwidth] [--soft]
 

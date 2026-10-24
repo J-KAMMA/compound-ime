@@ -67,7 +67,7 @@
 
 直し方: `native/jaen-detector/typed_digits.inc` の `KeepsTypedDigits` / `ReplaceWithTypedDigits` を `Converter::PreferTypedDigits`（`tools/apply_jaen_integration.py` 220 行目付近）から呼ぶ。打った読み（文節の鍵）に算用数字がある文節だけを対象に、先頭の候補が打った数字をそのまま含んでいなければ、同じ数字を持つ候補を先頭へ移し、なければ先頭の候補の数字の部分だけを打った数字に戻す（`九百八十円` → `980円`、`十度` → `10度`、`4.一点` → `4.1点`、`10.0.0.一` → `10.0.0.1`）。数字の幅は打った鍵（数字の設定）に合わせる。かなで打った「一つ」「一番」「十分」は鍵に算用数字がないので触らない。呼ぶ場所は Mozc の書き換えのあと（`tools/apply_jaen_integration.py` 3219 行目付近）、人工知能と同音語の選択のあと（同 1656 行目付近）、選び手のあと（`tools/apply_selector_stage3.py` 506 行目）の3か所。
 
-試験: 単体は `native/jaen-detector/typed_digits_test.cc`（組 `s` が g++ で組み立てて動かす）。`tests/conversion/decimal.tsv` に、かなで打った漢数字の語（一つ、一番、十分、三人、六時、百円、三匹、二十年、十一月、四十分、一人前、七十歳）を足し、算用数字に化けたら `tools/score_decimal.py` が違いとして数えるようにした。
+試験: 単体は `native/jaen-detector/typed_digits_test.cc`（組 `s` が g++ で組み立てて動かす）。`tests/conversion/decimal.tsv` に、かなで打った数の語（一つ、一番、十分、三人、六時、百円、三匹、一人前）を足し、算用数字に化けたら `tools/score_decimal.py` が違いとして数えるようにした。二つ以上の部分からなる数（二十年 → 20年、四十分 → 40分、十一月 → 11月、七十歳 → 70歳）は、かなで打った数＋単位として算用数字を先頭にする（docs/kana-numbers.md、2026-10-24 の決定）。
 
 ### 見直しで直した3点（2026-10-21）
 

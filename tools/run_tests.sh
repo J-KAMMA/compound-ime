@@ -20,10 +20,12 @@
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
-#   s: 数字の間の点と文末の句点（docs/decimal-point.md）。tests/conversion/decimal.tsv（小数、版の番号、アドレスの番号、金額、割合、英語まじり、
-#      文末の数字、数字のあとの読点）と decimal-ja.tsv（普通の日本語の文）を、数字の設定が半角のとき（tools/make_decimal_config.py）と既定のとき、
-#      変換して確定する形と、変換せず入力中の表示をそのまま確定する形で流し、tools/score_decimal.py で数字と「. , 。、%」の並びを採点する。
-#      違いが1件でもあれば、この組は失敗にする（tools/make_decimal_tests.py、tools/decimal_transform_test.py）
+#   s: 数字の間の点と文末の句点（docs/decimal-point.md）と、かなで打った数＋単位（docs/kana-numbers.md）。
+#      tests/conversion/decimal.tsv（小数、版の番号、アドレスの番号、金額、割合、英語まじり、文末の数字、数字のあとの読点）、
+#      decimal-ja.tsv（普通の日本語の文）、kana-numbers.tsv（数＋単位は算用数字）、kana-numbers-ja.tsv（和語と数の形の普通の言葉は漢字）を、
+#      数字の設定が半角のとき（tools/make_decimal_config.py）と既定のとき、変換して確定する形と、変換せず入力中の表示をそのまま確定する形で流し、
+#      tools/score_decimal.py で数字と「. , 。、%」の並びを採点する。違いが1件でもあれば、この組は失敗にする
+#      （tools/make_decimal_tests.py、tools/make_kana_number_tests.py、tools/decimal_transform_test.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
@@ -281,7 +283,9 @@ f)
   fi
   ;;
 s)
-  # 数字の間の点と文末の句点、打った算用数字のあとの漢字の単位（3億、2千円）。文は tools/make_decimal_tests.py で作る。
+  # 数字の間の点と文末の句点、打った算用数字のあとの漢字の単位（3億、2千円）、
+  # かなで打った数＋単位（じゅうにん → 10人、ふつか → 二日）。文は tools/make_decimal_tests.py と
+  # tools/make_kana_number_tests.py で作る。
   # 採点は数字と「. , 。 、 %」、算用数字の直後の単位（十百千万億兆）の並びだけ（その他の漢字・かなは見ない）。
   # 半角の設定では、全角の数字・「．」「，」が出ても違いとする（数字は半角で点だけ全角、を見つける）。違いがあっても最後まで流し、最後に失敗にする
   # 打った算用数字を漢数字にしない部分の単体試験（Mozc を組み立てずに g++ で動く）
@@ -305,9 +309,11 @@ s)
     if [ "$mode" = preedit ]; then flags="$flags --preedit"; fi
     python3 $REPO/tools/score_decimal.py $T/$name.tsv $OUT/$tag.tsv "$tag" $flags | tee $OUT/$tag-score.txt || fail=1
   }
-  for name in decimal decimal-ja; do
+  for name in decimal decimal-ja kana-numbers kana-numbers-ja; do
     for config in half default; do
       for mode in convert preedit; do
+        # かなで打った数の試験は、入力中の表示がかなのままなので変換して確定する形だけを流す
+        if [ "$mode" = preedit ] && [ "${name#kana-numbers}" != "$name" ]; then continue; fi
         run_decimal $name $config $mode
       done
     done
