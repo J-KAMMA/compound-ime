@@ -129,9 +129,6 @@ nijuppiki.	20匹。	文末
 kyouhanihyappikiwokaimashita.	今日は200匹を買いました。	数と単位
 tsuginonihyappikiwoshirabemasu.	次の200匹を調べます。	数と単位
 nihyappiki.	200匹。	文末
-kyouhaippaiwokaimashita.	今日は1杯を買いました。	数と単位
-tsuginoippaiwoshirabemasu.	次の1杯を調べます。	数と単位
-ippai.	1杯。	文末
 kyouharoppaiwokaimashita.	今日は6杯を買いました。	数と単位
 tsuginoroppaiwoshirabemasu.	次の6杯を調べます。	数と単位
 roppai.	6杯。	文末
@@ -165,9 +162,6 @@ nihyakkai.	200回。	文末
 kyouhajuugokaimewokaimashita.	今日は15回目を買いました。	数と単位
 tsuginojuugokaimewoshirabemasu.	次の15回目を調べます。	数と単位
 juugokaime.	15回目。	文末
-kyouhaissaiwokaimashita.	今日は1歳を買いました。	数と単位
-tsuginoissaiwoshirabemasu.	次の1歳を調べます。	数と単位
-issai.	1歳。	文末
 kyouhahassaiwokaimashita.	今日は8歳を買いました。	数と単位
 tsuginohassaiwoshirabemasu.	次の8歳を調べます。	数と単位
 hassai.	8歳。	文末
@@ -397,6 +391,8 @@ juuji?	10時？	文末
 nijuutenn!	20点！	文末
 nijuutenn?	20点？	文末
 [nijuutenn]	「20点」	文末
+yonnjuppunnmachimashita.	40分待ちました。	数のあとの語
+nijuunenngonimataaimashou.	20年後にまた会いましょう。	数のあとの語
 kyounijuuninn.	今日20人。	時の言葉
 kinounijuuninn.	昨日20人。	時の言葉
 ashitanijuuninn.	明日20人。	時の言葉

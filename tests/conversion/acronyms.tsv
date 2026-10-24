@@ -1065,3 +1065,8 @@ seiseiaiwotsukau.	生成AIを使う。	b	AI	b-standalone
 ai,seiseiaiwomazeru.	AI、生成AIを混ぜる。	b	AI	b-standalone
 ainowawohirogeru.	AIの輪を広げる。	b	AI	b-standalone
 ainikiku.	AIに聞く。	b	AI	b-standalone
+aideaisatsusuru.	AIであいさつする。	b	AI	b-standalone
+aideaiwokataru.	AIで愛を語る。	b	AI	b-standalone
+tedeaiwotsukau.	手でAIを使う。	b	AI	b-standalone
+kideaiwotsukau.	木でAIを使う。	b	AI	b-standalone
+medeaiwoyomu.	目でAIを読む。	b	AI	b-standalone
