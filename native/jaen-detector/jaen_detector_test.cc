@@ -33,7 +33,7 @@ const std::map<std::string, std::string> kTable = {
     {"su", "す"}, {"se", "せ"}, {"ta", "た"}, {"te", "て"}, {"ti", "ち"}, {"to", "と"},
     {"na", "な"}, {"ni", "に"}, {"ne", "ね"}, {"no", "の"}, {"nn", "ん"}, {"ha", "は"},
     {"ma", "ま"}, {"me", "め"}, {"de", "で"}, {"go", "ご"}, {"pu", "ぷ"}, {"wo", "を"},
-    {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
+    {"gwo", "ぐぉ"}, {"le", "ぇ"}, {"ya", "や"}, {"yu", "ゆ"}, {"mo", "も"}, {"re", "れ"}, {"ra", "ら"},
     {"tte", "って"}, {"da", "だ"}, {"chi", "ち"}, {"mi", "み"}, {"tsu", "つ"},
     {"do", "ど"}, {"xu", "ぅ"}, {"fi", "ふぃ"}, {"xtu", "っ"}, {"gi", "ぎ"}, {"li", "ぃ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
@@ -656,6 +656,15 @@ int main() {
     Expect(english("aimai").empty() && english("aisatsu").empty(), "曖昧・あいさつ は日本語のまま");
     Expect(english("aideru").empty(), "愛でる は日本語のまま");
     Expect(english("ainotsukai") == "ai|", "ai + の + 使い は AI");
+    Expect(english("ai ") == "ai|" && english("ai wo tsukau") == "ai|", "空白のあと・空白で区切った助詞のあとも AI");
+    Expect(english("ainiikennwoiu") == "ai|" && english("ainiikasu") == "ai|" &&
+           english("ainiikousuru") == "ai|", "AIに意見・活かす・移行する は AI（行く の形に見えても）");
+    Expect(english("ainiyuku").empty() && english("ainikoreru").empty() &&
+           english("ainikosaseta").empty(), "会いにゆく・来れる・来させる は日本語のまま");
+    Expect(english("aidesomeru").empty() && english("ainokimono").empty() &&
+           english("ainotewoireru").empty(), "藍で染める・藍の着物・合いの手を入れる は日本語のまま");
+    Expect(english("ainiku").empty() && english("ainorini").empty(), "生憎・相乗りに は日本語のまま");
+    Expect(english("aideta").empty() && english("aidemasu").empty(), "愛でた・愛でます は日本語のまま");
     Expect(english("naiwotsukau").empty(), "略語は打った文字の区切りから始まる（nai の ai は取らない）");
     Expect(english("uiwotsukau") == "ui|", "ui + を + 使う は UI");
     Expect(english("kouiwotsukau") == "ui|", "辞書がないときは行為を使う も取る（下は辞書があるとき）");
@@ -678,6 +687,15 @@ int main() {
       Expect(with("ainoriyou") == "ai|", "AIの利用 は AI（相乗り より先）");
       Expect(with("aidea").empty(), "アイデア（あいであ）は日本語のまま");
       Expect(with("aideru").empty(), "愛でる は辞書があっても日本語のまま");
+      Expect(with("ainiyuku").empty() && with("ainikoreru").empty() && with("ainikosaseta").empty(),
+             "会いにゆく・来れる・来させる は辞書があっても日本語のまま");
+      Expect(with("aidesomeru").empty(), "藍で染める は辞書があっても日本語のまま");
+      Expect(with("ainokimono").empty(), "藍の着物 は辞書があっても日本語のまま");
+      Expect(with("ainotewoireru").find("ai|") == std::string::npos,
+             "合いの手を入れる の ai は辞書があっても取らない");
+      Expect(with("ainiku").empty() && with("ainorini").empty(), "生憎・相乗りに は辞書があっても日本語のまま");
+      Expect(with("ainiikennwoiu") == "ai|" && with("ainiikasu") == "ai|" && with("ainiikousuru") == "ai|",
+             "AIに意見・活かす・移行する は辞書があっても AI");
     }
     {
       jaen::Choices choices;

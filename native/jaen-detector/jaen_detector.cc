@@ -609,22 +609,51 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       static constexpr std::string_view kStops[] = {"。", "、", "！", "？"};
       if (acronym.typed == "ai") {
         static constexpr std::string_view kAiStops[] = {"。", "、", "！", "？", ".", ",", "!", "?", " ", "　"};
+        static constexpr std::string_view kParticleKana[] = {"を", "が", "は", "で", "に", "の", "と", "も"};
         const bool stop = kb < kana.size() &&
             std::ranges::find(kAiStops, std::string_view(kana[kb])) != std::end(kAiStops);
-        // 「会いに」のあとが 行く・来る の活用なら日本語のまま（会いに行く）。AIに聞く（きく）、
-        // AIに任せる（まかせる）などは AI にする。
-        if (particle && kana[kb] == "に") {
+        // 空白はかなにならない（"ai wo tsukau" の 空白、"ai " の 末尾）ので、打った文字で見る。
+        const bool space = j < n && (raw[j] == ' ' || raw[j] == '\t' || raw[j] == '\r' ||
+                                     raw[j] == '\n' || raw.compare(j, 3, "　") == 0);
+        if (kb >= kana.size() || stop || space) return true;
+        // ai の次が助詞でなければ、日本語の語の続き（相手、愛して、合図、曖昧、あいさつ ...）。
+        const bool next_particle = std::ranges::find(kParticleKana, std::string_view(kana[kb])) != std::end(kParticleKana);
+        if (!next_particle) return false;
+        const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
+        const size_t next = kb + 1;  // after の先頭のかな
+        const auto next_is = [&](std::string_view s) { return next < kana.size() && std::string_view(kana[next]) == s; };
+        const auto particle_or_stop = [&](size_t at) {
+          return std::ranges::find(kParticleKana, at < kana.size() ? std::string_view(kana[at]) : std::string_view()) !=
+                     std::end(kParticleKana) ||
+                 (at < kana.size() && std::ranges::find(kAiStops, std::string_view(kana[at])) != std::end(kAiStops));
+        };
+        if (kana[kb] == "に") {
+          // 「会いに」のあとが 行く・来る の活用なら日本語のまま（会いに行く・ゆく・来れる・来させる）。
+          // AIに意見（いけん）・活かす（いかす）・移行する（いこうする）は、行く の形に見えても AI にする。
           static constexpr std::string_view kGoCome =
-              "いく,いき,いっ,いか,いけ,いこ,きた,きて,きま,くる,くれ,こな,こよ,こら,こい";
-          const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
-          if (StartsWithCue(after, kGoCome)) return false;
+              "いく,いきます,いきたい,いった,いって,いけない,いける,いかず,いかな,いかせ,いかれ,"
+              "いこう,きた,きます,きて,きてい,きなさい,きましょう,きません,くる,くれ,こい,こない,こよう,"
+              "これ,こさ,こられ,こさせ,ゆく,ゆきます,ゆこう,ゆき,ゆけ,ゆける,ゆか,ゆいた,ゆいて";
+          const bool going = StartsWithCue(after, kGoCome) &&
+                             !(after.starts_with("いこう") && after.substr(std::string_view("いこう").size()).starts_with("する"));
+          if (going) return false;
+          // 生憎（あいにく）: に + く で終わるか、助詞・句読点が続くときだけ。
+          if (next_is("く") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
+        } else if (kana[kb] == "の") {
+          // 相乗り（あいのり）: の + り のあとが助詞・句読点か文末。
+          if (next_is("り") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
+          // 合いの手（あいのてを）、藍の着物（あいのきもの）。
+          if (after.starts_with("てを") || after.starts_with("きも")) return false;
+        } else if (kana[kb] == "で") {
+          // 藍で染める。
+          if (after.starts_with("そめ")) return false;
+          // 愛でる・愛でた・愛でます などの活用。
+          if (after.starts_with("る") || after.starts_with("ます") || after.starts_with("ない") ||
+              after.starts_with("れ") || after.starts_with("よう")) return false;
+          if ((after.starts_with("た") || after.starts_with("て")) &&
+              (after.size() <= 3 || particle_or_stop(next + 1))) return false;
         }
-        // 「愛でる」の でる は日本語のまま。
-        if (particle && kana[kb] == "で") {
-          const std::string after = kana_text(kb + 1, std::min(kana.size(), kb + 1 + kAcronymCueWindow));
-          if (after.starts_with("る")) return false;
-        }
-        return particle || j == n || stop;
+        return true;
       }
       return particle || j == n ||
              (kb < kana.size() && std::ranges::find(kStops, std::string_view(kana[kb])) != std::end(kStops));
