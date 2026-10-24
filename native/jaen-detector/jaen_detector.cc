@@ -739,6 +739,23 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     return StartsWithCue(after, kAcronymCues) || StartsWithCue(after, acronym.extra_cues);
   };
 
+  // q の語（Qoder・Qt・QA ...）が助詞・句読点・空白・文末の直前にあり、英語の語として
+  // 日本語の文に埋め込まれているか。直前の日本語の読みが く で終わる偶然の一致で、
+  // q の語を捨てないために使う（qoder の前の はく、からく など）。4文字以上の語は
+  // 名前として十分長いので取り、短い語（Qt・QA・QR）は直前のかなが助詞のときだけ取る。
+  const auto q_before_break = [&](size_t i, size_t j) {
+    if (Lower(raw[i]) != 'q') return false;
+    if (j < n) {
+      const char c = raw[j];
+      if (!(c == '.' || c == ',' || c == '!' || c == '?' || c == ' ' || c == '\t' ||
+            c == '\r' || c == '\n') && !BeforeParticleOrEnd(raw, j)) return false;
+    }
+    if (j - i >= 4) return true;
+    static constexpr std::string_view kParticles[] = {"は", "が", "を", "に", "の", "で", "と", "も", "へ", "や"};
+    const size_t k = kana_at[i];
+    return k > 0 && std::ranges::find(kParticles, std::string_view(kana[k - 1])) != std::end(kParticles);
+  };
+
   // Occurrences of words the user turned back into Japanese; no English word
   // is taken inside one ("ogle" in "google"), but longer words still are.
   std::vector<std::pair<size_t, size_t>> japanese;
@@ -852,7 +869,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         // 厳選した語（ブランド名など）が7文字以上なら、前の助詞とのかな（は + ぁ + ん）に取られない
         // （halangchain: langchain）。偶然の一致は、これだけ長いと起きにくい。
         const bool vetted_long = word.size() >= 7 && lexicon.IsCurated(word);
-        if (!vetted_long && (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese))) continue;
+        if (!vetted_long && !q_before_break(i, j) &&
+            (starts_there || (sign > 0 && sign < kForeignCost && typed_for_japanese))) continue;
       }
       const int64_t length = kLengthBonus * static_cast<int64_t>(word.size());
       std::optional<int64_t> cost;
