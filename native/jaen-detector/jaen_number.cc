@@ -227,9 +227,16 @@ std::optional<std::pair<size_t, int>> DayAt(const Text& t, size_t pos, bool afte
 
 std::optional<Match> MatchAt(const Text& t, size_t i);
 
-// What may follow a span: the end, 、, a particle or です, ごぜん/ごご, or another span.
+// What may follow a span: the end, 句読点・閉じ括弧, a particle or です,
+// ごぜん/ごご, or another span.
 bool BoundaryOk(const Text& t, size_t end) {
-  if (end >= t.size() || t[end] == U'、') return true;
+  if (end >= t.size()) return true;
+  switch (t[end]) {
+    case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'」': case U'』': case U'）': case U'】': case U'・':
+    case U' ': case U'　': case U'\n':
+      return true;
+  }
   constexpr Piece kParticles[] = {U"は", U"が", U"を", U"に", U"で",   U"と",   U"の",
                                   U"も", U"へ", U"や", U"から", U"まで", U"より", U"って", U"です"};
   for (Piece p : kParticles) {
@@ -282,13 +289,6 @@ bool IsOrdinaryNumberWord(const Text& t, size_t begin, size_t end) {
       U"はってん",    // 発展
       U"はっけん",    // 発見
       U"いっけん",    // 一見
-      U"じゅうまい",  // 従妹
-      U"じゅうじ",    // 従事・重事
-      U"じゅうだい",  // 重大
-      U"じゅうど",    // 重度
-      U"じゅうばん",  // 重版
-      U"じゅうてん",  // 充填
-      U"にじゅうてん",  // 重点（に＋じゅうてん と読まない）
   };
   for (Piece w : kWords) {
     if (end - begin == w.size() && At(t, begin, w)) return true;
@@ -345,16 +345,30 @@ void OfferDigitString(const Text& t, size_t i, std::optional<Match>& best) {
 
 // 「ここにじゅうにん」の に は助詞で、数の一部（にじゅう = 20）ではない。
 // 直前に助詞（は・が・を・に・で・と・も・へ・や・の）か区切りがなければ、に から始めない。
+// ただし「きょうにじゅうにん」の に のように、時の言葉のすぐあとは助詞ではなく
+// 数の一部（にじゅう = 20）として取る。
 bool ParticleNi(const Text& t, size_t i) {
   if (!At(t, i, U"に") || i == 0) return false;
   switch (t[i - 1]) {
     case U'は': case U'が': case U'を': case U'に': case U'で': case U'と':
-    case U'も': case U'へ': case U'や': case U'の': case U'、': case U'。':
-    case U' ': case U'　':
+    case U'も': case U'へ': case U'や': case U'の':
+    case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'「': case U'」': case U'『': case U'』': case U'（': case U'）':
+    case U' ': case U'　': case U'\n':
       return false;
-    default:
-      return true;
   }
+  static constexpr Piece kTimeWords[] = {
+      U"きょう", U"きのう", U"あした", U"あさって", U"おととい",
+      U"けさ", U"こんばん", U"ゆうべ", U"いま",
+      U"ことし", U"きょねん", U"らいねん",
+      U"こんげつ", U"せんげつ", U"らいげつ",
+      U"こんしゅう", U"せんしゅう", U"らいしゅう",
+      U"まいにち", U"まいあさ", U"まいばん",
+  };
+  for (Piece w : kTimeWords) {
+    if (i >= w.size() && At(t, i - w.size(), w)) return false;
+  }
+  return true;
 }
 
 std::optional<Match> MatchAt(const Text& t, size_t i) {
