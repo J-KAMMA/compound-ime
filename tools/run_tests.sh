@@ -157,18 +157,19 @@ k)
   fi
   ;;
 l)
-  # 履歴の学習（tools/learn_respect_convert.sh）。1語の読みを変換して、人工知能なしの2番目の候補を同じ会話で4回選んで
-  # 確定したあと、同じ読みの先頭に来るかを、人工知能あり・なしで比べる（tests/conversion/learn-respect.tsv、50語以上）。
+  # 履歴の学習（tools/learn_respect_convert.sh）。人工知能なし・ありの両方の履歴なし候補から、先頭と違う共通の
+  # 書き方を選び、同じ会話で4回選んで確定したあと、同じ読みの先頭に来るかを比べる（tests/conversion/learn-respect.tsv、
+  # 50語以上）。人工知能なしで先頭に来たことを必ず確かめ、来なければ失敗にする。ありだけが別の書き方に替えたら失敗。
   # 前の文がある複数文節の文（learn-respect-context.tsv）でも、文脈の手がかりが別の書き方を先頭にしているところで、
   # 元の先頭を4回選び、人工知能あり・なしとも先頭に残るかを比べる（文節ごとの人工知能と全文生成を通す）。
-  # 履歴で先頭になった書き方を人工知能の段が別の書き方に替えていれば失敗にする（tools/score_learn_respect.py）。
+  # 採点は、実際に比べた語を書いた -targets.tsv を使い、結果の行が足りないときも失敗にする。
   if [ -f $T/learn-respect.tsv ]; then
     LEARN="bash $REPO/tools/learn_respect_convert.sh $E/session_handler_main $E"
     $LEARN $MODEL $T/learn-respect.tsv $OUT/learn-respect 2
-    python3 $REPO/tools/score_learn_respect.py $T/learn-respect.tsv \
+    python3 $REPO/tools/score_learn_respect.py $OUT/learn-respect-targets.tsv \
       $OUT/learn-respect-on.tsv $OUT/learn-respect-off.tsv | tee $OUT/learn-respect-score.txt
     if [ -f $OUT/learn-respect-context-on.tsv ] && [ -f $OUT/learn-respect-context-off.tsv ]; then
-      python3 $REPO/tools/score_learn_respect.py $T/learn-respect-context.tsv \
+      python3 $REPO/tools/score_learn_respect.py $OUT/learn-respect-context-targets.tsv \
         $OUT/learn-respect-context-on.tsv $OUT/learn-respect-context-off.tsv 1 \
         | tee $OUT/learn-respect-context-score.txt
     fi

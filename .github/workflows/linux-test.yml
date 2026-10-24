@@ -294,18 +294,17 @@ jobs:
               head -40 results/domain-$f-score.txt
             fi
           done
-          # 履歴の学習の試験（組 l）: 人工知能あり・なしで、選んだ書き方が先頭に来た数を並べる
-          if [ -f results/learn-respect-on.tsv ] && [ -f results/learn-respect-off.tsv ]; then
-            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect.tsv \
-              results/learn-respect-on.tsv results/learn-respect-off.tsv > results/learn-respect-score.txt
-            cat results/learn-respect-score.txt
+          # 履歴の学習の試験（組 l）: 人工知能あり・なしで、選んだ書き方が先頭に来た数を並べる。
+          # 実際に比べた語（-targets.tsv）を使い、人工知能なしで先頭に来たかと、結果の行の不足も見る
+          if [ -f results/learn-respect-targets.tsv ] && [ -f results/learn-respect-on.tsv ] && [ -f results/learn-respect-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py results/learn-respect-targets.tsv \
+              results/learn-respect-on.tsv results/learn-respect-off.tsv | tee results/learn-respect-score.txt
           fi
           # 前の文がある複数文節の文（組 l）: 文節ごとの人工知能と全文生成を通しても、選んだ書き方が先頭か
-          if [ -f results/learn-respect-context-on.tsv ] && [ -f results/learn-respect-context-off.tsv ]; then
-            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect-context.tsv \
+          if [ -f results/learn-respect-context-targets.tsv ] && [ -f results/learn-respect-context-on.tsv ] && [ -f results/learn-respect-context-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py results/learn-respect-context-targets.tsv \
               results/learn-respect-context-on.tsv results/learn-respect-context-off.tsv 1 \
-              > results/learn-respect-context-score.txt
-            cat results/learn-respect-context-score.txt
+              | tee results/learn-respect-context-score.txt
           fi
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
           if [ -f results/proper-nouns.tsv ] && [ -f repo/tests/conversion/proper-nouns.tsv ]; then

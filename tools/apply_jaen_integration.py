@@ -3814,16 +3814,28 @@ edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (c
 edit(T, """  } else if (command == "SET_FOLLOWING_TEXT") {""", """  } else if (command == "SELECT_CANDIDATE_VALUE") {
     MOZC_ASSERT_EQ(2, args.size());
     const std::string value(args[1]);
-    if (last_output_) {
-      const auto& words = last_output_->all_candidate_words();
-      for (int i = 0; i < words.candidates_size(); ++i) {
-        const auto& candidate = words.candidates(i);
+    const auto select = [&](const auto& candidates) {
+      for (const auto& candidate : candidates) {
         if (candidate.value() != value || !candidate.has_id()) continue;
-        MOZC_ASSERT_TRUE(client_->SelectCandidate(candidate.id(), last_output_.get()));
-        return absl::Status();
+        if (!client_->SelectCandidate(candidate.id(), last_output_.get())) return false;
+        return true;
       }
+      return false;
+    };
+    if (last_output_) {
+      // The candidate window is what the user sees; all_candidate_words expands
+      // groups, so its 2nd value can differ from the window's 2nd.
+      if (last_output_->has_candidate_window() &&
+          select(last_output_->candidate_window().candidate())) return absl::Status();
+      if (select(last_output_->all_candidate_words().candidates())) return absl::Status();
+      const auto& words = last_output_->all_candidate_words();
+      std::cerr << "candidate not found: " << value << " (" << words.candidates_size() << ")";
+      for (int i = 0; i < words.candidates_size() && i < 8; ++i)
+        std::cerr << "\t" << words.candidates(i).value();
+      std::cerr << std::endl;
+    } else {
+      std::cerr << "candidate not found: " << value << std::endl;
     }
-    std::cerr << "candidate not found: " << value << std::endl;
     return absl::InvalidArgumentError("candidate not found");
   } else if (command == "SET_FOLLOWING_TEXT") {""")
 
