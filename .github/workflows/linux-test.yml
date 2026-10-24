@@ -14,7 +14,7 @@ on:
         description: その配布ページのファイル名（例 zenz-v3.2-small-ft-v1-Q5_K_M.gguf）
         default: ''
       groups:
-        description: 流す試験の組（JSON の配列。空なら全部。例 ["k"]）
+        description: 流す試験の組（JSON の配列。空なら全部。例 ["k"]。長い文の時間は ["w"]）
         default: ''
   # 辞書の月1回の自動更新（dict-update.yml）から呼ぶ。dict_candidate に、署名つきの配布物を入れた成果物の名前を渡すと、
   # 試験の組ごとに「いまの辞書（base）」と「新しい辞書（cand）」の両方を流す（同じ変換エンジン）。結果は
@@ -193,7 +193,8 @@ jobs:
     needs: build
     if: github.ref_name != 'exp/selector-stage2'
     runs-on: ubuntu-24.04
-    timeout-minutes: 180
+    # 組 w（長い文の時間）は、1字 125 ミリ秒で打つ比較を3回ずつ流すので時間がかかる
+    timeout-minutes: 330
     # 下書きの配布ページ（公開しない、比べるための人工知能）を読むのに書き込みの権限が要る
     permissions:
       contents: write
@@ -397,6 +398,8 @@ jobs:
           [ -f results/slow-compare.txt ] && cat results/slow-compare.txt results/slow-ctx.txt results/slow-stats.txt results/slow-time.txt
           # 落ちないかの試験（組 j）
           [ -f results/stress.txt ] && cat results/stress.txt
+          # 長い文の時間（組 w）: 読みの長さ別・段別、先回りあり/なし、1秒の上限、案 (a)(b)(c) の見込み
+          [ -f results/long-latency-report.txt ] && cat results/long-latency-report.txt
           ls results
       - uses: actions/upload-artifact@v4
         with:

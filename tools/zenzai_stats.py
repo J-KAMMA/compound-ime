@@ -12,7 +12,8 @@ from pathlib import Path
 
 
 def collect(folder, pattern="*.zstats.*", exclude=None):
-    total = dict(conversions=0, hits=0, aborts=0, skips=0, total_ms=0, max_ms=0)
+    total = dict(conversions=0, hits=0, aborts=0, skips=0, total_ms=0, max_ms=0,
+                 key_conversions=0, key_hits=0, key_filter=0)
     files = 0
     for path in sorted(Path(folder).glob(pattern)):
         if exclude and path.name.startswith(exclude):
@@ -21,9 +22,11 @@ def collect(folder, pattern="*.zstats.*", exclude=None):
         if "conversions" not in fields:
             continue
         files += 1
-        for key in ("conversions", "hits", "aborts", "skips", "total_ms"):
+        for key in ("conversions", "hits", "aborts", "skips", "total_ms",
+                    "key_conversions", "key_hits"):
             total[key] += int(fields.get(key, 0))
         total["max_ms"] = max(total["max_ms"], int(fields.get("max_ms", 0)))
+        total["key_filter"] = max(total["key_filter"], int(fields.get("key_filter", 0)))
     return files, total
 
 

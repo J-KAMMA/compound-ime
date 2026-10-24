@@ -15,7 +15,8 @@ patches/myime-engine.patch を当てたあとの作業ツリーに、1回だけ�
    標準エラーへは ZenzaiMemoryLock.writeStandardError で書く（標準エラーのない処理でも落ちない）。
    FileHandle.standardError.write(_:) は使わない（書けないと try! で落ちる。1.144 の不具合）。
 3. 試験用: 環境変数 MYIME_ZENZAI_STATS_FILE があれば、変換のたびに「<値>.<処理番号>」へ
-   上限に当たった回数などを書く。
+   上限に当たった回数などを書く。SetZenzaiStatsCounting で印を付けた間（空白キーの変換）だけを
+   key_conversions/key_hits として、最初の5回を除いて数える。
 """
 import sys
 from pathlib import Path
@@ -70,12 +71,63 @@ public enum ZenzaiDeadline {
     nonisolated(unsafe) public private(set) static var totalMilliseconds = 0
     nonisolated(unsafe) public private(set) static var maxMilliseconds = 0
 
+    // 試験の集計用: 空白キーの変換だけを、最初の5回を除いて数える。
+    // C++ の入り口（tools/apply_latency_profile.py の Frame）が kind=conv の間だけ印を付ける。
+    nonisolated(unsafe) private static var statsFilterActive = false
+    nonisolated(unsafe) private static var statsSeen = 0
+    nonisolated(unsafe) public private(set) static var keyConversions = 0
+    nonisolated(unsafe) public private(set) static var keyHits = 0
+    private static let statsCountingKey = "MYIME_ZENZAI_STATS_COUNTING"
+    private static let statsDepthKey = "MYIME_ZENZAI_STATS_DEPTH"
+    private static let statsCountKey = "MYIME_ZENZAI_STATS_COUNT"
+    private static let statsHitKey = "MYIME_ZENZAI_STATS_HIT"
+
+    /// 試験用: この処理（スレッド）の呼び出しを、空白キーの変換として数えるか。
+    /// C++ の入り口が空白キーの変換の始まりで true、終わりで false にする。
+    /// false にすると、その変換で上限に当たっていれば key_hits に1回だけ足す。
+    public static func setStatsCounting(_ enabled: Bool) {
+        let dictionary = Thread.current.threadDictionary
+        dictionary[Self.statsCountingKey] = enabled
+        if enabled {
+            self.statsFilterActive = true
+            return
+        }
+        if (dictionary[Self.statsCountKey] as? Bool) == true,
+           (dictionary[Self.statsHitKey] as? Bool) == true {
+            self.keyHits += 1
+        }
+        dictionary[Self.statsCountKey] = false
+        dictionary[Self.statsHitKey] = false
+        dictionary[Self.statsDepthKey] = 0
+    }
+
+    private static var statsCounting: Bool {
+        (Thread.current.threadDictionary[Self.statsCountingKey] as? Bool) ?? false
+    }
+
     private static func nowNanos() -> UInt64 {
         DispatchTime.now().uptimeNanoseconds
     }
 
     /// 変換の前に呼ぶ。`milliseconds` が 0 以下なら上限なし。
     public static func begin(milliseconds: Int) {
+        let dictionary = Thread.current.threadDictionary
+        let depth = (dictionary[Self.statsDepthKey] as? Int) ?? 0
+        if depth == 0 {
+            // 空白キーの変換の最初の人工知能の呼び出し。この変換を数えるかを決める
+            // （1つの変換の中で何度も呼ばれても、変換の数は1つ）。
+            let counting = self.statsFilterActive && self.statsCounting
+            let counted = counting && self.statsSeen >= 5
+            if counting {
+                self.statsSeen += 1
+            }
+            dictionary[Self.statsCountKey] = counted
+            dictionary[Self.statsHitKey] = false
+            if counted {
+                self.keyConversions += 1
+            }
+        }
+        dictionary[Self.statsDepthKey] = depth + 1
         self.conversions += 1
         self.hitInCurrent = false
         self.callStartNanos = self.nowNanos()
@@ -86,6 +138,9 @@ public enum ZenzaiDeadline {
 
     /// 変換のあとに呼ぶ。
     public static func end() {
+        let dictionary = Thread.current.threadDictionary
+        let depth = (dictionary[Self.statsDepthKey] as? Int) ?? 0
+        dictionary[Self.statsDepthKey] = max(0, depth - 1)
         if self.hitInCurrent {
             self.hits += 1
         }
@@ -108,6 +163,9 @@ public enum ZenzaiDeadline {
         }
         if now >= self.endNanos {
             self.hitInCurrent = true
+            if self.statsFilterActive && self.statsCounting {
+                Thread.current.threadDictionary[Self.statsHitKey] = true
+            }
             return true
         }
         return false
@@ -124,7 +182,8 @@ public enum ZenzaiDeadline {
     /// 試験の集計用の1行。
     public static var summary: String {
         "conversions=\\(self.conversions) hits=\\(self.hits) aborts=\\(self.aborts) skips=\\(self.skips) "
-            + "total_ms=\\(self.totalMilliseconds) max_ms=\\(self.maxMilliseconds)"
+            + "total_ms=\\(self.totalMilliseconds) max_ms=\\(self.maxMilliseconds) "
+            + "key_filter=\\(self.statsFilterActive ? 1 : 0) key_conversions=\\(self.keyConversions) key_hits=\\(self.keyHits)"
     }
 }
 
@@ -290,6 +349,12 @@ nonisolated(unsafe) private let zenzaiStatsPath: String? = {
     }
     return value + "." + String(ProcessInfo.processInfo.processIdentifier)
 }()
+
+/// 試験用: 空白キーの変換の間だけ、上限の集計に数える印を付ける（C++ の入り口から呼ぶ）。
+@_cdecl("SetZenzaiStatsCounting")
+public func setZenzaiStatsCounting(_ enabled: Int32) {
+    ZenzaiDeadline.setStatsCounting(enabled != 0)
+}
 
 /// 変換の終わりに呼ぶ（engineLock を持ったまま）。
 func finishZenzaiDeadline() {
