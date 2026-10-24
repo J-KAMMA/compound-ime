@@ -672,6 +672,12 @@ int main() {
     Expect(english("aideteiru").empty(), "会いでいる は日本語のまま");
     Expect(english("aideta").empty() && english("aidemasu").empty(), "愛でた・愛でます は日本語のまま");
     Expect(english("aidea").empty() && english("aidehonnyaku") == "ai|", "アイデアは日本語のまま、AIで翻訳は AI");
+    Expect(english("aideawokangaeru").empty() && english("kiminoaideaiine").empty() &&
+           english("aidenteitei").empty(), "アイデア・アイデンティティ は日本語のまま");
+    Expect(english("ainorisuku") == "ai|" && english("ainorisuto") == "ai|" &&
+           english("ainotegaki") == "ai|", "AIのリスク・リスト・手書き は AI");
+    Expect(english("aideimasu").empty() && english("aideteimasu").empty() &&
+           english("aideteita").empty(), "会いでいます・愛でています・会いでいた は日本語のまま");
     Expect(english("naiwotsukau").empty(), "略語は打った文字の区切りから始まる（nai の ai は取らない）");
     Expect(english("uiwotsukau") == "ui|", "ui + を + 使う は UI");
     Expect(english("kouiwotsukau") == "ui|", "辞書がないときは行為を使う も取る（下は辞書があるとき）");
@@ -686,8 +692,11 @@ int main() {
       // 本物の Mozc の辞書には あいで（愛で）・あいは（相葉）・あいから（藍から）のような読みもある。
       // 後ろの読みで AI を止めないこと（止めると AIは技術だ が 愛は技術だ になる）。
       const std::set<std::string> readings = {"あいにく", "ばあい", "あいのり", "あいでる", "あいであ",
+                                              "あいでんてぃてぃ", "あいのて", "あいでいます", "あいでています",
+                                              "あいでいた", "あいでていた",
                                               "あいで", "あいは", "あいから", "あいまで", "あいより",
-                                              "であい", "しあい", "しりあい"};
+                                              "であい", "にあい", "しあい", "しりあい", "かいしゃ",
+                                              "じむしょ", "それ"};
       const jaen::ReadingCheck is_reading = [&](std::string_view kana) { return readings.contains(std::string(kana)); };
       const auto with = [&](std::string_view raw) {
         return Text(std::string(raw), jaen::SplitEnglish(Parse(raw), lexicon, Parse, nullptr, &is_reading), true);
@@ -700,11 +709,21 @@ int main() {
              with("aikarayomu") == "ai|" && with("aimadematsu") == "ai|" &&
              with("aiheokuru") == "ai|" && with("aiyoribenrida") == "ai|",
              "辞書に あいは・あいで・あいから・あいまで・あいより があっても独立した ai は AI");
-      Expect(with("jimushodeaiwotsukau") == "ai|" && with("kyouhaaigakowai") == "ai|",
+      Expect(with("soredeaiwotsukau") == "ai|",
              "辞書の であい（出会い）があっても、助詞のあとの AI は AI");
+      Expect(with("kyouhaaigakowai") == "ai|",
+             "辞書の あいがあっても、AIが怖い は AI");
       Expect(with("shiaiwomiru").empty() && with("shiraininiau").empty() &&
              with("baaihachigau").empty(), "試合・知り合い・場合 の ai は日本語のまま");
       Expect(with("aidea").empty(), "アイデア（あいであ）は日本語のまま");
+      Expect(with("aideawokangaeru").empty() && with("kiminoaideaiine").empty() &&
+             with("aidenteitei").empty(), "アイデアを考える・君のアイデアいいね・アイデンティティ は日本語のまま");
+      Expect(with("deai").empty() && with("deaiwotsutaeru").empty() && with("niai").empty(),
+             "文頭の 出会い・似合い は辞書の読みで日本語のまま");
+      Expect(with("ainorisuku") == "ai|" && with("ainorisuto") == "ai|" && with("ainotegaki") == "ai|",
+             "AIのリスク・リスト・手書き は AI（相乗り・合いの手 の例外を狭める）");
+      Expect(with("aideimasu").empty() && with("aideteimasu").empty() && with("aideteita").empty(),
+             "会いでいます・愛でています・会いでいた は日本語のまま");
       Expect(with("aideru").empty(), "愛でる は辞書があっても日本語のまま");
       Expect(with("ainiyuku").empty() && with("ainikoreru").empty() && with("ainikosaseta").empty(),
              "会いにゆく・来れる・来させる は辞書があっても日本語のまま");

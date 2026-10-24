@@ -1054,6 +1054,12 @@ kesaaiheokuru.	今朝AIへ送る。	b	AI	b-standalone
 watashihaaiheokuru.	私はAIへ送る。	b	AI	b-standalone
 jimushodeaiyoribennrida.	事務所でAIより便利だ。	b	AI	b-standalone
 aiyoribennrida.	AIより便利だ。	b	AI	b-standalone
+sorekara,ainorisuku.	それから、AIのリスク。	b	AI	b-standalone
+kyouhaainorisuku.	今日はAIのリスク。	b	AI	b-standalone
+buchouhaainorisuto.	部長はAIのリスト。	b	AI	b-standalone
+ima,ainorisuto.	今、AIのリスト。	b	AI	b-standalone
+watashihaainotegaki.	私はAIの手書き。	b	AI	b-standalone
+saikinn,ainotegaki.	最近、AIの手書き。	b	AI	b-standalone
 sorehaaidesu.	それはAIです。	b	AI	b-standalone
 seiseiaiwotsukau.	生成AIを使う。	b	AI	b-standalone
 ai,seiseiaiwomazeru.	AI、生成AIを混ぜる。	b	AI	b-standalone
