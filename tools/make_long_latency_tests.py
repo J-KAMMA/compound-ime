@@ -3,7 +3,8 @@
   python tools/make_long_latency_tests.py --out tests/conversion/long-latency.tsv [--count 36] [--check]
 
 tests/conversion/wiki-typing.tsv（ウィキペディアの文）と tests/conversion/context.tsv（前の文つきの文）から、
-読みの長さ（目標の文の字数）が 10・20・40・60・80・120 字ほどの組を作る。40 字までの組は1文、
+読み（かな）の長さが 10・20・40・60・80・120 字ほどの組を作る。読みはローマ字を
+tools/make_test_romaji_table.py の表でかなに戻して数える（句読点は数えない）。40 字までの組は1文、
 それより長い組は句点でつないだ複数の文を使う。前の文は context.tsv から取る。
 出力は「組<TAB>ローマ字<TAB>前の文<TAB>元の文」。組ごとに --count 文（既定 36 文。最初の 5 回は
 模型の読み込みとして捨てるので、30 文以上が残る）。
@@ -20,15 +21,29 @@ REPO = HERE.parent
 WIKI = REPO / "tests/conversion/wiki-typing.tsv"
 CONTEXT = REPO / "tests/conversion/context.tsv"
 
-# 組の名前（目標の字数）と、受け入れる字数の範囲
+sys.path.insert(0, str(HERE))
+import make_test_romaji_table  # noqa: E402
+import romaji_variants  # noqa: E402
+
+# ローマ字をかなに戻す表（本物の Mozc の表ではない。読みの字数を数えるだけに使う）
+TABLE = {key: (kana, pending) for key, kana, pending in make_test_romaji_table.rows()}
+TABLE.setdefault("n", ("ん", ""))
+
+# 組の名前（目標の読みの字数）と、受け入れる読みの字数の範囲
 BUCKETS = [
     (10, 8, 14),
     (20, 16, 26),
-    (40, 32, 50),
-    (60, 50, 72),
-    (80, 68, 96),
-    (120, 100, 150),
+    (40, 30, 50),
+    (60, 52, 72),
+    (80, 74, 96),
+    (120, 104, 150),
 ]
+
+
+def reading_length(romaji):
+    """ローマ字をかなに戻し、句読点を除いた読みの字数を数える。"""
+    kana = romaji_variants.to_kana(romaji, TABLE)
+    return sum(1 for ch in kana if "\u3041" <= ch <= "\u30ff")
 
 
 def read_tsv(path):
@@ -75,7 +90,7 @@ def pick_single(units, lo, hi, used, start):
         romaji, target = units[(start + k) % n]
         if target in used:
             continue
-        if lo <= len(target) <= hi:
+        if lo <= reading_length(romaji) <= hi:
             return romaji, target
     return None
 
@@ -86,13 +101,14 @@ def pick_joined(units, lo, hi, used, start):
     for k in range(n):
         idx = (start + k) % n
         romaji, target = units[idx]
-        while len(target) < lo:
-            nxt = units[(idx + 1 + (len(target) // 7)) % n]
-            idx = (idx + 1 + (len(target) // 7)) % n
+        while reading_length(romaji) < lo:
+            step = idx + 1 + (reading_length(romaji) // 7)
+            nxt = units[step % n]
+            idx = step % n
             romaji, target = join_units((romaji, target), nxt)
-            if len(target) > hi:
+            if reading_length(romaji) > hi:
                 break
-        if lo <= len(target) <= hi and target not in used:
+        if lo <= reading_length(romaji) <= hi and target not in used:
             return romaji, target
     return None
 
@@ -130,14 +146,15 @@ def main():
         for i, (romaji, target) in enumerate(picked):
             before = befores[(bucket + i * 7) % len(befores)]
             lines.append(f"{bucket}\t{romaji}\t{before}\t{target}")
-        print(f"組 {bucket}: {len(picked)} 文（字数 {min(len(t) for _, t in picked)}〜{max(len(t) for _, t in picked)}）")
+        readings = [reading_length(r) for r, _ in picked]
+        print(f"組 {bucket}: {len(picked)} 文（読み {min(readings)}〜{max(readings)} 字）")
 
     if args.check:
         return
     header = (
         "# 長い文の変換の時間を測るための文。ウィキペディア日本語版（CC BY-SA 4.0、https://ja.wikipedia.org/）の\n"
         "# tests/conversion/wiki-typing.tsv と context.tsv から tools/make_long_latency_tests.py で作った。\n"
-        "# 組（目標の字数）<TAB>ローマ字<TAB>前の文<TAB>元の文。時間を測る試験だけに使い、学習や語の一覧には使わない。\n"
+        "# 組（目標の読みの字数）<TAB>ローマ字<TAB>前の文<TAB>元の文。時間を測る試験だけに使い、学習や語の一覧には使わない。\n"
     )
     out = Path(args.out)
     out.parent.mkdir(parents=True, exist_ok=True)

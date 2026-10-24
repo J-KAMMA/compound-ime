@@ -1727,8 +1727,9 @@ edit(E, '''      if (!selected) continue;
 T = "session/session_handler_tool.cc"
 edit(T, "#include <cstddef>\n", "#include <chrono>\n#include <cstddef>\n#include <iostream>\n#include <thread>\n")
 edit(T, '  if (command == "RESET_CONTEXT") {\n', r'''  // Timing aids for latency tests: SEND_KEYS_PACED<TAB>keys<TAB>ms types
-  // with a pause after each key; SLEEP<TAB>ms; MARK; ELAPSED prints the
-  // milliseconds since MARK.
+  // with a pause between keys (no pause after the last key, so the caller's
+  // SLEEP is the whole wait before the Space key); SLEEP<TAB>ms; MARK;
+  // ELAPSED prints the milliseconds since MARK.
   static std::chrono::steady_clock::time_point mark = std::chrono::steady_clock::now();
   if (command == "SEND_KEYS_PACED") {
     MOZC_ASSERT_EQ(3, args.size());
@@ -1739,7 +1740,9 @@ edit(T, '  if (command == "RESET_CONTEXT") {\n', r'''  // Timing aids for latenc
       key_event.Clear();
       key_event.set_key_code(keys[i]);
       MOZC_ASSERT_TRUE(client_->SendKey(key_event, last_output_.get()));
-      std::this_thread::sleep_for(std::chrono::milliseconds(pause));
+      if (i + 1 < keys.size()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(pause));
+      }
     }
     return absl::Status();
   }

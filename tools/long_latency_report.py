@@ -129,9 +129,10 @@ def deadline(runs):
         if not profile_conv:
             continue
         if s.get("key_filter"):
-            # 新しい記録: 空白キーの変換の間だけ数えた当たり数。分母は時間の表と同じ変換の数
+            # 新しい記録: 空白キーの変換（最初の5変換を除く）だけを数えた当たり数と変換の数。
+            # 分母も同じ期間の key_conversions を使う（古い記録に無ければ時間の表に合わせる）
             run_hits = s.get("key_hits", 0)
-            run_conv = profile_conv
+            run_conv = s.get("key_conversions", 0) or profile_conv
         else:
             # 古い記録: 上限の当たり数は全体。分母だけは時間の表と合わせる
             run_hits = s.get("hits", 0)
