@@ -1,7 +1,7 @@
 """Builds dictionary14.txt: proper nouns written in English as candidates of their kana reading.
 
   python tools/build_proper_noun_dictionary.py --mozc <mozc/src> --names tools/data/proper-nouns.tsv \
-      --out dictionary14.txt [--install]
+      [--names tools/data/proper-noun-extra.tsv] --out dictionary14.txt [--install]
 
 For each line of tools/data/proper-nouns.tsv (shown<TAB>typed<TAB>flags<TAB>readings<TAB>...), the
 spelling (Google, New York, Elon Musk) becomes a candidate of each reading (ぐーぐる, にゅーよーく).
@@ -15,7 +15,17 @@ It never takes the first place from what Mozc already has:
 - a reading Mozc does not have (4 kana or more): a proper-noun entry at --default-cost, high enough that
   the name never wins in a sentence over Mozc's own words (an earlier 8200 turned たいら into Tyla and
   カップヌードル into Cup Noodles) and is only a candidate of its reading.
-A (reading, spelling) pair Mozc already has is skipped. Readings shorter than 3 kana are not used.
+A (reading, spelling) pair Mozc already has is skipped. Readings of 2 kana are used only from the
+first of several --names files and only when Mozc already has a word for the reading (the checked
+tools/data/proper-noun-extra.tsv: メタ, then Meta); the generated proper-nouns.tsv and a single
+--names keep the old 3-kana rule (the acronym table is what adds あい → AI).
+
+An optional 7th column of --names (after the number of Wikipedia language editions) holds other
+official spellings separated by | (DRAGON BALL for Dragon Ball, NIKE for Nike, adidas for Adidas).
+They are candidates of the same reading, just after the main spelling, and never before the
+Japanese word either. --names may be given more than once: rows of the earlier files come first
+when two files name the same reading (tools/data/proper-noun-extra.tsv is passed before
+proper-nouns.tsv, so the checked official spelling comes first).
 
 --acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
 the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (1 to 3): rank
@@ -52,7 +62,7 @@ def katakana(reading):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mozc", type=Path, required=True)
-    parser.add_argument("--names", type=Path, required=True)
+    parser.add_argument("--names", type=Path, action="append", required=True)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--penalty", type=int, default=10)
     parser.add_argument("--margin", type=int, default=2000)
@@ -80,6 +90,7 @@ def main():
     existing = set()
     katakana_entries = {}  # (reading, katakana) -> (lid, rid, cost)
     max_cost, min_cost = {}, {}
+    surface_costs = defaultdict(dict)  # reading -> surface -> cheapest cost
     for path in sorted(data.glob("dictionary*.txt")):
         if path.name == "dictionary14.txt":
             continue
@@ -93,34 +104,87 @@ def main():
                 reading_entries[reading].append((cost, lid, rid))
             max_cost[reading] = max(max_cost.get(reading, 0), cost)
             min_cost[reading] = min(min_cost.get(reading, 1 << 30), cost)
+            surfaces = surface_costs[reading]
+            surfaces[surface] = min(surfaces.get(surface, 1 << 30), cost)
             if surface == katakana(reading):  # the reading written in katakana, as the name is usually written
                 old = katakana_entries.get((reading, surface))
                 if old is None or cost < old[2]:
                     katakana_entries[(reading, surface)] = (lid, rid, cost)
 
-    entries = {}
-    for line in args.names.read_text(encoding="utf-8").splitlines():
-        if line.startswith("#") or not line.strip():
-            continue
-        f = line.split("\t")
-        shown, readings, kind = f[0], f[3], f[4]
-        for reading in readings.split("|"):
-            if not HIRAGANA.fullmatch(reading) or len(reading) < 3 or (reading, shown) in existing:
+    # (reading, spelling) -> (file order, row order, variant order, kind, is an old main spelling).
+    # The first file given wins for the order of an identical spelling; variants of a spelling are
+    # kept with it. A spelling that proper-nouns.tsv already had as a main spelling is "old": its
+    # cost stays exactly what it was, so the first candidate of an existing reading does not move.
+    wanted_names = {}
+    file_order = 0
+    short_readings = len(args.names) > 1  # only the first (checked extra) file may use 2-kana readings
+    for path in args.names:
+        for row_order, line in enumerate(path.read_text(encoding="utf-8").splitlines()):
+            if line.startswith("#") or not line.strip():
                 continue
-            kata = katakana_entries.get((reading, katakana(reading)))
-            if kata and kata[2] <= min_cost[reading]:  # the katakana word is Mozc's first choice for the reading
-                lid, rid, cost = kata[0], kata[1], kata[2] + args.penalty
-            elif kata:  # also a Japanese word (たいら: 平, Tyla is タイラ): the name stays behind all of them
-                lid, rid, cost = kata[0], kata[1], max_cost[reading] + args.margin
+            f = line.split("\t")
+            if len(f) < 5:
+                continue
+            shown, readings, kind = f[0], f[3], f[4]
+            variants = f[6].split("|") if len(f) > 6 and f[6] else []
+            for reading in readings.split("|"):
+                if not HIRAGANA.fullmatch(reading) or len(reading) < (2 if short_readings and file_order == 0 else 3):
+                    continue
+                for variant_order, spelling in enumerate([shown] + variants):
+                    spelling = spelling.strip()
+                    if not spelling or (reading, spelling) in existing:
+                        continue
+                    key = (reading, spelling)
+                    order = (file_order, row_order, variant_order)
+                    # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
+                    # the generated row: it is the spelling to put right after the katakana word.
+                    is_old = file_order > 0 and variant_order == 0
+                    if key not in wanted_names:
+                        wanted_names[key] = order + (kind, is_old, file_order == 0)
+                    else:
+                        current = wanted_names[key]
+                        wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
+                                                                      current[5] or file_order == 0))
+        file_order += 1
+
+    # Old main spellings keep their cost (all old names of a reading had the same cost). A new
+    # spelling goes after them, and the other official spellings (variants) after the main one.
+    by_reading = defaultdict(list)
+    for (reading, spelling), info in wanted_names.items():
+        by_reading[reading].append((info[:3], spelling, info[4], info[5]))
+    entries = {}
+    for reading, spellings in by_reading.items():
+        kata = katakana_entries.get((reading, katakana(reading)))
+        if kata and kata[2] <= min_cost[reading]:  # the katakana word is Mozc's first choice for the reading
+            base = kata[2] + args.penalty
+        elif kata:  # also a Japanese word (たいら: 平, Tyla is タイラ): the name stays behind all of them
+            base = max_cost[reading] + args.margin
+        else:
+            if reading not in max_cost and len(reading) < 4:
+                continue  # a short reading no word has: the name could win over kana of other words
+            base = max_cost[reading] + args.margin if reading in max_cost else args.default_cost
+        has_old = any(old for _, _, old, _ in spellings)
+        # A new spelling goes right after the katakana word when Mozc has one, even when another
+        # Japanese word is cheaper (ないき: 無い気, ない気, ナイキ, Nike). An old spelling keeps the
+        # cost it had when that is already within the first 10; only an old spelling outside it
+        # (Nike) moves. This keeps the old candidates where they were.
+        new_base = kata[2] + args.penalty if kata else base
+        old_rank = sum(1 for cost in surface_costs.get(reading, {}).values() if cost < base)
+        move_old = old_rank > 9 and any(old and checked for _, _, old, checked in spellings)
+        main_base = new_base if move_old else base
+        new_index = 1 if has_old else 0
+        for _, spelling, old, _ in sorted(spellings):
+            if old:
+                cost = main_base
             else:
-                if reading not in max_cost and len(reading) < 4:
-                    continue  # a short reading no word has: the name could win over kana of other words
-                pos = ids[POS[KIND_POS.get(kind, "other")]]
-                lid = rid = int(pos)
-                cost = max_cost[reading] + args.margin if reading in max_cost else args.default_cost
-            key = (reading, shown)
-            if key not in entries or cost < entries[key][2]:
-                entries[key] = (lid, rid, cost)
+                cost = main_base + new_index
+                new_index += 1
+            if kata:
+                lid, rid = kata[0], kata[1]
+            else:
+                kind = wanted_names[(reading, spelling)][3]
+                lid = rid = int(ids[POS[KIND_POS.get(kind, "other")]])
+            entries[(reading, spelling)] = (lid, rid, cost)
 
     for shown, reading, rank in acronyms:
         if (reading, shown) in existing:

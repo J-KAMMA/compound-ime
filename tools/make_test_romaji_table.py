@@ -43,15 +43,19 @@ for c, kana in (("k", "き"), ("g", "ぎ"), ("s", "し"), ("z", "じ"), ("t", "�
 CONSONANTS = "bcdfghjklmpqrstvwxyz"
 
 
-def main():
-    rows = [(k, v, "") for k, v in BASE.items()]
+def rows():
+    out = [(k, v, "") for k, v in BASE.items()]
     for c in CONSONANTS:
         if c not in "n":
-            rows.append((c + c, "っ", c))
+            out.append((c + c, "っ", c))
     for c in CONSONANTS + "n":
         if c not in "ny":
-            rows.append(("n" + c, "ん", c))
-    for key, value, pending in sorted(rows):
+            out.append(("n" + c, "ん", c))
+    return sorted(out)
+
+
+def main():
+    for key, value, pending in rows():
         print(f"{key}\t{value}\t{pending}")
 
 

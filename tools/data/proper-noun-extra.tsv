@@ -1,0 +1,75 @@
+# 作品名・企業名・ブランド名の、公式の書き方と読みの足し方（人が確かめた表）。
+# tools/data/proper-nouns.tsv（Wikidata から作る）を変えずに、build_proper_noun_dictionary.py が
+# 読みの候補に足す。列: 表示<TAB>打つ形（小文字）<TAB>印（s）<TAB>かなの読み（| 区切り）
+# <TAB>分野（work=作品、company=企業・ブランド）<TAB>言語版の数（0 でよい）<TAB>別の公式表記（| 区切り）
+# 和製の名前や、英語の題名が別にある作品は、公式の英語の題名を書く。
+Dragon Ball	dragonball		どらごんぼーる	work	0	DRAGON BALL
+Dragon Ball Z	dragonballz		どらごんぼーるぜっと	work	0	DRAGON BALL Z
+One Piece	onepiece		わんぴーす|わんぴ	work	0	ONE PIECE
+Naruto	naruto		なると	work	0	NARUTO
+Pokémon	pokemon		ぽけもん	work	0	POKÉMON
+Final Fantasy	finalfantasy		ふぁいなるふぁんたじー	work	0	FINAL FANTASY
+The Legend of Zelda	thelegendofzelda		ぜるだのでんせつ|ぜるだ	work	0	THE LEGEND OF ZELDA|Zelda
+Super Mario	super mario		すーぱーまりお	work	0	SUPER MARIO
+Minecraft	minecraft		まいんくらふと	work	0	MINECRAFT
+Fortnite	fortnite		ふぉーとなーと	work	0	FORTNITE
+Harry Potter	harrypotter		はりーぽったー	work	0	HARRY POTTER
+Star Wars	starwars		すたーうぉーず	work	0	STAR WARS
+Spider-Man	spiderman		すぱいだーまん	work	0	SPIDER-MAN
+Batman	batman		ばっとまん	work	0	BATMAN
+Detective Conan	detectiveconan		めいたんていこなん	work	0	DETECTIVE CONAN
+Doraemon	doraemon		どらえもん	work	0	DORAEMON
+GeGeGe no Kitaro	gegegeno-kitarou		げげげのきたろう	work	0	GEGEGE NO KITARO
+Neon Genesis Evangelion	neongenesisevangelion		しんせいきゔぁんげりおん|えゔぁんげりおん	work	0	NEON GENESIS EVANGELION
+Attack on Titan	attackontitan		しんげきのきょじん	work	0	ATTACK ON TITAN
+Demon Slayer	demon slayer		きめつのやいば	work	0	DEMON SLAYER
+Jujutsu Kaisen	jujutsukaisen		じゅじゅつかいせん	work	0	JUJUTSU KAISEN
+My Hero Academia	myheroacademia		ぼくのひーろーあかでみあ	work	0	MY HERO ACADEMIA
+Tokyo Revengers	tokyorevengers		とうきょうりべんじゃーず	work	0	TOKYO REVENGERS
+Rurouni Kenshin	rurounikenshin		るろうにけんしん	work	0	RUROUNI KENSHIN
+Fullmetal Alchemist	fullmetalalchemist		はがねのれんきんじゅつし	work	0	FULLMETAL ALCHEMIST
+Sailor Moon	sailormoon		せーらーむーん	work	0	SAILOR MOON
+Sailor Moon	sailormoon		びしょうじょせんしせーらーむーん	work	0	SAILOR MOON
+Sword Art Online	swordartonline		そーどあーとおんらいん	work	0	SWORD ART ONLINE
+Dark Souls	darksouls		だーくそうる	work	0	DARK SOULS
+Resident Evil	residentevil		ばいおはざーど	work	0	RESIDENT EVIL
+Street Fighter	streetfighter		すとりーとふぁいたー	work	0	STREET FIGHTER
+Metal Gear Solid	metalgearsolid		めたるぎあそりっど	work	0	METAL GEAR SOLID
+Grand Theft Auto	grandtheftauto		ぐらんどせふとおーと	work	0	GRAND THEFT AUTO
+Call of Duty	callofduty		こーるおぶでゅーてぃ	work	0	CALL OF DUTY
+League of Legends	leagueoflegends		りーぐおぶれじぇんど	work	0	LEAGUE OF LEGENDS
+Overwatch	overwatch		おーばーうぉっち	work	0	OVERWATCH
+Tetris	tetris		てとりす	work	0	TETRIS
+Pac-Man	pacman		ぱっくまん	work	0	PAC-MAN
+Sonic	sonic		そにっく	work	0	SONIC
+Angry Birds	angrybirds		あんぐりーばーど	work	0	ANGRY BIRDS
+Candy Crush	candycrush		きゃんでぃーくらっしゅ	work	0	CANDY CRUSH
+The Lord of the Rings	thelordoftherings		ろーどおぶざりんぐ	work	0	THE LORD OF THE RINGS
+The Matrix	thematrix		まとりっくす	work	0	THE MATRIX
+Jurassic Park	jurassicpark		じゅらしっくぱーく	work	0	JURASSIC PARK
+Titanic	titanic		たいたにっく	work	0	TITANIC
+Avatar	avatar		あばたー	work	0	AVATAR
+Toy Story	toystory		といすとーりー	work	0	TOY STORY
+Finding Nemo	findingnemo		ふぁいんでぃんぐにも	work	0	FINDING NEMO
+The Lion King	thelionking		らいおんきんぐ	work	0	THE LION KING
+Game of Thrones	gameofthrones		げーむおぶすろーんず	work	0	GAME OF THRONES
+Breaking Bad	breakingbad		ぶれいきんぐばっど	work	0	BREAKING BAD
+Stranger Things	strangerthings		すとれんじゃーしんぐす	work	0	STRANGER THINGS
+The Simpsons	thesimpsons		しんぷそんず	work	0	THE SIMPSONS
+Apple	apple		あっぷる	company	0	Apple
+Microsoft	microsoft		まいくろそふと	company	0	MICROSOFT
+Google	google		ぐーぐる	company	0	GOOGLE
+Amazon	amazon		あまぞん	company	0	AMAZON
+Meta	meta		めた	company	0	META
+NVIDIA	nvidia		えぬびでぃあ|えぬゔぃでぃあ	company	0	NVIDIA
+Tesla	tesla		てすら	company	0	TESLA
+Nike	nike		ないき|ないきー	company	0	NIKE
+adidas	adidas		あでぃだす	company	0	Adidas
+Starbucks	starbucks		すたーばっくす	company	0	STARBUCKS
+McDonald's	mcdonalds		まくどなるど|まくだーなるず	company	0	McDonald's
+Coca-Cola	coca-cola		こかこーら|こかこら	company	0	COCA-COLA
+Louis Vuitton	louisvuitton		るいゔぃとん|るいびとん|ゔぃとん|びとん	company	0	LOUIS VUITTON
+IKEA	ikea		いけあ	company	0	IKEA
+Samsung	samsung		さむすん|さんすん	company	0	SAMSUNG
+Netflix	netflix		ねっとふりっくす	company	0	NETFLIX
+Spotify	spotify		すぽてぃふぁい	company	0	SPOTIFY

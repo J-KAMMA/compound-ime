@@ -43,7 +43,10 @@ CLASSES = [
     ("island", "Q23442", 40, False), ("mountain", "Q8502", 50, False), ("river", "Q4022", 50, False),
     ("lake", "Q23397", 40, False),
     ("band", "Q215380", 25, False), ("film", "Q11424", 40, False), ("tvseries", "Q5398426", 30, False),
-    ("album", "Q482994", 30, False), ("novel", "Q7725634", 60, True), ("character", "Q95074", 45, True),
+    ("tvprogram", "Q15416", 25, True), ("filmseries", "Q24856", 25, True),
+    ("album", "Q482994", 30, False), ("novel", "Q7725634", 60, True), ("lightnovel", "Q747381", 20, True),
+    ("manga", "Q8274", 20, True), ("anime", "Q1107", 20, True), ("comic", "Q1004", 20, True),
+    ("videogameseries", "Q14204246", 25, True), ("character", "Q95074", 45, True),
 ]
 PEOPLE_MIN_SITELINKS = 40
 PEOPLE_MONTHS = 60
@@ -183,11 +186,46 @@ def fetch_aliases(directory):
         print("aliases", path.name, len(aliases), flush=True)
 
 
+def fetch_official(directory):
+    """Third pass: official names (P1448) and titles (P1476) in English, for the spellings
+    (DRAGON BALL, NIKE, adidas) that the labels alone do not give."""
+    path = directory / "official.tsv"
+    if path.exists() and path.stat().st_size > 0:
+        return
+    ids = set()
+    for source in sorted(directory.glob("*.tsv")):
+        if source.name == "official.tsv":
+            continue
+        for line in source.read_text(encoding="utf-8").splitlines():
+            qid = line.split("\t", 1)[0]
+            if qid.startswith("Q"):
+                ids.add(qid)
+    forms = {}
+    ids = sorted(ids)
+    for start in range(0, len(ids), 250):
+        values = " ".join(f"wd:{q}" for q in ids[start:start + 250])
+        rows = sparql(f"""SELECT ?item ?form WHERE {{ VALUES ?item {{ {values} }}
+          {{ ?item wdt:P1448 ?form . FILTER(LANG(?form) = "en") }}
+          UNION {{ ?item wdt:P1476 ?form . FILTER(LANG(?form) = "en") }} }}""")
+        for b in rows or []:
+            qid = b["item"]["value"].rsplit("/", 1)[-1]
+            form = b["form"]["value"]
+            forms.setdefault(qid, [])
+            if form not in forms[qid]:
+                forms[qid].append(form)
+        time.sleep(2)
+    with path.open("w", encoding="utf-8", newline="\n") as out:
+        for qid in sorted(forms):
+            out.write(qid + "\t" + "|".join(forms[qid]) + "\n")
+    print("official", len(forms), flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--only", nargs="*", help="file names to fetch (default: all)")
     parser.add_argument("--no-aliases", action="store_true")
+    parser.add_argument("--no-official", action="store_true")
     args = parser.parse_args()
     args.out.mkdir(parents=True, exist_ok=True)
     jobs = [(name, cls, [(low, 1000000)], trans) for name, cls, low, trans in CLASSES]
@@ -210,6 +248,8 @@ def main():
         print("people", fetch_people(people), flush=True)
     if not args.no_aliases:
         fetch_aliases(args.out)
+    if not args.no_official:
+        fetch_official(args.out)
 
 
 if __name__ == "__main__":

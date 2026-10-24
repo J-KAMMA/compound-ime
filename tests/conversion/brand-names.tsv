@@ -1,0 +1,321 @@
+# 企業・ブランド名の英字（期待する候補が上位10個以内。列: ローマ字<TAB>期待する候補<TAB>種類<TAB>由来）
+appuru	Apple	company	extra	あっぷる
+maikurosofuto	Microsoft	company	extra	まいくろそふと
+maikurosofuto	MICROSOFT	company	extra-variant	まいくろそふと
+gu-guru	Google	company	extra	ぐーぐる
+gu-guru	GOOGLE	company	extra-variant	ぐーぐる
+amazonn	Amazon	company	extra	あまぞん
+amazonn	AMAZON	company	extra-variant	あまぞん
+meta	Meta	company	extra	めた
+meta	META	company	extra-variant	めた
+enubidhia	NVIDIA	company	extra	えぬびでぃあ
+tesura	Tesla	company	extra	てすら
+tesura	TESLA	company	extra-variant	てすら
+naiki	Nike	company	extra	ないき
+naiki	NIKE	company	extra-variant	ないき
+adhidasu	adidas	company	extra	あでぃだす
+adhidasu	Adidas	company	extra-variant	あでぃだす
+suta-bakkusu	Starbucks	company	extra	すたーばっくす
+suta-bakkusu	STARBUCKS	company	extra-variant	すたーばっくす
+makudonarudo	McDonald's	company	extra	まくどなるど
+kokako-ra	Coca-Cola	company	extra	こかこーら
+kokako-ra	COCA-COLA	company	extra-variant	こかこーら
+ruivitonn	Louis Vuitton	company	extra	るいゔぃとん
+ruivitonn	LOUIS VUITTON	company	extra-variant	るいゔぃとん
+ruibitonn	Louis Vuitton	company	extra	るいびとん
+ruibitonn	LOUIS VUITTON	company	extra-variant	るいびとん
+vitonn	Louis Vuitton	company	extra	ゔぃとん
+vitonn	LOUIS VUITTON	company	extra-variant	ゔぃとん
+bitonn	Louis Vuitton	company	extra	びとん
+bitonn	LOUIS VUITTON	company	extra-variant	びとん
+ikea	IKEA	company	extra	いけあ
+samusunn	Samsung	company	extra	さむすん
+samusunn	SAMSUNG	company	extra-variant	さむすん
+sannsunn	Samsung	company	extra	さんすん
+sannsunn	SAMSUNG	company	extra-variant	さんすん
+nettofurikkusu	Netflix	company	extra	ねっとふりっくす
+nettofurikkusu	NETFLIX	company	extra-variant	ねっとふりっくす
+supothifai	Spotify	company	extra	すぽてぃふぁい
+supothifai	SPOTIFY	company	extra-variant	すぽてぃふぁい
+so-dasutori-mu	SodaStream	business	data	そーだすとりーむ
+rikachann	Licca-chan	brand	data	りかちゃん
+vashuronnkonnsutanntann	Vacheron Constantin	business	data	ゔぁしゅろんこんすたんたん
+koreosu	Correos	business	data	これおす
+sute-tosutori-to	State Street	business	data	すてーとすとりーと
+runo-samusunn	Renault Korea Motors	business	data	るのーさむすん
+haro-suku-ru	Harrow School	business	data	はろーすくーる
+kubota	Kubota	brand	data	くぼた
+purattoinnsuthithu-to	Pratt Institute	business	data	ぷらっといんすてぃてゅーと
+funakku	Fnac	brand	data	ふなっく
+shida-poinnto	Cedar Point	business	data	しだーぽいんと
+irumoa	Ilmor	business	data	いるもあ
+fa-uei	Huawei	business	data	ふぁーうえい
+sevumashu	Sevmash	business	data	せゔましゅ
+koruge-topa-mori-bu	Colgate-Palmolive	business	data	こるげーとぱーもりーぶ
+berurittsu	Berlitz	brand	data	べるりっつ
+po-rumo-ru	Pall Mall	brand	data	ぽーるもーる
+adani	Adani	business	data	あだに
+touhokudaigaku	Tohoku University	business	data	とうほくだいがく
+chu-da-	Tudor Watches	business	data	ちゅーだー
+vo-gu	Vogue	brand	data	ゔぉーぐ
+nomosugurasuhyutte	Nomos Glashütte	business	data	のもすぐらすひゅって
+tamuronn	Tamron	business	data	たむろん
+wannwa-rudo	Oneworld	business	data	わんわーるど
+kinnpai	Jinbei	brand	data	きんぱい
+sa-bu	Saab Automobile	business	data	さーぶ
+kurieithibukomonnzu	Creative Commons	business	data	くりえいてぃぶこもんず
+berashi	Bellasi	business	data	べらし
+joma	Joma	business	data	じょま
+inndhiann	Indian Motorcycle	business	data	いんでぃあん
+nipponnginnkou	Bank of Japan	business	data	にっぽんぎんこう
+bo-zu	Bose	business	data	ぼーず
+namuko	Namco	business	data	なむこ
+nikori	Nikoli	business	data	にこり
+thiso	Tissot	business	data	てぃそ
+nobonorudhisuku	Novo	business	data	のぼのるでぃすく
+itareri	Italeri	business	data	いたれり
+nyu-erakyappu	New Era Cap	business	data	にゅーえらきゃっぷ
+roito	Norddeutscher Lloyd	business	data	ろいと
+bebasuto	Webasto SE	business	data	べばすと
+aibu	I've Sound	brand	data	あいぶ
+soni-myu-jikkuenntateinnmennto	Sony Music	brand	data	そにーみゅーじっくえんたていんめんと
+binntann	Bintang Beer	brand	data	びんたん
+ramada	Ramada	brand	data	らまだ
+ka-chisuraito	Curtiss-Wright	business	data	かーちすらいと
+torenitaria	Trenitalia	business	data	とれにたりあ
+supaika-	Spyker	business	data	すぱいかー
+dhizuni-channneru	Disney Channel	business	data	でぃずにーちゃんねる
+nyu-toroji-na	Neutrogena	business	data	にゅーとろじーな
+ronnza	Lonza	business	data	ろんざ
+thinnba-ranndo	The Timberland	business	data	てぃんばーらんど
+fannthikku	Fantic Motor	business	data	ふぁんてぃっく
+biannki	Bianchi Bicycles	business	data	びあんき
+sami-	Sammy	business	data	さみー
+bejimaito	Vegemite	brand	data	べじまいと
+twui	TUI	business	data	とぅい
+purime-radhibishionn	Uruguayan Primera División	business	data	ぷりめーらでぃびしおん
+epitafureko-do	Epitaph Records	brand	data	えぴたふれこーど
+maruchisuzukiinndhia	Maruti Suzuki	business	data	まるちすずきいんでぃあ
+kuruboaje	Courvoisier	business	data	くるぼあじぇ
+bappu	VAP	business	data	ばっぷ
+chuushinnginnkou	China CITIC Bank	business	data	ちゅうしんぎんこう
+kura-na	Klarna	business	data	くらーな
+buru-ho-ru	Krafton	business	data	ぶるーほーる
+kyoudoutsuushinnsha	Kyodo News	business	data	きょうどうつうしんしゃ
+kurei	Cray	business	data	くれい
+jira-ruperugo	Girard-Perregaux	business	data	じらーるぺるご
+yuniba-sarusutajioshinngapo-ru	Universal Studios Singapore	business	data	ゆにばーさるすたじおしんがぽーる
+jo-jitaunndaigaku	Georgetown University	business	data	じょーじたうんだいがく
+tekisutoronn	Textron	business	data	てきすとろん
+sherinngupurau	Schering-Plough	business	data	しぇりんぐぷらう
+dhia	Dexia	business	data	でぃあ
+rusa-ru	Rusal	business	data	るさーる
+romanekonnthi	Romanée-Conti	business	data	ろまねこんてぃ
+mitsubishidennki	Mitsubishi Electric	business	data	みつびしでんき
+toukyoudaigaku	University of Tokyo	business	data	とうきょうだいがく
+a-bannautofitta-zu	Urban Outfitters	brand	data	あーばんあうとふぃったーず
+nagasakidaigaku	Nagasaki University	business	data	ながさきだいがく
+bannja	Banja	business	data	ばんじゃ
+hyu-mann	Human Entertainment	business	data	ひゅーまん
+nokianntaiya	Nokian Tyres	business	data	のきあんたいや
+junipa-nettowa-kusu	Juniper Networks	business	data	じゅにぱーねっとわーくす
+ma-berukomikku	Marvel Comics	business	data	まーべるこみっく
+hawaianasu	Havaianas	brand	data	はわいあなす
+takarajimasha	Takarajimasha	business	data	たからじましゃ
+baiogurafu	Biograph	business	data	ばいおぐらふ
+ninnbasu	Nimbus	business	data	にんばす
+ruminizumu	Luminism	business	data	るみにずむ
+wasedadaigaku	Waseda University	business	data	わせだだいがく
+runo-torakku	Renault Trucks	business	data	るのーとらっく
+youmeikaiunn	Yang Ming Marine Transport	business	data	ようめいかいうん
+ritsumeikanndaigaku	Ritsumeikan University	business	data	りつめいかんだいがく
+toukyoukokusaidaigaku	Tokyo International University	business	data	とうきょうこくさいだいがく
+adeko	The Adecco	business	data	あでこ
+harufirumume-ka-	Hal Film Maker	business	data	はるふぃるむめーかー
+feimasugurausu	The Famous Grouse	brand	data	ふぇいますぐらうす
+gakushuuinndaigaku	Gakushuin University	business	data	がくしゅういんだいがく
+kinemashitorasu	Kinema Citrus	business	data	きねましとらす
+komodo-ru	Commodore International	business	data	こもどーる
+fera-riwa-rudo	Ferrari World Abu Dhabi	business	data	ふぇらーりわーるど
+nesure	Nestlé	business	data	ねすれ
+burithisshuearosupe-su	British Aerospace	business	data	ぶりてぃっしゅえあろすぺーす
+pyuto-	Section d'Or	business	data	ぴゅとー
+sonngyunngwann	Sungkyunkwan	business	data	そんぎゅんぐぁん
+komerutsubannku	Commerzbank	business	data	こめるつばんく
+hereusu	Heraeus	business	data	へれうす
+finnranndhia	Finlandia Vodka	brand	data	ふぃんらんでぃあ
+ka-negi-meronndaigaku	Carnegie Mellon University	business	data	かーねぎーめろんだいがく
+ge-muzuwa-kushoppu	Games Workshop	business	data	げーむずわーくしょっぷ
+shatta-sutokku	Shutterstock	business	data	しゃったーすとっく
+forukusuwa-genn	Volkswagen	brand	data	ふぉるくすわーげん
+okado	Ocado	business	data	おかど
+tawa-reko-do	Tower Records	brand	data	たわーれこーど
+kannsaidaigaku	Kansai University	business	data	かんさいだいがく
+kumamotodaigaku	Kumamoto University	business	data	くまもとだいがく
+sabupoppu	Sub Pop	brand	data	さぶぽっぷ
+jinnbei	Jinbei	brand	data	じんべい
+riviera	Riviera Hotel and Casino	business	data	りゔぃえら
+itera	Posti	business	data	いてら
+vannga-do	The Vanguard	business	data	ゔぁんがーど
+wesutanndejitaru	Western Digital	business	data	うぇすたんでじたる
+atorasukopuko	Atlas Copco	business	data	あとらすこぷこ
+akuronisu	Acronis	business	data	あくろにす
+ha-ba-dodaigaku	Harvard University	business	data	はーばーどだいがく
+akune	Acne Studios	business	data	あくね
+uxo-ta-mann	Waterman	business	data	うぉーたーまん
+va-jinnreko-do	Virgin Records	brand	data	ゔぁーじんれこーど
+benechiann	The Venetian	business	data	べねちあん
+yukosu	Yukos	business	data	ゆこす
+u-ruwa-su	F. W. Woolworth	business	data	うーるわーす
+ho-rufu-zuma-ketto	Whole Foods Market	brand	data	ほーるふーずまーけっと
+su-ri-	Thule	business	data	すーりー
+hyu-rettopakka-do	Hewlett-Packard	business	data	ひゅーれっとぱっかーど
+kottonnkurabu	Cotton Club	business	data	こっとんくらぶ
+koreko	Coleco	brand	data	これこ
+mereru	Merrell	business	data	めれる
+annzani	Anzani	business	data	あんざに
+bari-zu	Horseshoe Las Vegas	business	data	ばりーず
+iveko	Iveco	business	data	いゔぇこ
+asutora	Astra-Unceta y Cia	business	data	あすとら
+sa-china	Certina Kurth Frères	business	data	さーちな
+ariannsupe-su	Arianespace	business	data	ありあんすぺーす
+rije	Ligier	business	data	りじぇ
+yunishisu	Unisys	business	data	ゆにしす
+hariba-tonn	Halliburton	business	data	はりばーとん
+mosutekku	Mostek	business	data	もすてっく
+urutorasu-pa-pikucha-zu	Ultra Super Pictures	business	data	うるとらすーぱーぴくちゃーず
+re-be	Loewe Technology	business	data	れーべ
+reinnforesutokafe	Rainforest Cafe	brand	data	れいんふぉれすとかふぇ
+enikkusu	Enix	business	data	えにっくす
+pekinndaigaku	Peking University	business	data	ぺきんだいがく
+go-monn	Gaumont	business	data	ごーもん
+roiyarukopennha-genn	Royal Copenhagen	brand	data	ろいやるこぺんはーげん
+sabiann	Sabian	business	data	さびあん
+musashinobijutsudaigaku	Musashino Art University	business	data	むさしのびじゅつだいがく
+deroriann	DeLorean Motor	business	data	でろりあん
+fainnberukubau	Feinwerkbau	business	data	ふぁいんべるくばう
+kureima-	Kramer Guitars	business	data	くれいまー
+terusutora	Telstra	business	data	てるすとら
+motomori-ni	Moto Morini	business	data	もともりーに
+runesasuerekutoronikusu	Renesas Electronics	business	data	るねさすえれくとろにくす
+murataseisakusho	Murata Manufacturing	business	data	むらたせいさくしょ
+rifuto	Lyft	business	data	りふと
+uburo	Hublot	business	data	うぶろ
+zauba-	Sauber Motorsport	business	data	ざうばー
+bobesupa	São Paulo Stock Exchange	business	data	ぼべすぱ
+maranntsu	Marantz	brand	data	まらんつ
+rinndennrabo	Linden Lab	business	data	りんでんらぼ
+to-yo-taiya	Toyo Tire	business	data	とーよーたいや
+ottogi	Ottogi	business	data	おっとぎ
+dejitarurisa-chi	Digital Research	business	data	でじたるりさーち
+keihinnkyuukoudenntetsu	Keikyu	business	data	けいひんきゅうこうでんてつ
+kokoichi	Ichibanya	brand	data	ここいち
+suta-dasutopuromo-shonn	Stardust Promotion	business	data	すたーだすとぷろもーしょん
+mopa-	MoPar	business	data	もぱー
+nihonntabakosanngyou	Japan Tobacco	business	data	にほんたばこさんぎょう
+maidhia	Midea	business	data	まいでぃあ
+yuniri-ba	Unilever	business	data	ゆにりーば
+faseru	Facel Vega	business	data	ふぁせる
+sunohetta	Snøhetta	business	data	すのへった
+yonekkusu	Yonex	business	data	よねっくす
+toukyouerekutoronn	Tokyo Electron	business	data	とうきょうえれくとろん
+chuugokukoutetsu	China Steel	business	data	ちゅうごくこうてつ
+eruzebia	Elsevier	business	data	えるぜびあ
+sunoko	Sunoco	brand	data	すのこ
+parado-ru	Paradores de Turismo	brand	data	ぱらどーる
+zekushizu	Zexcs	business	data	ぜくしず
+ferunanndesu	Fernandes Guitars	business	data	ふぇるなんです
+eisa-	Acer	business	data	えいさー
+erisa	Elisa	business	data	えりさ
+shinnyouhikikougyoushuudann	Shenyang Aircraft	business	data	しんようひきこうぎょうしゅうだん
+pikusa-	Pixar	business	data	ぴくさー
+sutajiokororido	Studio Colorido	business	data	すたじおころりど
+kapuroni	Caproni	business	data	かぷろに
+akera	Akella	business	data	あけら
+marimekko	Marimekko	business	data	まりめっこ
+surabiapuraha	SK Slavia Prague	business	data	すらびあぷらは
+a-sa-annda-senn	Arthur Andersen	business	data	あーさーあんだーせん
+sakkani-	Saucony	business	data	さっかにー
+ge-mufuri-ku	Game Freak	business	data	げーむふりーく
+meishi-zu	Macy's	brand	data	めいしーず
+burufuroggu	Bullfrog Productions	business	data	ぶるふろっぐ
+twusann	Doosan	business	data	とぅさん
+burakkusuto-nn	Blackstone	business	data	ぶらっくすとーん
+dhizuni-majikku	Disney Magic	business	data	でぃずにーまじっく
+pettsu	Pez	brand	data	ぺっつ
+arukasaru	Alcázar of Toledo	business	data	あるかさる
+taitorisuto	Titleist	business	data	たいとりすと
+su-pa-ri-gu	Super League	business	data	すーぱーりーぐ
+akuserushupurinnga-	Axel Springer SE	business	data	あくせるしゅぷりんがー
+okusufo-do	Pembroke College	business	data	おくすふぉーど
+kyanonnde-ru	Cannondale Bicycle	brand	data	きゃのんでーる
+makushisu	Maxis	business	data	まくしす
+sekaiginnkou	World Bank	business	data	せかいぎんこう
+shopa-ru	Chopard	business	data	しょぱーる
+dhurekkusu	Durex	business	data	でゅれっくす
+kinethikku	QinetiQ	business	data	きねてぃっく
+fo-domo-ta-	Ford Motor	business	data	ふぉーどもーたー
+ro-ba-	Rover	business	data	ろーばー
+irufo-do	Ilford Photo	business	data	いるふぉーど
+geiko	GEICO	business	data	げいこ
+dhuponn	DuPont	business	data	でゅぽん
+sannyoudennki	Sanyo	business	data	さんようでんき
+chibaterebi	Chiba Television Broadcasting	business	data	ちばてれび
+shunaida-erekutorikku	Schneider Electric	business	data	しゅないだーえれくとりっく
+sanntannde-ruginnkou	Banco Santander	business	data	さんたんでーるぎんこう
+nissannjidousha	Nissan	brand	data	にっさんじどうしゃ
+abaronnhiru	Avalon Hill	business	data	あばろんひる
+kanadataiheiyoutetsudou	Canadian Pacific Railway	business	data	かなだたいへいようてつどう
+sanntekkupawa-	Suntech Power	business	data	さんてっくぱわー
+amerikannekisupuresu	American Express	business	data	あめりかんえきすぷれす
+girudogita-	Guild Guitar	business	data	ぎるどぎたー
+fo-poinntobaisheratonn	Four Points by Sheraton	brand	data	ふぉーぽいんとばいしぇらとん
+chainaterekomu	China Telecommunications	business	data	ちゃいなてれこむ
+shinnbiann	Symbian Software	business	data	しんびあん
+akushiosu	Axios	business	data	あくしおす
+sora-zu	Sollers JSC	business	data	そらーず
+nikko-rurennzu	Nikkor	brand	data	にっこーるれんず
+soni-finannsharuguru-pu	Sony Financial	business	data	そにーふぃなんしゃるぐるーぷ
+annpekkusu	Ampex	brand	data	あんぺっくす
+purinnguruzu	Pringles	brand	data	ぷりんぐるず
+kogunosu	Cognos	business	data	こぐのす
+shinaroakaruteru	Sinaloa Cartel	business	data	しなろあかるてる
+jannsenisumu	Jansenism	business	data	じゃんせにすむ
+yu-rosupo-tsu	Eurosport	business	data	ゆーろすぽーつ
+winnrasubegasu	Wynn Las Vegas	business	data	うぃんらすべがす
+dennso	Denso	business	data	でんそ
+vikka-su	Vickers	business	data	ゔぃっかーす
+arukonn	Alcon	business	data	あるこん
+miumiu	Miu Miu	business	data	みうみう
+heneshi-	Hennessy	business	data	へねしー
+doitsuposuto	DHL	business	data	どいつぽすと
+bihhi	Big Hit Music	brand	data	びっひ
+ri-mannburaza-zu	Lehman Brothers	business	data	りーまんぶらざーず
+nettoma-buru	Netmarble	business	data	ねっとまーぶる
+shuvarutsu	Schwarz	business	data	しゅゔぁるつ
+chainamobairu	China Mobile	business	data	ちゃいなもばいる
+chikkufirei	Chick-fil-A	brand	data	ちっくふぃれい
+moba-do	Movado	business	data	もばーど
+esupuri	Esprit	business	data	えすぷり
+runndodaigaku	Lund University	business	data	るんどだいがく
+sumitomodennkikougyou	Sumitomo Electric Industries	business	data	すみともでんきこうぎょう
+dannroppusupo-tsu	Dunlop Sport	business	data	だんろっぷすぽーつ
+suisuposuto	Die Schweizerische Post	business	data	すいすぽすと
+sukuweaenikkusu	Square Enix	business	data	すくうぇあえにっくす
+kepperu	Keppel	business	data	けっぺる
+kokuta	Cockta	business	data	こくた
+tarinnku	Tallink	business	data	たりんく
+shekuta-	Schecter Guitar Research	business	data	しぇくたー
+kyousera	Kyocera	business	data	きょうせら
+hitachiseisakusho	Hitachi	business	data	ひたちせいさくしょ
+byuruga-buroikera-	Bürgerbräukeller	business	data	びゅるがーぶろいけらー
+sannpawa-	SunPower	business	data	さんぱわー
+rottewa-rudo	Lotte World	business	data	ろってわーるど
+bikutorinokkusu	Victorinox	business	data	びくとりのっくす
+supesharaizudo	Specialized Bicycle Components	business	data	すぺしゃらいずど
+seimoadannkann	Seymour Duncan	business	data	せいもあだんかん
+vi-vo	Vivo	business	data	ゔぃーゔぉ
+makuseru	Maxell	brand	data	まくせる
+doburogita-	Dobro	brand	data	どぶろぎたー
+shoutaimu	Showtime	business	data	しょうたいむ
+guro-e	Grohe	business	data	ぐろーえ
