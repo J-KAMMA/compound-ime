@@ -30,7 +30,8 @@ def main():
             "どらごんぼーる\t0\t0\t3000\tドラゴンボール\n"
             "ないき\t0\t0\t3000\tナイキ\n"
             "まんしょん\t0\t0\t3000\tマンション\n"
-            "めた\t0\t0\t3000\tメタ\n", encoding="utf-8")
+            "めた\t0\t0\t3000\tメタ\n"
+            + "".join(f"ないき\t0\t0\t{3100 + i}\t内規{i}\n" for i in range(10)), encoding="utf-8")
 
         # 0. カタカナ語と英単語の組（和製英語を外し、JMdict の組を足す）
         lex = tmp / "lex"
@@ -83,7 +84,8 @@ def main():
             "Coca-Cola\tcoca-cola\t\tこかこーら\tcompany\t0\tCOCA-COLA\n"
             "Meta\tmeta\t\tめた\tcompany\t0\tMETA\n", encoding="utf-8")
         base = tmp / "base.tsv"
-        base.write_text("Adidas\tadidas\t\tあでぃだす\tcompany\t0\t\n", encoding="utf-8")
+        base.write_text("Adidas\tadidas\t\tあでぃだす\tcompany\t0\t\n"
+                        "Nike\tnike\t\tないき\tbusiness\t0\t\n", encoding="utf-8")
         out14 = tmp / "dictionary14.txt"
         subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.py"),
                         "--mozc", str(mozc), "--names", str(extra), "--names", str(base), "--out", str(out14)],
@@ -100,7 +102,8 @@ def main():
             check(dragon_caps == 3011, f"DRAGON BALL は Dragon Ball の次のはず: {dragon_caps}")
         nike = rows.get(("ないき", "Nike"))
         nike_caps = rows.get(("ないき", "NIKE"))
-        check(nike == 3010 and nike_caps == 3011, f"ないき → Nike, NIKE の順が違う: {nike} {nike_caps}")
+        check(nike == 3010 and nike_caps == 3011,
+              f"ないき → Nike, NIKE の順が違う（古い費用が上位10個の外なら、カタカナ語の次へ）: {nike} {nike_caps}")
         check(rows.get(("こかこーら", "Coca-Cola")) == 15000,
               f"読みを持つ語がないときは既定の費用: {rows.get(('こかこーら', 'Coca-Cola'))}")
         check(rows.get(("めた", "Meta")) == 3010 and rows.get(("めた", "META")) == 3011,

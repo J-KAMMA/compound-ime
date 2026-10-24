@@ -90,6 +90,7 @@ def main():
     existing = set()
     katakana_entries = {}  # (reading, katakana) -> (lid, rid, cost)
     max_cost, min_cost = {}, {}
+    surface_costs = defaultdict(dict)  # reading -> surface -> cheapest cost
     for path in sorted(data.glob("dictionary*.txt")):
         if path.name == "dictionary14.txt":
             continue
@@ -103,6 +104,8 @@ def main():
                 reading_entries[reading].append((cost, lid, rid))
             max_cost[reading] = max(max_cost.get(reading, 0), cost)
             min_cost[reading] = min(min_cost.get(reading, 1 << 30), cost)
+            surfaces = surface_costs[reading]
+            surfaces[surface] = min(surfaces.get(surface, 1 << 30), cost)
             if surface == katakana(reading):  # the reading written in katakana, as the name is usually written
                 old = katakana_entries.get((reading, surface))
                 if old is None or cost < old[2]:
@@ -133,19 +136,22 @@ def main():
                         continue
                     key = (reading, spelling)
                     order = (file_order, row_order, variant_order)
+                    # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
+                    # the generated row: it is the spelling to put right after the katakana word.
                     is_old = file_order > 0 and variant_order == 0
                     if key not in wanted_names:
-                        wanted_names[key] = order + (kind, is_old)
+                        wanted_names[key] = order + (kind, is_old, file_order == 0)
                     else:
                         current = wanted_names[key]
-                        wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old))
+                        wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
+                                                                      current[5] or file_order == 0))
         file_order += 1
 
     # Old main spellings keep their cost (all old names of a reading had the same cost). A new
     # spelling goes after them, and the other official spellings (variants) after the main one.
     by_reading = defaultdict(list)
     for (reading, spelling), info in wanted_names.items():
-        by_reading[reading].append((info[:3], spelling, info[4]))
+        by_reading[reading].append((info[:3], spelling, info[4], info[5]))
     entries = {}
     for reading, spellings in by_reading.items():
         kata = katakana_entries.get((reading, katakana(reading)))
@@ -157,13 +163,21 @@ def main():
             if reading not in max_cost and len(reading) < 4:
                 continue  # a short reading no word has: the name could win over kana of other words
             base = max_cost[reading] + args.margin if reading in max_cost else args.default_cost
-        has_old = any(old for _, _, old in spellings)
+        has_old = any(old for _, _, old, _ in spellings)
+        # A new spelling goes right after the katakana word when Mozc has one, even when another
+        # Japanese word is cheaper (ないき: 無い気, ない気, ナイキ, Nike). An old spelling keeps the
+        # cost it had when that is already within the first 10; only an old spelling outside it
+        # (Nike) moves. This keeps the old candidates where they were.
+        new_base = kata[2] + args.penalty if kata else base
+        old_rank = sum(1 for cost in surface_costs.get(reading, {}).values() if cost < base)
+        move_old = old_rank > 9 and any(old and checked for _, _, old, checked in spellings)
+        main_base = new_base if move_old else base
         new_index = 1 if has_old else 0
-        for _, spelling, old in sorted(spellings):
+        for _, spelling, old, _ in sorted(spellings):
             if old:
-                cost = base
+                cost = main_base
             else:
-                cost = base + new_index
+                cost = main_base + new_index
                 new_index += 1
             if kata:
                 lid, rid = kata[0], kata[1]

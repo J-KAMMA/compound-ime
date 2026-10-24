@@ -21,7 +21,10 @@ The rows come from the same tables the dictionary is built from: tools/data/kata
 tools/data/proper-nouns.tsv and the checked tools/data/proper-noun-extra.tsv. The sample is
 deterministic (--seed). A reading that cannot be written in the base romaji style is left out.
 With --mozc, a reading whose cheapest Mozc entry is already English is left out too: in the test
-the Japanese candidate has to be first (the English word comes after it).
+the Japanese candidate has to be first (the English word comes after it). A loanword whose
+katakana word is not a Mozc entry (the dictionary builder leaves it out) is left out, and a name
+with too many Mozc words before it (the dictionary puts the name after them) is left out, so the
+test only asks for candidates the built dictionary can show in the first 10.
 """
 import argparse
 import random
@@ -37,6 +40,7 @@ WORK_KINDS = {"film", "filmseries", "tvseries", "tvprogram", "videogame", "video
               "album", "band", "novel", "lightnovel", "manga", "anime", "comic", "character", "work"}
 BRAND_KINDS = {"business", "brand", "company"}
 KATAKANA = re.compile(r"[ァ-ヺー・=＝ヽヾ 　]+")
+HIRAGANA = re.compile(r"[ぁ-ゖー]+")
 EXAMPLES = ["コンピューター", "スマートフォン", "アップデート", "データベース", "コーヒー", "カフェ",
             "インターネット", "システム", "サービス", "プロジェクト"]
 
@@ -95,21 +99,48 @@ def main():
     rng = random.Random(args.seed)
 
     japanese_first = None
+    mozc_katakana = None
+    mozc_surfaces = None
+    mozc_existing = None
     if args.mozc:
         japanese_first = {}  # reading -> True when Mozc's cheapest entry is not English letters
-        for path in sorted((args.mozc / "data/dictionary_oss").glob("dictionary0*.txt")):
+        mozc_surfaces = {}  # reading -> surface -> cheapest cost
+        mozc_katakana = {}  # reading -> (surface, cost) of the katakana word the builder uses
+        mozc_existing = set()
+        for path in sorted((args.mozc / "data/dictionary_oss").glob("dictionary*.txt")):
+            if path.name in ("dictionary12.txt", "dictionary14.txt"):
+                continue  # the files this feature adds; the other dictionaries are what comes before them
             for line in path.read_text(encoding="utf-8").splitlines():
                 f = line.split("\t")
                 if len(f) < 5:
                     continue
-                cost, surface = int(f[3]), f[4]
-                old = japanese_first.get(f[0])
+                reading, lid, cost, surface = f[0], int(f[1]), int(f[3]), f[4]
+                mozc_existing.add((reading, surface))
+                old = japanese_first.get(reading)
                 if old is None or cost < old[0]:
-                    japanese_first[f[0]] = (cost, not surface.isascii())
+                    japanese_first[reading] = (cost, not surface.isascii())
+                surfaces = mozc_surfaces.setdefault(reading, {})
+                surfaces[surface] = min(surfaces.get(surface, 1 << 30), cost)
+                if KATAKANA.fullmatch(surface) and HIRAGANA.fullmatch(reading) and not 1921 <= lid <= 1929:
+                    old_kata = mozc_katakana.get(reading)
+                    if old_kata is None or cost < old_kata[1]:
+                        mozc_katakana[reading] = (surface, cost)
         japanese_first = {reading: ok for reading, (_, ok) in japanese_first.items()}
 
     def usable(reading):
         return japanese_first is None or japanese_first.get(reading, False)
+
+    def can_show(reading, origin):
+        """The builder puts a checked name right after the katakana word and a generated name after
+        every entry of the reading. Only readings where that is within the first 10 are tested."""
+        if mozc_surfaces is None:
+            return True
+        surfaces = mozc_surfaces.get(reading, {})
+        if origin.startswith("extra"):
+            kata = mozc_katakana.get(reading)
+            if kata:
+                return sum(1 for cost in surfaces.values() if cost < kata[1]) <= 7
+        return len(surfaces) <= 8
 
     # 1. Loanwords. The same katakana can have two English words (the pair table lists both).
     pairs = {}
@@ -130,6 +161,13 @@ def main():
         for english in pairs[katakana]:
             if len(english) < 3:
                 continue  # in, on: too short to be a useful loanword test
+            if mozc_katakana is not None:
+                reading = hira(katakana)
+                kata = mozc_katakana.get(reading)
+                kata_rank = sum(1 for cost in mozc_surfaces.get(reading, {}).values() if cost < kata[1]) if kata else 99
+                if (not kata or kata[0] != katakana or kata_rank > 7
+                        or (reading, english) in mozc_existing):
+                    continue  # the dictionary builder leaves this pair out, or the word is too far down
             loanwords.append((raw, english, "loanword", "example" if katakana in EXAMPLES else "data"))
             seen.add(katakana)
             break
@@ -169,7 +207,8 @@ def main():
         # stays on one page.
         by_reading = {}
         for row in names:
-            if row[2] in kinds and len(row[1]) >= 2 and re.fullmatch(r"[A-Za-z0-9À-ɏ .'&+\-!]+", row[1]):
+            if (row[2] in kinds and len(row[1]) >= 2 and re.fullmatch(r"[A-Za-z0-9À-ɏ .'&+\-!]+", row[1])
+                    and can_show(row[4], row[3])):
                 by_reading.setdefault(row[0], []).append(row)
         extra_rows, pool = [], []
         for reading, rows in by_reading.items():

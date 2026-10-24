@@ -249,7 +249,7 @@ t)
       bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/$f.txt $OUT/$f.tsv 4
     fi
   done
-  python3 $REPO/tools/score_katakana_english.py --tests $T --results $OUT --min-rate 0.5 --max-wasei 0 \
+  python3 $REPO/tools/score_katakana_english.py --tests $T --results $OUT --min-rate 0.98 --max-wasei 0 \
     | tee $OUT/katakana-english-score.txt
   ;;
 q)

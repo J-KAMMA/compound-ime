@@ -1,50 +1,50 @@
 # 和製英語・意味がずれた外来語（英語の語をそのまま当てない）。カタカナ語に英語の候補を付けない
-# （tools/build_katakana_english.py の --wasei）。1列目はカタカナ、2列目は元にした英語（参考）。
+# （tools/build_katakana_english.py の --wasei）。1列目はカタカナ、2列目は候補に出てはいけない英語（元の綴りの語）。
 マンション	mansion
-ノートパソコン	note personal computer
-パソコン	personal computer
+ノートパソコン	note
+パソコン	computer
 サラリーマン	salaryman
-コンセント	concentric plug
+コンセント	concentric
 エアコン	air conditioner
 アパート	apartment
 アルバイト	arbeit
-ガソリンスタンド	gasoline stand
-コインロッカー	coin locker
-ゴールデンウィーク	golden week
-サイン	signature
+ガソリンスタンド	gasoline
+コインロッカー	coin
+ゴールデンウィーク	golden
+サイン	sign
 スキンシップ	skinship
-ソフトクリーム	soft cream
-ドライヤー	hair dryer
-トレーナー	sweatshirt
+ソフトクリーム	soft
+ドライヤー	dryer
+トレーナー	trainer
 パンク	puncture
-ハンドル	steering wheel
-ビニール	plastic
-ビジネスホテル	business hotel
+ハンドル	handle
+ビニール	vinyl
+ビジネスホテル	business
 フリーター	freeter
-プレハブ	prefabricated building
-ペーパードライバー	paper driver
-ホッチキス	stapler
-ホームページ	website
-ポスト	mailbox
-モーニングコール	wake-up call
-ラジカセ	radio cassette player
+プレハブ	prefabricated
+ペーパードライバー	paper
+ホッチキス	Hotchkiss
+ホームページ	homepage
+ポスト	post
+モーニングコール	morning
+ラジカセ	radio
 リストラ	restructuring
-レンジ	microwave oven
-ワイシャツ	dress shirt
-ワープロ	word processor
-オフィスレディー	office lady
-キャッチボール	catch ball
+レンジ	range
+ワイシャツ	white
+ワープロ	word
+オフィスレディー	office
+キャッチボール	catch
 コスプレ	cosplay
-コンビニ	convenience store
+コンビニ	convenience
 ショートケーキ	shortcake
-タッチパネル	touchscreen
-デジカメ	digital camera
-テレビゲーム	video game
-ナイター	night game
-バックミラー	rearview mirror
+タッチパネル	touch
+デジカメ	digital
+テレビゲーム	video
+ナイター	nighter
+バックミラー	back
 ファミコン	Famicom
-ベビーカー	stroller
-ペットボトル	PET bottle
-ボディタッチ	body touch
-マザコン	mother complex
-メルマガ	email newsletter
+ベビーカー	baby
+ペットボトル	PET
+ボディタッチ	body
+マザコン	mother
+メルマガ	mail

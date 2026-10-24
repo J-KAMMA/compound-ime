@@ -45,7 +45,7 @@ jobs:
           python3 $W/repo/tools/build_katakana_english.py --pairs $W/out/pairs-all.tsv \
             --level $W/lex10 --level $W/lex20 --level $W/lex35 --checked $W/repo/tools/data/katakana-english-common.tsv \
             --checked $W/repo/tools/data/loanwords.tsv --jmdict $W/out/jmdict-loanwords.tsv \
-            --wasei $W/repo/tools/data/wasei.tsv \
+            --wasei $W/repo/tools/data/wasei.tsv --wasei $W/out/jmdict-wasei.tsv \
             --mozc $W/myime/mozc/src --out $W/out/katakana-english.tsv
           shuf -n 60 --random-source=<(yes) $W/out/katakana-english.tsv | paste -sd' '
 

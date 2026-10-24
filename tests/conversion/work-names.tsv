@@ -18,8 +18,8 @@ mainnkurafuto	Minecraft	work	extra	まいんくらふと
 mainnkurafuto	MINECRAFT	work	extra-variant	まいんくらふと
 hari-potta-	Harry Potter	work	extra	はりーぽったー
 hari-potta-	HARRY POTTER	work	extra-variant	はりーぽったー
-suta-who-zu	Star Wars	work	extra	すたーうぉーず
-suta-who-zu	STAR WARS	work	extra-variant	すたーうぉーず
+suta-uxo-zu	Star Wars	work	extra	すたーうぉーず
+suta-uxo-zu	STAR WARS	work	extra-variant	すたーうぉーず
 supaida-mann	Spider-Man	work	extra	すぱいだーまん
 supaida-mann	SPIDER-MAN	work	extra-variant	すぱいだーまん
 battomann	Batman	work	extra	ばっとまん
@@ -56,8 +56,6 @@ ko-ruobudhu-thi	Call of Duty	work	extra	こーるおぶでゅーてぃ
 ko-ruobudhu-thi	CALL OF DUTY	work	extra-variant	こーるおぶでゅーてぃ
 ri-guoburejenndo	League of Legends	work	extra	りーぐおぶれじぇんど
 ri-guoburejenndo	LEAGUE OF LEGENDS	work	extra-variant	りーぐおぶれじぇんど
-o-ba-whotchi	Overwatch	work	extra	おーばーうぉっち
-o-ba-whotchi	OVERWATCH	work	extra-variant	おーばーうぉっち
 tetorisu	Tetris	work	extra	てとりす
 tetorisu	TETRIS	work	extra-variant	てとりす
 pakkumann	Pac-Man	work	extra	ぱっくまん
@@ -92,230 +90,232 @@ sutorennja-shinngusu	Stranger Things	work	extra	すとれんじゃーしんぐ�
 sutorennja-shinngusu	STRANGER THINGS	work	extra-variant	すとれんじゃーしんぐす
 shinnpusonnzu	The Simpsons	work	extra	しんぷそんず
 shinnpusonnzu	THE SIMPSONS	work	extra-variant	しんぷそんず
-ko-da	Coda	album	data	こーだ
-zafure-minngurippusu	The Flaming Lips	band	data	ざふれーみんぐりっぷす
-minerubamakugonagaru	Minerva McGonagall	character	data	みねるばまくごながる
+bari-rinndonn	Barry Lyndon	film	data	ばりーりんどん
+ga-ruzudei	Girl's Day	band	data	がーるずでい
 rianime-shonn	Reanimation	album	data	りあにめーしょん
-iruma-re	The Lake House	film	data	いるまーれ
-saunndoobumyu-jikku	The Sound of Music	film	data	さうんどおぶみゅーじっく
-shinngenn	Proverbs	novel	data	しんげん
-aene-isu	Aeneid	novel	data	あえねーいす
-shaini-	SHINee	band	data	しゃいにー
-imajinndoragonnzu	Imagine Dragons	band	data	いまじんどらごんず
-ritorumisusannshainn	Little Miss Sunshine	film	data	りとるみすさんしゃいん
-beiwhotchi	Baywatch	film	data	べいうぉっち
-misshonn	The Mission	film	data	みっしょん
-furaterisu	The Fratellis	band	data	ふらてりす
-se-rusumann	The Salesman	film	data	せーるすまん
-fifusueremennto	The Fifth Element	film	data	ふぃふすえれめんと
-firaderufia	Philadelphia	film	data	ふぃらでるふぃあ
-ennjeruwho-zu	Sucker Punch	film	data	えんじぇるうぉーず
-nimuroddo	Nimrod	album	data	にむろっど
-yonasho	Book of Jonah	novel	data	よなしょ
-banntannsonyonndann	BTS	band	data	ばんたんそにょんだん
-katarushisu	Katarsis	band	data	かたるしす
-anntora-ju	Entourage	tvseries	data	あんとらーじゅ
-ma-ni-	Marnie	film	data	まーにー
-ronndonnfiru	London Philharmonic Orchestra	band	data	ろんどんふぃる
-reinnmann	Rain Man	film	data	れいんまん
-buronndhi	Blondie	band	data	ぶろんでぃ
-aurushithi-	Owl City	band	data	あうるしてぃー
-asauzanndosannzu	A Thousand Suns	album	data	あさうざんどさんず
-innkyubasu	Incubus	band	data	いんきゅばす
-baddobo-izu	Bad Boys	film	data	ばっどぼーいず
-zerogurabithi	Gravity	film	data	ぜろぐらびてぃ
-suteppuappu	Step Up	film	data	すてっぷあっぷ
-zapo-gusu	The Pogues	band	data	ざぽーぐす
-ivunosubete	All About Eve	film	data	いゔのすべて
-adamusufamiri-	The Addams Family	film	data	あだむすふぁみりー
-baiburu	Bible	novel	data	ばいぶる
-wennzude-	Wednesday	tvseries	data	うぇんずでー
-misuta-bi-nn	Mr. Bean	tvseries	data	みすたーびーん
-buro-kubakkumaunntenn	Brokeback Mountain	film	data	ぶろーくばっくまうんてん
-fijikarugurafithi	Physical Graffiti	album	data	ふぃじかるぐらふぃてぃ
-zaburakkupare-do	The Black Parade	album	data	ざぶらっくぱれーど
-sanosu	Thanos	character	data	さのす
-ekkusujapann	X Japan	band	data	えっくすじゃぱん
-ginesuwa-rudoreko-zu	Guinness World Records	novel	data	ぎねすわーるどれこーず
+innekusesu	INXS	band	data	いんえくせす
+kutwurufu	Cthulhu	character	data	くとぅるふ
 erijiumu	Elysium	film	data	えりじうむ
-sanndomann	The Sandman	tvseries	data	さんどまん
-kyari-	Carrie	film	data	きゃりー
-ravugann	Love Gun	album	data	らゔがん
-seijouki	The Star-Spangled Banner	novel	data	せいじょうき
-suta-torekku	Star Trek	film	data	すたーとれっく
-ya-ya-ya-zu	Yeah Yeah Yeahs	band	data	やーやーやーず
-kara-pa-puru	The Color Purple	film	data	からーぱーぷる
-innta-sutera-	Interstellar	film	data	いんたーすてらー
-pi-chi	Princess Peach	character	data	ぴーち
-bo-zuobukanada	Boards of Canada	band	data	ぼーずおぶかなだ
-onikkusu	Onyx	band	data	おにっくす
-kurokodairudanndhi-	Crocodile Dundee	film	data	くろこだいるだんでぃー
-batorurowaiaru	Battle Royale	film	data	ばとるろわいある
-annthigone	Antigone	novel	data	あんてぃごね
-inndoneshiaraya	Indonesia Raya	novel	data	いんどねしあらや
-rebekka	Rebecca	film	data	れべっか
-pinokkio	Pinocchio	character	data	ぴのっきお
-sannobuana-ki-	Sons of Anarchy	tvseries	data	さんおぶあなーきー
-yu-rizumikkusu	Eurythmics	band	data	ゆーりずみっくす
-appuo-runaito	Up All Night	album	data	あっぷおーるないと
-rushifa-	Lucifer	tvseries	data	るしふぁー
-sutoreikizzu	Stray Kids	band	data	すとれいきっず
-mennattowa-ku	Men at Work	band	data	めんあっとわーく
-mikasho	Book of Micah	novel	data	みかしょ
-suparutakasu	Spartacus	film	data	すぱるたかす
-bureivunyu-wa-rudo	Brave New World	novel	data	ぶれいゔにゅーわーるど
-annda-maisukinn	Under My Skin	album	data	あんだーまいすきん
-mirivaniri	Milli Vanilli	band	data	みりゔぁにり
-aisudoa-su	Iced Earth	band	data	あいすどあーす
-teogonia	Theogony	novel	data	ておごにあ
-kokuto-tsuinnzu	Cocteau Twins	band	data	こくとーついんず
-poinnta-shisuta-zu	The Pointer Sisters	band	data	ぽいんたーしすたーず
-anncha-teddo	Uncharted	film	data	あんちゃーてっど
-ki-nn	Keane	band	data	きーん
-ofuzawho-ru	Off the Wall	album	data	おふざうぉーる
-gurizuri-bea	Grizzly Bear	band	data	ぐりずりーべあ
-guru-vuarumada	Groove Armada	band	data	ぐるーゔあるまだ
-goddofa-za-	The Godfather	film	data	ごっどふぁーざー
-jinngisukann	Dschinghis Khan	band	data	じんぎすかん
-zainnta-purita-	The Interpreter	film	data	ざいんたーぷりたー
-animaruzu	The Animals	band	data	あにまるず
-shiga-rosu	Sigur Rós	band	data	しがーろす
-makufurai	McFly	band	data	まくふらい
-puraimasu	Primus	band	data	ぷらいます
-jimi-i-towa-rudo	Jimmy Eat World	band	data	じみーいーとわーるど
+satade-naitofi-ba-	Saturday Night Fever	film	data	さたでーないとふぃーばー
+basuthiru	Bastille	band	data	ばすてぃる
+ofuzauxo-ru	Off the Wall	album	data	おふざうぉーる
+purizunnbureiku	Prison Break	tvseries	data	ぷりずんぶれいく
+menninnburakku	Men in Black	film	data	めんいんぶらっく
+samaeru	Samael	band	data	さまえる
+niki-ta	Nikita	film	data	にきーた
 a-chienemi-	Arch Enemy	band	data	あーちえねみー
-shisuta-	SISTAR	band	data	しすたー
-takasa	Takasa	band	data	たかさ
-marefisennto	Maleficent	film	data	まれふぃせんと
-burakkuadamu	Black Adam	film	data	ぶらっくあだむ
-kojiki	Kojiki	novel	data	こじき
-da-kunaito	The Dark Knight	film	data	だーくないと
-aruse-nurupann	Arsène Lupin	character	data	あるせーぬるぱん
-to-kinnguhezzu	Talking Heads	band	data	とーきんぐへっず
-ta-bo	Turbo	film	data	たーぼ
-zasukwea	The Square	film	data	ざすくぇあ
-riva	Riva	band	data	りゔぁ
-fo-shi-zunnzu	The Four Seasons	band	data	ふぉーしーずんず
-no-dauto	No Doubt	band	data	のーだうと
-annkurusamu	Uncle Sam	character	data	あんくるさむ
-manngojeri-	Mungo Jerry	band	data	まんごじぇりー
-donnjonn	Don Jon	film	data	どんじょん
-superu	Drag Me to Hell	film	data	すぺる
-buru-oisuta-karuto	Blue Öyster Cult	band	data	ぶるーおいすたーかると
-rarukuannshieru	L'Arc-en-Ciel	band	data	らるくあんしえる
-ganndarufu	Gandalf	character	data	がんだるふ
-odhusseia	Odyssey	novel	data	おでゅっせいあ
-supaige-mu	Spy Game	film	data	すぱいげーむ
-mobi-dhikku	Moby-Dick	novel	data	もびーでぃっく
-outounoaji	Taste of Cherry	film	data	おうとうのあじ
-mirionndara-beibi-	Million Dollar Baby	film	data	みりおんだらーべいびー
-buru-suburaza-zu	The Blues Brothers	film	data	ぶるーすぶらざーず
-zahowaitosutoraipusu	The White Stripes	band	data	ざほわいとすとらいぷす
-innposshiburu	The Impossible	film	data	いんぽっしぶる
-merodhitaimu	Melody Time	film	data	めろでぃたいむ
-shinnpi	A Saucerful of Secrets	album	data	しんぴ
-maifearedhi	My Fair Lady	film	data	まいふぇあれでぃ
-hoteruruwannda	Hotel Rwanda	film	data	ほてるるわんだ
-aineia-su	Aeneas	character	data	あいねいあーす
-sauronn	Sauron	character	data	さうろん
-annnounnpureja-zu	Unknown Pleasures	album	data	あんのうんぷれじゃーず
-ma-meido	The Little Mermaid	novel	data	まーめいど
-nani-	The Nanny	tvseries	data	なにー
-dhuranndhurann	Duran Duran	band	data	でゅらんでゅらん
-ta-minaru	The Terminal	film	data	たーみなる
-monarizasumairu	Mona Lisa Smile	film	data	もなりざすまいる
-katatonia	Katatonia	band	data	かたとにあ
-aida	Aida	novel	data	あいだ
-puredeta-	Predator	film	data	ぷれでたー
-bibari-hiruzukoppu	Beverly Hills Cop	film	data	びばりーひるずこっぷ
-vannherushinngu	Van Helsing	film	data	ゔぁんへるしんぐ
-desugurippusu	Death Grips	band	data	ですぐりっぷす
-matchibokkusutwuennthi	Matchbox Twenty	band	data	まっちぼっくすとぅえんてぃ
-mare-na	Malèna	film	data	まれーな
-rakurimo-sa	Lacrimosa	band	data	らくりもーさ
-robinnfuddo	Robin Hood	character	data	ろびんふっど
-osero	Othello	novel	data	おせろ
-marukoniyorufukuinnsho	Gospel of Mark	novel	data	まるこによるふくいんしょ
-bureikuauto	Breakout	album	data	ぶれいくあうと
-dame-jipurann	Damageplan	band	data	だめーじぷらん
-zaronettsu	The Ronettes	band	data	ざろねっつ
-buru-berubetto	Blue Velvet	film	data	ぶるーべるべっと
-rakki-ravu	Kylie	album	data	らっきーらゔ
-suku-bi-dwu-	Scooby-Doo	film	data	すくーびーどぅー
-kaunnthinngukurouzu	Counting Crows	band	data	かうんてぃんぐくろうず
-kinngudamuobuhebunn	Kingdom of Heaven	film	data	きんぐだむおぶへぶん
-ga-dhiannzuobugyarakushi-	Guardians of the Galaxy	film	data	がーでぃあんずおぶぎゃらくしー
-suma-fu	The Smurfs	film	data	すまーふ
-zarannnaweizu	The Runaways	band	data	ざらんなうぇいず
-jeneshisu	Genesis	band	data	じぇねしす
-burekkufasutokurabu	The Breakfast Club	film	data	ぶれっくふぁすとくらぶ
-wannoku	One Ok Rock	band	data	わんおく
-rui-ji	Luigi	character	data	るいーじ
-mannga	maNga	band	data	まんが
-hittomannzurekuiemu	In Bruges	film	data	ひっとまんずれくいえむ
-minionnzu	Minions	film	data	みにおんず
-oashisu	Definitely Maybe	album	data	おあしす
-sousakusha	The Searchers	film	data	そうさくしゃ
-mairefutofutto	My Left Foot	film	data	まいれふとふっと
-fikusa-	Michael Clayton	film	data	ふぃくさー
-easapurai	Air Supply	band	data	えあさぷらい
-zava-vu	The Verve	band	data	ざゔぁーゔ
-girugameshu	Gilgamesh	character	data	ぎるがめしゅ
-kouyanoyoujinnbou	A Fistful of Dollars	film	data	こうやのようじんぼう
-ganndhi	Gandhi	film	data	がんでぃ
-rivinngukara-	Living Colour	band	data	りゔぃんぐからー
-kainndoobumajikku	A Kind of Magic	album	data	かいんどおぶまじっく
-fo-tomaina-	Fort Minor	band	data	ふぉーとまいなー
-hamunaputora	The Mummy	film	data	はむなぷとら
-apokariputo	Apocalypto	film	data	あぽかりぷと
-tsotsi	Tsotsi	film	data	つぉつぃ
-risashinnpusonn	Lisa Simpson	character	data	りさしんぷそん
-howaitokara-	White Collar	tvseries	data	ほわいとからー
-biyonnse	Beyoncé	album	data	びよんせ
-sukuru-jimakudakku	Scrooge McDuck	character	data	すくるーじまくだっく
-o-ruzattorimeinnzu	All That Remains	band	data	おーるざっとりめいんず
-daigyakutenn	Trading Places	film	data	だいぎゃくてん
-puraibe-toraiann	Saving Private Ryan	film	data	ぷらいべーとらいあん
-toraverinnguwiruberi-zu	Traveling Wilburys	band	data	とらゔぇりんぐうぃるべりーず
-arekisannda-	Alexander	film	data	あれきさんだー
-shithiobuennjeru	City of Angels	film	data	してぃおぶえんじぇる
-penntatonikkusu	Pentatonix	band	data	ぺんたとにっくす
-sukizu	Stray Kids	band	data	すきず
-dhu-nn	Dune	novel	data	でゅーん
-patoriotto	The Patriot	film	data	ぱとりおっと
-ta-mine-ta-	The Terminator	film	data	たーみねーたー
-hyu-mannri-gu	The Human League	band	data	ひゅーまんりーぐ
-koiniochitasheikusupia	Shakespeare in Love	film	data	こいにおちたしぇいくすぴあ
-suno-piasa-	Snowpiercer	film	data	すのーぴあさー
-panikkuru-mu	Panic Room	film	data	ぱにっくるーむ
-desuthini-zuchairudo	Destiny's Child	band	data	ですてぃにーずちゃいるど
-kennto	Kent	band	data	けんと
-fainarukatto	The Final Cut	album	data	ふぁいなるかっと
-enntwu-mudo	Entombed	band	data	えんとぅーむど
-daunnbairo-	Down by Law	film	data	だうんばいろー
-heasupure-	Hairspray	film	data	へあすぷれー
-reddohottochiripeppa-zu	Red Hot Chili Peppers	band	data	れっどほっとちりぺっぱーず
-takushi-doraiba-	Taxi Driver	film	data	たくしーどらいばー
-ano-ra	Anora	film	data	あのーら
-asuterikkusu	Asterix	novel	data	あすてりっくす
-chi-putorikku	Cheap Trick	band	data	ちーぷとりっく
-garadorieru	Galadriel	character	data	がらどりえる
-rainnmann	Rain Man	film	data	らいんまん
-o-ruzakinngusumenn	All the King's Men	film	data	おーるざきんぐすめん
-ikonn	iKon	band	data	いこん
-heitoburi-do	Hatebreed	band	data	へいとぶりーど
-innbikutasu	Invictus	film	data	いんびくたす
-modannfamiri-	Modern Family	tvseries	data	もだんふぁみりー
-deividdokopafi-rudo	David Copperfield	novel	data	でいゔぃっどこぱふぃーるど
-torisutania	Tristania	band	data	とりすたにあ
-supesharuzu	The Specials	band	data	すぺしゃるず
+redhipureiya-wann	Ready Player One	film	data	れでぃぷれいやーわん
+shinnkyoku	The Divine Comedy	novel	data	しんきょく
+ko-rudouxo-	Cold War	film	data	こーるどうぉー
+gorirazu	Gorillaz	band	data	ごりらず
+ni-berunngu	Nibelungenlied	novel	data	にーべるんぐ
+parasaito	Parasite	film	data	ぱらさいと
+wizuinntennpute-shonn	Within Temptation	band	data	うぃずいんてんぷてーしょん
+venomu	Venom	film	data	ゔぇのむ
 anaza-raunndo	Another Round	film	data	あなざーらうんど
-no-efuekkusu	NOFX	band	data	のーえふえっくす
-purashi-bo	Placebo	band	data	ぷらしーぼ
-ashia	Asia	band	data	あしあ
-rannninngumann	Running Man	tvseries	data	らんにんぐまん
-kajinorowaiyaru	Casino Royale	film	data	かじのろわいやる
+kakushitoridenosannakuninn	The Hidden Fortress	film	data	かくしとりでのさんあくにん
+hadakanoousama	The Emperor's New Clothes	novel	data	はだかのおうさま
+teretabi-zu	Teletubbies	tvseries	data	てれたびーず
+sairenntonaito	Stille Nacht Heilige Nacht	novel	data	さいれんとないと
+karafina	Kalafina	band	data	からふぃな
+vannpaiadaiari-zu	The Vampire Diaries	tvseries	data	ゔぁんぱいあだいありーず
+kyoseiji-guferudo	The Great Ziegfeld	film	data	きょせいじーぐふぇるど
+autokyasuto	OutKast	band	data	あうときゃすと
+sanosu	Thanos	character	data	さのす
+buru-bi-toru	Blue Beetle	film	data	ぶるーびーとる
+penntatonikkusu	Pentatonix	band	data	ぺんたとにっくす
+ko-da	Coda	album	data	こーだ
+ma-zuvoruta	The Mars Volta	band	data	まーずゔぉるた
+appuo-runaito	Up All Night	album	data	あっぷおーるないと
+poruta-gaisuto	Poltergeist	film	data	ぽるたーがいすと
+zakiruzu	The Kills	band	data	ざきるず
+dhireinn	Delain	band	data	でぃれいん
+aiwoyomuhito	The Reader	film	data	あいをよむひと
+kumonosujou	Throne of Blood	film	data	くものすじょう
+ke-burugai	The Cable Guy	film	data	けーぶるがい
+anaberu	Annabelle	film	data	あなべる
+korone-shonnsutori-to	Coronation Street	tvseries	data	ころねーしょんすとりーと
+wannokurokku	One Ok Rock	band	data	わんおくろっく
+hokuhokuseinishinnrowotore	North by Northwest	film	data	ほくほくせいにしんろをとれ
+fiafakutori-	Fear Factory	band	data	ふぃあふぁくとりー
+beishithiro-ra-zu	Bay City Rollers	band	data	べいしてぃろーらーず
+minittsutwumiddonaito	Minutes to Midnight	album	data	みにっつとぅみっどないと
+uxo-kutwurimennba-	A Walk to Remember	film	data	うぉーくとぅりめんばー
+ha-reikuinn	Harley Quinn	character	data	はーれいくいん
+zamenntarisuto	The Mentalist	tvseries	data	ざめんたりすと
+buritto	Bullitt	film	data	ぶりっと
+sannjuushi	The Three Musketeers	novel	data	さんじゅうし
+zatwunaitosho-	The Tonight Show	tvseries	data	ざとぅないとしょー
+beddotaimusuto-ri-zu	Bedtime Stories	album	data	べっどたいむすとーりーず
+shinnyakuseisho	New Testament	novel	data	しんやくせいしょ
+rekuiemufo-dori-mu	Requiem for a Dream	film	data	れくいえむふぉーどりーむ
 bura-	Blur	band	data	ぶらー
-kuraimori	Wrong Turn	film	data	くらいもり
+mefisutoferesu	Mephistopheles	character	data	めふぃすとふぇれす
+surobbinngugurissuru	Throbbing Gristle	band	data	すろっびんぐぐりっする
+banirasukai	Vanilla Sky	film	data	ばにらすかい
+mana-	Maná	band	data	まなー
+chairudopurei	Child's Play	film	data	ちゃいるどぷれい
+eruvisu	Elvis	film	data	えるゔぃす
+minnsuuki	Book of Numbers	novel	data	みんすうき
+ranndamuakusesumemori-zu	Random Access Memories	album	data	らんだむあくせすめもりーず
+se-rusumann	The Salesman	film	data	せーるすまん
+fanntasuthikkufo-	Fantastic Four	film	data	ふぁんたすてぃっくふぉー
+zapurodhiji-	The Prodigy	band	data	ざぷろでぃじー
+baguruzu	The Buggles	band	data	ばぐるず
+misshonn	The Mission	film	data	みっしょん
+jienndo	The E.N.D	album	data	じえんど
+fugaji	Fugazi	band	data	ふがじ
+ra-ma	Rama	character	data	らーま
+nani-	The Nanny	tvseries	data	なにー
+mashinnheddo	Machine Head	band	data	ましんへっど
+gu-subannpusu	Goosebumps	film	data	ぐーすばんぷす
+furogginngumori-	Flogging Molly	band	data	ふろっぎんぐもりー
+sanndomann	The Sandman	tvseries	data	さんどまん
+kinngukonngu	King Kong	film	data	きんぐこんぐ
+haimu	Haim	band	data	はいむ
+furairi-fu	Flyleaf	band	data	ふらいりーふ
+minerubamakugonagaru	Minerva McGonagall	character	data	みねるばまくごながる
+mo-ta-saikurudaiari-zu	The Motorcycle Diaries	film	data	もーたーさいくるだいありーず
+faiabo-ru	Fireball	album	data	ふぁいあぼーる
+i-guruai	Eagle Eye	film	data	いーぐるあい
+annnounnpureja-zu	Unknown Pleasures	album	data	あんのうんぷれじゃーず
+ferudhinanndo	Ferdinand	film	data	ふぇるでぃなんど
+goshippuga-ru	Gossip Girl	tvseries	data	ごしっぷがーる
+shinnpi	A Saucerful of Secrets	album	data	しんぴ
+zapo-gusu	The Pogues	band	data	ざぽーぐす
+sukuri-mu	Scream	film	data	すくりーむ
+tsuri-oburaifu	The Tree of Life	film	data	つりーおぶらいふ
+mashi-nnheddo	Machine Head	band	data	ましーんへっど
+suroudaivu	Slowdive	band	data	すろうだいゔ
+cha-chizu	Chvrches	band	data	ちゃーちず
+anntomann	Ant-Man	film	data	あんとまん
+weza-ripo-to	Weather Report	band	data	うぇざーりぽーと
+ho-muaro-nn	Home Alone	film	data	ほーむあろーん
+basori-	Bathory	band	data	ばそりー
+purakuthikarumajikku	Practical Magic	film	data	ぷらくてぃかるまじっく
+yanngusu-pa-mann	Smallville	tvseries	data	やんぐすーぱーまん
+twuria	Tulia	band	data	とぅりあ
+shinnpann	The Trial	novel	data	しんぱん
+kuxi-nn	The Queen	film	data	くぃーん
+kyanonnbo-ru	The Cannonball Run	film	data	きゃのんぼーる
+narushisu	Narcissus	character	data	なるしす
+defurepa-do	Def Leppard	band	data	でふれぱーど
+dori-muga-ruzu	Dreamgirls	film	data	どりーむがーるず
+suponnjibobusukueapanntsu	SpongeBob SquarePants	character	data	すぽんじぼぶすくえあぱんつ
+wiruko	Wilco	band	data	うぃるこ
+nosutarujia	Nostalghia	film	data	のすたるじあ
+reberuha-to	Rebel Heart	album	data	れべるはーと
+takushi-doraiba-	Taxi Driver	film	data	たくしーどらいばー
+attozageitsu	At the Gates	band	data	あっとざげいつ
+shi-kurettoga-denn	Secret Garden	band	data	しーくれっとがーでん
+o-ruamerikannrijekutsu	The All-American Rejects	band	data	おーるあめりかんりじぇくつ
+amorufisu	Amorphis	band	data	あもるふぃす
+maiinnta-nn	The Intern	film	data	まいいんたーん
+superu	Drag Me to Hell	film	data	すぺる
+reddoburu	Red Heat	film	data	れっどぶる
+sakusonn	Saxon	band	data	さくそん
+yamaneko	The Leopard	film	data	やまねこ
+roikusoppu	Röyksopp	band	data	ろいくそっぷ
+rui-ji	Luigi	character	data	るいーじ
+mobudhi-pu	Mobb Deep	band	data	もぶでぃーぷ
+toppugia	Top Gear	tvseries	data	とっぷぎあ
+guddorakkucha-ri-	Good Luck Charlie	tvseries	data	ぐっどらっくちゃーりー
 shiruba-chea-	Silverchair	band	data	しるばーちぇあー
-haivusu	The Hives	band	data	はいゔす
+iesu	Yes	band	data	いえす
+amerikannpai	American Pie	film	data	あめりかんぱい
+dhi-saido	Deicide	band	data	でぃーさいど
+buro-kubakkumaunntenn	Brokeback Mountain	film	data	ぶろーくばっくまうんてん
+baruthimora	Baltimora	band	data	ばるてぃもら
+dhiahannta-	The Deer Hunter	film	data	でぃあはんたー
+puranettoa-su	Planet Earth	tvseries	data	ぷらねっとあーす
+hannki-dori-	Hunky Dory	album	data	はんきーどりー
+puraimarufia	Primal Fear	film	data	ぷらいまるふぃあ
+maririonn	Marillion	band	data	まりりおん
+ekkusujapann	X Japan	band	data	えっくすじゃぱん
+sune-kufuraito	Snakes on a Plane	film	data	すねーくふらいと
+marefisennto	Maleficent	film	data	まれふぃせんと
+kajinorowaiyaru	Casino Royale	film	data	かじのろわいやる
+kainndoobumajikku	A Kind of Magic	album	data	かいんどおぶまじっく
+meri-popinnzu	Mary Poppins	film	data	めりーぽぴんず
+heitoburi-do	Hatebreed	band	data	へいとぶりーど
+shokujinnzoku	Cannibal Holocaust	film	data	しょくじんぞく
+twumoro-ranndo	Tomorrowland	film	data	とぅもろーらんど
+modanntaimusu	Modern Times	film	data	もだんたいむす
+jonasuburaza-zu	Jonas Brothers	band	data	じょなすぶらざーず
+mi-nnga-ruzu	Mean Girls	film	data	みーんがーるず
+furodobaginnzu	Frodo Baggins	character	data	ふろどばぎんず
+gurinnchi	The Grinch	film	data	ぐりんち
+to-kinnguhezzu	Talking Heads	band	data	とーきんぐへっず
+ba-zu	The Byrds	band	data	ばーず
+rosutoinnsupe-su	Lost in Space	tvseries	data	ろすといんすぺーす
+meihemu	Mayhem	band	data	めいへむ
+go-sutoraita-	The Ghost Writer	film	data	ごーすとらいたー
+be-ourufu	Beowulf	novel	data	べーおうるふ
+minnshuunoteki	The Public Enemy	film	data	みんしゅうのてき
+mairefutofutto	My Left Foot	film	data	まいれふとふっと
+zadamudo	The Damned	band	data	ざだむど
+sha-rokkuho-muzu	Sherlock Holmes	character	data	しゃーろっくほーむず
+jumannji	Jumanji	film	data	じゅまんじ
+ozunomahoutsukai	The Wizard of Oz	film	data	おずのまほうつかい
+shinnzu	The Shins	band	data	しんず
+rasutotanngoinnpari	Last Tango in Paris	film	data	らすとたんごいんぱり
+arisuinncheinnzu	Alice in Chains	band	data	ありすいんちぇいんず
+battomannbiginnzu	Batman Begins	film	data	ばっとまんびぎんず
+fainarukatto	The Final Cut	album	data	ふぁいなるかっと
+hanumann	Hanuman	character	data	はぬまん
+dame-jipurann	Damageplan	band	data	だめーじぷらん
+fo-shi-zunnzu	The Four Seasons	band	data	ふぉーしーずんず
+wanndairekushonn	One Direction	band	data	わんだいれくしょん
+borube-ru	Volver	film	data	ぼるべーる
+sutoreikizzu	Stray Kids	band	data	すとれいきっず
+arashigaoka	Wuthering Heights	novel	data	あらしがおか
+supi-kunau	Speak Now	album	data	すぴーくなう
+firaderufia	Philadelphia	film	data	ふぃらでるふぃあ
+ritorumisusannshainn	Little Miss Sunshine	film	data	りとるみすさんしゃいん
+ri-masuru-pinn	Remus Lupin	character	data	りーまするーぴん
+go-rudennai	GoldenEye	film	data	ごーるでんあい
+mannobusuthi-ru	Man of Steel	film	data	まんおぶすてぃーる
+panndora	Pandora	character	data	ぱんどら
+buraidaruuxo-zu	Bride Wars	film	data	ぶらいだるうぉーず
+goaurudo	Stargate SG-1	tvseries	data	ごあうるど
+naitoraida-	Knight Rider	tvseries	data	ないとらいだー
+anncha-teddo	Uncharted	film	data	あんちゃーてっど
+apokariputhika	Apocalyptica	band	data	あぽかりぷてぃか
+shiriasumann	A Serious Man	film	data	しりあすまん
+beibi-doraiba-	Baby Driver	film	data	べいびーどらいばー
+suma-fu	The Smurfs	film	data	すまーふ
+marukopo-ro	Marco Polo	tvseries	data	まるこぽーろ
+ougonnkyoujidai	The Gold Rush	film	data	おうごんきょうじだい
+sukamu	Skam	tvseries	data	すかむ
+juno	Juno	film	data	じゅの
+aineia-su	Aeneas	character	data	あいねいあーす
+twuru-romannsu	True Romance	film	data	とぅるーろまんす
+regorasu	Legolas	character	data	れごらす
+maikeru	Michael	film	data	まいける
+gokuri	Gollum	character	data	ごくり
+rioburabo-	Rio Bravo	film	data	りおぶらぼー
+buro-doweimerodhi-	The Broadway Melody	film	data	ぶろーどうぇいめろでぃー
+arekusanndorunefusuki-	Alexander Nevsky	film	data	あれくさんどるねふすきー
+reddohottochiripeppa-zu	Red Hot Chili Peppers	band	data	れっどほっとちりぺっぱーず
+haruku	Hulk	character	data	はるく
+shisuta-	SISTAR	band	data	しすたー
+deividdokopafi-rudo	David Copperfield	novel	data	でいゔぃっどこぱふぃーるど
+deivukura-kufaivu	The Dave Clark Five	band	data	でいゔくらーくふぁいゔ
+shiriusuburakku	Sirius Black	character	data	しりうすぶらっく
+animaruzu	The Animals	band	data	あにまるず
+ebanno-rumaithi	Evan Almighty	film	data	えばんおーるまいてぃ
+guddomo-ninnguamerika	Good Morning America	tvseries	data	ぐっどもーにんぐあめりか
+wannda-u-mann	Wonder Woman	character	data	わんだーうーまん
+a-thisuto	The Artist	film	data	あーてぃすと
+towairaitozo-nn	The Twilight Zone	tvseries	data	とわいらいとぞーん
+i-suta-bani-	Easter Bunny	character	data	いーすたーばにー
+resura-	The Wrestler	film	data	れすらー
+donnjonn	Don Jon	film	data	どんじょん
+ka-minn	Karmin	band	data	かーみん
+annda-maisukinn	Under My Skin	album	data	あんだーまいすきん
+kara-pa-puru	The Color Purple	film	data	からーぱーぷる
+jiyuuhenosannka	Hymn to Liberty	novel	data	じゆうへのさんか
+fijikarugurafithi	Physical Graffiti	album	data	ふぃじかるぐらふぃてぃ
+kuwaiettoraiotto	Quiet Riot	band	data	くわいえっとらいおっと
+reddotsepperinn	Led Zeppelin	band	data	れっどつぇっぺりん
+hyu-mannri-gu	The Human League	band	data	ひゅーまんりーぐ
