@@ -605,12 +605,39 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         std::ranges::find(kBeforeParticles, std::string_view(kana[ka - 1])) != std::end(kBeforeParticles);
     bool word_before_particle = false;
     if (is_reading && acronym.typed == "ai" && after_particle) {
-      for (size_t a = ka >= 6 ? ka - 6 : 0; a + 2 <= ka - 1; ++a) {
-        if ((*is_reading)(kana_text(a, ka - 1))) {
+      // 手・木・目 のような1文字の語のあとの助詞も見る（手でAI）。
+      // ただし は・が・を ... の助詞1文字は語と数えない（「彼女はで会い」）。
+      static constexpr std::string_view kOneKanaParticles[] = {"は", "が", "を", "に", "で", "と", "も", "へ", "の", "や"};
+      for (size_t a = ka >= 7 ? ka - 7 : 0; a + 1 <= ka - 1; ++a) {
+        const std::string before = kana_text(a, ka - 1);
+        if (before.size() == std::string_view("は").size() &&
+            std::ranges::find(kOneKanaParticles, std::string_view(before)) != std::end(kOneKanaParticles)) {
+          continue;
+        }
+        if ((*is_reading)(before)) {
           word_before_particle = true;
           break;
         }
       }
+    }
+    // AIのあとの で + あい...（AIで愛を・AIであいさつ）は、後ろの あい を日本語の語
+    // （愛・挨拶 ...）として残す。ただし「それでAI」「会社でAI」のように、助詞の前に
+    // 独立した日本語の語があるときは AI のまま。直前が AI 自身（AIで愛）も日本語にする。
+    // 出会い（であい）・場合（ばあい）のように あい で終わる長い語のあとでも、
+    // その語に含まれる あい を AI と取り違えない。
+    const bool de_ni_before_ai = ka > 0 && (kana[ka - 1] == "で" || kana[ka - 1] == "に");
+    const auto ai_is_the_word_before = [&](size_t at) {
+      if (at < 3 || kana_text(at - 3, at - 1) != "あい") return false;
+      const size_t end = at - 1;
+      constexpr size_t kLongest = 8;
+      for (size_t a = end >= kLongest ? end - kLongest : 0; a < end - 2; ++a) {
+        if ((*is_reading)(kana_text(a, end))) return false;
+      }
+      return true;
+    };
+    if (is_reading && acronym.typed == "ai" && de_ni_before_ai &&
+        (!word_before_particle || ai_is_the_word_before(ka))) {
+      return false;
     }
     if (is_reading && acronym.typed == "ai" && crosses_preceding_reading(ka, kb) &&
         !(after_particle && word_before_particle)) {
@@ -667,24 +694,30 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           // 生憎（あいにく）: に + く で終わるか、助詞・句読点が続くときだけ。
           if (next_is("く") && (after.size() <= 3 || particle_or_stop(next + 1))) return false;
         } else if (kana[kb] == "の") {
-          // 相乗り（あいのり）・相乗りする: の + り のあとが助詞・句読点で終わるか、
-          // する・した・して などの活用。りすく（リスク）・りすと（リスト）は AI のまま。
+          // 相乗り（あいのり）は日本語の語。AIのリスク・リスト・利用 だけ AI の続きとして取る。
+          // 相乗りが好き・相乗りを進める のように、後ろに語が続いても日本語のまま。
+          // AIのリーダー（りーだー）・AIの理論（りろん）のような語は AI にする。
           if (next_is("り")) {
-            const bool one = next + 1 >= kana.size();
-            const bool particle_end = next + 1 < kana.size() && particle_or_stop(next + 1) &&
-                                      (next + 2 >= kana.size() || particle_or_stop(next + 2));
-            static constexpr std::string_view kSuru[] = {"りする", "りした", "りして", "りしよ", "りしな",
-                                                         "りしま", "りされ", "りさせ", "りでき"};
-            const bool suru = std::ranges::any_of(kSuru, [&](std::string_view s) { return after.starts_with(s); });
-            if (one || particle_end || suru) return false;
+            static constexpr std::string_view kAiRi[] = {"りすく", "りすと", "りよう"};
+            static constexpr std::string_view kNoruForms =
+                "りする,りした,りして,りし,りでき,りたい,りたく,りた,りながら,りません,りました";
+            const bool nori_word = after == "り" || particle_or_stop(next + 1) ||
+                after.starts_with("りから") || after.starts_with("りまで") ||
+                after.starts_with("りへ") || after.starts_with("りより") ||
+                StartsWithCue(after, kNoruForms);
+            if (!std::ranges::any_of(kAiRi, [&](std::string_view s) { return after.starts_with(s); }) &&
+                nori_word) {
+              return false;
+            }
           }
-          // 合いの手（あいのて・あいのてを入れる）、藍の着物（あいのきもの）。
-          // てがき（手書き）・てじゅん（手順）は AI の続きなので取る。
+          // 合いの手（あいのて）は日本語の語。AIの手書き（てがき）・手順（てじゅん）だけ AI の続き。
+          // AIの展開（てんかい）・提案（ていあん）は AI にする。
           if (next_is("て")) {
-            if (next + 1 >= kana.size()) return false;
-            if (after.starts_with("てを")) return false;
-            if (next + 1 < kana.size() && particle_or_stop(next + 1) &&
-                (next + 2 >= kana.size() || particle_or_stop(next + 2))) return false;
+            const bool tegi = after.starts_with("てがき") || after.starts_with("てじゅん");
+            const bool te_word = after == "て" || particle_or_stop(next + 1) ||
+                after.starts_with("てから") || after.starts_with("てまで") ||
+                after.starts_with("てへ") || after.starts_with("てより");
+            if (!tegi && te_word) return false;
           }
           if (after.starts_with("きも")) return false;
         } else if (kana[kb] == "で") {
@@ -705,11 +738,10 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           // 「AIで明日（あした）」のように あ のあとが語の続きなら取る。
           if (next < kana.size() && kana[next] == "あ") {
             const size_t a1 = next + 1;
-            const bool idea = a1 >= kana.size() || particle_or_stop(a1) ||
-                              (a1 + 1 < kana.size() && (kana[a1] == "い" ||
-                               (kana[a1] == "で" && (kana[a1 + 1] == "す" || kana[a1 + 1] == "し" ||
-                                                     kana[a1 + 1] == "っ")) ||
-                               kana[a1] == "だ"));
+            // アイデア（あいであ）・アイディア（あいでぃあ）だけを日本語の語として守る。
+            // あいさつ（挨拶）・あいを（愛を）は AI のあとの日本語の語なので、ここでは止めない。
+            const bool idea = a1 >= kana.size() || particle_or_stop(a1) || kana[a1] == "だ" ||
+                              (kana[a1] == "い" && a1 + 1 < kana.size() && kana[a1 + 1] == "い");
             if (idea) return false;
           }
           // アイデンティティ（あいでんてぃ・あいでんてい）。でんし（電子）などは取る。

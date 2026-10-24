@@ -233,10 +233,14 @@ bool BoundaryOk(const Text& t, size_t end) {
   if (end >= t.size()) return true;
   switch (t[end]) {
     case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'!': case U'?': case U'[': case U']':
     case U'」': case U'』': case U'）': case U'】': case U'・':
     case U' ': case U'　': case U'\n':
       return true;
   }
+  // 数のあとに続く語（40分待ちました、20年後に）。単位そのものではないが、
+  // 数＋単位のまとまりを切る右の境界にする。
+  if (At(t, end, U"まち") || At(t, end, U"ご")) return true;
   constexpr Piece kParticles[] = {U"は", U"が", U"を", U"に", U"で",   U"と",   U"の",
                                   U"も", U"へ", U"や", U"から", U"まで", U"より", U"って", U"です"};
   for (Piece p : kParticles) {
@@ -289,6 +293,8 @@ bool IsOrdinaryNumberWord(const Text& t, size_t begin, size_t end) {
       U"はってん",    // 発展
       U"はっけん",    // 発見
       U"いっけん",    // 一見
+      U"いっぱい",    // いっぱい（たくさん）。1杯 と紛れるので漢字・かなのまま
+      U"いっさい",    // 一切。1歳 と紛れるので漢字のまま
   };
   for (Piece w : kWords) {
     if (end - begin == w.size() && At(t, begin, w)) return true;
@@ -353,7 +359,9 @@ bool ParticleNi(const Text& t, size_t i) {
     case U'は': case U'が': case U'を': case U'に': case U'で': case U'と':
     case U'も': case U'へ': case U'や': case U'の':
     case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'!': case U'?':
     case U'「': case U'」': case U'『': case U'』': case U'（': case U'）':
+    case U'[': case U']':
     case U' ': case U'　': case U'\n':
       return false;
   }

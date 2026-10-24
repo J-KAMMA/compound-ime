@@ -293,6 +293,11 @@ s)
   g++ -std=c++20 -O2 -I $REPO/native/jaen-detector \
     $REPO/native/jaen-detector/typed_digits_test.cc -o $W/typed_digits_test
   $W/typed_digits_test | tee $OUT/typed-digits.txt
+  # かなで打った数＋単位の単体試験（同じく g++ で動く）
+  g++ -std=c++20 -O2 -I $REPO/native/jaen-detector \
+    $REPO/native/jaen-detector/jaen_number_test.cc $REPO/native/jaen-detector/jaen_number.cc \
+    -o $W/jaen_number_test
+  $W/jaen_number_test | tee $OUT/jaen-number.txt
   python3 $REPO/tools/make_decimal_config.py $W/half.db
   fail=0
   run_decimal() {  # <試験名> <半角|既定> <変換|入力中>
