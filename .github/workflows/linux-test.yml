@@ -198,7 +198,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","u"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u"]') }}
         # dict_candidate があるときだけ、新しい辞書（cand）でも流す
         variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
@@ -375,6 +375,17 @@ jobs:
             python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"
             venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/colloquial.tsv results/colloquial.tsv "話し言葉の打ち込み" > results/colloquial-score.txt
             head -9 results/colloquial-score.txt
+          fi
+          # 〜ておくの縮約と、〜になってる・担う（組 t）の採点。h と同じ道具（SudachiPy は上の venv を使う）
+          if [ -f results/toku.tsv ] && [ -f repo/tests/conversion/toku.tsv ]; then
+            [ -x venv/bin/python ] || { python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"; }
+            venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/toku.tsv results/toku.tsv "〜ておくの縮約" > results/toku-score.txt
+            head -12 results/toku-score.txt
+          fi
+          if [ -f results/naru.tsv ] && [ -f repo/tests/conversion/naru.tsv ]; then
+            [ -x venv/bin/python ] || { python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"; }
+            venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/naru.tsv results/naru.tsv "〜になる・担う" > results/naru-score.txt
+            head -12 results/naru-score.txt
           fi
           # 人工知能の時間の上限に当たった回数（全部の組の合計。わざと遅くする組 i の slow- は除く）
           python3 repo/tools/zenzai_stats.py results --exclude slow- --label "全部の組" | tee results/zenzai-deadline-stats.txt

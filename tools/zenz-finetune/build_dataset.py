@@ -256,13 +256,15 @@ class TestExclusion:
             self.files.append(inputs)
         tsv_files = [(test_dir / name, column) for name, column in
                      (("variants.tsv", 3), ("expected-windows-139.tsv", 2), ("wiki-typing.tsv", 1),
-                      ("domain-prog.tsv", 1), ("domain-crypto.tsv", 1), ("colloquial.tsv", 1)) if name not in ignore]
+                      ("domain-prog.tsv", 1), ("domain-crypto.tsv", 1), ("colloquial.tsv", 1),
+                      ("toku.tsv", 1), ("naru.tsv", 1)) if name not in ignore]
         extra = [Path(p) for p in extra_files]
         tsv_files += [(p, 1) for p in extra]  #これから足す試験（分野の試験を作った直後など）
         for path, column in tsv_files:
             if not path.exists():
                 continue
-            typing_test = path.name in ("wiki-typing.tsv", "domain-prog.tsv", "domain-crypto.tsv", "colloquial.tsv") or path in extra
+            typing_test = path.name in ("wiki-typing.tsv", "domain-prog.tsv", "domain-crypto.tsv", "colloquial.tsv",
+                                        "toku.tsv", "naru.tsv") or path in extra
             for line in path.read_text(encoding="utf-8").splitlines():
                 if line.startswith("#"):
                     continue

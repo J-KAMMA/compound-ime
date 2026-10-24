@@ -1,0 +1,4 @@
+# 〜になってる の同音（担ってる）を、文脈の手がかりで選ぶための辞書。
+# 読み<TAB>表記<TAB>種類<TAB>費用。tools/data/homophone-cues.tsv の 担っ／になっ と組で使う。
+になってる	になってる	verb_naru_teru	2600
+になってる	担ってる	verb_naru_teru	2700

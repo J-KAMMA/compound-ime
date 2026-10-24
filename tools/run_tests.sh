@@ -7,6 +7,8 @@
 #   c: 英単語まじりの267文と200文、打ち間違いの150文2組
 #   d1, d2: 打ち方の揺れ（tests/conversion/variants.tsv の前半と後半。tools/romaji_variants.py）
 #   h: 話し言葉の文をローマ字で打ち込む（tests/conversion/colloquial.tsv。tools/colloquial_text.py）
+#   t: 〜ておくの縮約（〜とく・〜どく）と、〜になってる・担う。tests/conversion/toku.tsv、naru.tsv
+#      （tools/make_toku_tests.py）。採点は h と同じ道具（tools/score_colloquial.py）
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv、道具の名前の domain-tools.tsv。tools/domain_typing_test.py）
@@ -257,6 +259,16 @@ h)
     grep -v '^#' $T/colloquial.tsv | cut -f1 > $W/colloquial.txt
     $BATCH $W/colloquial.txt $OUT/colloquial.tsv 4
   fi
+  ;;
+t)
+  # 〜ておくの縮約（〜とく・〜どく、300 文以上）と、〜になってる・〜になっちゃう・担う（100 文以上）。
+  # きっと・もっと・ずっと・ちょっと・得・解く・説く・毒・退くの文も入れる。採点は h と同じ。
+  for f in toku naru; do
+    if [ -f $T/$f.tsv ]; then
+      grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt
+      $BATCH $W/$f.txt $OUT/$f.tsv 4
+    fi
+  done
   ;;
 x)
   # 診断（原因調べの間だけ）: 話し言葉の文を、仕組みを一つずつ切って流し、候補の書き出し付きで残す
@@ -536,5 +548,5 @@ PY
   ) || true
   ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、u、x、y のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、t、u、x、y のどれか" >&2; exit 2 ;;
 esac

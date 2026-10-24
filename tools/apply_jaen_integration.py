@@ -1786,9 +1786,12 @@ subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_diction
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
 # 話し言葉・ネットの書き方（dictionary13.txt）: 行こっか、まあいっか、すいたー など
-# （tools/data/colloquial.tsv）。Mozc に同じ読みの語があれば、その語より少し後ろにする。
+# （tools/data/colloquial.tsv）。〜ておくの縮約（切っとく、書いといて、読んどく など）は
+# tools/data/toku.tsv、〜になってる と 担ってる の選び分けは tools/data/naru.tsv。
+# Mozc に同じ読みの語があれば、その語より少し後ろにする。
 subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py"), "--mozc", str(src),
-                "--words", str(REPO / "tools/data/colloquial.tsv"),
+                "--words", str(REPO / "tools/data/colloquial.tsv"), str(REPO / "tools/data/toku.tsv"),
+                str(REPO / "tools/data/naru.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
 
