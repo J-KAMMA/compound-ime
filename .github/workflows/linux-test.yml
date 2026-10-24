@@ -70,6 +70,7 @@ jobs:
           # カタカナ語の英単語・作品名・企業名の辞書の組み立てと、JMdict の外来語（Mozc なし）
           python3 $GITHUB_WORKSPACE/repo/tools/katakana_english_dictionary_test.py
           python3 $GITHUB_WORKSPACE/repo/tools/jmdict_loanwords_test.py
+          python3 $GITHUB_WORKSPACE/repo/tools/protobuf_text_unescape_test.py
 
       - name: 上流のソースと土台の改修
         run: |

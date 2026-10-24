@@ -1,7 +1,7 @@
 """Builds dictionary14.txt: proper nouns written in English as candidates of their kana reading.
 
   python tools/build_proper_noun_dictionary.py --mozc <mozc/src> --names tools/data/proper-nouns.tsv \
-      [--names tools/data/proper-noun-extra.tsv] --out dictionary14.txt [--install]
+      [--names tools/data/proper-noun-extra.tsv] [--wasei tools/data/wasei.tsv] --out dictionary14.txt [--install]
 
 For each line of tools/data/proper-nouns.tsv (shown<TAB>typed<TAB>flags<TAB>readings<TAB>...), the
 spelling (Google, New York, Elon Musk) becomes a candidate of each reading (ぐーぐる, にゅーよーく).
@@ -27,6 +27,10 @@ Japanese word either. --names may be given more than once: rows of the earlier f
 when two files name the same reading (tools/data/proper-noun-extra.tsv is passed before
 proper-nouns.tsv, so the checked official spelling comes first).
 
+Long-vowel variants of a reading (でんそー / でんそう / でんそ, あいでぃーる) are added when Mozc
+already has a word for the variant, so the Japanese candidate stays first. --wasei drops a name
+that is what a wasei word merely looks like (マンション -> mansion).
+
 --acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
 the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (1 to 3): rank
 1 costs less than every Mozc entry of the reading, so it is the first candidate (AI for あい; 愛 follows); rank 2 or
@@ -36,8 +40,13 @@ proper-nouns.tsv is skipped by the 3-kana rule; this is what makes AI a candidat
 """
 import argparse
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import reading_variants  # noqa: E402
 
 HIRAGANA = re.compile(r"[ぁ-ゖー]+")
 KATAKANA_OF = {chr(c): chr(c + 0x60) for c in range(0x3041, 0x3097)}
@@ -59,13 +68,38 @@ def katakana(reading):
     return "".join(KATAKANA_OF.get(c, c) for c in reading)
 
 
+def within_first_page(reading, cost, surface_costs):
+    """The cost itself when it leaves the name among the first 10, otherwise
+    the cost of the 8th word of the reading (one page is 9 candidates, 10 checked)."""
+    costs = sorted(surface_costs.get(reading, {}).values())
+    if not costs or sum(1 for c in costs if c < cost) < 10:
+        return cost
+    target = costs[min(7, len(costs) - 1)]
+    return max(costs[0] + 1, target) if target < cost else cost
+
+
+def hiragana(katakana_text):
+    out = []
+    for ch in katakana_text:
+        if ch in "・=＝ 　":
+            continue
+        if ch == "ヴ":
+            out.append("ゔ")
+        elif "ァ" <= ch <= "ヶ":
+            out.append(chr(ord(ch) - 0x60))
+        else:
+            out.append(ch)
+    return "".join(out)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--mozc", type=Path, required=True)
     parser.add_argument("--names", type=Path, action="append", required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--penalty", type=int, default=10)
-    parser.add_argument("--margin", type=int, default=2000)
+    parser.add_argument("--wasei", type=Path, help="tools/data/wasei.tsv: never add these names")
+    parser.add_argument("--penalty", type=int, default=1)
+    parser.add_argument("--margin", type=int, default=100)
     parser.add_argument("--default-cost", type=int, default=15000)
     parser.add_argument("--acronyms", type=Path, help="tools/data/acronyms.tsv (type b rows: reading and rank)")
     parser.add_argument("--install", action="store_true")
@@ -85,6 +119,14 @@ def main():
             if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("1", "2", "3"):
                 raise SystemExit(f"bad acronym row: {line}")
             acronyms.append((f[1], f[3], int(f[5])))
+    wasei = set()  # (reading variant, English word) that a wasei word merely looks like
+    if args.wasei:
+        for line in args.wasei.read_text(encoding="utf-8").splitlines():
+            if line.startswith("#") or "\t" not in line:
+                continue
+            katakana_text, english = line.split("\t")[:2]
+            for reading in reading_variants.variants(hiragana(katakana_text)):
+                wasei.add((reading, english.lower()))
     wanted = {reading for _, reading, _ in acronyms}
     reading_entries = defaultdict(list)  # reading -> [(cost, lid, rid)] of Mozc's own entries, for the acronyms
     existing = set()
@@ -128,23 +170,35 @@ def main():
             shown, readings, kind = f[0], f[3], f[4]
             variants = f[6].split("|") if len(f) > 6 and f[6] else []
             for reading in readings.split("|"):
-                if not HIRAGANA.fullmatch(reading) or len(reading) < (2 if short_readings and file_order == 0 else 3):
+                if not HIRAGANA.fullmatch(reading):
                     continue
-                for variant_order, spelling in enumerate([shown] + variants):
-                    spelling = spelling.strip()
-                    if not spelling or (reading, spelling) in existing:
+                # Long vowels are typed in more than one way (でんそー / でんそう /
+                # でんそ, あいでぃる / あいでぃーる).  A variant is added only when
+                # Mozc already has a word for that reading, so the Japanese
+                # candidate stays first.
+                expanded = [reading]
+                for variant in sorted(reading_variants.variants(reading)):
+                    if variant != reading and variant in max_cost:
+                        expanded.append(variant)
+                for expanded_reading in expanded:
+                    if len(expanded_reading) < (2 if short_readings and file_order == 0 else 3):
                         continue
-                    key = (reading, spelling)
-                    order = (file_order, row_order, variant_order)
-                    # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
-                    # the generated row: it is the spelling to put right after the katakana word.
-                    is_old = file_order > 0 and variant_order == 0
-                    if key not in wanted_names:
-                        wanted_names[key] = order + (kind, is_old, file_order == 0)
-                    else:
-                        current = wanted_names[key]
-                        wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
-                                                                      current[5] or file_order == 0))
+                    for variant_order, spelling in enumerate([shown] + variants):
+                        spelling = spelling.strip()
+                        if (not spelling or (expanded_reading, spelling) in existing
+                                or (expanded_reading, spelling.lower()) in wasei):
+                            continue
+                        key = (expanded_reading, spelling)
+                        order = (file_order, row_order, variant_order)
+                        # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
+                        # the generated row: it is the spelling to put right after the katakana word.
+                        is_old = file_order > 0 and variant_order == 0 and expanded_reading == reading
+                        if key not in wanted_names:
+                            wanted_names[key] = order + (kind, is_old, file_order == 0)
+                        else:
+                            current = wanted_names[key]
+                            wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
+                                                                          current[5] or file_order == 0))
         file_order += 1
 
     # Old main spellings keep their cost (all old names of a reading had the same cost). A new
@@ -172,6 +226,7 @@ def main():
         old_rank = sum(1 for cost in surface_costs.get(reading, {}).values() if cost < base)
         move_old = old_rank > 9 and any(old and checked for _, _, old, checked in spellings)
         main_base = new_base if move_old else base
+        main_base = within_first_page(reading, main_base, surface_costs)
         new_index = 1 if has_old else 0
         for _, spelling, old, _ in sorted(spellings):
             if old:
