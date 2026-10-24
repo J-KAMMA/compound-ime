@@ -3810,7 +3810,7 @@ edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (c
 
 # 履歴の学習を見る試験（組 l）: 変換中の候補を、順番ではなく値で選ぶ。
 # SELECT_CANDIDATE_VALUE<TAB>候補: 直前の出力（空白で変換した候補の一覧）から値を探し、
-# その候補の番号で SELECT_CANDIDATE を送る。学習した候補が先頭にあっても、何度でも同じ書き方を選べる。
+# その候補の番号で候補を選ぶ。学習した候補が先頭にあっても、何度でも同じ書き方を選べる。
 edit(T, """  } else if (command == "SET_FOLLOWING_TEXT") {""", """  } else if (command == "SELECT_CANDIDATE_VALUE") {
     MOZC_ASSERT_EQ(2, args.size());
     const std::string value(args[1]);
@@ -3819,17 +3819,13 @@ edit(T, """  } else if (command == "SET_FOLLOWING_TEXT") {""", """  } else if (c
       for (int i = 0; i < words.candidates_size(); ++i) {
         const auto& candidate = words.candidates(i);
         if (candidate.value() != value || !candidate.has_id()) continue;
-        commands::SessionCommand session_command;
-        session_command.set_type(commands::SessionCommand::SELECT_CANDIDATE);
-        session_command.set_id(candidate.id());
-        MOZC_ASSERT_TRUE(client_->SendCommand(session_command, last_output_.get()));
+        MOZC_ASSERT_TRUE(client_->SelectCandidate(candidate.id(), last_output_.get()));
         return absl::Status();
       }
     }
     std::cerr << "candidate not found: " << value << std::endl;
     return absl::InvalidArgumentError("candidate not found");
   } else if (command == "SET_FOLLOWING_TEXT") {""")
-edit(T, "#include <thread>\n", "#include <thread>\n#include \"protocol/commands.pb.h\"\n")
 
 # 英語の文を1語ずつ打つ人（続き）: 節: session が「さっき確定した文字」を覚える（native/jaen-detector/recent_commit.h、
 # docs/english-follow.md）。Mozc は、確定のあとに空白を打つと変換の履歴を消す（Session::EchoBack が converter の Reset を呼ぶ）ので、

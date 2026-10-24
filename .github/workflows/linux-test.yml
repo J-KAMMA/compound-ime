@@ -300,6 +300,13 @@ jobs:
               results/learn-respect-on.tsv results/learn-respect-off.tsv > results/learn-respect-score.txt
             cat results/learn-respect-score.txt
           fi
+          # 前の文がある複数文節の文（組 l）: 文節ごとの人工知能と全文生成を通しても、選んだ書き方が先頭か
+          if [ -f results/learn-respect-context-on.tsv ] && [ -f results/learn-respect-context-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect-context.tsv \
+              results/learn-respect-context-on.tsv results/learn-respect-context-off.tsv 1 \
+              > results/learn-respect-context-score.txt
+            cat results/learn-respect-context-score.txt
+          fi
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
           if [ -f results/proper-nouns.tsv ] && [ -f repo/tests/conversion/proper-nouns.tsv ]; then
             python3 repo/tools/score_proper_nouns.py sentences repo/tests/conversion/proper-nouns.tsv results/proper-nouns.tsv "固有名詞の文" > results/proper-nouns-score.txt

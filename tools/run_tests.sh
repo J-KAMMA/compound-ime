@@ -18,7 +18,9 @@
 #      -memory.tsv / -expire.tsv は session が覚える直前の確定の試験（tools/english_follow_memory.sh、前の文は渡さない）。
 #      tools/make_english_follow_tests.py、tools/score_english_follow.py
 #   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
-#   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）
+#   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）。
+#      1語の表（learn-respect.tsv、50語以上）と、前の文がある複数文節の表（learn-respect-context.tsv。文脈が別の書き方を
+#      先頭にしている文で、文節の元の先頭を4回選ぶ）を流す
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
 #   s: 数字の間の点と文末の句点（docs/decimal-point.md）と、かなで打った数＋単位（docs/kana-numbers.md）。
@@ -157,12 +159,19 @@ k)
 l)
   # 履歴の学習（tools/learn_respect_convert.sh）。1語の読みを変換して、人工知能なしの2番目の候補を同じ会話で4回選んで
   # 確定したあと、同じ読みの先頭に来るかを、人工知能あり・なしで比べる（tests/conversion/learn-respect.tsv、50語以上）。
+  # 前の文がある複数文節の文（learn-respect-context.tsv）でも、文脈の手がかりが別の書き方を先頭にしているところで、
+  # 元の先頭を4回選び、人工知能あり・なしとも先頭に残るかを比べる（文節ごとの人工知能と全文生成を通す）。
   # 履歴で先頭になった書き方を人工知能の段が別の書き方に替えていれば失敗にする（tools/score_learn_respect.py）。
   if [ -f $T/learn-respect.tsv ]; then
     LEARN="bash $REPO/tools/learn_respect_convert.sh $E/session_handler_main $E"
     $LEARN $MODEL $T/learn-respect.tsv $OUT/learn-respect 2
     python3 $REPO/tools/score_learn_respect.py $T/learn-respect.tsv \
       $OUT/learn-respect-on.tsv $OUT/learn-respect-off.tsv | tee $OUT/learn-respect-score.txt
+    if [ -f $OUT/learn-respect-context-on.tsv ] && [ -f $OUT/learn-respect-context-off.tsv ]; then
+      python3 $REPO/tools/score_learn_respect.py $T/learn-respect-context.tsv \
+        $OUT/learn-respect-context-on.tsv $OUT/learn-respect-context-off.tsv 1 \
+        | tee $OUT/learn-respect-context-score.txt
+    fi
   fi
   ;;
 m)
