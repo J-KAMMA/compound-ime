@@ -241,7 +241,7 @@ r)
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/acronyms-cand.txt $OUT/acronyms-cand.tsv 4
   fi
   ;;
-t)
+z1)
   # カタカナ語・作品名・企業名の英字。名前の読みをかなで打ち、空白で変換した候補を見る。
   # カタカナ語と作品名・企業名は、期待する英字が上位10個以内にあり、日本語の候補が先頭のままであること。
   # 和製英語（マンション、パソコン ...）は、元の英単語が候補に出ないこと。採点は tools/score_katakana_english.py

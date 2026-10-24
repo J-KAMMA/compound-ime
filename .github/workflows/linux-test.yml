@@ -201,7 +201,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u","z1"]') }}
         # dict_candidate があるときだけ、新しい辞書（cand）でも流す
         variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
