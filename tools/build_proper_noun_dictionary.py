@@ -27,9 +27,11 @@ Japanese word either. --names may be given more than once: rows of the earlier f
 when two files name the same reading (tools/data/proper-noun-extra.tsv is passed before
 proper-nouns.tsv, so the checked official spelling comes first).
 
-Long-vowel variants of a reading (でんそー / でんそう / でんそ, あいでぃーる) are added when Mozc
-already has a word for the variant, so the Japanese candidate stays first. --wasei drops a name
-that is what a wasei word merely looks like (マンション -> mansion).
+Only the long-vowel variant pairs in reading_variants.ALLOWED (でんそー / でんそう / でんそ,
+あいでぃる / あいでぃーる) are added.  A variant that merely drops the long vowel is not added
+even when Mozc has a word for the variant reading: it can be an unrelated Japanese word (おおさか
+-> おさか / 大阪, あたーる -> あたる / 当たる). --wasei drops a name that is what a wasei word
+merely looks like (マンション -> mansion).
 
 --acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
 the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (1 to 3): rank
@@ -173,12 +175,14 @@ def main():
                 if not HIRAGANA.fullmatch(reading):
                     continue
                 # Long vowels are typed in more than one way (でんそー / でんそう /
-                # でんそ, あいでぃる / あいでぃーる).  A variant is added only when
-                # Mozc already has a word for that reading, so the Japanese
-                # candidate stays first.
+                # でんそ, あいでぃる / あいでぃーる).  Only the explicit ALLOWED pairs
+                # are added: dropping a long vowel can hit an unrelated Japanese
+                # word (おおさか -> おさか, あたーる -> あたる).
                 expanded = [reading]
                 for variant in sorted(reading_variants.variants(reading)):
-                    if variant != reading and variant in max_cost:
+                    if variant == reading or variant not in max_cost:
+                        continue
+                    if reading_variants.allowed(reading, variant):
                         expanded.append(variant)
                 for expanded_reading in expanded:
                     if len(expanded_reading) < (2 if short_readings and file_order == 0 else 3):

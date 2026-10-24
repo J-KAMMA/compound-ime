@@ -34,6 +34,12 @@ def main():
             "でんそ\t0\t0\t8333\t田租\n"
             "でんそー\t0\t0\t3000\tデンソー\n"
             "でんそう\t0\t0\t4000\t伝送\n"
+            "あき\t0\t0\t2727\t秋\n"
+            "あきー\t0\t0\t6000\tアキー\n"
+            "あたる\t0\t0\t2715\t当たる\n"
+            "あたーる\t0\t0\t6000\tアタール\n"
+            "おおさか\t0\t0\t3000\t大阪\n"
+            "おさか\t0\t0\t5000\tオオサカ\n"
             + "".join(f"ないき\t0\t0\t{3100 + i}\t内規{i}\n" for i in range(10)), encoding="utf-8")
 
         # 0. カタカナ語と英単語の組（和製英語を外し、JMdict の組を足す）
@@ -66,7 +72,8 @@ def main():
 
         # 1. カタカナ語の英単語
         pairs = tmp / "pairs.tsv"
-        pairs.write_text("コーヒー\tcoffee\nマンション\tmansion\nデンソー\tDenso\n", encoding="utf-8")
+        pairs.write_text("コーヒー\tcoffee\nマンション\tmansion\nデンソー\tDenso\nアキー\tackee\n",
+                         encoding="utf-8")
         out12 = tmp / "dictionary12.txt"
         subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_dictionary.py"),
                         "--mozc", str(mozc), "--pairs", str(pairs), "--wasei", str(wasei_file),
@@ -84,6 +91,8 @@ def main():
         check(denso.get("でんそー") == 3001, f"でんそー → Denso がカタカナ語の次にない: {denso}")
         check(denso.get("でんそう") == 4001, f"でんそう（長音をうで打つ）→ Denso がない: {denso}")
         check(denso.get("でんそ") == 8334, f"でんそ（長音なし）→ Denso がない: {denso}")
+        check(not any(r[0] == "あき" and r[4] == "ackee" for r in rows),
+              "長音を落とした無関係な読み（あき → ackee）に英字を付けている")
 
         # 2. 公式表記と別表記
         extra = tmp / "extra.tsv"
@@ -92,8 +101,10 @@ def main():
             "Nike\tnike\t\tないき\tcompany\t0\tNIKE\n"
             "Coca-Cola\tcoca-cola\t\tこかこーら\tcompany\t0\tCOCA-COLA\n"
             "Meta\tmeta\t\tめた\tcompany\t0\tMETA\n"
-            "Denso\tdenso\t\tでんそ|でんそー|でんそう\tbusiness\t0\tDENSO\n"
-            "Mansion\tmansion\t\tまんしょん\tbrand\t0\t\n", encoding="utf-8")
+            "Denso\tdenso\t\tでんそー|でんそ\tbusiness\t0\tDENSO\n"
+            "Mansion\tmansion\t\tまんしょん\tbrand\t0\t\n"
+            "Atar\tatar\t\tあたーる\tcity\t0\t\n"
+            "Osaka\tosaka\t\tおおさか\tcity\t0\t\n", encoding="utf-8")
         base = tmp / "base.tsv"
         base.write_text("Adidas\tadidas\t\tあでぃだす\tcompany\t0\t\n"
                         "Nike\tnike\t\tないき\tbusiness\t0\t\n", encoding="utf-8")
@@ -127,6 +138,10 @@ def main():
         check(rows.get(("でんそ", "Denso")) == 8433,
               f"でんそ（長音なし）→ Denso がない: {rows.get(('でんそ', 'Denso'))}")
         check(("まんしょん", "Mansion") not in rows, "和製英語（マンション → Mansion）を dictionary14 に入れている")
+        check(("あたる", "Atar") not in rows,
+              "長音を落とした無関係な読み（あたる → Atar）に英字を付けている")
+        check(("おさか", "Osaka") not in rows,
+              "長音の揺れ（おおさか → おさか）に Osaka を付けている")
         # 既にある (読み, 表記) は足さない
         check(all(not (r[0] == "こーひー" and r[4] == "コーヒー") for r in rows), "Mozc にある表記を足している")
 

@@ -9,9 +9,11 @@ after the katakana word: コーヒー, then coffee. Only the katakana word's rea
 reading of the English spelling typed as romaji is often a Japanese word ("site" reads して),
 and words typed in English spelling are kept as English by the English-word detector.
 
-The reading's long-vowel variants (でんそー / でんそう / でんそ) get the same English word when
-Mozc already has a word for the variant, so the Japanese candidate stays first. --wasei never
-adds the English word a wasei word merely looks like (マンション -> mansion).
+The reading's long-vowel variants (でんそー / でんそう / でんそ) get the same English word only
+when the same katakana word has the variant reading in Mozc, or for the pairs in
+reading_variants.ALLOWED (でんそ, あいでぃーる), so the Japanese candidate stays first and an
+unrelated Japanese word (あき for アキー) gets no English candidate. --wasei never adds the
+English word a wasei word merely looks like (マンション -> mansion).
 """
 import argparse
 import re
@@ -111,10 +113,13 @@ def main():
         reading, lid, rid, cost = katakana_entries[katakana]
         add(reading, english, lid, rid, within_first_page(reading, cost + args.penalty, surface_costs))
         # Long vowels are typed in more than one way (でんそー / でんそう / でんそ).
-        # Add the English word under a variant only when Mozc already has a word
-        # for it, so the Japanese candidate stays first.
+        # Add the English word under a variant only when the same katakana word
+        # has that reading in Mozc, or the pair is in ALLOWED.  Otherwise the
+        # variant can be an unrelated Japanese word (アキー -> あき / 秋).
         for variant in sorted(reading_variants.variants(reading)):
             if variant == reading or variant not in max_cost:
+                continue
+            if (variant, katakana) not in existing and not reading_variants.allowed(reading, variant):
                 continue
             add(variant, english, lid, rid,
                 within_first_page(variant, max_cost[variant] + args.penalty, surface_costs))

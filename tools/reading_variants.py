@@ -7,8 +7,10 @@
 
 Long vowels are written with ー, with the vowel (おう, うう, えい) or not at all
 (でんそー / でんそう / でんそ).  The dictionary builders add the English word or
-the official spelling under these readings when Mozc already has a word for the
-variant, so the Japanese candidate stays first.  The set is small and stable.
+the official spelling under these readings only when the same katakana word has
+the variant reading in Mozc, or when the pair is in ALLOWED, so the Japanese
+candidate stays first and an unrelated Japanese word (あき / アキー) gets no
+English candidate.  The set is small and stable.
 """
 O_ROW = set("おこそとのほもよろごぞどぼぽょ")
 U_ROW = set("うくすつふむゆぐずづぶぷゅ")
@@ -16,6 +18,23 @@ E_ROW = set("えけせてねへめれげぜでべぺ")
 SMALL = "ぃぇぅぉ"
 LONG_VOWELS = ("おう", "おお", "うう", "えい", "ええ", "いい")
 LIMIT = 16
+
+# (reading, variant) pairs that are added even when Mozc has no word for the
+# variant reading.  Only words whose reading is commonly typed both ways and
+# whose English word or official spelling is known belong here; every other
+# variant is added only when the same katakana word has the variant reading in
+# Mozc (so アキー does not put ackee on あき / 秋).
+ALLOWED = {
+    ("でんそ", "でんそう"),
+    ("でんそー", "でんそう"),
+    ("でんそ", "でんそー"),
+    ("でんそー", "でんそ"),
+    ("あいでぃる", "あいでぃーる"),
+}
+
+
+def allowed(reading, variant):
+    return (reading, variant) in ALLOWED
 
 
 def _add(out, value):
