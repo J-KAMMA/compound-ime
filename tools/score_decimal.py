@@ -81,6 +81,8 @@ def main():
     groups = {}
     bad = []
     for raw, want, category in tests:
+        if "--preedit" in flags and category == "かなの数の語":
+            continue  # 入力中の表示は変換しないので、かなで打った数は数字にならない
         out = got.get(raw)
         if out is None:
             missing += 1
