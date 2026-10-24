@@ -3233,8 +3233,9 @@ edit("converter/converter.cc", "  RewriteAndSuppressCandidates(request, segments
 
 # 数の読みは数字: 節: 「にじゅうよっか」「しちがつはつか」「にせんにじゅうろくねん」のような
 # 数の読み＋単位（native/jaen-detector/jaen_number の FindNumbers）を、日本語の部分の中で
-# 確定済みの文節（24日、7月20日、2026年）にする。前後の日本語はこれまでどおり変換される。
-# 1けたの数＋単位（にほん、くじ）は取らない。MYIME_NUMBERS=0 で止める。
+# 確定済みの文節（24日、7月20日、2026年、10人、200分）にする。前後の日本語はこれまでどおり変換される。
+# ふつうの1けた＋単位（にほん、くじ）、ひゃく・せん だけの数、和語の日の言葉は取らない。
+# MYIME_NUMBERS=0 で止める。決め方: docs/kana-numbers.md。
 for name in ("jaen_number.h", "jaen_number.cc"):
     write(f"converter/{name}", (REPO / "native/jaen-detector" / name).read_text(encoding="utf-8")
           .replace('#include "jaen_number.h"', '#include "converter/jaen_number.h"'))

@@ -30,7 +30,8 @@ struct Multiplier {
 };
 
 constexpr Multiplier kThousands[] = {{U"せん", 1000}, {U"ぜん", 1000}};
-constexpr Multiplier kHundreds[] = {{U"ひゃく", 100}, {U"びゃく", 100}, {U"ぴゃく", 100}};
+constexpr Multiplier kHundreds[] = {{U"ひゃく", 100}, {U"びゃく", 100}, {U"ぴゃく", 100},
+                                    {U"ひゃっ", 100}, {U"びゃっ", 100}, {U"ぴゃっ", 100}};
 constexpr Multiplier kTens[] = {{U"じゅう", 10}};
 constexpr Multiplier kTensTsu[] = {{U"じゅっ", 10}, {U"じっ", 10}};
 
@@ -41,13 +42,15 @@ struct Unit {
 
 constexpr Unit kUnits[] = {
     {U"ねん", "年"},     {U"がつ", "月"},       {U"にち", "日"},      {U"じ", "時"},
-    {U"ふん", "分"},     {U"ぷん", "分"},       {U"びょう", "秒"},    {U"ほん", "本"},
-    {U"ぼん", "本"},     {U"ぽん", "本"},       {U"こ", "個"},        {U"にん", "人"},
-    {U"かい", "回"},     {U"えん", "円"},       {U"さい", "歳"},      {U"ど", "度"},
-    {U"ばん", "番"},     {U"まい", "枚"},       {U"だい", "台"},      {U"ひき", "匹"},
-    {U"びき", "匹"},     {U"ぴき", "匹"},       {U"けん", "件"},      {U"しゅうかん", "週間"},
-    {U"かげつ", "か月"}, {U"じかん", "時間"},   {U"にちかん", "日間"}, {U"ばんめ", "番目"},
-    {U"かいめ", "回目"}, {U"にんまえ", "人前"}, {U"ぱーせんと", "%"},
+    {U"ふん", "分"},     {U"ぷん", "分"},       {U"ぶん", "分"},      {U"びょう", "秒"},
+    {U"ほん", "本"},     {U"ぼん", "本"},       {U"ぽん", "本"},      {U"こ", "個"},
+    {U"にん", "人"},     {U"かい", "回"},       {U"えん", "円"},      {U"さい", "歳"},
+    {U"ど", "度"},       {U"ばん", "番"},       {U"まい", "枚"},      {U"だい", "台"},
+    {U"ひき", "匹"},     {U"びき", "匹"},       {U"ぴき", "匹"},      {U"けん", "件"},
+    {U"はい", "杯"},     {U"ぱい", "杯"},       {U"ばい", "倍"},      {U"さつ", "冊"},
+    {U"てん", "点"},     {U"わり", "割"},       {U"しゅうかん", "週間"}, {U"かげつ", "か月"},
+    {U"じかん", "時間"}, {U"にちかん", "日間"}, {U"ばんめ", "番目"},  {U"かいめ", "回目"},
+    {U"にんまえ", "人前"}, {U"ぱーせんと", "%"},
 };
 
 struct DayWord {
@@ -63,8 +66,8 @@ constexpr DayWord kDayWords[] = {
 };
 
 // A number reading: where it ends, its value, and how many parts it has (each
-// digit and each multiplier is one). One part alone (a digit, or a bare じゅう,
-// ひゃく, せん) is too often an ordinary word to be taken.
+// digit and each multiplier is one). A single part (one digit, or one じゅう)
+// is taken only in the narrow cases in SinglePartNumber below.
 struct Cand {
   size_t end;
   uint64_t value;
@@ -224,9 +227,16 @@ std::optional<std::pair<size_t, int>> DayAt(const Text& t, size_t pos, bool afte
 
 std::optional<Match> MatchAt(const Text& t, size_t i);
 
-// What may follow a span: the end, 、, a particle or です, ごぜん/ごご, or another span.
+// What may follow a span: the end, 句読点・閉じ括弧, a particle or です,
+// ごぜん/ごご, or another span.
 bool BoundaryOk(const Text& t, size_t end) {
-  if (end >= t.size() || t[end] == U'、') return true;
+  if (end >= t.size()) return true;
+  switch (t[end]) {
+    case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'」': case U'』': case U'）': case U'】': case U'・':
+    case U' ': case U'　': case U'\n':
+      return true;
+  }
   constexpr Piece kParticles[] = {U"は", U"が", U"を", U"に", U"で",   U"と",   U"の",
                                   U"も", U"へ", U"や", U"から", U"まで", U"より", U"って", U"です"};
   for (Piece p : kParticles) {
@@ -254,24 +264,36 @@ void OfferClock(const Text& t, size_t i, std::optional<Match>& best) {
   }
 }
 
-// 日の読み＋かんは日数（ここのかかん -> 9日間、みっかかん -> 3日間）。1、5、7、8日は
-// 除く（いつか、なのか、ようか は日常の言葉: いつかかんがえる）。人工知能が数の部分を
-// かなで書く（ここの日間）ことがあるため、数字の確定済み文節にして防ぐ。
-void OfferDaySpan(const Text& t, size_t i, std::optional<Match>& best) {
-  for (const DayWord& w : kDayWords) {
-    if (w.day == 1 || w.day == 5 || w.day == 7 || w.day == 8) continue;
-    if (!At(t, i, w.reading) || !At(t, i + w.reading.size(), U"かん")) continue;
-    const size_t end = i + w.reading.size() + 2;
-    // 右の切れ目は狭く取る: や（みっかかんやすみ = 三日間休み）、が（かんがえる）、
-    // って は外す。
-    bool boundary = end >= t.size() || t[end] == U'、';
-    for (Piece p : {Piece(U"は"), Piece(U"を"), Piece(U"に"), Piece(U"で"), Piece(U"と"),
-                    Piece(U"の"), Piece(U"も"), Piece(U"へ"), Piece(U"から"), Piece(U"まで"),
-                    Piece(U"より"), Piece(U"です")}) {
-      boundary = boundary || At(t, end, p);
-    }
-    if (boundary) Offer(t, best, end, Join(w.day, "日間"));
+// 一つの部分だけの数でも、単位が続けば数として取るのは、じゅう（10）と
+// 促音の いっ・ろっ・はっ（1・6・8）だけ。ふつうの1けた（に、さん、ろく ...）は
+// にほん（日本）、くじ（籤）、いちにち（一日）、いちど（一度）と紛れ、ひゃく・せん は
+// 百姓・千葉・仙台・先輩と紛れるので取らない。にひゃく・さんぜん のような複数の
+// 部分からなる数は、この限りでない。
+bool SinglePartNumber(const Text& t, size_t begin, size_t end) {
+  static constexpr Piece kAllowed[] = {
+      U"じゅう", U"じゅっ", U"じっ", U"いっ", U"ろっ", U"はっ",
+  };
+  for (Piece p : kAllowed) {
+    if (end - begin == p.size() && At(t, begin, p)) return true;
   }
+  return false;
+}
+
+// 数の形をした普通の言葉。単位まで含めた読みがこれに当たるときは数字にしない。
+bool IsOrdinaryNumberWord(const Text& t, size_t begin, size_t end) {
+  static constexpr Piece kWords[] = {
+      U"じゅうぶん",  // 十分
+      U"いってん",    // 一転
+      U"じっけん",    // 実験
+      U"じっさい",    // 実際
+      U"はってん",    // 発展
+      U"はっけん",    // 発見
+      U"いっけん",    // 一見
+  };
+  for (Piece w : kWords) {
+    if (end - begin == w.size() && At(t, begin, w)) return true;
+  }
+  return false;
 }
 
 void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
@@ -285,7 +307,10 @@ void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
           if (Offer(t, best, day->first, Join(c.value, "月") + Join(day->second, "日"))) continue;
         }
       }
-      if (c.parts >= 2) Offer(t, best, end, Join(c.value, u.text));
+      if (IsOrdinaryNumberWord(t, i, end)) continue;
+      if (c.parts >= 2 || SinglePartNumber(t, i, c.end)) {
+        Offer(t, best, end, Join(c.value, u.text));
+      }
     }
   }
 }
@@ -318,12 +343,44 @@ void OfferDigitString(const Text& t, size_t i, std::optional<Match>& best) {
   for (const auto& [end, digits] : runs) Offer(t, best, end, digits);
 }
 
+// 「ここにじゅうにん」の に は助詞で、数の一部（にじゅう = 20）ではない。
+// 直前に助詞（は・が・を・に・で・と・も・へ・や・の）か区切りがなければ、に から始めない。
+// ただし「きょうにじゅうにん」の に のように、時の言葉のすぐあとは助詞ではなく
+// 数の一部（にじゅう = 20）として取る。
+bool ParticleNi(const Text& t, size_t i) {
+  if (!At(t, i, U"に") || i == 0) return false;
+  switch (t[i - 1]) {
+    case U'は': case U'が': case U'を': case U'に': case U'で': case U'と':
+    case U'も': case U'へ': case U'や': case U'の':
+    case U'、': case U'。': case U'，': case U'．': case U'！': case U'？':
+    case U'「': case U'」': case U'『': case U'』': case U'（': case U'）':
+    case U' ': case U'　': case U'\n':
+      return false;
+  }
+  static constexpr Piece kTimeWords[] = {
+      U"きょう", U"きのう", U"あした", U"あさって", U"おととい",
+      U"けさ", U"こんばん", U"ゆうべ", U"いま",
+      U"ことし", U"きょねん", U"らいねん",
+      U"こんげつ", U"せんげつ", U"らいげつ",
+      U"こんしゅう", U"せんしゅう", U"らいしゅう",
+      U"まいにち", U"まいあさ", U"まいばん",
+  };
+  for (Piece w : kTimeWords) {
+    if (i >= w.size() && At(t, i - w.size(), w)) return false;
+  }
+  return true;
+}
+
 std::optional<Match> MatchAt(const Text& t, size_t i) {
+  if (ParticleNi(t, i)) return std::nullopt;
   std::optional<Match> best;
   OfferDigitString(t, i, best);
   OfferClock(t, i, best);
-  if (auto day = DayAt(t, i, false)) Offer(t, best, day->first, Join(day->second, "日"));
-  OfferDaySpan(t, i, best);
+  // 和語の日の言葉（ふつか、ついたち ...）は漢字のまま。日の言葉に数が付く
+  // にじゅうよっか（24日）だけは数として取る。
+  if (At(t, i, U"じゅう") || At(t, i, U"にじゅう") || At(t, i, U"さんじゅう")) {
+    if (auto day = DayAt(t, i, false)) Offer(t, best, day->first, Join(day->second, "日"));
+  }
   OfferNumbers(t, i, best);
   return best;
 }
