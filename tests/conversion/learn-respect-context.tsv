@@ -1,0 +1,8 @@
+# 履歴の学習の試験（組 l）の、前後の文がある複数文節の文。列: 文のローマ字<TAB>文節の読み<TAB>前の文。
+# tools/learn_respect_convert.sh は、履歴のないとき（人工知能なし）に前の文の手がかりが別の書き方を先頭にしていることを確かめ、
+# その文節の元の先頭（2番目になっている書き方）を同じ会話で4回選んでから、同じ文を変換する。
+# 人工知能あり・なしとも、選んだ書き方がその文節の先頭に残ることを比べる。
+kishanohanashi	kisha	線路を歩いた。
+kouennohanashi	kouen	舞台を見た。
+kaihounohanashi	kaihou	窓を開けた。
+hoshounohanashi	houshou	損害を受けた。

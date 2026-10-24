@@ -136,6 +136,54 @@
    "intended": "おっぱいがお椀型で羨ましいなあ。",
    "alternatives": ["おっぱいがお椀型でうらやましいなあ。"],
    "note": "2026-10-18 話し言葉の試験で発見: おっぱいがおわん型で… とひらがなが残った（人工知能は正しく答えたが組み直しが断られた）"
+  },
+  {
+   "id": "r019",
+   "category": "reported",
+   "romaji": "kittoite",
+   "intended": "切っといて",
+   "alternatives": [],
+   "note": "2026-10-24 報告: 〜ておくの縮約が辞書になく、きっと居て になった"
+  },
+  {
+   "id": "r020",
+   "category": "reported",
+   "romaji": "ninatteru",
+   "intended": "になってる",
+   "alternatives": [],
+   "note": "2026-10-24 報告: 助詞の に ＋ なってる が、担っ（費用 2613）になっ（4551）より安く、担ってる になった（費用と直前の手がかりで直す）"
+  },
+  {
+   "id": "r021",
+   "category": "reported",
+   "romaji": "karehajuuyounayakuwoninatteru.",
+   "intended": "彼は重要な役を担ってる。",
+   "alternatives": [],
+   "note": "2026-10-24 見直し: 役を の直前の手がかりがなく、担ってる が になってる に負けた"
+  },
+  {
+   "id": "r022",
+   "category": "reported",
+   "romaji": "shigotowoyameterakuninatteru.",
+   "intended": "仕事をやめて楽になってる。",
+   "alternatives": [],
+   "note": "2026-10-24 見直し: 仕事を を担側の手がかりにしたため、楽に になってる が壊れた"
+  },
+  {
+   "id": "r023",
+   "category": "reported",
+   "romaji": "ninatteta.",
+   "intended": "になってた。",
+   "alternatives": [],
+   "note": "2026-10-24 見直し: になってた の辞書がなく、担ってた になった"
+  },
+  {
+   "id": "r024",
+   "category": "reported",
+   "romaji": "hanashitoita.",
+   "intended": "話しといた。",
+   "alternatives": [],
+   "note": "2026-10-24 見直し: 一覧にない動詞の 〜といた が辞書になかった"
   }
  ]
 }

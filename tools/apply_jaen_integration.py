@@ -1105,9 +1105,14 @@ edit("engine/engine.cc", """    std::string preceding;
     for (size_t i = 0; i < segment_calls; ++i) {""")
 edit("engine/engine.cc", """      bool rerank = false;
       bool literal_first = false;
-      if (compare_context) {""", """      bool rerank = false;
+      if (compare_context) {""", """      // The user's learned spelling stays first: the AI may add candidates
+      // after it, but never replaces it with another spelling.
+      const bool learned_first =
+          (segment->candidate(0).attributes &
+           converter::Attribute::USER_SEGMENT_HISTORY_REWRITER) != 0;
+      bool rerank = false;
       bool literal_first = false;
-      if (compare_context && segment_context) {""")
+      if (compare_context && segment_context && !learned_first) {""")
 edit("engine/engine.cc", """      std::vector<int> indices; const char* rejection = "Compatible";
       bool selected = MatchWholePhrase(*candidate, *segments, key, &indices, &rejection);""", """      std::vector<int> indices; const char* rejection = "Compatible";
       // The AI's best whole sentence in kana only is a transliteration, not a
@@ -1781,9 +1786,13 @@ subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_diction
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
 # 話し言葉・ネットの書き方（dictionary13.txt）: 行こっか、まあいっか、すいたー など
-# （tools/data/colloquial.tsv）。Mozc に同じ読みの語があれば、その語より少し後ろにする。
+# （tools/data/colloquial.tsv）。〜ておくの縮約（切っとく、書いといて、読んどく など）は
+# tools/data/toku.tsv と、Mozc の辞書にある動詞から作る。〜になってる と 担ってる の
+# 選び分けは tools/data/naru.tsv。
+# Mozc に同じ読みの語があれば、その語より少し後ろにする。
 subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py"), "--mozc", str(src),
-                "--words", str(REPO / "tools/data/colloquial.tsv"),
+                "--words", str(REPO / "tools/data/colloquial.tsv"), str(REPO / "tools/data/toku.tsv"),
+                str(REPO / "tools/data/naru.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary13.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary13.txt.tmp").unlink()
 
@@ -1932,7 +1941,17 @@ edit(C, '''    std::stable_sort(scores.begin(), scores.end(),
     const bool keep_first =
         segments->conversion_segments_size() >= 2 && !scores[0].context &&
         scores[0].candidate != &segment->candidate(0);
-    modified |= SortCandidates(scores, segment, keep_first);''')
+    modified |= SortCandidates(scores, segment, keep_first);
+    // Mark the winner even when it was already first: the AI stages below
+    // (whole phrase, selector, homophone cues) never replace a learned
+    // spelling with another one.
+    if (scores[0].score > 0 && scores[0].candidate != nullptr &&
+        segment->candidates_size() > 0 &&
+        segment->candidate(0).key == scores[0].candidate->key &&
+        segment->candidate(0).value == scores[0].candidate->value) {
+      segment->mutable_candidate(0)->attributes |=
+          converter::Attribute::USER_SEGMENT_HISTORY_REWRITER;
+    }''')
 
 # When the AI's best sentence does not fit Mozc's segments (紙に字を vs
 # 髪虹を), re-split at the AI's boundaries with Mozc's own candidates;
@@ -3792,6 +3811,25 @@ edit(T, """  } else if (command == "SET_PRECEDING_TEXT") {""", """  } else if (c
   } else if (command == "SET_EXPERIMENTAL_FEATURE") {
     client_->SetExperimentalFeature(args.size() >= 2 ? args[1] : "");
   } else if (command == "SET_PRECEDING_TEXT") {""")
+
+# 履歴の学習を見る試験（組 l）: 変換中の候補を、順番ではなく値で選ぶ。
+# SELECT_CANDIDATE_VALUE<TAB>候補: 直前の出力（空白で変換した候補の一覧）から値を探し、
+# その候補の番号で候補を選ぶ。学習した候補が先頭にあっても、何度でも同じ書き方を選べる。
+edit(T, """  } else if (command == "SET_FOLLOWING_TEXT") {""", """  } else if (command == "SELECT_CANDIDATE_VALUE") {
+    MOZC_ASSERT_EQ(2, args.size());
+    const std::string value(args[1]);
+    if (last_output_) {
+      const auto& words = last_output_->all_candidate_words();
+      for (int i = 0; i < words.candidates_size(); ++i) {
+        const auto& candidate = words.candidates(i);
+        if (candidate.value() != value || !candidate.has_id()) continue;
+        MOZC_ASSERT_TRUE(client_->SelectCandidate(candidate.id(), last_output_.get()));
+        return absl::Status();
+      }
+    }
+    std::cerr << "candidate not found: " << value << std::endl;
+    return absl::InvalidArgumentError("candidate not found");
+  } else if (command == "SET_FOLLOWING_TEXT") {""")
 
 # 英語の文を1語ずつ打つ人（続き）: 節: session が「さっき確定した文字」を覚える（native/jaen-detector/recent_commit.h、
 # docs/english-follow.md）。Mozc は、確定のあとに空白を打つと変換の履歴を消す（Session::EchoBack が converter の Reset を呼ぶ）ので、

@@ -198,7 +198,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","m","n","p","q","r","s","u"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u"]') }}
         # dict_candidate があるときだけ、新しい辞書（cand）でも流す
         variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
@@ -294,6 +294,19 @@ jobs:
               head -40 results/domain-$f-score.txt
             fi
           done
+          # 履歴の学習の試験（組 l）: 人工知能あり・なしで、選んだ書き方が先頭に来た数を並べる
+          if [ -f results/learn-respect-on.tsv ] && [ -f results/learn-respect-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect.tsv \
+              results/learn-respect-on.tsv results/learn-respect-off.tsv > results/learn-respect-score.txt
+            cat results/learn-respect-score.txt
+          fi
+          # 前の文がある複数文節の文（組 l）: 文節ごとの人工知能と全文生成を通しても、選んだ書き方が先頭か
+          if [ -f results/learn-respect-context-on.tsv ] && [ -f results/learn-respect-context-off.tsv ]; then
+            python3 repo/tools/score_learn_respect.py repo/tests/conversion/learn-respect-context.tsv \
+              results/learn-respect-context-on.tsv results/learn-respect-context-off.tsv 1 \
+              > results/learn-respect-context-score.txt
+            cat results/learn-respect-context-score.txt
+          fi
           # 大文字で始まる英字の固有名詞の試験（組 k）の採点
           if [ -f results/proper-nouns.tsv ] && [ -f repo/tests/conversion/proper-nouns.tsv ]; then
             python3 repo/tools/score_proper_nouns.py sentences repo/tests/conversion/proper-nouns.tsv results/proper-nouns.tsv "固有名詞の文" > results/proper-nouns-score.txt
@@ -362,6 +375,17 @@ jobs:
             python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"
             venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/colloquial.tsv results/colloquial.tsv "話し言葉の打ち込み" > results/colloquial-score.txt
             head -9 results/colloquial-score.txt
+          fi
+          # 〜ておくの縮約と、〜になってる・担う（組 t）の採点。h と同じ道具（SudachiPy は上の venv を使う）
+          if [ -f results/toku.tsv ] && [ -f repo/tests/conversion/toku.tsv ]; then
+            [ -x venv/bin/python ] || { python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"; }
+            venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/toku.tsv results/toku.tsv "〜ておくの縮約" > results/toku-score.txt
+            head -12 results/toku-score.txt
+          fi
+          if [ -f results/naru.tsv ] && [ -f repo/tests/conversion/naru.tsv ]; then
+            [ -x venv/bin/python ] || { python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428"; }
+            venv/bin/python repo/tools/score_colloquial.py repo/tests/conversion/naru.tsv results/naru.tsv "〜になる・担う" > results/naru-score.txt
+            head -12 results/naru-score.txt
           fi
           # 人工知能の時間の上限に当たった回数（全部の組の合計。わざと遅くする組 i の slow- は除く）
           python3 repo/tools/zenzai_stats.py results --exclude slow- --label "全部の組" | tee results/zenzai-deadline-stats.txt

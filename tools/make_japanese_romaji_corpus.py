@@ -37,7 +37,7 @@ def main():
     lines = []
     for item in json.loads((tests / "ja400.json").read_text(encoding="utf-8"))["items"]:
         lines.append(item["romaji"])
-    for name in ("wiki-typing.tsv", "colloquial.tsv"):
+    for name in ("wiki-typing.tsv", "colloquial.tsv", "toku.tsv", "naru.tsv"):
         for line in (tests / name).read_text(encoding="utf-8").splitlines():
             if line and not line.startswith("#"):
                 f = line.split("\t")
