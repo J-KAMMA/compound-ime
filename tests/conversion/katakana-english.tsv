@@ -1,0 +1,501 @@
+# カタカナ語の英字（tools/make_katakana_english_tests.py。期待する候補が上位10個以内。列: ローマ字<TAB>期待する候補<TAB>種類<TAB>由来）
+konnpyu-ta-	computer	loanword	example
+suma-tofonn	smartphone	loanword	example
+appude-to	update	loanword	example
+de-tabe-su	database	loanword	example
+ko-hi-	coffee	loanword	example
+kafe	cafe	loanword	example
+innta-netto	internet	loanword	example
+shisutemu	system	loanword	example
+sa-bisu	service	loanword	example
+purojekuto	project	loanword	example
+adenoshinn	adenosine	loanword	data
+akusesupurobaida	access provider	loanword	data
+akusuru	axle	loanword	data
+agape-	agape	loanword	data
+asupikku	aspic	loanword	data
+aisu	ice	loanword	data
+autoso-shinngu	out-sourcing	loanword	data
+adoputo	adopting	loanword	data
+asefe-to	acephate	loanword	data
+autoreiji	outrage	loanword	data
+autodoaraifu	outdoor life	loanword	data
+atakka	attacca	loanword	data
+aso-tomennto	assortment	loanword	data
+asufoderu	asphodel	loanword	data
+appubi-to	upbeat	loanword	data
+akuchuari-	actuary	loanword	data
+akushisu	axis	loanword	data
+adohokurashi-	adhocracy	loanword	data
+aisokuronasu	isochronous	loanword	data
+asuperithi	asperity	loanword	data
+aisore-shonntannku	isolation tank	loanword	data
+asai-	acai	loanword	data
+ajite-ta-	agitator	loanword	data
+anaborikkusuteroido	anabolic steroid	loanword	data
+adapushonn	adoption	loanword	data
+akusesumappu	access map	loanword	data
+attene-ta-	attenuator	loanword	data
+aikonn	icon	loanword	data
+achi-bumennto	achievement	loanword	data
+akusesurannkinngu	access ranking	loanword	data
+appurinnku	uplink	loanword	data
+akuano-to	aquanaut	loanword	data
+akuriruamido	acrylamide	loanword	data
+anatema	anathema	loanword	data
+autodoasupo-tsu	outdoor sports	loanword	data
+asuteroido	asteroid	loanword	data
+asainn	assignment	loanword	data
+auta-	outer	loanword	data
+asupekuto	aspect	loanword	data
+aisaito	eyesight	loanword	data
+agennsuto	head wind	loanword	data
+akyurashi-	accuracy	loanword	data
+autodoareja-	outdoor leisure	loanword	data
+appuruso-su	apple sauce	loanword	data
+asetoaminofenn	acetaminophen	loanword	data
+adhikushonn	addiction	loanword	data
+adowea	adware	loanword	data
+authinngu	outing	loanword	data
+aidennthithi	identity	loanword	data
+aguroforesutori-	agroforestry	loanword	data
+akushonnkamera	action camera	loanword	data
+apputaimu	uptime	loanword	data
+adenouirusu	adenovirus	loanword	data
+akidakuto	aqueduct	loanword	data
+akusesureberu	access level	loanword	data
+akuroporisu	acropolis	loanword	data
+akutoresu	actress	loanword	data
+asechiruseruro-su	acetylcellulose	loanword	data
+ananasu	ananas	loanword	data
+autokamu	outcome	loanword	data
+akusannshirukonnfurekkusu	circumflex accent	loanword	data
+akirea	achillea	loanword	data
+adobaizari-bo-do	advisory board	loanword	data
+akademia	academia	loanword	data
+ajita-to	agitato	loanword	data
+adoinn	add-in	loanword	data
+auta-wea	outerwear	loanword	data
+asupirinn	aspirin	loanword	data
+asennburu	assemble	loanword	data
+autokaunnto	out count	loanword	data
+adobe	adobe	loanword	data
+akaunnto	account	loanword	data
+aisubokkusu	icebox	loanword	data
+asufarutojannguru	asphalt jungle	loanword	data
+atoropinn	atropine	loanword	data
+aza-nn	adhan	loanword	data
+akuthibisuto	activist	loanword	data
+adhishonaru	additional	loanword	data
+akuseshiburu	accessible	loanword	data
+ajirithi	agility	loanword	data
+asashinn	assassin	loanword	data
+aisukuri-mu	ice cream	loanword	data
+appusaikuru	upcycling	loanword	data
+aikea	eye care	loanword	data
+aisurinnku	ice rink	loanword	data
+autosaido	outside	loanword	data
+azo-ru	azole	loanword	data
+anata-ze	anatase	loanword	data
+adeno	adenovirus	loanword	data
+akuthibithi	activity	loanword	data
+akureimu	acclaim	loanword	data
+autodoashoppu	outdoor shop	loanword	data
+autosutora-da	autostrada	loanword	data
+atenndannto	attendant	loanword	data
+athikku	attic	loanword	data
+asupara	asparagus	loanword	data
+aisosupinn	isospin	loanword	data
+autodoate-buru	outdoor table	loanword	data
+aisudannsu	ice dancing	loanword	data
+akisharu	axial	loanword	data
+aikonntakuto	eye contact	loanword	data
+adobenncha-ge-mu	adventure game	loanword	data
+aipiro-	eye pillow	loanword	data
+appukonnba-to	upconversion	loanword	data
+anagurifu	anaglyph	loanword	data
+autosutanndhinngu	outstanding	loanword	data
+ashiddojazu	acid jazz	loanword	data
+aiboruto	eye bolt	loanword	data
+aidhiru	idyll	loanword	data
+autori-chi	outreach	loanword	data
+ajipuro	agitprop	loanword	data
+appa-	apple	loanword	data
+asarutoraifuru	assault rifle	loanword	data
+aironi-	irony	loanword	data
+akuronimu	acronym	loanword	data
+adobaizari-sutaffu	advisory staff	loanword	data
+ajidochimijinn	azidothymidine	loanword	data
+aisore-shonn	isolation	loanword	data
+ashinnmetori-	asymmetry	loanword	data
+asoshie-shonnfuttobo-ru	association football	loanword	data
+autosaida-	outsider	loanword	data
+atenndo	attend	loanword	data
+asurethikkutore-na-	athletic trainer	loanword	data
+ajite-shonn	agitation	loanword	data
+airisu	iris	loanword	data
+adomisshonnporishi-	admission policy	loanword	data
+adaputo	to adapt	loanword	data
+aisupikku	ice pick	loanword	data
+ashuarannsu	assurance	loanword	data
+akusuruhaujinngu	axle housing	loanword	data
+adobenncha-	adventure	loanword	data
+akushonnrisa-chi	action research	loanword	data
+anaguramu	anagram	loanword	data
+appugure-do	upgrade	loanword	data
+asuteroidoberuto	asteroid belt	loanword	data
+atero-mu	atheroma	loanword	data
+akusesuki-	access key	loanword	data
+asete-to	acetate	loanword	data
+autorettosutoa	outlet store	loanword	data
+akushonnge-mu	action game	loanword	data
+atoranndamu	at random	loanword	data
+aironn	iron	loanword	data
+airasshu	eyelash	loanword	data
+ajito	agitating point	loanword	data
+aisoma-	isomer	loanword	data
+agabe	agave	loanword	data
+anakuronizumu	anachronism	loanword	data
+atomaizu	atomizing	loanword	data
+adoburokka-	ad blocker	loanword	data
+aisuba-nn	icy road	loanword	data
+aibannku	eye bank	loanword	data
+aisusurejjihokke-	sledge hockey	loanword	data
+acha-ru	achaar	loanword	data
+anakonnda	anaconda	loanword	data
+aideamann	idea man	loanword	data
+aishinngurasu	isinglass	loanword	data
+asutarisuku	asterisk	loanword	data
+akurironitoriru	acrylonitrile	loanword	data
+adobannsudo	advanced	loanword	data
+atarakushia	ataraxia	loanword	data
+ageratamu	ageratum	loanword	data
+asutorinnzennto	astringent	loanword	data
+akuthibu	active	loanword	data
+ashiennda	hacienda	loanword	data
+akune	acne	loanword	data
+aitorakkinngu	eye tracking	loanword	data
+atomikku	atomic	loanword	data
+appuraitopiano	upright piano	loanword	data
+aironikku	ironic	loanword	data
+adaputa-	adapter	loanword	data
+akusanntegyu	acute accent	loanword	data
+akuserare-ta	accelerator	loanword	data
+ashuwagannda	poison gooseberry	loanword	data
+akusesukaunnta-	access counter	loanword	data
+atoriumu	atrium	loanword	data
+ashisutannto	assistant	loanword	data
+adotorakku	advertising truck	loanword	data
+akonichinn	aconitine	loanword	data
+aorisuto	aorist	loanword	data
+akekonn	arcade controller	loanword	data
+adobokashi-	advocacy	loanword	data
+akurirugasshu	acrylic gouache	loanword	data
+adeputo	adept	loanword	data
+autoso-su	outsourcing	loanword	data
+akusesa	accessor	loanword	data
+athithu-do	attitude	loanword	data
+akuijishonn	acquisition	loanword	data
+akusesupaneru	access panel	loanword	data
+aidorutaimu	idle time	loanword	data
+aisupakku	ice bag	loanword	data
+asuparute-mu	aspartame	loanword	data
+akuabitto	aquavit	loanword	data
+anaunnsumennto	announcement	loanword	data
+aidoru	idol	loanword	data
+adamannto	adamant	loanword	data
+asetto	asset	loanword	data
+anaza-	another	loanword	data
+asuta-	asterisk	loanword	data
+aishinngu	icing	loanword	data
+aisusuke-to	ice skating	loanword	data
+adhikuto	addict	loanword	data
+appusutoro-ku	upstroke	loanword	data
+asettomanejimennto	asset management	loanword	data
+ajubannto	adjuvant	loanword	data
+akaunnthinngu	accounting	loanword	data
+asennburi	assembly	loanword	data
+ashiddo	acid	loanword	data
+asechiru	acetyl	loanword	data
+akuthibizumu	activism	loanword	data
+akushonnpazuru	action puzzle	loanword	data
+ajasuta-	adjuster	loanword	data
+adomitannsu	admittance	loanword	data
+appurujakku	applejack	loanword	data
+atorakuthibu	attractive	loanword	data
+adobenncha-tsu-rizumu	adventure tourism	loanword	data
+airanndo	island	loanword	data
+akuamarinn	aquamarine	loanword	data
+appusutori-mu	upstream	loanword	data
+asai-bouru	acai bowl	loanword	data
+atemoya	custard apple	loanword	data
+aigo-	argh	loanword	data
+adobaiza-	advisor	loanword	data
+asutoronomi-	astronomy	loanword	data
+adoresu	address	loanword	data
+agabeshiroppu	agave syrup	loanword	data
+aioriso-su	aioli sauce	loanword	data
+asekusharu	gender-neutral	loanword	data
+appuro-da-	uploader	loanword	data
+asuri-to	athlete	loanword	data
+aisukuraiminngu	ice climbing	loanword	data
+autoro	outro	loanword	data
+asutoraru	astral	loanword	data
+autobaunndo	outbound	loanword	data
+aiburou	eyebrow pencil	loanword	data
+aisubureiku	icebreaker	loanword	data
+akarashia	achalasia	loanword	data
+adoresennsu	adolescence	loanword	data
+akege-	arcade game	loanword	data
+aishikuru	icicle	loanword	data
+adoresubasu	address bus	loanword	data
+akuthinngu	acting	loanword	data
+adenoido	adenoid	loanword	data
+ajasutomennto	adjustment	loanword	data
+apputaunn	uptown	loanword	data
+appa-katto	uppercut	loanword	data
+akusanngura-bu	grave accent	loanword	data
+aki-	ackee	loanword	data
+aguretto	aglet	loanword	data
+asetazoramido	acetazolamide	loanword	data
+adhishonarutaimu	stoppage time	loanword	data
+akuchinomaishinn	actinomycin	loanword	data
+atorubasutachinn	atorvastatin	loanword	data
+akuroma-to	achromat	loanword	data
+aidearu	ideal	loanword	data
+airasshuka-ra-	eyelash curler	loanword	data
+adobataizumennto	advertisement	loanword	data
+akuthibusona-	active sonar	loanword	data
+ada-jetto	adagietto	loanword	data
+aiko	iced coffee	loanword	data
+akushonnaitemu	action item	loanword	data
+autosaida-zu	outsiders	loanword	data
+aufuhe-benn	sublation	loanword	data
+autobakku	outback	loanword	data
+akuaranngu	aqualung	loanword	data
+asukonn	asphalt concrete	loanword	data
+aisotonikku	isotonic	loanword	data
+aidennthifai	identify	loanword	data
+airetto	eyelet	loanword	data
+aikamera	eye camera	loanword	data
+aisosutashi-	isostasy	loanword	data
+autopure-sumennto	outplacement	loanword	data
+akusesupoinnto	access point	loanword	data
+asannpushonn	assumption	loanword	data
+autaruki-	autarchy	loanword	data
+appurusaida-	sweet cider	loanword	data
+akusesukonntoro-ru	access control	loanword	data
+appuro-do	upload	loanword	data
+agurige-shonn	aggregation	loanword	data
+akaunntopurannna-	account planner	loanword	data
+airaina-	eye liner	loanword	data
+akurobathikku	acrobatic	loanword	data
+akusesari-shu-	hot shoe	loanword	data
+adominisutore-ta	administrator	loanword	data
+aidea	idea	loanword	data
+akusann	stress	loanword	data
+autorukku	outlook	loanword	data
+asutorosaito	astrocyte	loanword	data
+akushonnba-	action bar	loanword	data
+asureja-	athleisure	loanword	data
+ajido	azide	loanword	data
+appuruwainn	apple wine	loanword	data
+adominisutore-shonn	administration	loanword	data
+akuthibe-shonn	activation	loanword	data
+apputsu-de-to	up-to-date	loanword	data
+akusesari-	accessory	loanword	data
+aji-ru	asylum	loanword	data
+asuparagasu	asparagus	loanword	data
+adenoshinndeamina-ze	adenosine deaminase	loanword	data
+ako-suthikkusaunndo	acoustic sound	loanword	data
+akuchue-ta	actuator	loanword	data
+aisusho-	ice show	loanword	data
+assha-	usher	loanword	data
+achi-bumenntotesuto	achievement test	loanword	data
+atoraku	attraction	loanword	data
+aibekkusu	ibex	loanword	data
+asutorakann	astrakhan	loanword	data
+akutomioshinn	actomyosin	loanword	data
+autodoaribinngu	outdoor living	loanword	data
+aisometorikkusu	isometrics	loanword	data
+anadeji	analog digital	loanword	data
+adapute-shonn	adaptation	loanword	data
+atennshonn	attention	loanword	data
+aisore-ta	isolator	loanword	data
+akuta-	actor	loanword	data
+anato-	annatto	loanword	data
+aiwea	eyewear	loanword	data
+akume	orgasm	loanword	data
+autobureiku	outbreak	loanword	data
+aisotaipu	isotype	loanword	data
+akurijinn	acridine	loanword	data
+asahikomu	asahi.com	loanword	data
+adeninn	adenine	loanword	data
+appurupai	apple pie	loanword	data
+akusesurogu	access log	loanword	data
+akoraito	acolyte	loanword	data
+auchi	ouch	loanword	data
+aisubure-ka-	icebreaker	loanword	data
+aishi-rudo	eye shield	loanword	data
+adamaito	adamite	loanword	data
+asaruto	assault	loanword	data
+autorainn	outline	loanword	data
+autoka-bu	outcurve	loanword	data
+aisometorikku	isometric	loanword	data
+adaputhibu	adaptive	loanword	data
+anatomika	anatomical	loanword	data
+adoresshinngu	addressing	loanword	data
+ashisutosu-tsu	assistive exoskeleton	loanword	data
+akademikkupakke-ji	academic package	loanword	data
+asupire-shonn	aspiration	loanword	data
+akusesu	access	loanword	data
+akuse	accessory	loanword	data
+akusesucha-ji	access charge	loanword	data
+autorettomo-ru	outlet mall	loanword	data
+akusesua-mu	access arm	loanword	data
+adobaizari-	advisory	loanword	data
+aso-to	assortment	loanword	data
+apputennpo	uptempo	loanword	data
+azarea	azalea	loanword	data
+akuariumu	aquarium	loanword	data
+akuseputo	accept	loanword	data
+autoburi-do	outbreeding	loanword	data
+aguri-	agreeing	loanword	data
+adoresurejisuta	address register	loanword	data
+anafirakishi-	anaphylaxis	loanword	data
+aisufo-ru	icefall	loanword	data
+akusesuko-do	access code	loanword	data
+appusuke-ru	upscale	loanword	data
+asechirenn	acetylene	loanword	data
+ashisuto	assist	loanword	data
+asa-shonn	assertion	loanword	data
+asenosufea	asthenosphere	loanword	data
+aipi-su	eyepiece	loanword	data
+autodoa	outdoor	loanword	data
+aidorinngu	idling	loanword	data
+akapera	a cappella	loanword	data
+aufutakuto	upbeat	loanword	data
+asutororoji-	astrology	loanword	data
+ajianntamu	adiantum	loanword	data
+akuchinido	actinides	loanword	data
+asupenn	aspen	loanword	data
+akuriruarudehido	acrylic aldehyde	loanword	data
+asennshonn	ascension	loanword	data
+asennbura	assembler	loanword	data
+aibori-	ivory	loanword	data
+ashido-shisu	acidosis	loanword	data
+ashime	asymmetry	loanword	data
+aisuthi	iced tea	loanword	data
+atorajinn	atrazine	loanword	data
+asechirukorinnesutera-ze	acetylcholinesterase	loanword	data
+auta-massuru	outer muscles	loanword	data
+akyumure-ta	accumulator	loanword	data
+autofitto	outfit	loanword	data
+asupekutoreshio	aspect ratio	loanword	data
+aisore-to	isolate	loanword	data
+adhidasu	adidas	loanword	data
+akuserupedaru	accelerator pedal	loanword	data
+asoshieito	associate	loanword	data
+aura	aura	loanword	data
+asuparaginn	asparagine	loanword	data
+awei	opponents' ground	loanword	data
+adhiponekuchinn	adiponectin	loanword	data
+adarutochirudorenn	adult child	loanword	data
+akuroreinn	acrolein	loanword	data
+atomosufia	atmosphere	loanword	data
+awea	aware	loanword	data
+adohokku	ad hoc	loanword	data
+asa-thibu	assertive	loanword	data
+agapannsasu	lily-of-the-nile	loanword	data
+adobataijinngu	advertising	loanword	data
+akusennto	accent	loanword	data
+aiori	aioli	loanword	data
+asa-to	assert	loanword	data
+aisubairu	ice axe	loanword	data
+aikonosuko-pu	iconoscope	loanword	data
+autoriga-	outrigger	loanword	data
+adaruto	adult	loanword	data
+aso-tochokore-to	assorted chocolates	loanword	data
+azotobakuta-	azotobacter	loanword	data
+akushonnpurann	action plan	loanword	data
+auta-raizu	outerrise	loanword	data
+ako-suthikkugita-	acoustic guitar	loanword	data
+asechiruasetonn	acetylacetone	loanword	data
+aisusurari-	ice slurry	loanword	data
+ashikurobiru	acyclovir	loanword	data
+aidhia	idea	loanword	data
+ajisuromaishinn	azithromycin	loanword	data
+appuru	apple	loanword	data
+asufarutoshinnguru	asphalt shingle	loanword	data
+akomode-shonn	accommodation	loanword	data
+asairamu	asylum	loanword	data
+aisupottoshikuriddo	peacock bass	loanword	data
+auto	out	loanword	data
+akuserare-shonn	acceleration	loanword	data
+aisuari-na	ice arena	loanword	data
+aisuthi-	iced tea	loanword	data
+akurosuthikku	acrostic	loanword	data
+akuaporinn	aquaporin	loanword	data
+akuathikku	aquatic	loanword	data
+ajiann	adjourn	loanword	data
+adeyakko	blueface angelfish	loanword	data
+aisuakkusu	ice axe	loanword	data
+ajasuto	adjustment	loanword	data
+asetoarudehido	acetaldehyde	loanword	data
+autoputto	output	loanword	data
+adoburo	ad blocking	loanword	data
+anaunnsa-	announcer	loanword	data
+akaunntabirithi	accountability	loanword	data
+aibisu	ibis	loanword	data
+aironikaru	ironical	loanword	data
+adomisshonnofisu	admissions office	loanword	data
+anabaputesuto	anabaptist	loanword	data
+akuao-ra	aqua aura	loanword	data
+adoinnsofuto	add-in software	loanword	data
+aiburoupennshiru	eyebrow pencil	loanword	data
+aisubainn	eisbein	loanword	data
+atoribyu-to	attribute	loanword	data
+akuchuaru	actual	loanword	data
+atorakuta	attractor	loanword	data
+aisujaiannto	ice giant	loanword	data
+atomaiza-	atomizer	loanword	data
+aisupe-ru	ice bucket	loanword	data
+agachisu	kauri	loanword	data
+akushionn	axion	loanword	data
+akuseshibirithi	accessibility	loanword	data
+autorettobokkusu	outlet box	loanword	data
+aurosu	double flute	loanword	data
+adhu-	adieu	loanword	data
+ajata	ajata	loanword	data
+akogi	acoustic guitar	loanword	data
+akuthibe-ta	activator	loanword	data
+aguri-mennto	agreement	loanword	data
+aweiku	awake	loanword	data
+appuseru	up-selling	loanword	data
+airu	aisle	loanword	data
+adomiraru	admiral	loanword	data
+akuseputannsu	acceptance	loanword	data
+akushonndorama	action drama	loanword	data
+asutorobaioroji-	astrobiology	loanword	data
+asainnmennto	assignment	loanword	data
+azuraito	azurite	loanword	data
+atoribyu-shonn	attribution	loanword	data
+asafethida	asafetida	loanword	data
+adobaisu	advice	loanword	data
+akushonn	action	loanword	data
+aisozaimu	isozyme	loanword	data
+ajennda	agenda	loanword	data
+asesurufamukariumu	acesulfame potassium	loanword	data
+appukuxo-ku	up quark	loanword	data
+aisuba-gu	iceberg	loanword	data
+appuraito	upright	loanword	data
+adoonn	add-on	loanword	data
+azachiopurinn	azathioprine	loanword	data
+audhi	allude	loanword	data
+aikonnbotann	icon button	loanword	data
+azumaginnzame	narrownose chimaera	loanword	data
+akua	aqua	loanword	data
+aisubure-kinngu	ice-breaking	loanword	data
+adarutobideo	adult video	loanword	data
+awe-ge-mu	away game	loanword	data
+ajinngu	urging	loanword	data

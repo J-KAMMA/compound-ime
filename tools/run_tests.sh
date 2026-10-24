@@ -23,6 +23,9 @@
 #   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）。
 #      1語の表（learn-respect.tsv、50語以上）と、前の文がある複数文節の表（learn-respect-context.tsv。文脈が別の書き方を
 #      先頭にしている文で、文節の元の先頭を4回選ぶ）を流す
+#   t: カタカナ語の英字、和製英語に付けないこと、作品名・企業名の公式の英字（tests/conversion/katakana-english.tsv、
+#      katakana-wasei.tsv、work-names.tsv、brand-names.tsv。名前だけを打って変換した候補。tools/make_katakana_english_tests.py、
+#      tools/score_katakana_english.py。期待する英字が上位10個以内か、日本語の候補が先頭のままか）
 #   r: 小文字で打たれやすい英字の略語（AI、API、UI、PDF ...）。略語が入った文（tests/conversion/acronyms.tsv）、略語と同じ並びが日本語の語になる文
 #      （acronyms-ja.tsv。愛を、会いに、憂いを ...。日本語のまま出るのが正解）、略語だけを打った候補（acronyms-cand.tsv）。tools/make_acronym_tests.py、tools/score_proper_nouns.py
 #   s: 数字の間の点と文末の句点（docs/decimal-point.md）と、かなで打った数＋単位（docs/kana-numbers.md）。
@@ -237,6 +240,19 @@ r)
     grep -v '^#' $T/acronyms-cand.tsv | cut -f1 > $W/acronyms-cand.txt
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/acronyms-cand.txt $OUT/acronyms-cand.tsv 4
   fi
+  ;;
+z1)
+  # カタカナ語・作品名・企業名の英字。名前の読みをかなで打ち、空白で変換した候補を見る。
+  # カタカナ語と作品名・企業名は、期待する英字が上位10個以内にあり、日本語の候補が先頭のままであること。
+  # 和製英語（マンション、パソコン ...）は、元の英単語が候補に出ないこと。採点は tools/score_katakana_english.py
+  for f in katakana-english katakana-wasei work-names brand-names; do
+    if [ -f $T/$f.tsv ]; then
+      grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt
+      bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/$f.txt $OUT/$f.tsv 4
+    fi
+  done
+  python3 $REPO/tools/score_katakana_english.py --tests $T --results $OUT --min-rate 0.98 --max-wasei 0 \
+    | tee $OUT/katakana-english-score.txt
   ;;
 q)
   # 開発の道具の名前（opencode ...）: 名前だけを打って変換したときの候補の並び（採点は tools/score_proper_nouns.py candidates）と、

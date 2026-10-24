@@ -19,7 +19,7 @@
 
 | 一覧 | 元 | 焼き込み先 |
 |---|---|---|
-| 固有名詞 `tools/data/proper-nouns.tsv` | Wikidata（`fetch_wikidata_names.py` → `build_proper_nouns.py`） | ① `build_proper_noun_dictionary.py` が `dictionary14.txt`（読み・左右の品詞番号・費用・表記）にして Mozc の辞書の元データ `data/dictionary_oss/` に入れ、Bazel の `mozc_dataset` が `mozc.data`（と実行ファイルに埋め込む `mozc_data.inc`）にする。② 「打つ形」と表示の形は `converter/brand_casing_data.inc`、英語の言い回し・語は `english_lexicon_data.inc`（C++ の配列）に書かれる |
+| 固有名詞 `tools/data/proper-nouns.tsv` | Wikidata（`fetch_wikidata_names.py` → `build_proper_nouns.py`） | ① `build_proper_noun_dictionary.py` が `dictionary14.txt`（読み・左右の品詞番号・費用・表記）にして Mozc の辞書の元データ `data/dictionary_oss/` に入れ、Bazel の `mozc_dataset` が `mozc.data`（と実行ファイルに埋め込む `mozc_data.inc`）にする。② 「打つ形」と表示の形は `converter/brand_casing_data.inc`、英語の言い回し・語は `english_lexicon_data.inc`（C++ の配列）に書かれる。作品名・企業名の公式の別表記は、人が確かめた `tools/data/proper-noun-extra.tsv` を先に読む |
 | 略語 `tools/data/acronyms.tsv` | 手で作った（自作）| 型 b（日本語に読める。あい → AI）の読みは上の `dictionary14.txt` に入る。型 a（api、url …）と手がかりは `build_acronym_table.py` が `native/jaen-detector/jaen_detector.cc`（英語の検出器のコード）の表に書く |
 | 英単語の一覧 `jaen-modern-words.tsv`、`jaen-brand-words.txt`、`jaen-domain-words.txt` ほか | 手で作った・分野の文書から作った | `english_lexicon_data.inc` と `brand_casing_data.inc`。起動して最初に使うとき、これらから語の一覧（`jaen::Lexicon`）を組み立てる |
 
@@ -169,7 +169,7 @@ current/   今の辞書   previous/  1つ前の辞書   staging/  取ってい�
 
 | 種類 | 試験（採点の数） | 許す下がり |
 |---|---|---|
-| 対象（辞書を変えて直したい試験） | 固有名詞の文（名前が合う）、固有名詞の候補（先頭・上位3つ・候補の中）、略語の文（名前が合う）、略語の候補（先頭・候補の中）、開発の道具の候補（先頭）、英単語と重なるローマ字の英語にしたい文（英語で出た） | 0.5%、最低1件 |
+| 対象（辞書を変えて直したい試験） | 固有名詞の文（名前が合う）、固有名詞の候補（先頭・上位3つ・候補の中）、略語の文（名前が合う）、略語の候補（先頭・候補の中）、開発の道具の候補（先頭）、英単語と重なるローマ字の英語にしたい文（英語で出た）、カタカナ語・作品名・企業名の英字（上位10個以内）、和製英語に英字が付いた数 | 0.5%、最低1件 |
 | 日本語 | 日本語だけの400文（合計）、英単語と重なるローマ字の日本語だけの文（日本語のまま）、略語と重なる日本語の文、ウィキペディアの文・プログラミング・仮想通貨・開発の道具の名前の文（元の文と同じ、英字が混じった）、話し言葉（厳しい採点） | 0.3%、最低2件 |
 
 - 「英字が混じった」は少ないほうがよい項目（増えたら悪くなった）。

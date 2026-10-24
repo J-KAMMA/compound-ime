@@ -1,6 +1,7 @@
 # カタカナ語と英単語の組（tools/data/katakana-english.tsv）を作る。手動で動く。
 # Mozc の辞書のカタカナ語と、英単語の発音（CMU Pronouncing Dictionary、BSD）を照らし合わせ、
-# 英単語の使われやすさ（SCOWL の段階）で選ぶ。できた一覧は成果物として残る。
+# 英単語の使われやすさ（SCOWL の段階）で選ぶ。和製英語（tools/data/wasei.tsv）には付けない。
+# できた一覧は成果物として残る。
 name: Katakana data
 
 on:
@@ -30,6 +31,8 @@ jobs:
             https://raw.githubusercontent.com/cmusphinx/cmudict/0f8072f814306c5ee4fbf992ed853601b12c01f9/cmudict.dict
           echo "81917843c7f44ce2b094ac63873c2c7a4cf802040792c455ba3ca406891c3d22  $W/cmudict.dict" | sha256sum -c
           for l in 10 20 35; do python3 $W/repo/tools/build_english_lexicon.py --out $W/lex$l --level $l; done
+          # JMdict（EDRDG、CC BY-SA 4.0）の外来語の元の綴り。更新されるのでハッシュは固定しない
+          curl -fsSL -o $W/JMdict_e.gz https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz
 
       - name: 組を作る
         run: |
@@ -37,9 +40,13 @@ jobs:
           W=$GITHUB_WORKSPACE; mkdir -p $W/out
           python3 $W/repo/tools/build_loanword_pairs.py --mozc $W/myime/mozc/src --cmudict $W/cmudict.dict \
             --lexicon $W/lex35/english-lexicon.txt --out $W/out/pairs-all.tsv --all-words
+          python3 $W/repo/tools/build_jmdict_loanwords.py --jmdict $W/JMdict_e.gz \
+            --out $W/out/jmdict-loanwords.tsv --wasei-out $W/out/jmdict-wasei.tsv
           python3 $W/repo/tools/build_katakana_english.py --pairs $W/out/pairs-all.tsv \
             --level $W/lex10 --level $W/lex20 --level $W/lex35 --checked $W/repo/tools/data/katakana-english-common.tsv \
-            --checked $W/repo/tools/data/loanwords.tsv --mozc $W/myime/mozc/src --out $W/out/katakana-english.tsv
+            --checked $W/repo/tools/data/loanwords.tsv --jmdict $W/out/jmdict-loanwords.tsv \
+            --wasei $W/repo/tools/data/wasei.tsv --wasei $W/out/jmdict-wasei.tsv \
+            --mozc $W/myime/mozc/src --out $W/out/katakana-english.tsv
           shuf -n 60 --random-source=<(yes) $W/out/katakana-english.tsv | paste -sd' '
 
       - uses: actions/upload-artifact@v4

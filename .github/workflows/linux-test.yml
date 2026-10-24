@@ -67,6 +67,9 @@ jobs:
           python3 -m venv $GITHUB_WORKSPACE/venv-dict && $GITHUB_WORKSPACE/venv-dict/bin/pip -q install cryptography
           bash $GITHUB_WORKSPACE/repo/tools/run_dict_update_unit_tests.sh $GITHUB_WORKSPACE/venv-dict/bin/python $RUNNER_TEMP/dict-update-test
           python3 $GITHUB_WORKSPACE/repo/tools/test_dict_quality_gate.py
+          # カタカナ語の英単語・作品名・企業名の辞書の組み立てと、JMdict の外来語（Mozc なし）
+          python3 $GITHUB_WORKSPACE/repo/tools/katakana_english_dictionary_test.py
+          python3 $GITHUB_WORKSPACE/repo/tools/jmdict_loanwords_test.py
 
       - name: 上流のソースと土台の改修
         run: |
@@ -198,7 +201,7 @@ jobs:
       fail-fast: false
       max-parallel: 16
       matrix:
-        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u"]') }}
+        group: ${{ fromJSON(inputs.groups || '["a1","a2","b","c","d1","d2","e1","e2","f","g","h","i","j","k","l","m","n","p","q","r","s","t","u","z1"]') }}
         # dict_candidate があるときだけ、新しい辞書（cand）でも流す
         variant: ${{ fromJSON(inputs.dict_candidate && '["base","cand"]' || '["base"]') }}
     steps:
@@ -365,6 +368,8 @@ jobs:
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/acronyms-cand.tsv results/acronyms-cand.tsv "略語の候補" > results/acronyms-cand-score.txt
             head -26 results/acronyms-cand-score.txt
           fi
+          # カタカナ語・作品名・企業名の英字（組 t）の採点
+          [ -f results/katakana-english-score.txt ] && cat results/katakana-english-score.txt
           # ja400.json の話し言葉の区分（colloquial）の結果。話し言葉の打ち込み試験（組 h）と並べて見る
           if [ -f results/ja400.tsv ]; then
             python3 repo/tools/score_categories.py results/ja400.tsv repo/tests/conversion/ja400.json > results/ja400-score.txt

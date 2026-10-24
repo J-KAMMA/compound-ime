@@ -22,6 +22,7 @@
 - SCOWL 2020.12.07: https://downloads.sourceforge.net/project/wordlist/SCOWL/2020.12.07/scowl-2020.12.07.tar.gz 、SHA-256 `5587667caa20c4891390c2d42dbb4d5c4c3f41bee77af1457ece3ba23fb859cc`（`tools/build_english_lexicon.py` が自動で取得して照合。`--archive` で手元のファイルも指定可）
 - SudachiDict 由来の `mozcdic-ut-sudachidict.txt.bz2`（Apache-2.0）: https://github.com/utuhiro78/mozcdic-ut-sudachidict の配布物。SHA-256 `d2cb4b2b16d513e257d26d1c33673ebda254a1d5aa0c3c0c9bc94f932619fbdc`（`tools/build_ut_dictionary.py` に記録した採用版。展開した `mozcdic-ut-sudachidict.txt` を置いたフォルダーを `--ut` に渡す）
 - CMU Pronouncing Dictionary（`cmudict.dict`、BSD、https://github.com/cmusphinx/cmudict）: `tools/data/loanwords.tsv` を作り直すときだけ必要
+- JMdict（英語版 `JMdict_e.gz`、EDRDG、CC BY-SA 4.0、https://ftp.edrdg.org/pub/Nihongo/JMdict_e.gz）: カタカナの外来語の元の英語を `tools/data/katakana-english.tsv` に足すとき。`tools/build_jmdict_loanwords.py` が読む（毎日更新されるので版は固定しない）
 
 `tools/data/*` は生成済みの語彙・対応表です。通常は作り直さずそのまま使えます。第三者の著作権表示は `docs/credits_en.html` にあります。
 
@@ -53,9 +54,9 @@ python tools/build_ut_dictionary.py --mozc <src> --ut <ut-dir> --sources sudachi
 
 `build_ut_dictionary.py --install` は `<src>/data/dictionary_oss/dictionary10.txt` を置き、その BUILD.bazel に追加します。ローマ字別名辞書（dictionary11）と仮名の3文字連接モデルは、次の適用スクリプトが `tools/build_romaji_alias_dictionary.py` と `tools/build_kana_model.py` を呼んで作ります。
 
-任意（`tools/data` の作り直し）: `build_brand_casing.py`（`--ut` に上記 txt）、`build_hepburn_names.py`、`build_loanword_pairs.py`（`--cmudict`、`--lexicon`）。
+任意（`tools/data` の作り直し）: `build_brand_casing.py`（`--ut` に上記 txt）、`build_hepburn_names.py`、`build_loanword_pairs.py`（`--cmudict`、`--lexicon`）。カタカナ語の英単語（`tools/data/katakana-english.tsv`）は `.github/workflows/katakana-data.yml` が `build_jmdict_loanwords.py` と `build_katakana_english.py`（`--jmdict`、`--wasei tools/data/wasei.tsv`）で作る。作品名・企業名の公式の別表記は、人が確かめた `tools/data/proper-noun-extra.tsv` を `build_proper_noun_dictionary.py` が `--names` で読む。
 
-大文字を含む英字の固有名詞（`tools/data/proper-nouns.tsv`、Wikidata の CC0 データ）の作り直し: `fetch_wikidata_names.py --out <dir>`（Wikidata の問い合わせサービスと Wikimedia の API から取得。約1時間）、続けて `build_proper_nouns.py`（`--wikidata <dir>` ほか。詳しくは冒頭の説明。英語の検出器の試し用 `native/jaen-detector/jaen_trial.cc` が要る）。日本語だけの文のローマ字と英単語まじりの文は `make_japanese_romaji_corpus.py` で作る。
+大文字を含む英字の固有名詞（`tools/data/proper-nouns.tsv`、Wikidata の CC0 データ）の作り直し: `fetch_wikidata_names.py --out <dir>`（Wikidata の問い合わせサービスと Wikimedia の API から取得。約1時間。公式名 P1448・題名 P1476 も `<dir>/official.tsv` に取る）、続けて `build_proper_nouns.py`（`--wikidata <dir>`、`--official <dir>/official.tsv` ほか。詳しくは冒頭の説明。英語の検出器の試し用 `native/jaen-detector/jaen_trial.cc` が要る）。日本語だけの文のローマ字と英単語まじりの文は `make_japanese_romaji_corpus.py` で作る。
 
 英語の切り分けだけを手元で動かす（Mozc なし）: `g++ -std=c++20 -O2 -I native/jaen-detector native/jaen-detector/jaen_trial.cc native/jaen-detector/jaen_detector.cc -o jaen_trial`、続けて `JAEN_DICT=<mozc>/src/data/dictionary_oss CONTEXT=1 ./jaen_trial <romaji.tsv と readings.txt の場所> <一覧の場所> < ローマ字の行`（`CONTEXT=1` で、ローマ字として日本語に読める英単語を文脈で決める段まで動く。詳しくは [docs/all-english.md](docs/all-english.md)）。英単語と重なるローマ字の試験の文は `tools/make_allenglish_tests.py` で作り、組 `m` で流す。
 

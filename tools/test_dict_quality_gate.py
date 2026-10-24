@@ -30,6 +30,11 @@ def sample(proper=100, cand_first=80, cand_any=95, mixed=70, ja=198, ja400=380, 
         "ja400-score.txt": f"colloquial     20/20\n合計            {ja400}/400\n",
         "wiki-typing-score.txt": f"ウィキペディアの文: 元の文と同じ {wiki}/1000、英字が混じった {letters}\n",
         "domain-prog-score.txt": "分野の打ち込み（プログラミング）: 元の文と同じ 250/300、英字が混じった 1\n",
+        "katakana-english-score.txt": "カタカナ語: 上位10個以内 500/500、先頭 0 件（英字が先頭になった数）\n"
+                                      "作品名: 上位10個以内 320/320、先頭 0 件（英字が先頭になった数）\n"
+                                      "企業・ブランド: 上位10個以内 320/320、先頭 0 件（英字が先頭になった数）\n"
+                                      "和製英語: 英字が出た 0/44（0 が正しい）\n"
+                                      "合計: 上位10個以内 1140/1140（100.0%）、英字が先頭になった 0 件\n",
         "colloquial-score.txt": f"話し言葉の打ち込み: 厳しい {colloquial}/200、記号ゆれ込み 170/200、緩い 180/200\n",
         "inputs.tsv": "a\tx\tA\nb\ty\tB\n",
     }
@@ -102,7 +107,7 @@ def main():
     rules = json.loads((HERE / "data/dict-gate.json").read_text(encoding="utf-8"))
     sources = {"proper": "score_proper_nouns.py", "cand": "score_proper_nouns.py", "acronyms": "score_proper_nouns.py", "domain-tools-cand": "score_proper_nouns.py",
                "allenglish": "score_allenglish.py", "ja400": "score_categories.py", "wiki": "score_wiki_typing.py", "domain": "score_wiki_typing.py",
-               "colloquial": "score_colloquial.py"}
+               "colloquial": "score_colloquial.py", "katakana-english": "score_katakana_english.py"}
     for metric in rules["metrics"]:
         key = next(k for k in sources if metric["file"].startswith(k))
         literal = [w for w in __import__("re").findall(r"[ぁ-んァ-ヶ一-龠]+|\d?[ぁ-んァ-ヶ一-龠]+", metric["pattern"]) if w]

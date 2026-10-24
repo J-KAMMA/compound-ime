@@ -127,7 +127,8 @@ jobs:
           else
             $PY $W/repo/tools/build_proper_nouns.py --wikidata $W/wikidata --mozc-dictionaries $S/data/dictionary_oss \
               --ut $W/ut/mozcdic-ut-sudachidict.txt --table $W/romanji-hiragana.tsv --lexicon $W/lexq --trial $W/jaen_trial \
-              --trial-work $W/trialwork --corpus $W/corpus-ja.txt $W/corpus-mixed.txt --out $W/new/proper-nouns.tsv --work $W/work
+              --trial-work $W/trialwork --corpus $W/corpus-ja.txt $W/corpus-mixed.txt \
+              --official $W/wikidata/official.tsv --out $W/new/proper-nouns.tsv --work $W/work
           fi
           wc -l $W/new/proper-nouns.tsv
 
@@ -136,7 +137,7 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
           # 新しい一覧から
-          $PY $T/build_proper_noun_dictionary.py --mozc $S --names $W/new/proper-nouns.tsv --acronyms $T/data/acronyms.tsv --out $W/new/supplement.tsv
+          $PY $T/build_proper_noun_dictionary.py --mozc $S --names $T/data/proper-noun-extra.tsv --names $W/new/proper-nouns.tsv --acronyms $T/data/acronyms.tsv --out $W/new/supplement.tsv
           $PY $T/build_english_extra.py --proper-nouns $W/new/proper-nouns.tsv --out $W/new/english-extra.tsv
           # いまの一覧（リポジトリのもの。supplement は本体に焼き込んだ dictionary14.txt と同じ作り方）
           mkdir -p $W/old
@@ -185,7 +186,7 @@ jobs:
     permissions:
       contents: write
     with:
-      groups: ${{ inputs.groups || '["a1","a2","b","e1","e2","g","h","k","m","r"]' }}
+      groups: ${{ inputs.groups || '["a1","a2","b","e1","e2","g","h","k","m","r","t"]' }}
       dict_candidate: dict-release
 
   gate:
