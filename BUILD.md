@@ -1,6 +1,6 @@
 # ビルド手順
 
-コンパウンドIMEは、上流の MyIME のソースツリーに、このリポジトリのスクリプトとソースを重ねて作ります。ここには改造部分とその生成器だけがあり、上流のソースは含みません。`<...>` は各自の環境に合わせて置き換えてください。Windows 10/11 x64、Visual Studio（MSVC、C++ と Windows SDK）、Git for Windows、Python 3.13、LLVM（clang-cl）、.NET SDK（WiX 用）が必要です。
+複合IME（旧名 コンパウンドIME）は、上流の MyIME のソースツリーに、このリポジトリのスクリプトとソースを重ねて作ります。ここには改造部分とその生成器だけがあり、上流のソースは含みません。`<...>` は各自の環境に合わせて置き換えてください。Windows 10/11 x64、Visual Studio（MSVC、C++ と Windows SDK）、Git for Windows、Python 3.13、LLVM（clang-cl）、.NET SDK（WiX 用）が必要です。
 
 ## 1. 上流の入力（固定版）
 

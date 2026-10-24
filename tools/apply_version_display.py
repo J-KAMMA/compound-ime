@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 src = Path(sys.argv[1])
-JA = "コンパウンドIME"
+JA = "複合IME"
 
 
 def edit(path, old, new, count=1):

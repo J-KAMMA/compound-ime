@@ -1,5 +1,5 @@
 #!/bin/bash
-# コンパウンドIME 新版のお知らせ（Linux 用）
+# 複合IME 新版のお知らせ（Linux 用）
 # curl と notify-send を使う。notify-send がなければ何もしない。
 # 失敗したときは黙って終わる。外部に送るのは GitHub の releases API への GET だけ。
 
@@ -74,7 +74,7 @@ main() {
   [ "$notified" != "$latest" ] || return 0
 
   url="${RELEASE_BASE}${latest}"
-  msg="コンパウンドIMEの新しい版（${latest_ver}）があります。押すと配布ページを開きます。"
+  msg="複合IMEの新しい版（${latest_ver}）があります。押すと配布ページを開きます。"
 
   # 知らせた版を記録
   printf 'checked=%s\nnotified=%s\n' "$now" "$latest" > "$STATE_FILE" 2>/dev/null
@@ -82,16 +82,16 @@ main() {
   if notify-send --help 2>&1 | grep -q -- '--action'; then
     (
       if command -v timeout >/dev/null 2>&1; then
-        act=$(timeout 600 notify-send --wait --app-name="CompoundIME" --action="open=配布ページを開く" "コンパウンドIME" "$msg" 2>/dev/null)
+        act=$(timeout 600 notify-send --wait --app-name="CompoundIME" --action="open=配布ページを開く" "複合IME" "$msg" 2>/dev/null)
       else
-        act=$(notify-send --wait --app-name="CompoundIME" --action="open=配布ページを開く" "コンパウンドIME" "$msg" 2>/dev/null)
+        act=$(notify-send --wait --app-name="CompoundIME" --action="open=配布ページを開く" "複合IME" "$msg" 2>/dev/null)
       fi
       if [ "$act" = "open" ] && command -v xdg-open >/dev/null 2>&1; then
         xdg-open "$url" >/dev/null 2>&1
       fi
     ) >/dev/null 2>&1 &
   else
-    notify-send "コンパウンドIME" "$msg" >/dev/null 2>&1
+    notify-send "複合IME" "$msg" >/dev/null 2>&1
   fi
   return 0
 }

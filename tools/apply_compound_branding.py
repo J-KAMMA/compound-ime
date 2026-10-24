@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 
 src = Path(sys.argv[1])
-ASCII, JA = "CompoundIME", "コンパウンドIME"
+ASCII, JA = "CompoundIME", "複合IME"
 COMPANY = "CompoundIME Project"
 URL = "https://github.com/J-KAMMA/compound-ime"
 

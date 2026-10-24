@@ -1,6 +1,6 @@
 # Qt source code offer (LGPL v3)
 
-CompoundIME (コンパウンドIME) uses the Qt toolkit, version 6.9.1, as dynamic libraries:
+CompoundIME (複合IME) uses the Qt toolkit, version 6.9.1, as dynamic libraries:
 
 - `Qt6Core.dll`, `Qt6Gui.dll`, `Qt6Widgets.dll`
 - `platforms\qwindows.dll`
