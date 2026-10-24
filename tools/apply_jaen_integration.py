@@ -1787,7 +1787,8 @@ subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_diction
 
 # 話し言葉・ネットの書き方（dictionary13.txt）: 行こっか、まあいっか、すいたー など
 # （tools/data/colloquial.tsv）。〜ておくの縮約（切っとく、書いといて、読んどく など）は
-# tools/data/toku.tsv、〜になってる と 担ってる の選び分けは tools/data/naru.tsv。
+# tools/data/toku.tsv と、Mozc の辞書にある動詞から作る。〜になってる と 担ってる の
+# 選び分けは tools/data/naru.tsv。
 # Mozc に同じ読みの語があれば、その語より少し後ろにする。
 subprocess.run([sys.executable, str(REPO / "tools/build_colloquial_dictionary.py"), "--mozc", str(src),
                 "--words", str(REPO / "tools/data/colloquial.tsv"), str(REPO / "tools/data/toku.tsv"),

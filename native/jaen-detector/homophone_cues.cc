@@ -85,9 +85,35 @@ const Member* Find(std::string_view content, size_t* group_index) {
   return best;
 }
 
-bool Cued(const Member& member, std::string_view context) {
+// 助詞 (〜を担う, 〜になる) は動詞のすぐ前に来る。収縮の
+// 〜とく／〜どく と 〜になってる／担ってる の組では、文のどこかに
+// あるだけの語ではなく、この文節の直前にある語だけを手がかりにする。
+bool EndsWithCue(std::string_view text, std::string_view cue) {
+  if (cue.empty() || cue.size() > text.size()) return false;
+  if (text.substr(text.size() - cue.size()) != cue) return false;
+  return true;
+}
+
+// 手がかりの語の直後に助詞が付く形 (役 + を, 楽 + に) も許す。
+bool CuedAdjacent(const Member& member, std::string_view context) {
+  size_t boundary = context.find('\n');
+  if (boundary == std::string_view::npos) boundary = context.size();
+  const std::string_view before = context.substr(0, boundary);
+  for (const auto& cue : member.cues) {
+    if (EndsWithCue(before, cue)) return true;
+    for (const std::string_view particle : {"を", "は", "が", "も", "に", "へ", "で", "と", "や", "の"}) {
+      if (EndsWithCue(before, cue + std::string(particle))) return true;
+    }
+  }
+  return false;
+}
+
+bool Cued(const Member& member, std::string_view context, std::string_view extra,
+          bool adjacent) {
+  if (adjacent) return CuedAdjacent(member, context);
+  const std::string text = std::string(context) + std::string(extra);
   for (const auto& cue : member.cues)
-    if (context.find(cue) != std::string_view::npos) return true;
+    if (text.find(cue) != std::string_view::npos) return true;
   return false;
 }
 
@@ -100,9 +126,9 @@ size_t PreferByHomophoneCues(const std::vector<HomophoneCandidate>& candidates,
   const Member* top = Find(candidates[0].content_value, &top_group);
   if (!top || candidates[0].value.compare(0, top->stem.size(), top->stem) != 0) return 0;
   const std::string_view top_rest = std::string_view(candidates[0].value).substr(top->stem.size());
-  // The first candidate's own text after the stem also counts (細菌|学者).
-  const std::string text = std::string(context) + std::string(top_rest);
-  if (Cued(*top, text)) return 0;
+  // 〜ておく の縮約など、語幹が「っ」で終わる組は直前の語だけを見る。
+  const bool adjacent = top->stem.size() >= 3 && top->stem.substr(top->stem.size() - 3) == "っ";
+  if (Cued(*top, context, top_rest, adjacent)) return 0;
   for (size_t i = 1; i < candidates.size(); ++i) {
     size_t group = 0;
     const Member* other = Find(candidates[i].content_value, &group);
@@ -110,7 +136,7 @@ size_t PreferByHomophoneCues(const std::vector<HomophoneCandidate>& candidates,
         candidates[i].value.compare(0, other->stem.size(), other->stem) != 0 ||
         std::string_view(candidates[i].value).substr(other->stem.size()) != top_rest)
       continue;
-    if (Cued(*other, text)) return i;
+    if (Cued(*other, context, top_rest, adjacent)) return i;
   }
   return 0;
 }
