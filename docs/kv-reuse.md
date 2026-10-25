@@ -34,6 +34,12 @@
    `ZenzCandidateEvaluator` が渡すので、問いと候補の境目が分かる。
 3. `MYIME_KV_REUSE=0` で止められる（既定は有効）。止めたときは列も問いの記憶も触らないので、
    出力は変更前と同じになる。
+4. llama.cpp の KV は全列で 512 語片を共有する。評価（全文の採点と一括採点）の前に、列 18 の
+   今回使わない後ろを `llama_kv_cache_seq_rm` で消して容量を空ける。前の文を外した問いなど、
+   残した問いを使わない評価では列 18 を全部消す。これで、長い行が続いても古い問いのセルが
+   新しい問いと一括採点のセルを押し出さない。
+5. 列 18 へ写す前に、列 18 のセルを全部消す。`llama_kv_cache_seq_cp` は写す先を消さずに列の
+   番号を足すだけなので、消さないと同じ位置に2つのセルができてしまう。
 
 ## 確かめ方（本物の Mozc で流す）
 
@@ -42,7 +48,9 @@
 
 ### 出力が1文字も変わらないこと
 
-組 `a1 a2 b c f h k m r s t` を、結果フォルダーを分けて2回流す。
+組 `a1 a2 b c f h k m r s t` を、結果フォルダーを分けて2回流す。長い行（104〜147字）が
+前の行と違う読みで続く組 `w` も、同じ2通りで流して比べる（`latency_convert.sh` が確定した文を
+`long-*.tsv` に残す）。組 `w` は `LAT_N` で1組あたりの文の数を減らせる。
 
 ```
 for g in a1 a2 b c f h k m r s t; do
@@ -50,10 +58,15 @@ for g in a1 a2 b c f h k m r s t; do
   MYIME_KV_REUSE=1 bash tools/run_tests.sh $g <engine> <model.gguf> <repo> <out>/on-$g
   python3 tools/compare_kv_reuse.py <out>/off-$g <out>/on-$g
 done
+MYIME_KV_REUSE=0 bash tools/run_tests.sh w <engine> <model.gguf> <repo> <out>/off-w
+MYIME_KV_REUSE=1 bash tools/run_tests.sh w <engine> <model.gguf> <repo> <out>/on-w
+python3 tools/compare_kv_reuse.py <out>/off-w <out>/on-w
 ```
 
-`compare_kv_reuse.py` は変換の結果（`.tsv`、`.json`、`.txt`）を行数と1行ずつ比べ、
-時間・記録・環境のファイルは飛ばす。違いが1件でもあれば終了の番号 1 を返す。
+`compare_kv_reuse.py` は変換の結果のうち、名前の形を明示した許可リスト（`long-*.tsv` などを含む）に
+合うファイルだけを行数と1行ずつ比べる。時間・記録・環境のファイルは許可リストに入れない。
+両方のフォルダーが存在し、比べたファイルが1つ以上あることも要求する。フォルダーが無い・
+ファイルが0個・違いが1件でもあれば、終了の番号 1 を返す。
 `MYIME_KV_REUSE=0` は変更前と同じ道を通るので、この比較は「変更前」と「変更後（有効）」の比較になる。
 組 `j`（落ちないか）も、同じ2通りで流す。
 

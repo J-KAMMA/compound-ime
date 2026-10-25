@@ -9,6 +9,9 @@ tools/apply_batch_score.py のあと、tools/apply_latency_profile.py の前に1
    ZenzContext に持つ。評価のたびに、その列の先頭から今回の語片と一致する長さまでを
    evalSeqId（列 0）へ写し、違う後ろだけを llama_decode する。問いの後ろ（候補の表記）は
    この列に入れないので、次の打鍵で読みが伸びても、前回の読みの KV をそのまま使える。
+   評価の前に、この列の今回使わない後ろを消して容量を空ける（llama.cpp の KV は全列で
+   512 語片を共有するため）。写す前にこの列のセルを全部消す（seq_cp は写す先を消さない
+   ので、消さないと同じ位置に2つのセルができる）。
 2. 評価の入り口（evaluationLogits）に「問いの語片の数」を渡せるようにし、jointLogProbability、
    選び手の suffixLogProbabilities、ZenzCandidateEvaluator から渡す。問いの境目が分かるので、
    候補の表記を問いの列に混ぜない。
@@ -68,7 +71,18 @@ edit(ctx, """        self.prevInputBySeq = [:]
 
 # --- 2. 評価の入り口に、問いの語片の数を足す ---
 edit(ctx, "    private func getLogits(tokens: [llama_token], logits_start_index: Int = 0, seqId: llama_seq_id = 0) -> UnsafeMutablePointer<Float>? {\n",
-     "    private func getLogits(tokens: [llama_token], logits_start_index: Int = 0, seqId: llama_seq_id = 0, promptTokenCount: Int? = nil, retainPrompt: Bool = true) -> UnsafeMutablePointer<Float>? {\n")
+     """    /// 列 promptPrefixSeqId を指定の長さまでに縮め、その先のセルを解放する。
+    /// llama.cpp の KV は全列で 512 語片を共有するので、使わない古いセルを残すと評価に失敗する。
+    private func trimPromptPrefix(to count: Int) {
+        guard Self.kvReuseEnabled else { return }
+        if count < self.prevPromptPrefix.count {
+            llama_kv_cache_seq_rm(self.context, self.promptPrefixSeqId, llama_pos(count), -1)
+            self.prevPromptPrefix = Array(self.prevPromptPrefix.prefix(count))
+        }
+    }
+
+    private func getLogits(tokens: [llama_token], logits_start_index: Int = 0, seqId: llama_seq_id = 0, promptTokenCount: Int? = nil, retainPrompt: Bool = true) -> UnsafeMutablePointer<Float>? {
+""")
 
 # ほかの列（入力予測）から写したあと、問いの前半の列のほうが長く一致するなら、そちらから写す。
 edit(ctx, """        // Manage KV cache: remove entries that differ from previous input
@@ -90,6 +104,29 @@ edit(ctx, """        // Manage KV cache: remove entries that differ from previou
         // Manage KV cache: remove entries that differ from previous input
 """)
 
+# 評価の前に、この評価で使わない古い問いの後ろを列 18 から消す。llama.cpp の KV は全列で
+# 512 語片を共有するので、残すと新しい問いと一括採点のセルが入らなくなる。
+edit(ctx, """            prefixCacheCount = min(commonTokens.count, logits_start_index)
+            llama_kv_cache_seq_rm(context, seqId, llama_pos(prefixCacheCount), -1)
+            debug("new pos max:", llama_kv_cache_seq_pos_max(self.context, seqId), "commonTokens:", commonTokens.count)
+""", """            prefixCacheCount = min(commonTokens.count, logits_start_index)
+            llama_kv_cache_seq_rm(context, seqId, llama_pos(prefixCacheCount), -1)
+            if Self.kvReuseEnabled, seqId == self.evalSeqId {
+                if retainPrompt, promptTokenCount != nil {
+                    // この評価で使わない古い問いの後ろを、評価の前に解放する。
+                    // 問いの語片の数が分かる評価だけ、あとで列 18 を置き直せる。
+                    let promptMatch = self.prevPromptPrefix.commonPrefix(with: tokens).count
+                    self.trimPromptPrefix(to: min(prefixCacheCount, promptMatch))
+                } else if !retainPrompt {
+                    // 違う問い（前の文を外した問いなど）なので、残した問いは使わない。
+                    // 容量を空けるために捨てる。
+                    llama_kv_cache_seq_rm(context, self.promptPrefixSeqId, 0, -1)
+                    self.prevPromptPrefix = []
+                }
+            }
+            debug("new pos max:", llama_kv_cache_seq_pos_max(self.context, seqId), "commonTokens:", commonTokens.count)
+""")
+
 # 評価が済んだら、問いの前半だけを別の列に残す。問いが同じなら写さない（候補ごとの評価で増やさない）。
 edit(ctx, """        // update cached input for next call (for KV cache management)
         self.prevInputBySeq[seqId] = tokens
@@ -102,12 +139,29 @@ edit(ctx, """        // update cached input for next call (for KV cache manageme
             let prompt = Array(tokens.prefix(promptTokenCount))
             let common = self.prevPromptPrefix.commonPrefix(with: prompt).count
             if common < prompt.count || common < self.prevPromptPrefix.count {
-                llama_kv_cache_seq_rm(context, self.promptPrefixSeqId, llama_pos(common), -1)
+                // seq_cp は写す先の列を消さずに列の番号を足すだけなので、先にこの列の
+                // セルを全部消す。消さないと同じ位置に2つのセルができる。
+                llama_kv_cache_seq_rm(context, self.promptPrefixSeqId, 0, -1)
                 llama_kv_cache_seq_cp(context, seqId, self.promptPrefixSeqId, 0, llama_pos(prompt.count))
                 self.prevPromptPrefix = prompt
             }
         }
         return llama_get_logits(context)
+""")
+
+# 一括採点も llama_decode を直接呼ぶので、評価の前に列 18 の使わない後ろを消す。
+# useEvalSequence が false の問い（前の文を外した問い）は、残した問いを使わないので全部消す。
+edit(ctx, """        var newTokenCount = max(promptCount - reuse, 0)
+""", """        if Self.kvReuseEnabled {
+            if useEvalSequence {
+                let promptMatch = self.prevPromptPrefix.commonPrefix(with: promptTokens).count
+                self.trimPromptPrefix(to: min(reuse, promptMatch))
+            } else {
+                llama_kv_cache_seq_rm(self.context, self.promptPrefixSeqId, 0, -1)
+                self.prevPromptPrefix = []
+            }
+        }
+        var newTokenCount = max(promptCount - reuse, 0)
 """)
 
 edit(ctx, """    func evaluationLogits(tokens: [llama_token], startOffset: Int) -> UnsafeMutablePointer<Float>? {

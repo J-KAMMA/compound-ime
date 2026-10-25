@@ -99,4 +99,6 @@ llama.cpp の評価は、2語片以上をまとめて計算した回を **prefil
 `tools/apply_kv_reuse.py` を当てた変換エンジンでは、`MYIME_KV_REUSE=0` で使い回しを止められる（既定は有効）。
 組 `w` を `MYIME_KV_REUSE=0` と `=1` で同じ計算機・同じ条件で3回以上ずつ流し、
 `long-latency-report.txt` の中央値・幅と `<段>_tok` / `<段>_new`（使い回しの割合 = 1 − new/tok）を比べる。
+`latency_convert.sh` は確定した文を `<出力の名前>.tsv`（入力<TAB>確定）にも残すので、
+`tools/compare_kv_reuse.py` で =0 と =1 の長い行の出力を1行ずつ比べられる。
 詳しくは [kv-reuse.md](kv-reuse.md)。
