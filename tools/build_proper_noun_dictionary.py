@@ -136,6 +136,7 @@ def main():
     parser.add_argument("--penalty", type=int, default=1)
     parser.add_argument("--margin", type=int, default=100)
     parser.add_argument("--default-cost", type=int, default=15000)
+    parser.add_argument("--titles", type=Path, help="tools/data/japanese-titles.tsv: Japanese titles before the name")
     parser.add_argument("--acronyms", type=Path, help="tools/data/acronyms.tsv (type b rows: reading and rank)")
     parser.add_argument("--install", action="store_true")
     args = parser.parse_args()
@@ -318,6 +319,18 @@ def main():
                 kind = wanted_names[(reading, spelling)][3]
                 lid = rid = int(ids[POS[KIND_POS.get(kind, "other")]])
             entries[(reading, spelling)] = (lid, rid, cost)
+
+    # The Japanese title of a name whose reading Mozc does not have as one word
+    # (ゲゲゲの鬼太郎): Mozc writes it from smaller words, which lose to the
+    # name's one entry. It goes just before the cheapest spelling of the reading.
+    if args.titles:
+        for line in args.titles.read_text(encoding="utf-8").splitlines():
+            if line.startswith("#") or "\t" not in line:
+                continue
+            reading, title = line.split("\t")[:2]
+            costs = [cost for (r, _), (_, _, cost) in entries.items() if r == reading]
+            if costs and (reading, title) not in existing:
+                entries[(reading, title)] = (title_pos, title_pos, max(0, min(costs) - 1))
 
     for shown, reading, rank in acronyms:
         if (reading, shown) in existing:
