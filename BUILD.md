@@ -83,6 +83,13 @@ python tools/apply_jaen_integration.py <src> <lex>
 python tools/apply_dict_update.py <src>
 ```
 
+候補の採点をまとめる改造と、打鍵をまたぐ KV キャッシュの使い回しは、続けて次をこの順で1回だけ実行します（止めるときは `MYIME_KV_REUSE=0`）。詳しくは [docs/kv-reuse.md](docs/kv-reuse.md)。
+
+```
+python tools/apply_batch_score.py <work>/myime/src
+python tools/apply_kv_reuse.py <work>/myime/src
+```
+
 本体に焼き込む値は、品詞の表（`<src>/data/dictionary_oss/id.def` の SHA-256 と行数）、署名の公開鍵（`tools/dict-update/public-key.txt`。`UNSET` の間は辞書を取りに行かない）、取る先（`tools/dict-update/config.txt`）です。Mozc なしの単体試験は `bash tools/run_dict_update_unit_tests.sh <cryptography の入った python>`（g++ が要ります）。
 
 このスクリプトは、変換エンジン（Swift）の `<work>/myime/src` にも `tools/apply_zenzai_deadline.py` で改造を足します（手順 2 のパッチを当ててあること）。変換 1 回あたりの人工知能の時間の上限（既定 1000 ミリ秒。環境変数 `MYIME_ZENZAI_TIME_LIMIT_MS`、または設定 `ZenzaiTimeLimitMs`。0 で上限なし）と、人工知能の重みのメモリ固定（既定は有効。`MYIME_ZENZAI_MLOCK=0`、または設定 `ZenzaiMemoryLock=0` でやめる）です。足したあとに変換エンジンを組み立て直してください。
