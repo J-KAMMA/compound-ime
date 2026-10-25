@@ -656,6 +656,41 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         !(after_particle && word_before_particle)) {
       return false;
     }
+    // ai の後ろにカタカナ語の続き（あいでぃる = アイディル、あいであまん、
+    // あいとらっきんぐ、あいである = アイデアル）があるときは、AI ではなく
+    // 一つの日本語の語。アイデア（あいであ）は下の規則で扱うので、続きが
+    // 4かなより長い読みだけを見る（AIであいさつ の あいであ は取らない）。
+    // あい の後ろがカタカナ語（アイディル・アイデアマン・アイトラッキング・
+    // アイデアル）なら AI にしない。ただし AIを読む人・AIと絆 のように助詞から
+    // 始まる日本語の句は AI のまま。で で始まる語と、と + カタカナ語の印
+    // （小さいかな・っ・ー）だけを見る。あいである は AI + である とも読める
+    // （AIであるから）ので、読みが入力の終わりか句読点まで続くときだけにする。
+    if (is_reading && acronym.typed == "ai" && kb < kana.size() && kana[kb] != "の") {
+      const bool starts_de = kana[kb] == "で";
+      const bool starts_to = kana[kb] == "と";
+      if (starts_de || starts_to) {
+        constexpr size_t kLongest = 12;
+        static constexpr std::string_view kWordStops[] = {"。", "、", "！", "？"};
+        static constexpr std::string_view kSmall[] = {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "っ", "ー"};
+        for (size_t b = kb + 3; b <= kana.size() && b - ka <= kLongest; ++b) {
+          if (!(*is_reading)(kana_text(ka, b))) continue;
+          if (starts_to) {
+            bool loanword = false;
+            for (size_t k = kb + 1; k < b; ++k) {
+              if (std::ranges::find(kSmall, std::string_view(kana[k])) != std::end(kSmall)) {
+                loanword = true;
+                break;
+              }
+            }
+            if (!loanword) continue;
+          }
+          const bool de_aru = b >= 2 && kana_text(b - 2, b) == "ある";
+          const bool word_end = b == kana.size() ||
+              std::ranges::find(kWordStops, std::string_view(kana[b])) != std::end(kWordStops);
+          if (!de_aru || word_end) return false;
+        }
+      }
+    }
     if (is_reading && acronym.typed != "ai" && crosses_reading(ka, kb)) {
       return false;
     }
