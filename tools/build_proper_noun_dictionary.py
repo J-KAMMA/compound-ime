@@ -1,7 +1,7 @@
 """Builds dictionary14.txt: proper nouns written in English as candidates of their kana reading.
 
   python tools/build_proper_noun_dictionary.py --mozc <mozc/src> --names tools/data/proper-nouns.tsv \
-      [--names tools/data/proper-noun-extra.tsv] --out dictionary14.txt [--install]
+      [--names tools/data/proper-noun-extra.tsv] [--wasei tools/data/wasei.tsv] --out dictionary14.txt [--install]
 
 For each line of tools/data/proper-nouns.tsv (shown<TAB>typed<TAB>flags<TAB>readings<TAB>...), the
 spelling (Google, New York, Elon Musk) becomes a candidate of each reading (ぐーぐる, にゅーよーく).
@@ -27,6 +27,15 @@ Japanese word either. --names may be given more than once: rows of the earlier f
 when two files name the same reading (tools/data/proper-noun-extra.tsv is passed before
 proper-nouns.tsv, so the checked official spelling comes first).
 
+Only the long-vowel variant pairs in reading_variants.ALLOWED (でんそー / でんそう / でんそ,
+あいでぃる / あいでぃーる) are added.  A variant that merely drops the long vowel is not added
+even when Mozc has a word for the variant reading: it can be an unrelated Japanese word (おおさか
+-> おさか / 大阪, あたーる -> あたる / 当たる). --wasei drops a name that is what a wasei word
+merely looks like (マンション -> mansion), nor one part of a wasei compound
+(オフィスレディー -> オフィス -> office).  A work's English spelling goes after the Japanese
+title even when the reading's katakana form is a cheaper Mozc entry (ドラゴンボールZ before
+Dragon Ball Z).
+
 --acronyms tools/data/acronyms.tsv: the acronyms that read as Japanese words (type b: ai → あい, ui → うい) are
 the exception to the 3-kana rule. Each becomes a candidate of its reading at the rank the list gives (1 to 3): rank
 1 costs less than every Mozc entry of the reading, so it is the first candidate (AI for あい; 愛 follows); rank 2 or
@@ -36,8 +45,13 @@ proper-nouns.tsv is skipped by the 3-kana rule; this is what makes AI a candidat
 """
 import argparse
 import re
+import sys
 from collections import defaultdict
 from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import reading_variants  # noqa: E402
 
 HIRAGANA = re.compile(r"[ぁ-ゖー]+")
 KATAKANA_OF = {chr(c): chr(c + 0x60) for c in range(0x3041, 0x3097)}
@@ -53,10 +67,64 @@ KIND_POS = {"business": "company", "brand": "company", "airline": "company", "tv
             "band": "company", "people": "person",
             "country": "place", "usstate": "place", "city": "place", "region": "place", "island": "place",
             "mountain": "place", "river": "place", "lake": "place"}
+WORK_KINDS = {"film", "filmseries", "tvseries", "tvprogram", "videogame", "videogameseries",
+              "album", "band", "novel", "lightnovel", "manga", "anime", "comic", "character", "work"}
 
 
 def katakana(reading):
     return "".join(KATAKANA_OF.get(c, c) for c in reading)
+
+
+def within_first_page(reading, cost, surface_costs):
+    """The cost itself when it leaves the name among the first 10, otherwise the
+    largest cost that keeps at most 9 words at or below it (one page is 9
+    candidates, 10 checked).  Ties count: many words can share a cost, and the
+    name must still be in the first page.  Never go down to the cheapest cost,
+    so the English spelling is not the first candidate."""
+    costs = sorted(surface_costs.get(reading, {}).values())
+    if not costs or sum(1 for c in costs if c <= cost) <= 9:
+        return cost
+    for target in sorted(set(costs), reverse=True):
+        if target >= cost or target <= costs[0]:
+            continue
+        if sum(1 for c in costs if c <= target) <= 9:
+            return target
+    # Every other word has the same cost: go just above the cheapest word so
+    # the English word is in the first page and never first.
+    if costs[0] + 1 < cost:
+        return costs[0] + 1
+    return cost
+
+
+def japanese_title(surface, reading, work=False):
+    """A Japanese work title among the surfaces of a reading: mixed kana and
+    something else (ドラゴンボールZ, ゲゲゲの鬼太郎, 東京リベンジャーズ).  A
+    surface of only kana is the reading's own spelling.  A surface of only kanji
+    is another language's name (羅馬 for ローマ), not the work's title, unless
+    the reading is a work's (人魚姫 for The Little Mermaid)."""
+    if surface.isascii() or surface == katakana(reading):
+        return False
+    kana = other = False
+    for ch in surface:
+        if "ぁ" <= ch <= "ゖ" or "ァ" <= ch <= "ヺ" or ch in "ー・":
+            kana = True
+        elif "㐀" <= ch <= "䶿" or "一" <= ch <= "鿿" or ch.isalnum() or ch in "!?&+-'.":
+            other = True
+    return other and (kana or work)
+
+
+def hiragana(katakana_text):
+    out = []
+    for ch in katakana_text:
+        if ch in "・=＝ 　":
+            continue
+        if ch == "ヴ":
+            out.append("ゔ")
+        elif "ァ" <= ch <= "ヶ":
+            out.append(chr(ord(ch) - 0x60))
+        else:
+            out.append(ch)
+    return "".join(out)
 
 
 def main():
@@ -64,8 +132,9 @@ def main():
     parser.add_argument("--mozc", type=Path, required=True)
     parser.add_argument("--names", type=Path, action="append", required=True)
     parser.add_argument("--out", type=Path, required=True)
-    parser.add_argument("--penalty", type=int, default=10)
-    parser.add_argument("--margin", type=int, default=2000)
+    parser.add_argument("--wasei", type=Path, help="tools/data/wasei.tsv: never add these names")
+    parser.add_argument("--penalty", type=int, default=1)
+    parser.add_argument("--margin", type=int, default=100)
     parser.add_argument("--default-cost", type=int, default=15000)
     parser.add_argument("--acronyms", type=Path, help="tools/data/acronyms.tsv (type b rows: reading and rank)")
     parser.add_argument("--install", action="store_true")
@@ -76,6 +145,7 @@ def main():
     for line in (data / "id.def").read_text(encoding="utf-8").splitlines():
         number, _, pos = line.partition(" ")
         ids.setdefault(pos, number)
+    title_pos = int(ids[POS["other"]])  # 名詞,固有名詞,一般: an all-kanji work title's part of speech
     acronyms = []  # (shown, reading, rank) of the acronyms that read as Japanese words
     if args.acronyms:
         for line in args.acronyms.read_text(encoding="utf-8").splitlines():
@@ -85,11 +155,45 @@ def main():
             if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("1", "2", "3"):
                 raise SystemExit(f"bad acronym row: {line}")
             acronyms.append((f[1], f[3], int(f[5])))
+    wasei = set()  # (reading variant, English word) that a wasei word merely looks like
+    if args.wasei:
+        for line in args.wasei.read_text(encoding="utf-8").splitlines():
+            if line.startswith("#") or "\t" not in line:
+                continue
+            katakana_text, english = line.split("\t")[:2]
+            for reading in reading_variants.variants(hiragana(katakana_text)):
+                wasei.add((reading, english.lower()))
+                # A wasei compound (オフィスレディー -> office) must not put the
+                # English word of one part (オフィス -> office) either.
+                for n in range(2, len(reading)):
+                    wasei.add((reading[:n], english.lower()))
+    short_readings = len(args.names) > 1  # only the first (checked extra) file may use 2-kana readings
+    # Readings that name a work: an all-kanji title (人魚姫 for The Little
+    # Mermaid) counts as the Japanese title there, while a place name's kanji
+    # (羅馬 for ローマ) must not move the English spelling.
+    work_readings = set()
+    for file_order, path in enumerate(args.names):
+        for line in path.read_text(encoding="utf-8").splitlines():
+            if line.startswith("#") or not line.strip():
+                continue
+            f = line.split("\t")
+            if len(f) < 5 or f[4] not in WORK_KINDS:
+                continue
+            for reading in f[3].split("|"):
+                if not HIRAGANA.fullmatch(reading):
+                    continue
+                if len(reading) < (2 if short_readings and file_order == 0 else 3):
+                    continue
+                work_readings.add(reading)
+                for variant in reading_variants.variants(reading):
+                    if variant == reading or reading_variants.allowed(reading, variant):
+                        work_readings.add(variant)
     wanted = {reading for _, reading, _ in acronyms}
     reading_entries = defaultdict(list)  # reading -> [(cost, lid, rid)] of Mozc's own entries, for the acronyms
     existing = set()
     katakana_entries = {}  # (reading, katakana) -> (lid, rid, cost)
     max_cost, min_cost = {}, {}
+    name_max = {}  # reading -> cost of the dearest Japanese work title (mixed kana and kanji/letters)
     surface_costs = defaultdict(dict)  # reading -> surface -> cheapest cost
     for path in sorted(data.glob("dictionary*.txt")):
         if path.name == "dictionary14.txt":
@@ -104,6 +208,17 @@ def main():
                 reading_entries[reading].append((cost, lid, rid))
             max_cost[reading] = max(max_cost.get(reading, 0), cost)
             min_cost[reading] = min(min_cost.get(reading, 1 << 30), cost)
+            # A work's Japanese title (ドラゴンボールZ, 東京リベンジャーズ,
+            # ゲゲゲの鬼太郎) must stay before the English spelling even when the
+            # katakana reading of the name is a cheaper Mozc entry.  Do not
+            # count a kana-only alternate spelling (アヴァター) or a kanji-only
+            # name (羅馬 for ローマ): they would push the English spelling behind
+            # all of them and move a place or brand name out of the first page.
+            # An all-kanji title (人魚姫) counts when the reading names a work and
+            # the surface is a general proper noun, not a person or place name.
+            work = reading in work_readings and lid == title_pos
+            if japanese_title(surface, reading, work):
+                name_max[reading] = max(name_max.get(reading, 0), cost)
             surfaces = surface_costs[reading]
             surfaces[surface] = min(surfaces.get(surface, 1 << 30), cost)
             if surface == katakana(reading):  # the reading written in katakana, as the name is usually written
@@ -117,7 +232,6 @@ def main():
     # cost stays exactly what it was, so the first candidate of an existing reading does not move.
     wanted_names = {}
     file_order = 0
-    short_readings = len(args.names) > 1  # only the first (checked extra) file may use 2-kana readings
     for path in args.names:
         for row_order, line in enumerate(path.read_text(encoding="utf-8").splitlines()):
             if line.startswith("#") or not line.strip():
@@ -128,23 +242,37 @@ def main():
             shown, readings, kind = f[0], f[3], f[4]
             variants = f[6].split("|") if len(f) > 6 and f[6] else []
             for reading in readings.split("|"):
-                if not HIRAGANA.fullmatch(reading) or len(reading) < (2 if short_readings and file_order == 0 else 3):
+                if not HIRAGANA.fullmatch(reading):
                     continue
-                for variant_order, spelling in enumerate([shown] + variants):
-                    spelling = spelling.strip()
-                    if not spelling or (reading, spelling) in existing:
+                # Long vowels are typed in more than one way (でんそー / でんそう /
+                # でんそ, あいでぃる / あいでぃーる).  Only the explicit ALLOWED pairs
+                # are added: dropping a long vowel can hit an unrelated Japanese
+                # word (おおさか -> おさか, あたーる -> あたる).
+                expanded = [reading]
+                for variant in sorted(reading_variants.variants(reading)):
+                    if variant == reading or variant not in max_cost:
                         continue
-                    key = (reading, spelling)
-                    order = (file_order, row_order, variant_order)
-                    # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
-                    # the generated row: it is the spelling to put right after the katakana word.
-                    is_old = file_order > 0 and variant_order == 0
-                    if key not in wanted_names:
-                        wanted_names[key] = order + (kind, is_old, file_order == 0)
-                    else:
-                        current = wanted_names[key]
-                        wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
-                                                                      current[5] or file_order == 0))
+                    if reading_variants.allowed(reading, variant):
+                        expanded.append(variant)
+                for expanded_reading in expanded:
+                    if len(expanded_reading) < (2 if short_readings and file_order == 0 else 3):
+                        continue
+                    for variant_order, spelling in enumerate([shown] + variants):
+                        spelling = spelling.strip()
+                        if (not spelling or (expanded_reading, spelling) in existing
+                                or (expanded_reading, spelling.lower()) in wasei):
+                            continue
+                        key = (expanded_reading, spelling)
+                        order = (file_order, row_order, variant_order)
+                        # A checked row (the first file, proper-noun-extra.tsv) may replace the cost of
+                        # the generated row: it is the spelling to put right after the katakana word.
+                        is_old = file_order > 0 and variant_order == 0 and expanded_reading == reading
+                        if key not in wanted_names:
+                            wanted_names[key] = order + (kind, is_old, file_order == 0)
+                        else:
+                            current = wanted_names[key]
+                            wanted_names[key] = (min(order, current[:3]) + (kind, current[4] or is_old,
+                                                                          current[5] or file_order == 0))
         file_order += 1
 
     # Old main spellings keep their cost (all old names of a reading had the same cost). A new
@@ -172,6 +300,11 @@ def main():
         old_rank = sum(1 for cost in surface_costs.get(reading, {}).values() if cost < base)
         move_old = old_rank > 9 and any(old and checked for _, _, old, checked in spellings)
         main_base = new_base if move_old else base
+        main_base = within_first_page(reading, main_base, surface_costs)
+        is_work = any(wanted_names[(reading, spelling)][3] in WORK_KINDS
+                      for _, spelling, _, _ in spellings)
+        if is_work and reading in name_max:  # the Japanese title stays first
+            main_base = max(main_base, name_max[reading] + args.penalty)
         new_index = 1 if has_old else 0
         for _, spelling, old, _ in sorted(spellings):
             if old:

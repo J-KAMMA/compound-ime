@@ -39,7 +39,7 @@ const std::map<std::string, std::string> kTable = {
     {"q", "く"}, {"qa", "くぁ"}, {"qi", "くぃ"}, {"qe", "くぇ"}, {"qo", "くぉ"}, {"qu", "く"}, {"qwe", "くぇ"},
     {"nu", "ぬ"}, {"xn", "ん"}, {"ga", "が"}, {"ri", "り"}, {"so", "そ"}, {"wa", "わ"}, {"yo", "よ"}, {"gu", "ぐ"}, {"du", "づ"},
     {"lo", "ぉ"}, {"he", "へ"}, {"two", "とぉ"}, {"ji", "じ"}, {"ja", "じゃ"}, {"pa", "ぱ"}, {"ba", "ば"}, {"bi", "び"}, {"ru", "る"}, {"fu", "ふ"}, {"la", "ぁ"}, {"n'", "ん"}, {"va", "ゔぁ"}, {"vi", "ゔぃ"}, {"xe", "ぇ"},
-    {",", "、"}, {".", "。"}, {"!", "！"}, {"?", "？"}, {"-", "ー"}};
+    {",", "、"}, {".", "。"}, {"!", "！"}, {"?", "？"}, {"-", "ー"}, {"dhi", "でぃ"}};
 
 // Greedy longest match; "n" before a consonant becomes ん; unknown keys pend.
 std::vector<Chunk> Parse(std::string_view raw) {
@@ -730,6 +730,8 @@ int main() {
                                               "あいでんてぃてぃ", "あいのて", "あいでいます", "あいでています",
                                               "あいでいた", "あいでていた", "あいさつ", "あい",
                                               "あいで", "あいは", "あいから", "あいまで", "あいより",
+                                              "あいでぃる", "あいであまん", "あいとらっきんぐ", "あいである",
+                                              "あいでぃあ", "あいをよむひと", "あいときずな", "あいとかんしゃ",
                                               "であい", "にあい", "しあい", "しりあい", "かいしゃ",
                                               "じむしょ", "それ", "て", "き", "め"};
       const jaen::ReadingCheck is_reading = [&](std::string_view kana) { return readings.contains(std::string(kana)); };
@@ -772,6 +774,17 @@ int main() {
              "相乗りが好き・合いの手が好き の ai は辞書があっても取らない");
       Expect(with("aideaisatsu") == "ai|" && with("aideaiwo") == "ai|",
              "AIであいさつ・AIで愛を の最初の AI は取る（後ろの あい は日本語のまま）");
+      Expect(with("aidhiru").empty() && with("aideamann").empty() &&
+             with("aitorakkinngu").empty() && with("aidearu").empty() &&
+             with("aidearu.").empty(),
+             "ai の後ろにカタカナ語の続き（アイディル・アイデアマン・アイトラッキング・アイデアル）があるときは AI にしない");
+      Expect(with("aidearukara") == "ai|" && with("aidearunode") == "ai|" &&
+             with("aidearuwake") == "ai|",
+             "AIであるから・AIであるので・AIであるわけ の ai は AI（アイデアル だけを打ったときと分ける）");
+      Expect(with("aidhia").empty(), "アイディア（あいでぃあ）は日本語のまま");
+      Expect(with("aiwoyomuhito") == "ai|" && with("aitokizuna") == "ai|" &&
+             with("aitokannsha") == "ai|",
+             "AIを読む人・AIと絆・AIと感謝 の ai は AI（助詞から始まる日本語の句）");
       Expect(with("deaideaiwotsukau") == "ai|" && with("baaideaiwotsukau") == "ai|" &&
              with("baainiaiwotsukau") == "ai|", "出会いで・場合で・場合に のあとの AI は辞書があっても AI");
       Expect(with("tedeaiwotsukau") == "ai|" && with("kideaiwotsukau") == "ai|" &&

@@ -1782,6 +1782,7 @@ subprocess.run([sys.executable, str(REPO / "tools/build_romaji_alias_dictionary.
 # tools/data/katakana-english.tsv は .github/workflows/katakana-data.yml で作る。
 subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_dictionary.py"), "--mozc", str(src),
                 "--pairs", str(REPO / "tools/data/katakana-english.tsv"),
+                "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary12.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
@@ -1806,6 +1807,7 @@ subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.p
                 "--names", str(REPO / "tools/data/proper-noun-extra.tsv"),
                 "--names", str(REPO / "tools/data/proper-nouns.tsv"),
                 "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
+                "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
 
