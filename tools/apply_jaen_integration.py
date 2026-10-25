@@ -1812,6 +1812,52 @@ subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.p
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
 
+# 日本語の名前（tools/data/japanese-titles.tsv）は、辞書で英字より前にしても、人工知能の採点で
+# 英字（GeGeGe no Kitaro）が先頭に戻る。変換の最後（PreferTypedDigits の頭）で、表の読みの文節の
+# 先頭が英字なら、日本語の名前を先頭に戻す。
+titles = [line.split("\t")[:2] for line in (REPO / "tools/data/japanese-titles.tsv").read_text(encoding="utf-8").splitlines()
+          if line and not line.startswith("#")]
+assert all(len(t) == 2 and '"' not in t[0] + t[1] and "\\" not in t[0] + t[1] for t in titles)
+edit("converter/converter.h", """  static void PreferTypedDigits(Segments* segments);
+""", """  static void PreferTypedDigits(Segments* segments);
+
+  // A name in tools/data/japanese-titles.tsv (げげげのきたろう): its Japanese
+  // title goes before an English first candidate (GeGeGe no Kitaro).
+  static void PreferJapaneseTitles(Segments* segments);
+""")
+edit("converter/converter.cc", """void Converter::PreferTypedDigits(Segments* segments) {
+  if (segments == nullptr) return;
+""", """void Converter::PreferJapaneseTitles(Segments* segments) {
+  static constexpr const char* kTitles[][2] = {
+""" + "".join(f'      {{"{a}", "{b}"}},\n' for a, b in titles) + """  };
+  for (Segment& segment : segments->conversion_segments()) {
+    if (segment.candidates_size() < 2) continue;
+    const std::string& top = segment.candidate(0).value;
+    if (!std::all_of(top.begin(), top.end(),
+                     [](char c) { return static_cast<unsigned char>(c) < 0x80; })) {
+      continue;
+    }
+    for (const auto& title : kTitles) {
+      if (segment.key() != title[0]) continue;
+      for (size_t i = 1; i < segment.candidates_size() && i < 20; ++i) {
+        if (segment.candidate(i).value == title[1]) {
+          segment.move_candidate(static_cast<int>(i), 0);
+          break;
+        }
+      }
+      break;
+    }
+  }
+}
+
+void Converter::PreferTypedDigits(Segments* segments) {
+  if (segments == nullptr) return;
+  PreferJapaneseTitles(segments);
+""")
+t = (src / "converter/converter.cc").read_text(encoding="utf-8")
+if "#include <algorithm>" not in t:
+    edit("converter/converter.cc", "#include <limits>\n", "#include <algorithm>\n#include <limits>\n")
+
 
 # A word learned only on its own does not override a sentence's first
 # candidate: it becomes second (one choice of 公演 must not make 公園で散歩
