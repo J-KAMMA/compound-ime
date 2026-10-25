@@ -583,12 +583,15 @@ w)
   python3 $REPO/tools/long_latency_prepare.py $TESTS $W/long
   # 句分けの対応表は、結果のフォルダー（long_latency_report.py が読む場所）にも置く
   for f in $W/long/long-*-split-map.tsv; do cp "$f" $OUT/; done
+  # 6時間の上限に収めるため、長さの組ごとに先頭 LAT_N 文（既定 10）だけ測る
+  for f in $W/long/long-*.tsv; do case $f in *-split-map.tsv) continue;; esac; awk -v n=${LAT_N:-10} '/^#/ || c++ < n' "$f" > "$f.tmp" && mv "$f.tmp" "$f"; done
   LAT="bash $REPO/tools/latency_convert.sh $E/session_handler_main $E $MODEL"
   for b in 10 20 40 60 80 120; do
     for r in 1 2 3; do
       $LAT $W/long/long-$b.tsv $OUT/long-$b-plain-r$r
       $LAT $W/long/long-$b-ctx.tsv $OUT/long-$b-plain-ctx-r$r
       $LAT $W/long/long-$b-split.tsv $OUT/long-$b-split-r$r
+      [ $r = 1 ] || continue  # 打つ速さをまねる測り方は遅いので1回だけ
       LAT_REAL=1 LAT_STATS=1 LAT_PAUSE_MS=300 MYIME_PREFETCH_DELAY=120 $LAT $W/long/long-$b.tsv $OUT/long-$b-real-pf-r$r 125
       LAT_REAL=1 LAT_STATS=1 LAT_PAUSE_MS=300 MYIME_PREFETCH_DELAY=0 $LAT $W/long/long-$b.tsv $OUT/long-$b-real-nopf-r$r 125
     done
