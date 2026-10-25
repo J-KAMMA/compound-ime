@@ -1833,12 +1833,27 @@ edit("converter/converter.cc", """void Converter::PreferTypedDigits(Segments* se
   for (Segment& segment : segments->conversion_segments()) {
     if (segment.candidates_size() < 2) continue;
     const std::string& top = segment.candidate(0).value;
-    if (!std::all_of(top.begin(), top.end(),
-                     [](char c) { return static_cast<unsigned char>(c) < 0x80; })) {
-      continue;
-    }
+    const bool ascii_top = std::all_of(top.begin(), top.end(),
+                                       [](char c) { return static_cast<unsigned char>(c) < 0x80; });
     for (const auto& title : kTitles) {
       if (segment.key() != title[0]) continue;
+      // The full-width variant (ドラゴンボールＺ) first is moved too.
+      std::string half;
+      for (size_t i = 0; i < top.size(); ++i) {
+        const unsigned char b0 = top[i];
+        if (b0 == 0xEF && i + 2 < top.size()) {
+          const unsigned code = ((b0 & 0x0Fu) << 12) |
+                                ((static_cast<unsigned char>(top[i + 1]) & 0x3Fu) << 6) |
+                                (static_cast<unsigned char>(top[i + 2]) & 0x3Fu);
+          if (code >= 0xFF01 && code <= 0xFF5E) {
+            half.push_back(static_cast<char>(code - 0xFEE0));
+            i += 2;
+            continue;
+          }
+        }
+        half.push_back(top[i]);
+      }
+      if (!ascii_top && (top == title[1] || half != title[1])) break;
       for (size_t i = 1; i < segment.candidates_size() && i < 20; ++i) {
         if (segment.candidate(i).value == title[1]) {
           segment.move_candidate(static_cast<int>(i), 0);
