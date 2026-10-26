@@ -218,6 +218,11 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       s.insert(i + 1, 1, v);
       add(std::move(s), priors.long_vowel);
     }
+    if (c == 'a') {  // the i of ai left out
+      std::string s = text;
+      s.insert(i + 1, 1, 'i');
+      add(std::move(s), priors.dropped_ai);
+    }
   }
   // The first key is left alone: "ashita" is not "shita" mistyped.
   for (size_t i = 1; i < text.size(); ++i) {
