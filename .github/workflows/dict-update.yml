@@ -137,7 +137,7 @@ jobs:
           set -eo pipefail
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
           # 新しい一覧から
-          $PY $T/build_proper_noun_dictionary.py --mozc $S --names $T/data/proper-noun-extra.tsv --names $W/new/proper-nouns.tsv --acronyms $T/data/acronyms.tsv --out $W/new/supplement.tsv
+          $PY $T/build_proper_noun_dictionary.py --mozc $S --names $T/data/proper-noun-extra.tsv --names $W/new/proper-nouns.tsv --acronyms $T/data/acronyms.tsv --titles $T/data/japanese-titles.tsv --wasei $T/data/wasei.tsv --out $W/new/supplement.tsv
           $PY $T/build_english_extra.py --proper-nouns $W/new/proper-nouns.tsv --out $W/new/english-extra.tsv
           # いまの一覧（リポジトリのもの。supplement は本体に焼き込んだ dictionary14.txt と同じ作り方）
           mkdir -p $W/old

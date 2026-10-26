@@ -31,6 +31,26 @@ def main():
             "ないき\t0\t0\t3000\tナイキ\n"
             "まんしょん\t0\t0\t3000\tマンション\n"
             "めた\t0\t0\t3000\tメタ\n"
+            "でんそ\t0\t0\t8333\t田租\n"
+            "でんそー\t0\t0\t3000\tデンソー\n"
+            "でんそう\t0\t0\t4000\t伝送\n"
+            "あき\t0\t0\t2727\t秋\n"
+            "あきー\t0\t0\t6000\tアキー\n"
+            "あたる\t0\t0\t2715\t当たる\n"
+            "あたーる\t0\t0\t6000\tアタール\n"
+            "おおさか\t0\t0\t3000\t大阪\n"
+            "おさか\t0\t0\t5000\tオオサカ\n"
+            "どらごんぼーるぜっと\t0\t0\t3000\tドラゴンボールゼット\n"
+            "どらごんぼーるぜっと\t0\t0\t5000\tドラゴンボールZ\n"
+            "おふぃす\t0\t0\t3000\tオフィス\n"
+            "おふぃすれでぃー\t0\t0\t3000\tオフィスレディー\n"
+            "ろーま\t0\t0\t2926\tローマ\n"
+            "ろーま\t0\t0\t5457\t羅馬\n"
+            "あばたー\t0\t0\t4988\tアバター\n"
+            "あばたー\t0\t0\t8378\tあばたー\n"
+            "あばたー\t0\t0\t9080\tアヴァター\n"
+            "まーめいど\t0\t0\t3667\tマーメイド\n"
+            "まーめいど\t4\t4\t4327\t人魚姫\n"
             + "".join(f"ないき\t0\t0\t{3100 + i}\t内規{i}\n" for i in range(10)), encoding="utf-8")
 
         # 0. カタカナ語と英単語の組（和製英語を外し、JMdict の組を足す）
@@ -42,7 +62,7 @@ def main():
         jmdict = tmp / "jmdict.tsv"
         jmdict.write_text("スマートフォン\tsmartphone\tlsource\n", encoding="utf-8")
         wasei_file = tmp / "wasei.tsv"
-        wasei_file.write_text("マンション\tmansion\n", encoding="utf-8")
+        wasei_file.write_text("マンション\tmansion\nオフィスレディー\toffice\n", encoding="utf-8")
         checked = tmp / "checked.tsv"
         checked.write_text("マンション\tmansion\n", encoding="utf-8")  # a checked list must not bring wasei back
         pairs_out = tmp / "pairs-out.tsv"
@@ -63,18 +83,29 @@ def main():
 
         # 1. カタカナ語の英単語
         pairs = tmp / "pairs.tsv"
-        pairs.write_text("コーヒー\tcoffee\nマンション\tmansion\n", encoding="utf-8")
+        pairs.write_text("コーヒー\tcoffee\nマンション\tmansion\nデンソー\tDenso\nアキー\tackee\n"
+                         "オフィス\toffice\n", encoding="utf-8")
         out12 = tmp / "dictionary12.txt"
         subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_dictionary.py"),
-                        "--mozc", str(mozc), "--pairs", str(pairs), "--out", str(out12)],
-                       check=True, stdout=subprocess.DEVNULL)
+                        "--mozc", str(mozc), "--pairs", str(pairs), "--wasei", str(wasei_file),
+                        "--out", str(out12)], check=True, stdout=subprocess.DEVNULL)
         rows = [l.split("\t") for l in out12.read_text(encoding="utf-8").splitlines()]
         coffee = next((r for r in rows if r[4] == "coffee"), None)
         check(coffee is not None, "コーヒー → coffee が出ていない")
         if coffee:
             check(coffee[0] == "こーひー", f"読みがカタカナ語と同じでない: {coffee[0]}")
-            check(int(coffee[3]) == 3010, f"費用はカタカナ語 + 10 のはず: {coffee[3]}")
+            check(int(coffee[3]) == 3001, f"費用はカタカナ語 + 1 のはず: {coffee[3]}")
             check(coffee[1:3] == ["0", "0"], f"品詞はカタカナ語と同じはず: {coffee[1:3]}")
+        check(not any(r[0] == "まんしょん" and r[4] == "mansion" for r in rows),
+              "和製英語（マンション → mansion）を dictionary12 に入れている")
+        denso = {r[0]: int(r[3]) for r in rows if r[4] == "Denso"}
+        check(denso.get("でんそー") == 3001, f"でんそー → Denso がカタカナ語の次にない: {denso}")
+        check(denso.get("でんそう") == 4001, f"でんそう（長音をうで打つ）→ Denso がない: {denso}")
+        check(denso.get("でんそ") == 8334, f"でんそ（長音なし）→ Denso がない: {denso}")
+        check(not any(r[0] == "あき" and r[4] == "ackee" for r in rows),
+              "長音を落とした無関係な読み（あき → ackee）に英字を付けている")
+        check(not any(r[0] == "おふぃす" and r[4] == "office" for r in rows),
+              "和製英語の複合語の部分（オフィスレディー の オフィス → office）に英字を付けている")
 
         # 2. 公式表記と別表記
         extra = tmp / "extra.tsv"
@@ -82,13 +113,22 @@ def main():
             "Dragon Ball\tdragonball\t\tどらごんぼーる\twork\t0\tDRAGON BALL\n"
             "Nike\tnike\t\tないき\tcompany\t0\tNIKE\n"
             "Coca-Cola\tcoca-cola\t\tこかこーら\tcompany\t0\tCOCA-COLA\n"
-            "Meta\tmeta\t\tめた\tcompany\t0\tMETA\n", encoding="utf-8")
+            "Meta\tmeta\t\tめた\tcompany\t0\tMETA\n"
+            "Denso\tdenso\t\tでんそー|でんそ\tbusiness\t0\tDENSO\n"
+            "Mansion\tmansion\t\tまんしょん\tbrand\t0\t\n"
+            "Atar\tatar\t\tあたーる\tcity\t0\t\n"
+            "Osaka\tosaka\t\tおおさか\tcity\t0\t\n"
+            "Rome\trome\t\tろーま\tcity\t0\t\n"
+            "Avatar\tavatar\t\tあばたー\twork\t0\tAVATAR\n"
+            "The Little Mermaid\tthe little mermaid\t\tりとるまーめいど|まーめいど\tnovel\t0\t\n"
+            "Dragon Ball Z\tdragonballz\t\tどらごんぼーるぜっと\twork\t0\tDRAGON BALL Z\n", encoding="utf-8")
         base = tmp / "base.tsv"
         base.write_text("Adidas\tadidas\t\tあでぃだす\tcompany\t0\t\n"
                         "Nike\tnike\t\tないき\tbusiness\t0\t\n", encoding="utf-8")
         out14 = tmp / "dictionary14.txt"
         subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.py"),
-                        "--mozc", str(mozc), "--names", str(extra), "--names", str(base), "--out", str(out14)],
+                        "--mozc", str(mozc), "--names", str(extra), "--names", str(base),
+                        "--wasei", str(wasei_file), "--out", str(out14)],
                        check=True, stdout=subprocess.DEVNULL)
         rows = {}
         for line in out14.read_text(encoding="utf-8").splitlines():
@@ -98,16 +138,39 @@ def main():
         dragon_caps = rows.get(("どらごんぼーる", "DRAGON BALL"))
         check(dragon is not None and dragon_caps is not None, "どらごんぼーる → Dragon Ball / DRAGON BALL が出ていない")
         if dragon is not None and dragon_caps is not None:
-            check(dragon == 3010, f"Dragon Ball はカタカナ語 + 10 のはず: {dragon}")
-            check(dragon_caps == 3011, f"DRAGON BALL は Dragon Ball の次のはず: {dragon_caps}")
+            check(dragon == 3001, f"Dragon Ball はカタカナ語 + 1 のはず: {dragon}")
+            check(dragon_caps == 3002, f"DRAGON BALL は Dragon Ball の次のはず: {dragon_caps}")
         nike = rows.get(("ないき", "Nike"))
         nike_caps = rows.get(("ないき", "NIKE"))
-        check(nike == 3010 and nike_caps == 3011,
+        check(nike == 3001 and nike_caps == 3002,
               f"ないき → Nike, NIKE の順が違う（古い費用が上位10個の外なら、カタカナ語の次へ）: {nike} {nike_caps}")
         check(rows.get(("こかこーら", "Coca-Cola")) == 15000,
               f"読みを持つ語がないときは既定の費用: {rows.get(('こかこーら', 'Coca-Cola'))}")
-        check(rows.get(("めた", "Meta")) == 3010 and rows.get(("めた", "META")) == 3011,
+        check(rows.get(("めた", "Meta")) == 3001 and rows.get(("めた", "META")) == 3002,
               f"2かなの読みでも、Mozc に語があればその後ろ: {rows.get(('めた', 'Meta'))} {rows.get(('めた', 'META'))}")
+        check(rows.get(("でんそー", "Denso")) == 3001,
+              f"でんそー → Denso がカタカナ語の次にない: {rows.get(('でんそー', 'Denso'))}")
+        check(rows.get(("でんそう", "Denso")) == 4100,
+              f"でんそう（長音をうで打つ）→ Denso がない: {rows.get(('でんそう', 'Denso'))}")
+        check(rows.get(("でんそ", "Denso")) == 8433,
+              f"でんそ（長音なし）→ Denso がない: {rows.get(('でんそ', 'Denso'))}")
+        check(("まんしょん", "Mansion") not in rows, "和製英語（マンション → Mansion）を dictionary14 に入れている")
+        check(("あたる", "Atar") not in rows,
+              "長音を落とした無関係な読み（あたる → Atar）に英字を付けている")
+        check(("おさか", "Osaka") not in rows,
+              "長音の揺れ（おおさか → おさか）に Osaka を付けている")
+        dragon_z = rows.get(("どらごんぼーるぜっと", "Dragon Ball Z"))
+        check(dragon_z is not None and dragon_z > 5000,
+              f"作品名の英字が日本語の名前（ドラゴンボールZ、費用 5000）より前: {dragon_z}")
+        rome = rows.get(("ろーま", "Rome"))
+        check(rome == 2927,
+              f"別の言語の名前（ローマ → 羅馬、費用 5457）の後ろに都市名を動かしている: {rome}")
+        avatar = rows.get(("あばたー", "Avatar"))
+        check(avatar == 4989,
+              f"かなだけの別表記（アヴァター、費用 9080）の後ろに作品名を動かしている: {avatar}")
+        mermaid = rows.get(("まーめいど", "The Little Mermaid"))
+        check(mermaid == 4328,
+              f"全漢字の作品名（人魚姫、費用 4327）より前に英字を出している: {mermaid}")
         # 既にある (読み, 表記) は足さない
         check(all(not (r[0] == "こーひー" and r[4] == "コーヒー") for r in rows), "Mozc にある表記を足している")
 

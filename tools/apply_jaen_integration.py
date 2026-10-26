@@ -1785,6 +1785,7 @@ subprocess.run([sys.executable, str(REPO / "tools/build_romaji_alias_dictionary.
 # tools/data/katakana-english.tsv は .github/workflows/katakana-data.yml で作る。
 subprocess.run([sys.executable, str(REPO / "tools/build_katakana_english_dictionary.py"), "--mozc", str(src),
                 "--pairs", str(REPO / "tools/data/katakana-english.tsv"),
+                "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary12.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary12.txt.tmp").unlink()
 
@@ -1809,8 +1810,71 @@ subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.p
                 "--names", str(REPO / "tools/data/proper-noun-extra.tsv"),
                 "--names", str(REPO / "tools/data/proper-nouns.tsv"),
                 "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
+                "--titles", str(REPO / "tools/data/japanese-titles.tsv"),
+                "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
 (src / "data/dictionary_oss/dictionary14.txt.tmp").unlink()
+
+# 日本語の名前（tools/data/japanese-titles.tsv）は、辞書で英字より前にしても、人工知能の採点で
+# 英字（GeGeGe no Kitaro）が先頭に戻る。変換の最後（PreferTypedDigits の頭）で、表の読みの文節の
+# 先頭が英字なら、日本語の名前を先頭に戻す。
+titles = [line.split("\t")[:2] for line in (REPO / "tools/data/japanese-titles.tsv").read_text(encoding="utf-8").splitlines()
+          if line and not line.startswith("#")]
+assert all(len(t) == 2 and '"' not in t[0] + t[1] and "\\" not in t[0] + t[1] for t in titles)
+edit("converter/converter.h", """  static void PreferTypedDigits(Segments* segments);
+""", """  static void PreferTypedDigits(Segments* segments);
+
+  // A name in tools/data/japanese-titles.tsv (げげげのきたろう): its Japanese
+  // title goes before an English first candidate (GeGeGe no Kitaro).
+  static void PreferJapaneseTitles(Segments* segments);
+""")
+edit("converter/converter.cc", """void Converter::PreferTypedDigits(Segments* segments) {
+  if (segments == nullptr) return;
+""", """void Converter::PreferJapaneseTitles(Segments* segments) {
+  static constexpr const char* kTitles[][2] = {
+""" + "".join(f'      {{"{a}", "{b}"}},\n' for a, b in titles) + """  };
+  for (Segment& segment : segments->conversion_segments()) {
+    if (segment.candidates_size() < 2) continue;
+    const std::string& top = segment.candidate(0).value;
+    const bool ascii_top = std::all_of(top.begin(), top.end(),
+                                       [](char c) { return static_cast<unsigned char>(c) < 0x80; });
+    for (const auto& title : kTitles) {
+      if (segment.key() != title[0]) continue;
+      // The full-width variant (ドラゴンボールＺ) first is moved too.
+      std::string half;
+      for (size_t i = 0; i < top.size(); ++i) {
+        const unsigned char b0 = top[i];
+        if (b0 == 0xEF && i + 2 < top.size()) {
+          const unsigned code = ((b0 & 0x0Fu) << 12) |
+                                ((static_cast<unsigned char>(top[i + 1]) & 0x3Fu) << 6) |
+                                (static_cast<unsigned char>(top[i + 2]) & 0x3Fu);
+          if (code >= 0xFF01 && code <= 0xFF5E) {
+            half.push_back(static_cast<char>(code - 0xFEE0));
+            i += 2;
+            continue;
+          }
+        }
+        half.push_back(top[i]);
+      }
+      if (!ascii_top && (top == title[1] || half != title[1])) break;
+      for (size_t i = 1; i < segment.candidates_size() && i < 20; ++i) {
+        if (segment.candidate(i).value == title[1]) {
+          segment.move_candidate(static_cast<int>(i), 0);
+          break;
+        }
+      }
+      break;
+    }
+  }
+}
+
+void Converter::PreferTypedDigits(Segments* segments) {
+  if (segments == nullptr) return;
+  PreferJapaneseTitles(segments);
+""")
+t = (src / "converter/converter.cc").read_text(encoding="utf-8")
+if "#include <algorithm>" not in t:
+    edit("converter/converter.cc", "#include <limits>\n", "#include <algorithm>\n#include <limits>\n")
 
 
 # A word learned only on its own does not override a sentence's first
