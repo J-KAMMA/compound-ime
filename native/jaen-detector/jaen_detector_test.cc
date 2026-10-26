@@ -257,6 +257,14 @@ int main() {
     with_joined.AddJoined("download");
     const auto one = jaen::SplitEnglish(Parse("downloadshita"), with_joined, Parse);
     Expect(!one.empty() && one[0].english && one[0].spaces.empty(), "a joined word keeps no space");
+    jaen::Lexicon letters;
+    letters.Add("m");
+    letters.Add("r");
+    for (const char* raw : {"10mm", "mm", "mmr"}) {
+      const auto unit = jaen::SplitEnglish(Parse(raw), letters, Parse);
+      Expect(!unit.empty() && unit.back().english && unit.back().spaces.empty(),
+             "letters with no vowel stay together (10mm, not 10m m)");
+    }
   }
 
   {
