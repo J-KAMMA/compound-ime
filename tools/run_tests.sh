@@ -136,7 +136,7 @@ b)
     case "$got" in *"$want"*) mark=合う ;; *) mark=合わない ;; esac
     echo "$mark: $keys（$want）: $seg: $got"
   done < $W/emoji-inline.tsv | tee -a $OUT/emoji.txt
-  # 全部の絵文字: 読み（いちばん長いひらがなの語）と「えもじ」を続けて打ち、最後の文節の候補の1ページ目（9つ）に
+  # 全部の絵文字: 読み（その絵文字に特有のひらがなの語）と「えもじ」を続けて打ち、最後の文節の候補の1ページ目（9つ）に
   # その絵文字があるか（tests/conversion/emoji-all.tsv、tools/make_emoji_all_tests.py で Mozc の絵文字の辞書から作る）。
   # 1つのセッションで続けて打ち、Escape 2回で消す
   cp $T/emoji-all.tsv $W/emoji-all.tsv

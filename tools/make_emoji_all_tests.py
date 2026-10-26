@@ -4,7 +4,7 @@
 
 試験の計算機には Mozc のソースがないので、作った表を tests/conversion に置く（Mozc の版を上げたら作り直す）。
 
-絵文字ごとに、読み（3列目）のうちいちばん長いひらがなの語を選び、その語と「えもじ」を続けて打つローマ字を作る。
+絵文字ごとに、読み（3列目）のひらがなの語のうち、その絵文字に特有のもの（同じなら長いもの）を選び、その語と「えもじ」を続けて打つローマ字を作る。
 列: ローマ字<TAB>絵文字<TAB>読み
 """
 import sys
@@ -57,7 +57,8 @@ def romaji(kana):
 
 
 def main():
-    rows = []
+    entries = []
+    shared = {}  # 読み -> その読みを持つ絵文字の数
     for line in Path(sys.argv[1]).read_text(encoding="utf-8").splitlines():
         if not line or line.startswith("#"):
             continue
@@ -65,12 +66,17 @@ def main():
         if len(cols) < 3 or not cols[1]:
             continue
         words = [w for w in cols[2].split() if all("ぁ" <= ch <= "ゖ" or ch == "ー" for ch in w)]
-        if not words:
-            continue
-        reading = max(words, key=len)
+        if words:
+            entries.append((cols[1], words))
+            for w in set(words):
+                shared[w] = shared.get(w, 0) + 1
+    rows = []
+    for emoji, words in entries:
+        # その絵文字に特有の読み（同じ読みの絵文字が少ないもの）、同じなら長いもの。「どうぶつ」より「やぎ」
+        reading = min(words, key=lambda w: (shared[w], -len(w)))
         typed = romaji(reading)
         if typed:
-            rows.append(f"{typed}emoji\t{cols[1]}\t{reading}")
+            rows.append(f"{typed}emoji\t{emoji}\t{reading}")
     Path(sys.argv[2]).write_text("\n".join(rows) + "\n", encoding="utf-8")
     print(f"emoji-all: {len(rows)} inputs")
 
