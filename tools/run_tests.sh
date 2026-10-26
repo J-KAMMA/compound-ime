@@ -140,6 +140,11 @@ c)
   romaji $T/typo150b.json > $W/typo150b.txt
   MYIME_TYPO_MARGIN=off $BATCH $W/typo150b.txt $OUT/typo150b-off.tsv 4
   $BATCH $W/typo150b.txt $OUT/typo150b.tsv 4
+  # 小さい「っ」の後に濁る音が来る外来語（ベッド、バッグ ...）: 濁る音の重ね打ちの直し（jaen_typo.h の
+  # doubled_voiced）で、打ったとおりの外来語を直してしまわないかの記録
+  printf '%s\n' beddo baggu guzzu doggu hottodoggu eggu wiggu kiddo reddo saddo heddohonn beddonineru baggunoirero \
+    hottodoggutabeta doggufu-do > $W/sokuon-loan.txt
+  $BATCH $W/sokuon-loan.txt $OUT/sokuon-loan.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか

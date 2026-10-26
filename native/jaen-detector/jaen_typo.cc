@@ -230,7 +230,8 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       std::string s = text;
       s.erase(i, 1);
       add(std::move(s), std::string_view("aiueo").find(text[i]) != std::string_view::npos ? priors.doubled_vowel
-                                                                   : priors.doubled_consonant);
+                        : std::string_view("gzjdb").find(text[i]) != std::string_view::npos ? priors.doubled_voiced
+                                                                                           : priors.doubled_consonant);
     }
     // Neighbors swapped ("kareu"); "uo" to ou costs more (see swapped_uo), and
     // ou is never made uo. The ' of n' is no key to swap.
