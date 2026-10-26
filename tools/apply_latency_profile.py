@@ -15,14 +15,19 @@ MYIME_PROFILE がなければ、時計を読むことも書くこともしない
   （TIMED_KEY の TIMED_US と同じ時計）
   以下は変換エンジン（Swift）の記録。段は allz（all_zenzai）、ctx（contextPriorWinner）、sel（選び手の採点）、
   proc（候補作り processResult。ctx を含む）、tpass（打ち間違いの補正の探索。中の段は数えない）、
-  typo（人工知能による打ち間違いの補正）、other（ほかの人工知能の使い道）。
+  typo（人工知能による打ち間違いの補正）、batch（候補をまとめた一括採点。ctx か sel の内側で動く）、
+  other（ほかの人工知能の使い道）。
   MYIME_PROFILE_THREADS=<数> を足すと、llama.cpp のスレッド数をその値にして比べられる。
     call_n/call_us: 変換エンジンの入り口の回数と時間
     <段>_n/<段>_us: その段に入った回数と時間
     <段>_dec_n/<段>_dec_us: そのうち llama.cpp の評価（llama_decode）の回数と時間
+    <段>_pre_n/<段>_pre_us: そのうち2語片以上をまとめて計算した回（prefill 相当）の回数と時間
+    <段>_step_n/<段>_step_us: そのうち1語片だけを計算した回（decode 相当）の回数と時間
     <段>_tok/<段>_new: 評価に渡した語片の全部と、前の計算を使い回せずに新しく計算した語片
+    batch_ctx_us/batch_sel_us: 一括採点が ctx/sel の内側で動いた時間（段の batch_us の内訳）
 
 変換エンジン（Swift）は MYIME_PROFILE があるときだけ記録し、ProfileTake で取り出して空にする。
+空白キーの変換（kind=conv）の間だけ、人工知能の上限の集計に数える印も付ける（SetZenzaiStatsCounting）。
 """
 import sys
 from pathlib import Path
@@ -59,7 +64,7 @@ import Foundation
 /// 変換は engineLock の中で1つずつ行われるが、裏の先回りの変換と重なっても数えられるよう、小さな鍵で守る。
 public enum ZenzaiProfile {
     public enum Stage: Int {
-        case other = 0, allZenzai, contextPrior, selector, typo, process, typoPass
+        case other = 0, allZenzai, contextPrior, selector, typo, process, typoPass, batch
     }
 
     public struct Token {
@@ -86,15 +91,24 @@ public enum ZenzaiProfile {
         return !value.isEmpty
     }()
 
-    private static let names = ["other", "allz", "ctx", "sel", "typo", "proc", "tpass"]
+    private static let names = ["other", "allz", "ctx", "sel", "typo", "proc", "tpass", "batch"]
     private static let lock = NSLock()
     nonisolated(unsafe) private static var current = 0
-    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 7)
-    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 7)
-    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 7)
-    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 7)
-    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 7)
-    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 7)
+    nonisolated(unsafe) private static var stageNanos = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var stageCalls = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var decodeCalls = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var decodeNanos = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var tokensAll = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var tokensNew = [Int](repeating: 0, count: 8)
+    // 評価を、複数の語片をまとめて計算した回（prefill 相当）と、1語片ずつ計算した回（decode 相当）に分ける
+    nonisolated(unsafe) private static var prefillCalls = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var prefillNanos = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var stepCalls = [Int](repeating: 0, count: 8)
+    nonisolated(unsafe) private static var stepNanos = [Int](repeating: 0, count: 8)
+    // 一括採点（候補をまとめた評価）が、どの段の内側で動いたか
+    nonisolated(unsafe) private static var batchCtxNanos = 0
+    nonisolated(unsafe) private static var batchSelNanos = 0
+    nonisolated(unsafe) private static var decodeIsPrefill = false
     nonisolated(unsafe) private static var callCount = 0
     nonisolated(unsafe) private static var contextChanged = 0
     nonisolated(unsafe) private static var callNanos = 0
@@ -126,12 +140,21 @@ public enum ZenzaiProfile {
         self.lock.lock()
         defer { self.lock.unlock() }
         let stage = self.current
-        self.stageNanos[stage] += Int(self.now() &- token.start)
+        let elapsed = Int(self.now() &- token.start)
+        self.stageNanos[stage] += elapsed
         self.stageCalls[stage] += 1
+        if stage == Stage.batch.rawValue {
+            if token.previous == Stage.contextPrior.rawValue {
+                self.batchCtxNanos += elapsed
+            } else if token.previous == Stage.selector.rawValue {
+                self.batchSelNanos += elapsed
+            }
+        }
         self.current = token.previous
     }
 
     /// llama_decode の前に呼ぶ。`newTokens` は今回新しく計算する語片、`totalTokens` は渡した語片の全部。
+    /// 2語片以上をまとめて計算した回を prefill（読み込み）相当、1語片だけの回を decode（1文字ずつ）相当として数える。
     static func decodeBegin(newTokens: Int, totalTokens: Int) -> UInt64 {
         guard self.enabled else {
             return 0
@@ -140,6 +163,7 @@ public enum ZenzaiProfile {
         defer { self.lock.unlock() }
         self.tokensNew[self.current] += newTokens
         self.tokensAll[self.current] += totalTokens
+        self.decodeIsPrefill = newTokens > 1
         return self.now()
     }
 
@@ -149,8 +173,16 @@ public enum ZenzaiProfile {
         }
         self.lock.lock()
         defer { self.lock.unlock() }
+        let elapsed = Int(self.now() &- start)
         self.decodeCalls[self.current] += 1
-        self.decodeNanos[self.current] += Int(self.now() &- start)
+        self.decodeNanos[self.current] += elapsed
+        if self.decodeIsPrefill {
+            self.prefillCalls[self.current] += 1
+            self.prefillNanos[self.current] += elapsed
+        } else {
+            self.stepCalls[self.current] += 1
+            self.stepNanos[self.current] += elapsed
+        }
     }
 
     /// 前後の文での並べ替えが、先頭の候補を替えたか（替えなかった並べ替えは、時間だけかかったことになる）。
@@ -201,19 +233,32 @@ public enum ZenzaiProfile {
             parts.append("\\(name)_dec_us=\\(self.decodeNanos[index] / 1000)")
             parts.append("\\(name)_tok=\\(self.tokensAll[index])")
             parts.append("\\(name)_new=\\(self.tokensNew[index])")
+            parts.append("\\(name)_pre_n=\\(self.prefillCalls[index])")
+            parts.append("\\(name)_pre_us=\\(self.prefillNanos[index] / 1000)")
+            parts.append("\\(name)_step_n=\\(self.stepCalls[index])")
+            parts.append("\\(name)_step_us=\\(self.stepNanos[index] / 1000)")
         }
+        parts.append("batch_ctx_us=\\(self.batchCtxNanos / 1000)")
+        parts.append("batch_sel_us=\\(self.batchSelNanos / 1000)")
         parts.append("ctx_changed=\\(self.contextChanged)")
         self.contextChanged = 0
         self.callCount = 0
         self.callNanos = 0
-        for index in 0..<7 {
+        for index in 0..<8 {
             self.stageNanos[index] = 0
             self.stageCalls[index] = 0
             self.decodeCalls[index] = 0
             self.decodeNanos[index] = 0
             self.tokensAll[index] = 0
             self.tokensNew[index] = 0
+            self.prefillCalls[index] = 0
+            self.prefillNanos[index] = 0
+            self.stepCalls[index] = 0
+            self.stepNanos[index] = 0
         }
+        self.batchCtxNanos = 0
+        self.batchSelNanos = 0
+        self.decodeIsPrefill = false
         return parts.joined(separator: " ")
     }
 }
@@ -270,6 +315,14 @@ edit(Z / "ZenzContext.swift", "        let decodeStatus = llama_decode(context, 
      "        let profileDecodeStart = ZenzaiProfile.decodeBegin(newTokens: Int(self.batch.n_tokens), totalTokens: tokens.count)\n"
      "        let decodeStatus = llama_decode(context, self.batch)\n        ZenzaiProfile.decodeEnd(profileDecodeStart)\n")
 # 候補をまとめた1回の評価（tools/apply_batch_score.py。この台本より前に動かす）
+# 一括採点は、前後の文の並べ替え（ctx）か選び手（sel）の内側で動く。段を分けて記録する
+edit(Z / "ZenzContext.swift", """    ) -> [[Double]]? {
+        let count = candidates.count
+""", """    ) -> [[Double]]? {
+        let profileBatchToken = ZenzaiProfile.enter(.batch)
+        defer { ZenzaiProfile.leave(profileBatchToken) }
+        let count = candidates.count
+""")
 edit(Z / "ZenzContext.swift", "        let treeDecodeStatus = llama_decode(context, self.treeBatch)\n",
      "        let profileTreeStart = ZenzaiProfile.decodeBegin(newTokens: Int(self.treeBatch.n_tokens), totalTokens: promptCount + nodes.count)\n"
      "        let treeDecodeStatus = llama_decode(context, self.treeBatch)\n        ZenzaiProfile.decodeEnd(profileTreeStart)\n")
@@ -299,18 +352,22 @@ A = "converter/azookey_immutable_converter.cc"
 cc = mozc / A
 edit(cc, "  using ScoreSentenceSuffixesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n",
      "  using ScoreSentenceSuffixesFunc = const char* (*)(const char*, const char*, const char*, const char*);\n"
-     "  using ProfileTakeFunc = const char* (*)();\n")
+     "  using ProfileTakeFunc = const char* (*)();\n"
+     "  using SetZenzaiStatsCountingFunc = void (*)(int);\n")
 edit(cc, "  ScoreSentenceSuffixesFunc ScoreSentenceSuffixes = nullptr;\n",
-     "  ScoreSentenceSuffixesFunc ScoreSentenceSuffixes = nullptr;\n  ProfileTakeFunc ProfileTake = nullptr;\n")
+     "  ScoreSentenceSuffixesFunc ScoreSentenceSuffixes = nullptr;\n  ProfileTakeFunc ProfileTake = nullptr;\n"
+     "  SetZenzaiStatsCountingFunc SetZenzaiStatsCounting = nullptr;\n")
 edit(cc, """    ScoreSentenceSuffixes = reinterpret_cast<ScoreSentenceSuffixesFunc>(
         GetProcAddress(dll_handle_, "ScoreSentenceSuffixes"));
 """, """    ScoreSentenceSuffixes = reinterpret_cast<ScoreSentenceSuffixesFunc>(
         GetProcAddress(dll_handle_, "ScoreSentenceSuffixes"));
     ProfileTake = reinterpret_cast<ProfileTakeFunc>(
         GetProcAddress(dll_handle_, "ProfileTake"));
+    SetZenzaiStatsCounting = reinterpret_cast<SetZenzaiStatsCountingFunc>(
+        GetProcAddress(dll_handle_, "SetZenzaiStatsCounting"));
 """)
-edit(cc, "    MYIME_LOAD(ScoreSentenceSuffixes);\n", "    MYIME_LOAD(ScoreSentenceSuffixes);\n    MYIME_LOAD(ProfileTake);\n")
-edit(cc, "    ScoreSentenceSuffixes = nullptr;\n", "    ScoreSentenceSuffixes = nullptr;\n    ProfileTake = nullptr;\n")
+edit(cc, "    MYIME_LOAD(ScoreSentenceSuffixes);\n", "    MYIME_LOAD(ScoreSentenceSuffixes);\n    MYIME_LOAD(ProfileTake);\n    MYIME_LOAD(SetZenzaiStatsCounting);\n")
+edit(cc, "    ScoreSentenceSuffixes = nullptr;\n", "    ScoreSentenceSuffixes = nullptr;\n    ProfileTake = nullptr;\n    SetZenzaiStatsCounting = nullptr;\n")
 edit(cc, "#include <mutex>\n", "#include <atomic>\n#include <chrono>\n#include <mutex>\n")
 
 # 人工知能側の変換エンジンの呼び出しの時間
@@ -347,6 +404,14 @@ std::string TakeEngineProfile() {
   std::string result(text);
   loader.FreeString(text);
   return result;
+}
+
+// 空白キーの変換（kind=conv）の間だけ、人工知能の上限の集計に「数える」印を付ける。
+// 先回り・予測・選び手の呼び出しを、空白キーの変換の回数から外すため（Swift 側の SetZenzaiStatsCounting）。
+void SetStatsCounting(bool enabled) {
+  auto& loader = AzooKeyDllLoader::GetInstance();
+  if (loader.IsLoaded() && loader.SetZenzaiStatsCounting)
+    loader.SetZenzaiStatsCounting(enabled ? 1 : 0);
 }
 
 int64_t TakeCounter(Counter counter) { return g_counters[counter].exchange(0); }
@@ -403,6 +468,7 @@ Frame::Frame(const char* kind, size_t key_chars, size_t left_chars, size_t right
   counted_ = true;
   if (g_depth++ > 0) return;  // 入れ子の内側は書かない
   outermost_ = true;
+  if (kind_ != nullptr && std::string(kind_) == "conv") SetStatsCounting(true);
   // 前の入り口のあとからここまでの裏の仕事（打っている間の先回りの変換など）
   const std::string engine = TakeEngineProfile();
   const bool idle = g_counters[kDllCalls].load() == 0 && engine.rfind("call_n=0 ", 0) == 0;
@@ -418,6 +484,7 @@ Frame::~Frame() {
   --g_depth;
   if (!outermost_) return;
   const int64_t total = Start() - start_;
+  if (kind_ != nullptr && std::string(kind_) == "conv") SetStatsCounting(false);
   const std::string engine = TakeEngineProfile();
   std::string line = std::string("kind=") + kind_ + "\tpid=" + std::to_string(static_cast<long>(getpid())) +
                      "\ttotal_us=" + std::to_string(total) + "\tt0_us=" + std::to_string(start_) +

@@ -15,7 +15,10 @@ patches/myime-engine.patch を当てたあとの作業ツリーに、1回だけ�
    標準エラーへは ZenzaiMemoryLock.writeStandardError で書く（標準エラーのない処理でも落ちない）。
    FileHandle.standardError.write(_:) は使わない（書けないと try! で落ちる。1.144 の不具合）。
 3. 試験用: 環境変数 MYIME_ZENZAI_STATS_FILE があれば、変換のたびに「<値>.<処理番号>」へ
-   上限に当たった回数などを書く。
+   上限に当たった回数などを書く。SetZenzaiStatsCounting で印を付けた間（空白キーの変換）だけを
+   key_conversions/key_hits として数える。数える単位は人工知能の呼び出しではなく空白キーの変換で、
+   最初の5変換を除く。最後の変換の当たりも残るよう、印を外したときにも書き出す。
+   測定の環境変数がないときは、スレッドの辞書も集計の数も触らない（時間の上限だけを見る）。
 """
 import sys
 from pathlib import Path
@@ -70,30 +73,90 @@ public enum ZenzaiDeadline {
     nonisolated(unsafe) public private(set) static var totalMilliseconds = 0
     nonisolated(unsafe) public private(set) static var maxMilliseconds = 0
 
+    // 試験の集計用: 空白キーの変換だけを、最初の5回の変換を除いて数える。
+    // C++ の入り口（tools/apply_latency_profile.py の Frame）が kind=conv の間だけ印を付ける。
+    // 印は変換の始まりと終わりに1回ずつで、人工知能の呼び出しの数とは関係ない。
+    nonisolated(unsafe) private static var statsFilterActive = false
+    nonisolated(unsafe) private static var statsSeen = 0
+    nonisolated(unsafe) public private(set) static var keyConversions = 0
+    nonisolated(unsafe) public private(set) static var keyHits = 0
+    private static let statsCountingKey = "MYIME_ZENZAI_STATS_COUNTING"
+    private static let statsCountKey = "MYIME_ZENZAI_STATS_COUNT"
+    private static let statsHitKey = "MYIME_ZENZAI_STATS_HIT"
+    /// 試験の集計（MYIME_PROFILE / MYIME_ZENZAI_STATS_FILE）があるときだけ、
+    /// スレッドの辞書や集計の数を触る。普段の変換では時間の上限だけを見る。
+    nonisolated(unsafe) private static let measurementEnabled: Bool = {
+        let environment = ProcessInfo.processInfo.environment
+        return !(environment["MYIME_PROFILE"] ?? "").isEmpty
+            || !(environment["MYIME_ZENZAI_STATS_FILE"] ?? "").isEmpty
+    }()
+
+    /// 試験用: この処理（スレッド）の変換を、空白キーの変換として数えるか。
+    /// C++ の入り口が空白キーの変換の始まりで true、終わりで false にする。
+    /// true のたびに1変換として数え、最初の5変換は除く。
+    /// false にすると、その変換で上限に当たっていれば key_hits に1回だけ足す。
+    public static func setStatsCounting(_ enabled: Bool) {
+        guard self.measurementEnabled else {
+            return
+        }
+        let dictionary = Thread.current.threadDictionary
+        dictionary[Self.statsCountingKey] = enabled
+        if enabled {
+            self.statsFilterActive = true
+            self.statsSeen += 1
+            let counted = self.statsSeen > 5
+            dictionary[Self.statsCountKey] = counted
+            dictionary[Self.statsHitKey] = false
+            if counted {
+                self.keyConversions += 1
+            }
+            return
+        }
+        if (dictionary[Self.statsCountKey] as? Bool) == true,
+           (dictionary[Self.statsHitKey] as? Bool) == true {
+            self.keyHits += 1
+        }
+        dictionary[Self.statsCountKey] = false
+        dictionary[Self.statsHitKey] = false
+    }
+
+    private static var statsCounting: Bool {
+        guard self.measurementEnabled else {
+            return false
+        }
+        return (Thread.current.threadDictionary[Self.statsCountingKey] as? Bool) ?? false
+    }
+
     private static func nowNanos() -> UInt64 {
         DispatchTime.now().uptimeNanoseconds
     }
 
     /// 変換の前に呼ぶ。`milliseconds` が 0 以下なら上限なし。
     public static func begin(milliseconds: Int) {
-        self.conversions += 1
-        self.hitInCurrent = false
-        self.callStartNanos = self.nowNanos()
         self.active = milliseconds > 0
         self.limitNanos = UInt64(min(max(milliseconds, 0), 600_000)) &* 1_000_000
         self.endNanos = 0
+        guard self.measurementEnabled else {
+            return
+        }
+        self.conversions += 1
+        self.hitInCurrent = false
+        self.callStartNanos = self.nowNanos()
     }
 
     /// 変換のあとに呼ぶ。
     public static func end() {
+        self.active = false
+        self.endNanos = 0
+        guard self.measurementEnabled else {
+            return
+        }
         if self.hitInCurrent {
             self.hits += 1
         }
         let elapsed = Int((self.nowNanos() &- self.callStartNanos) / 1_000_000)
         self.totalMilliseconds += elapsed
         self.maxMilliseconds = max(self.maxMilliseconds, elapsed)
-        self.active = false
-        self.endNanos = 0
     }
 
     /// 上限を過ぎたか。最初の呼び出しで時計を動かし始める。
@@ -107,7 +170,12 @@ public enum ZenzaiDeadline {
             return false
         }
         if now >= self.endNanos {
-            self.hitInCurrent = true
+            if self.measurementEnabled {
+                self.hitInCurrent = true
+                if self.statsFilterActive && self.statsCounting {
+                    Thread.current.threadDictionary[Self.statsHitKey] = true
+                }
+            }
             return true
         }
         return false
@@ -124,7 +192,8 @@ public enum ZenzaiDeadline {
     /// 試験の集計用の1行。
     public static var summary: String {
         "conversions=\\(self.conversions) hits=\\(self.hits) aborts=\\(self.aborts) skips=\\(self.skips) "
-            + "total_ms=\\(self.totalMilliseconds) max_ms=\\(self.maxMilliseconds)"
+            + "total_ms=\\(self.totalMilliseconds) max_ms=\\(self.maxMilliseconds) "
+            + "key_filter=\\(self.statsFilterActive ? 1 : 0) key_conversions=\\(self.keyConversions) key_hits=\\(self.keyHits)"
     }
 }
 
@@ -291,12 +360,27 @@ nonisolated(unsafe) private let zenzaiStatsPath: String? = {
     return value + "." + String(ProcessInfo.processInfo.processIdentifier)
 }()
 
-/// 変換の終わりに呼ぶ（engineLock を持ったまま）。
-func finishZenzaiDeadline() {
-    ZenzaiDeadline.end()
+/// 試験用: 上限の集計を今の状態で書く。
+private func writeZenzaiStats() {
     if let path = zenzaiStatsPath {
         try? ZenzaiDeadline.summary.write(toFile: path, atomically: false, encoding: .utf8)
     }
+}
+
+/// 試験用: 空白キーの変換の間だけ、上限の集計に数える印を付ける（C++ の入り口から呼ぶ）。
+/// 最後の変換の当たりは、変換全体が終わってこの印を外したときに増えるので、ここでも書く。
+@_cdecl("SetZenzaiStatsCounting")
+public func setZenzaiStatsCounting(_ enabled: Int32) {
+    ZenzaiDeadline.setStatsCounting(enabled != 0)
+    if enabled == 0 {
+        writeZenzaiStats()
+    }
+}
+
+/// 変換の終わりに呼ぶ（engineLock を持ったまま）。
+func finishZenzaiDeadline() {
+    ZenzaiDeadline.end()
+    writeZenzaiStats()
 }
 ''')
 ae = engine / "AzookeyEngine.swift"

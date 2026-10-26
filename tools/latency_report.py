@@ -63,6 +63,9 @@ def breakdown(row):
     sel_cpp = g(row, "sel_cpp_us")
     mozc = g(row, "mozc_us")
     total = g(row, "total_us")
+    batch = g(row, "batch_us")
+    batch_ctx = g(row, "batch_ctx_us")
+    batch_sel = g(row, "batch_sel_us")
     swift_call = max(0, call - sel_ai)  # 選び手の入り口を除いた、変換の呼び出しの Swift 側の時間
     return {
         "total": total,
@@ -70,6 +73,8 @@ def breakdown(row):
         "dll": dll,
         "allz": allz,
         "allz_dec": g(row, "allz_dec_us"),
+        "allz_pre": g(row, "allz_pre_us"),
+        "allz_step": g(row, "allz_step_us"),
         "proc_rest": max(0, proc - ctx),
         "ctx": ctx,
         "ctx_dec": g(row, "ctx_dec_us"),
@@ -78,6 +83,12 @@ def breakdown(row):
         "boundary": max(0, dll - swift_call),
         "sel": sel_cpp,
         "sel_ai": sel_ai,
+        "batch": batch,
+        "batch_ctx": batch_ctx,
+        "batch_sel": batch_sel,
+        "ctx_no_batch": max(0, ctx - batch_ctx),
+        "sel_no_batch": max(0, sel_cpp - batch_sel),
+        "sel_ai_no_batch": max(0, sel_ai - batch_sel),
         "other": max(0, total - mozc - dll - sel_cpp),
     }
 
@@ -88,9 +99,12 @@ ROWS = [
     ("人工知能側の変換エンジンの呼び出し（合計）", "dll", 1),
     ("all_zenzai（格子の構築と全文の評価）", "allz", 2),
     ("うち llama.cpp の評価", "allz_dec", 3),
+    ("うち まとめて計算（prefill 相当）", "allz_pre", 4),
+    ("うち 1語片ずつ（decode 相当）", "allz_step", 4),
     ("候補作り（並べ替えを除く）", "proc_rest", 2),
     ("contextPriorWinner（前後の文での並べ替え）", "ctx", 2),
     ("うち llama.cpp の評価", "ctx_dec", 3),
+    ("一括採点（候補をまとめた評価）", "batch", 2),
     ("打ち間違いの補正の探索（辞書側と人工知能）", "typo", 2),
     ("Swift の残り（候補の JSON 作りなど）", "swift_rest", 2),
     ("受け渡し（C++ と Swift の間）", "boundary", 2),
@@ -104,9 +118,9 @@ def fit_cost(conv):
     """評価1回の固定費 a と語片1つあたり b を、変換ごとの (回数, 新しい語片, 時間) から最小二乗で求める。"""
     xs = []
     for r in conv:
-        n = sum(g(r, p + "_dec_n") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
-        new = sum(g(r, p + "_new") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
-        us = sum(g(r, p + "_dec_us") for p in ("allz", "ctx", "sel", "typo", "tpass", "proc", "other"))
+        n = sum(g(r, p + "_dec_n") for p in ("allz", "ctx", "batch", "sel", "typo", "tpass", "proc", "other"))
+        new = sum(g(r, p + "_new") for p in ("allz", "ctx", "batch", "sel", "typo", "tpass", "proc", "other"))
+        us = sum(g(r, p + "_dec_us") for p in ("allz", "ctx", "batch", "sel", "typo", "tpass", "proc", "other"))
         if n:
             xs.append((n, new, us / 1000))
     if len(xs) < 20:
@@ -161,21 +175,25 @@ def describe(label, rows, wall, keyus):
         out.append(f"| （入り口の外）後 | {sum(post) / len(post):.1f} | - | {pct(post, .5):.1f} | {pct(post, .9):.1f} |")
     # 評価の回数と1回の時間
     out.append("")
-    out.append("| 評価（llama_decode） | 1変換あたりの回数 平均 | 中央値 | 90%点 | 1回の平均 ミリ秒 | 1回に新しく計算した語片 | 渡した語片 | 使い回せた割合 |")
-    out.append("|---|---:|---:|---:|---:|---:|---:|---:|")
-    for name, prefix in (("all_zenzai", "allz"), ("contextPriorWinner", "ctx"), ("選び手", "sel"), ("打ち間違いの探索", "tpass"), ("打ち間違い（人工知能）", "typo")):
+    out.append("| 評価（llama_decode） | 1変換あたりの回数 平均 | 中央値 | 90%点 | 1回の平均 ミリ秒 | 1回に新しく計算した語片 | 渡した語片 | 使い回せた割合 | まとめ n / ms | 1語片 n / ms |")
+    out.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+    for name, prefix in (("all_zenzai", "allz"), ("contextPriorWinner", "ctx"), ("一括採点", "batch"), ("選び手", "sel"), ("打ち間違いの探索", "tpass"), ("打ち間違い（人工知能）", "typo")):
         counts = [g(r, prefix + "_dec_n") for r in conv]
         n = sum(counts)
         us = sum(g(r, prefix + "_dec_us") for r in conv)
         new = sum(g(r, prefix + "_new") for r in conv)
         tok = sum(g(r, prefix + "_tok") for r in conv)
-        calls = sum(g(r, prefix + "_n") for r in conv)
+        pre_n = sum(g(r, prefix + "_pre_n") for r in conv)
+        pre_us = sum(g(r, prefix + "_pre_us") for r in conv)
+        step_n = sum(g(r, prefix + "_step_n") for r in conv)
+        step_us = sum(g(r, prefix + "_step_us") for r in conv)
         entered = sum(1 for r in conv if g(r, prefix + "_n") > 0)
         if n == 0:
-            out.append(f"| {name} | 0 | 0 | 0 | - | - | - | - |")
+            out.append(f"| {name} | 0 | 0 | 0 | - | - | - | - | - | - |")
             continue
         out.append(f"| {name}（段に入った変換 {100 * entered / len(conv):.0f}%） | {n / len(conv):.1f} | {pct(counts, .5):.0f} | {pct(counts, .9):.0f} | "
-                   f"{us / n / 1000:.1f} | {new / n:.0f} | {tok / n:.0f} | {100 * (1 - new / max(1, tok)):.0f}% |")
+                   f"{us / n / 1000:.1f} | {new / n:.0f} | {tok / n:.0f} | {100 * (1 - new / max(1, tok)):.0f}% | "
+                   f"{pre_n / len(conv):.1f} / {pre_us / 1000 / len(conv):.1f} | {step_n / len(conv):.1f} / {step_us / 1000 / len(conv):.1f} |")
     out.append(f"人工知能側の変換エンジンの呼び出し: 1変換あたり {sum(g(r, 'dll_n') for r in conv) / len(conv):.2f} 回")
     cost = fit_cost(conv)
     if cost:

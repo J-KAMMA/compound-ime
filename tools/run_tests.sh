@@ -36,6 +36,9 @@
 #      （tools/make_decimal_tests.py、tools/make_kana_number_tests.py、tools/decimal_transform_test.py）
 #   i: 人工知能の時間の上限の試験（わざと遅くする。tools/slow_compare.py、tools/zenzai_stats.py）
 #   p: 変換1回の時間を段ごとに測る（1つの計算機で、処理を1つだけ。tools/latency_convert.sh、tools/latency_report.py）
+#   w: 長い文（読み 10・20・40・60・80・120 字ほど、各36文）の空白キー1回を、段ごと・先回りあり/なし・
+#      1秒の上限に当たった割合に分けて測る。同じ計算機・同じ条件で3回ずつ。tests/conversion/long-latency.tsv、
+#      tools/long_latency_prepare.py、tools/long_latency_report.py。案 (a)(b)(c) の見込みも数字から出す（作らない）
 #   j: 落ちないかの試験（標準エラーなし、前後の文と実験の印つきでキーを1つずつ送り続ける）
 # 環境変数 DICT_CANDIDATE_DIR（署名つきの配布物の場所）があれば、どの組も、その辞書を本体の取り込みの道（DICT_UPDATE）で入れてから流す
 # （月1回の自動更新が、新しい辞書の結果を、いまの辞書の結果と比べるため。.github/workflows/dict-update.yml）。
@@ -571,6 +574,37 @@ PY
     fi
   ) || true
   ;;
+w)
+  # 長い文の空白キー1回を、読みの長さ（10・20・40・60・80・120 字ほど）ごとに段へ分けて測る。
+  # 1つの計算機で、変換の処理を1つだけにして、同じ条件を3回ずつ流す。
+  #   plain / plain-ctx: 上限なし・先回りなし（前の文なし／あり）
+  #   split: 句読点で分けた句を別々に（時間だけ。正解は見ない）
+  #   real-pf / real-nopf: 既定（上限 1000 ミリ秒、先回り 120 ミリ秒）で1字 125 ミリ秒ずつ打ち、
+  #     打ち終わってから空白キーまで 300 ミリ秒待つ（利用者が考える間。先回りが働ける時間）。
+  #     nopf は先回りだけ止める（MYIME_PREFETCH_DELAY=0）。上限に当たった回数は LAT_STATS=1 で残す
+  { echo "nproc=$(nproc)"; grep -m1 'model name' /proc/cpuinfo | sed 's/^[^:]*: *//'; } > $OUT/long-latency-env.txt
+  TESTS=$T/long-latency.tsv
+  if [ ! -f $TESTS ]; then
+    python3 $REPO/tools/make_long_latency_tests.py --out $TESTS
+  fi
+  python3 $REPO/tools/long_latency_prepare.py $TESTS $W/long
+  # 句分けの対応表は、結果のフォルダー（long_latency_report.py が読む場所）にも置く
+  for f in $W/long/long-*-split-map.tsv; do cp "$f" $OUT/; done
+  # 6時間の上限に収めるため、長さの組ごとに先頭 LAT_N 文（既定 10）だけ測る
+  for f in $W/long/long-*.tsv; do case $f in *-split-map.tsv) continue;; esac; awk -v n=${LAT_N:-10} '/^#/ || c++ < n' "$f" > "$f.tmp" && mv "$f.tmp" "$f"; done
+  LAT="bash $REPO/tools/latency_convert.sh $E/session_handler_main $E $MODEL"
+  for b in 10 20 40 60 80 120; do
+    for r in 1 2 3; do
+      $LAT $W/long/long-$b.tsv $OUT/long-$b-plain-r$r
+      $LAT $W/long/long-$b-ctx.tsv $OUT/long-$b-plain-ctx-r$r
+      $LAT $W/long/long-$b-split.tsv $OUT/long-$b-split-r$r
+      [ $r = 1 ] || continue  # 打つ速さをまねる測り方は遅いので1回だけ
+      LAT_REAL=1 LAT_STATS=1 LAT_PAUSE_MS=300 MYIME_PREFETCH_DELAY=120 $LAT $W/long/long-$b.tsv $OUT/long-$b-real-pf-r$r 125
+      LAT_REAL=1 LAT_STATS=1 LAT_PAUSE_MS=300 MYIME_PREFETCH_DELAY=0 $LAT $W/long/long-$b.tsv $OUT/long-$b-real-nopf-r$r 125
+    done
+  done
+  python3 $REPO/tools/long_latency_report.py $OUT | tee $OUT/long-latency-report.txt
+  ;;
 *)
-  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、t、u、x、y のどれか" >&2; exit 2 ;;
+  echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、t、u、w、x、y のどれか" >&2; exit 2 ;;
 esac
