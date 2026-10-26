@@ -453,4 +453,26 @@ edit(ae, """        "inferenceLimit": config.zenzaiInferenceLimit,
 edit(ae, """    let scores = conv.selectorSentenceScores(""", """    ZenzaiDeadline.begin(milliseconds: config.zenzaiTimeLimitMs)
     defer { finishZenzaiDeadline() }
     let scores = conv.selectorSentenceScores(""")
+
+# 打ち間違いの探索（TypoCorrectionPass）は、直した読みごとに文全体を辞書で変換し直す（最大16回）。
+# 長い文では重く（組 w、読み121字で平均0.5秒、全体の31%）、長い文で直した候補が出ても使われにくい。
+# 読みが MYIME_TYPO_PASS_MAX_CHARS 字（既定 60、0 以下で上限なし）を超えたら探索を省く。
+edit(engine / "TypoCorrectionPass.swift", """    guard hasLeftoverAlphabet || originalKeyCount >= minimumTypoInputLength else {
+        return []
+    }
+""", """    guard hasLeftoverAlphabet || originalKeyCount >= minimumTypoInputLength else {
+        return []
+    }
+    guard typoPassMaxChars <= 0 || originalKeyCount <= typoPassMaxChars else {
+        return []
+    }
+""")
+edit(engine / "TypoCorrectionPass.swift", "private let minimumTypoInputLength = 3\n",
+     "private let minimumTypoInputLength = 3\n"
+     "private let typoPassMaxChars: Int = {\n"
+     "    guard let raw = ProcessInfo.processInfo.environment[\"MYIME_TYPO_PASS_MAX_CHARS\"], let value = Int(raw) else {\n"
+     "        return 60\n"
+     "    }\n"
+     "    return value\n"
+     "}()\n")
 print("zenzai deadline ok")
