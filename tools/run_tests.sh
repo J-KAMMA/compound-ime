@@ -306,10 +306,10 @@ q)
     done
   done | tee $OUT/sokuon-keys.txt
   # 試し: 文の中の llm が崩れる条件（今日hall m）。選び手（MYIME_SELECTOR=0）の有無でも比べる
-  for r in kyouhallm kyouhallmwotsukau watashihallmwotsukau korehallmdesu kyouhassdwotsukau kyouhaaiwotsukau kyougallm kyounollm kyouhammr; do
-    for sel in 1 0; do
+  for r in kyouhallmwotsukau kyougallm kyouhammr; do
+    for sel in MYIME_SELECTOR=1 MYIME_TYPO_MARGIN=off MYIME_ENGLISH_CONTEXT=off MYIME_INTRA_CONTEXT=off MYIME_ENGLISH_FOLLOW=off; do
       printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" > $W/key.tsv
-      echo "$r sel=$sel: $(MYIME_SELECTOR=$sel run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
+      echo "$r $sel: $(env $sel run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
     done
   done | tee -a $OUT/sokuon-keys.txt
   ;;
