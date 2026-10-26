@@ -70,6 +70,11 @@ struct TypoPriors {
   // passport way leaves ou's u out before an o ("chuosen" is 中央線, and
   // ちょうせん reads 5066 cheaper); the 8 such slips read 6858 or more cheaper.
   int swapped_uo = 3000;
+  // The i of ai left out ("asatsu" for aisatsu, "shukuda" for shukudai, "rakyaku"
+  // for raikyaku): the commonest dropped vowel in typo150b (5 of 6). Measured with
+  // the typo tables and ja400: 0 fixes 3 more and changes none of the 950 others;
+  // -1000 also breaks one in typo150, 1000 fixes 1. MYIME_TYPO_PRIOR_AI overrides it.
+  int dropped_ai = 0;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit
