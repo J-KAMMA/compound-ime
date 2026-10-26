@@ -55,6 +55,7 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_decimal_point.py $S
+          $PY $W/repo/tools/apply_emoji_context.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           $PY $W/repo/tools/apply_dict_update.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
@@ -154,6 +155,7 @@ jobs:
           cp $W/repo/native/precision117/whole_surface_path_v2.h $S/engine/whole_surface_path_v2.h
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_decimal_point.py $S
+          $PY $W/repo/tools/apply_emoji_context.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           $PY $W/repo/tools/apply_dict_update.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src

@@ -110,6 +110,21 @@ b)
     printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\n' "$r" > $W/cand.tsv
     run_one $W/cand.tsv | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=8{exit} END{print out}' | sed "s|^|$r: |" || true
   done | tee $OUT/candidates.txt
+  # 「えもじ」: 直前の文に合う絵文字が2番目から並ぶか（tools/apply_emoji_context.py）。合わせ方の単体試験は g++ で動く
+  g++ -std=c++20 -O2 -I $REPO/native/jaen-detector $REPO/native/jaen-detector/emoji_context_test.cc -o $W/emoji_context_test
+  $W/emoji_context_test | tee $OUT/emoji-context.txt
+  # 列: 直前の文（- はなし）<TAB>上位5つに入ってほしい絵文字
+  printf '%s\t%s\n' 猫が寝てる 💤 今日はありがとう 🙏 誕生日おめでとう 🎂 すみませんでした 🙇 ラーメン食べた 🍜 - 😊 \
+    > $W/emoji-cases.tsv
+  while IFS=$'\t' read -r pre want; do
+    { printf 'SEND_KEY\tON\n'
+      if [ "$pre" != "-" ]; then printf 'SET_PRECEDING_TEXT\t%s\n' "$pre"; fi
+      printf 'SEND_KEYS\temoji\nSEND_KEY\tSpace\nSHOW_OUTPUT\n'; } > $W/emoji.tsv
+    got=$(run_one $W/emoji.tsv | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=5{exit} END{print out}' || true)
+    case "$got" in *"$want"*) mark=合う ;; *) mark=合わない ;; esac
+    echo "$mark: $pre（$want）: $got"
+  done < $W/emoji-cases.tsv | tee $OUT/emoji.txt
+  echo "えもじ: 上位5つに合う絵文字 $(grep -c '^合う:' $OUT/emoji.txt)/$(wc -l < $W/emoji-cases.tsv)" | tee -a $OUT/emoji.txt
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
