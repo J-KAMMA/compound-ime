@@ -139,6 +139,10 @@ for line in Path(table).read_text(encoding="utf-8").splitlines():
     key, reading, preceding = fields[0], fields[1], fields[2]
     target = first.get(reading)
     candidates = probe.get(key, [])
+    # 文の中の文節は「記者の」のように助詞まで含むことがあるので、書き方＋ひらがなの候補をその文節の書き方にする。
+    if target and target not in candidates:
+        target = next((c for c in candidates if c.startswith(target)
+                       and all("ぁ" <= ch <= "ゖ" for ch in c[len(target):])), target)
     if not target or target not in candidates:
         print(f"履歴なしの変換に、選ぶ書き方がありません: {key} ({reading} -> {target})", file=sys.stderr)
         sys.exit(1)
