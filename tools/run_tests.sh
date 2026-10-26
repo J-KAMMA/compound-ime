@@ -309,7 +309,7 @@ q)
   for r in kyouhallmwotsukau kyougallm kyouhammr; do
     for sel in MYIME_SELECTOR=1 MYIME_TYPO_MARGIN=off MYIME_ENGLISH_CONTEXT=off MYIME_INTRA_CONTEXT=off MYIME_ENGLISH_FOLLOW=off; do
       printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" > $W/key.tsv
-      echo "$r $sel: $(env $sel run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
+      echo "$r $sel: $(export $sel; run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
     done
   done | tee -a $OUT/sokuon-keys.txt
   ;;
