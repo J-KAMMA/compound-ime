@@ -131,8 +131,8 @@ b)
   while IFS=$'\t' read -r keys want; do
     printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnd\nSEND_KEY\tSpace\nSHOW_OUTPUT\n' "$keys" > $W/emoji.tsv
     out=$(run_one $W/emoji.tsv || true)
-    seg=$(echo "$out" | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0} END{print s}')
-    got=$(echo "$out" | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=5{exit} END{print out}')
+    seg=$(awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0} END{print s}' <<< "$out")
+    got=$(awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=5{exit} END{print out}' <<< "$out")
     case "$got" in *"$want"*) mark=合う ;; *) mark=合わない ;; esac
     echo "$mark: $keys（$want）: $seg: $got"
   done < $W/emoji-inline.tsv | tee -a $OUT/emoji.txt
