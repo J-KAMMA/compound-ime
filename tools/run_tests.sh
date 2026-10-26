@@ -125,6 +125,17 @@ b)
     echo "$mark: $pre（$want）: $got"
   done < $W/emoji-cases.tsv | tee $OUT/emoji.txt
   echo "えもじ: 上位5つに合う絵文字 $(grep -c '^合う:' $OUT/emoji.txt)/$(wc -l < $W/emoji-cases.tsv)" | tee -a $OUT/emoji.txt
+  # 文と「えもじ」を続けて打って一度に変換する。最後の文節（End）の候補を見る
+  printf '%s\t%s\n' tannjoubiomedetouemoji 🎂 ra-mennwotabetaemoji 🍜 nekoganeteruemoji 💤 arigatouemoji 🙏 \
+    > $W/emoji-inline.tsv
+  while IFS=$'\t' read -r keys want; do
+    printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnd\nSEND_KEY\tSpace\nSHOW_OUTPUT\n' "$keys" > $W/emoji.tsv
+    out=$(run_one $W/emoji.tsv || true)
+    seg=$(echo "$out" | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0} END{print s}')
+    got=$(echo "$out" | awk '/^ *candidates \{/{c=1} c&&/^ *value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); out=out v " / "; n++} n>=5{exit} END{print out}')
+    case "$got" in *"$want"*) mark=合う ;; *) mark=合わない ;; esac
+    echo "$mark: $keys（$want）: $seg: $got"
+  done < $W/emoji-inline.tsv | tee -a $OUT/emoji.txt
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1

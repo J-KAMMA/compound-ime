@@ -168,6 +168,17 @@ edit(R, """  DCHECK(segments);
 edit(R, "bool EmojiRewriter::RewriteCandidates(Segments* segments) const {",
      "bool EmojiRewriter::RewriteCandidates(Segments* segments,\n"
      "                                      absl::string_view context) const {")
+edit(R, """  for (Segment& segment : segments->conversion_segments()) {
+    reading = japanese_util::FullWidthAsciiToHalfWidthAscii(segment.key());""",
+     """  // 同じ変換の中で前にある文節も直前の文に足す（「たんじょうびおめでとうえもじ」を一度に変換したとき）
+  std::string sentence(context);
+  const Segment* previous = nullptr;
+  for (Segment& segment : segments->conversion_segments()) {
+    if (previous != nullptr && previous->candidates_size() > 0) {
+      sentence += previous->candidate(0).value;
+    }
+    previous = &segment;
+    reading = japanese_util::FullWidthAsciiToHalfWidthAscii(segment.key());""")
 edit(R, """      const EmojiEntryList utf8_emoji_list =
           GatherAllEmojiData(tokens, string_array_);
       if (utf8_emoji_list.empty()) {
@@ -181,7 +192,7 @@ edit(R, """      const EmojiEntryList utf8_emoji_list =
       // 直前の文に合う絵文字、よく使う絵文字、残り（今までの順）の順にする
       std::vector<absl::string_view> first;
       for (const std::string_view emoji :
-           jaen::ContextEmoji(context, kEmojiContextTable)) {
+           jaen::ContextEmoji(sentence, kEmojiContextTable)) {
         first.push_back(emoji);
       }
       for (const std::string_view emoji : kEmojiDefault) {
