@@ -808,6 +808,23 @@ int main() {
     Expect(english("sannkaimeno").empty(), "三回目の の ime は取らない（辞書がなくても、手がかりがない）");
     Expect(english("imeji").empty(), "イメージ の ime は取らない");
   }
+  {
+    // 小さい「っ」で終わる読み（うはっ）は、ha|llm の っ を日本語の語に取らない（今日はLLM が 今日hall m だった）
+    jaen::Lexicon words;
+    for (const char* w : {"hall", "gall"}) words.Add(w);
+    words.Add("llm", true);
+    const std::set<std::string> readings = {"うはっ", "うがっ", "きょう"};
+    const jaen::ReadingCheck is_reading = [&](std::string_view kana) { return readings.contains(std::string(kana)); };
+    const auto english = [&](std::string_view raw) {
+      std::string out;
+      for (const Piece& p : jaen::SplitEnglish(Parse(raw), words, Parse, nullptr, &is_reading)) {
+        if (p.english) out += std::string(raw.substr(p.begin, p.end - p.begin)) + "|";
+      }
+      return out;
+    };
+    Expect(english("kyouhallmwotsukau") == "llm|", "ha|llm after a reading ending in a small tsu (うはっ)");
+    Expect(english("kyougallm") == "llm|", "ga|llm after a reading ending in a small tsu (うがっ)");
+  }
 
   std::cout << "SUMMARY\t" << failures << '\n';
   return failures ? 1 : 0;
