@@ -305,6 +305,13 @@ q)
       echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
     done
   done | tee $OUT/sokuon-keys.txt
+  # 試し: 文の中の llm が崩れる条件（今日hall m）。選び手（MYIME_SELECTOR=0）の有無でも比べる
+  for r in kyouhallm kyouhallmwotsukau watashihallmwotsukau korehallmdesu kyouhassdwotsukau kyouhaaiwotsukau kyougallm kyounollm kyouhammr; do
+    for sel in 1 0; do
+      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" > $W/key.tsv
+      echo "$r sel=$sel: $(MYIME_SELECTOR=$sel run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
+    done
+  done | tee -a $OUT/sokuon-keys.txt
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
