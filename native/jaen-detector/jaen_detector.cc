@@ -585,13 +585,14 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   // A loanword kana k (IsKanaForLoanword) joining the kana before it in a
   // Japanese reading of 3+ kana (うぉ of うぉれっと typed "ulo", ゔぃ of へゔぃめたる
   // typed "hevi"): the keys were typed for that kana. Not one starting at k:
-  // "video" read as ゔぃでお is English.
+  // "video" read as ゔぃでお is English. A reading ending in a small tsu (うはっ)
+  // is no word unless kana follow it (うはった): ha|llm is は + LLM.
   const auto small_in_reading = [&](size_t k) {
     if (!is_reading) return false;
     constexpr size_t kLongest = 8;
     for (size_t a = k >= kLongest ? k - kLongest : 0; a < k; ++a) {
       for (size_t b = std::max(k + 1, a + 3); b <= kana.size() && b - a <= kLongest; ++b) {
-        if ((*is_reading)(kana_text(a, b))) return true;
+        if (kana[b - 1] != "っ" && (*is_reading)(kana_text(a, b))) return true;
       }
     }
     return false;

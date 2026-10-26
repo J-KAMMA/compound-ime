@@ -299,19 +299,12 @@ q)
   done | tee $OUT/tools-keys.txt
   # 同じ子音を重ねて始まる英字の略語（llm、ssd ...）: ローマ字では重ねた子音が小さい「っ」になる（llm → っlm）。
   # 打っている途中の表示（typing）と、Enter・Space のあとを記録する（sokuon-keys.txt）
-  for r in llm llmtte llmwotsukau kyouhallmwotsukau ssd ssdgaosoi ssh ffmpeg mmr; do
+  for r in llm llmtte llmwotsukau kyouhallmwotsukau kyougallm ssd ssdgaosoi ssh ffmpeg mmr; do
     for how in Enter Space; do
       printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSHOW_OUTPUT\nSEND_KEY\t%s\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" "$how" > $W/key.tsv
       echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
     done
   done | tee $OUT/sokuon-keys.txt
-  # 試し: 文の中の llm が崩れる条件（今日hall m）。選び手（MYIME_SELECTOR=0）の有無でも比べる
-  for r in kyouhallmwotsukau kyougallm kyouhammr; do
-    for sel in MYIME_SELECTOR=1 MYIME_TYPO_MARGIN=off MYIME_ENGLISH_CONTEXT=off MYIME_INTRA_CONTEXT=off MYIME_ENGLISH_FOLLOW=off; do
-      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" > $W/key.tsv
-      echo "$r $sel: $(export $sel; run_one $W/key.tsv | awk '/^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print v; r=0}' || true)"
-    done
-  done | tee -a $OUT/sokuon-keys.txt
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
