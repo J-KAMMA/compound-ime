@@ -83,7 +83,8 @@ def build_table(tsv):
         emoji = cols[1]
         emojis.append(emoji)
         found = set()
-        for word in cols[5].split():
+        # 言葉の列（6列目）に、読みの列（3列目、ひらがな）も足す: 一度に打った「あかちょうちんえもじ」は読みで合わせる
+        for word in cols[5].split() + cols[2].split():
             if usable(word):
                 found.add(word)
             # 寝る→寝、疲れた→疲れ、眠い→眠: 言葉の終わりのひらがなを外した形でも探す（寝てる、疲れて、眠くて）
@@ -171,13 +172,17 @@ edit(R, "bool EmojiRewriter::RewriteCandidates(Segments* segments) const {",
 edit(R, """  for (Segment& segment : segments->conversion_segments()) {
     reading = japanese_util::FullWidthAsciiToHalfWidthAscii(segment.key());""",
      """  // 同じ変換の中で前にある文節も直前の文に足す（「たんじょうびおめでとうえもじ」を一度に変換したとき）
+  // 前の文節の読みも、改行で区切って最後に足す（「あかちょうちん」が赤提灯にならなくても読みで合う）
   std::string sentence(context);
+  std::string keys;
   const Segment* previous = nullptr;
   for (Segment& segment : segments->conversion_segments()) {
     if (previous != nullptr && previous->candidates_size() > 0) {
       sentence += previous->candidate(0).value;
+      keys += previous->key();
     }
     previous = &segment;
+    const std::string with_keys = keys.empty() ? sentence : sentence + "\\n" + keys;
     reading = japanese_util::FullWidthAsciiToHalfWidthAscii(segment.key());""")
 edit(R, """      const EmojiEntryList utf8_emoji_list =
           GatherAllEmojiData(tokens, string_array_);
@@ -192,7 +197,7 @@ edit(R, """      const EmojiEntryList utf8_emoji_list =
       // 直前の文に合う絵文字、よく使う絵文字、残り（今までの順）の順にする
       std::vector<absl::string_view> first;
       for (const std::string_view emoji :
-           jaen::ContextEmoji(sentence, kEmojiContextTable)) {
+           jaen::ContextEmoji(with_keys, kEmojiContextTable)) {
         first.push_back(emoji);
       }
       for (const std::string_view emoji : kEmojiDefault) {

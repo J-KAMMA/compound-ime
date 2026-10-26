@@ -56,6 +56,7 @@ jobs:
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_decimal_point.py $S
           $PY $W/repo/tools/apply_emoji_context.py $S
+          $PY $W/repo/tools/apply_emoji_renderable.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           $PY $W/repo/tools/apply_dict_update.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
@@ -156,6 +157,7 @@ jobs:
           $PY $W/repo/tools/apply_jaen_integration.py $S $W/lex
           $PY $W/repo/tools/apply_decimal_point.py $S
           $PY $W/repo/tools/apply_emoji_context.py $S
+          $PY $W/repo/tools/apply_emoji_renderable.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           $PY $W/repo/tools/apply_dict_update.py $S
           $PY $W/repo/tools/apply_linux_engine_port.py $W/myime/src
