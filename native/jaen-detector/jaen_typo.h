@@ -75,6 +75,11 @@ struct TypoPriors {
   // the typo tables and ja400: 0 fixes 3 more and changes none of the 950 others;
   // -1000 also breaks one in typo150, 1000 fixes 1. MYIME_TYPO_PRIOR_AI overrides it.
   int dropped_ai = 0;
+  // A voiced consonant typed twice ("maddeo" for madeo, "hidda" for hida): Japanese
+  // has no small tsu before g, z, j, d or b outside loanwords (バッグ, ベッド). A
+  // lower doubled_consonant for every key also breaks mittsu (三つ) into
+  // mitsukatta (見つかった). MYIME_TYPO_PRIOR_DV overrides it.
+  int doubled_voiced = 0;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit
