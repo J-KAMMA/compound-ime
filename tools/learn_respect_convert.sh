@@ -67,10 +67,13 @@ run_mode() {  # <名前> <重み> <出力> <対象の表> [行ごとに履歴を
   done
   wait
   cat "$w"/part.*.res > "$out"
-  if grep -q "candidate not found" "$w"/*.out "$w"/*.err 2> /dev/null; then
-    grep -h "candidate not found" "$w"/*.out "$w"/*.err | head -3 >&2
-    echo "選ぶ候補が変換の候補にありませんでした（$name）" >&2
-    exit 1
+  # 人工知能ありの変換では、なしの2番目が候補の一覧に出ないことがある。その書き方は選べないので、
+  # その行を結果から外し（採点はあり・なし両方にある語だけを比べる）、外した書き方を記録する。
+  grep -h "^candidate not found: " "$w"/*.err 2> /dev/null | sed 's/^candidate not found: //' | sort -u > "$out.missing" || true
+  if [ -s "$out.missing" ]; then
+    echo "選ぶ候補が変換の候補になく外した書き方（$name）: $(wc -l < "$out.missing") 件: $(head -20 "$out.missing" | tr '\n' ' ')" >&2
+    awk -F'\t' -v m="$out.missing" 'BEGIN { while ((getline l < m) > 0) skip[l] = 1 } !($2 in skip)' \
+      "$out" > "$out.kept" && mv "$out.kept" "$out"
   fi
 }
 
@@ -136,6 +139,10 @@ for line in Path(table).read_text(encoding="utf-8").splitlines():
     key, reading, preceding = fields[0], fields[1], fields[2]
     target = first.get(reading)
     candidates = probe.get(key, [])
+    # 文の中の文節は「記者の」のように助詞まで含むことがあるので、書き方＋ひらがなの候補をその文節の書き方にする。
+    if target and target not in candidates:
+        target = next((c for c in candidates if c.startswith(target)
+                       and all("ぁ" <= ch <= "ゖ" for ch in c[len(target):])), target)
     if not target or target not in candidates:
         print(f"履歴なしの変換に、選ぶ書き方がありません: {key} ({reading} -> {target})", file=sys.stderr)
         sys.exit(1)

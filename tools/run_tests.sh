@@ -178,6 +178,13 @@ l)
         | tee $OUT/learn-respect-context-score.txt
     fi
   fi
+  # 学習が文脈を壊さないか（tools/learn_context_guard.sh）。1語で別の書き方を覚えさせたあと、文脈が元の書き方を指す文で
+  # 元の書き方のまま出るかを、学習の前とあと・人工知能あり・なしで比べる（いまは記録だけ）。
+  if [ -f $T/learn-context-guard.tsv ]; then
+    bash $REPO/tools/learn_context_guard.sh $E/session_handler_main $E $MODEL $T/learn-context-guard.tsv $OUT/learn-context-guard 2
+    python3 $REPO/tools/score_learn_context_guard.py $OUT/learn-context-guard-on.tsv $OUT/learn-context-guard-off.tsv \
+      | tee $OUT/learn-context-guard-score.txt
+  fi
   ;;
 m)
   # 英単語と重なるローマ字: ローマ字として日本語に読める英単語（made、take、same、one）を日本語の文にはさんだ文と英語だけの文（英語に
