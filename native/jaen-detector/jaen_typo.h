@@ -79,6 +79,8 @@ struct TypoPriors {
   // has no small tsu before g, z, j, d or b outside loanwords (バッグ, ベッド). A
   // lower doubled_consonant for every key also breaks mittsu (三つ) into
   // mitsukatta (見つかった). MYIME_TYPO_PRIOR_DV overrides it.
+  // Measured: fixes maddeo and hidda, changes none of ja400, the typo controls
+  // or the loanwords in group c (beddo, baggu ...).
   int doubled_voiced = 0;
 };
 struct TypoEdit {
