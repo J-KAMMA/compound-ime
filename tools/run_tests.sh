@@ -125,13 +125,6 @@ c)
   romaji $T/typo150b.json > $W/typo150b.txt
   MYIME_TYPO_MARGIN=off $BATCH $W/typo150b.txt $OUT/typo150b-off.tsv 4
   $BATCH $W/typo150b.txt $OUT/typo150b.tsv 4
-  # 試し: ai の i の抜けの上乗せ（MYIME_TYPO_PRIOR_AI）を変えて、打ち間違いの2表と普段の文（直してはいけない）を流す
-  romaji $T/ja400.json > $W/ja400.txt
-  for prior in -1000 0 1000; do
-    for f in typo150 typo150b ja400; do
-      MYIME_TYPO_PRIOR_AI=$prior $BATCH $W/$f.txt $OUT/aitrial-$prior-$f.tsv 4
-    done
-  done
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
