@@ -273,6 +273,14 @@ bool IsKanaForLoanword(const Chunk& chunk) {
 bool IsForeignChunk(const Chunk& chunk) { return ForeignWeight(chunk) > 0; }
 
 namespace {
+// Whether two English words typed together are shown with a space between
+// them: not when the joined form is a word, nor when it has no vowel (or y)
+// ("mm", "mmr", "kg" are units or abbreviations, not "m m").
+bool SpaceBetween(const Lexicon& lexicon, std::string_view joined) {
+  if (lexicon.Contains(joined) || lexicon.IsJoined(joined)) return false;
+  return joined.find_first_of("aiueoyAIUEOY") != std::string_view::npos;
+}
+
 // "tokyo|ni": a particle (or nothing) follows a place name.
 bool BeforeParticleOrEnd(std::string_view raw, size_t at) {
   static constexpr std::string_view kParticles[] = {"ni", "de", "he", "ha", "no", "wo", "ga", "kara",
@@ -1053,7 +1061,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       // concatenation is no word ("weekly report", not "down load").
       const size_t first_end = pieces.back().spaces.empty() ? pieces.back().end : pieces.back().spaces.back();
       const std::string_view joined = std::string_view(raw).substr(b.from, first_end - b.from);
-      if (!lexicon.Contains(joined) && !lexicon.IsJoined(joined)) pieces.back().spaces.push_back(j);
+      if (SpaceBetween(lexicon, joined)) pieces.back().spaces.push_back(j);
       pieces.back().begin = b.from;
     } else {
       pieces.push_back({b.from, j, b.english});
@@ -1196,7 +1204,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         bounds.push_back(run.end);
         for (size_t w = 1; w + 1 < bounds.size(); ++w) {
           const std::string_view joined = std::string_view(sub).substr(bounds[w - 1], bounds[w + 1] - bounds[w - 1]);
-          if (!lexicon.Contains(joined) && !lexicon.IsJoined(joined)) piece.spaces.push_back(gap.begin + bounds[w]);
+          if (SpaceBetween(lexicon, joined)) piece.spaces.push_back(gap.begin + bounds[w]);
         }
         std::ranges::reverse(piece.spaces);
         result.push_back(std::move(piece));
@@ -1226,7 +1234,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         const size_t first_end = piece.spaces.empty() ? piece.end : piece.spaces.back();
         const std::string_view joined = std::string_view(raw).substr(last_begin, first_end - last_begin);
         std::vector<size_t> spaces = piece.spaces;
-        if (!lexicon.Contains(joined) && !lexicon.IsJoined(joined)) spaces.push_back(piece.begin);
+        if (SpaceBetween(lexicon, joined)) spaces.push_back(piece.begin);
         spaces.insert(spaces.end(), left.spaces.begin(), left.spaces.end());
         left.spaces = std::move(spaces);
         left.end = piece.end;
