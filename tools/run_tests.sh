@@ -136,6 +136,28 @@ b)
     case "$got" in *"$want"*) mark=合う ;; *) mark=合わない ;; esac
     echo "$mark: $keys（$want）: $seg: $got"
   done < $W/emoji-inline.tsv | tee -a $OUT/emoji.txt
+  # 全部の絵文字: 読み（いちばん長いひらがなの語）と「えもじ」を続けて打ち、最後の文節の候補の1ページ目（9つ）に
+  # その絵文字があるか（tests/conversion/emoji-all.tsv、tools/make_emoji_all_tests.py で Mozc の絵文字の辞書から作る）。
+  # 1つのセッションで続けて打ち、Escape 2回で消す
+  cp $T/emoji-all.tsv $W/emoji-all.tsv
+  { printf 'SEND_KEY\tON\n'
+    cut -f1 $W/emoji-all.tsv | while read -r keys; do
+      printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnd\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEscape\nSEND_KEY\tEscape\n' "$keys"
+    done; } > $W/emoji-all-keys.tsv
+  run_one $W/emoji-all-keys.tsv | awk '
+    function flush() { if (have) print s "\t" c; have=0 }
+    /^preedit \{/ { flush(); have=1; p=1; s=""; c=""; n=0; next }
+    p && /^    value:/ { v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|" }
+    p && /^}/ { p=0 }
+    /^ *candidates \{/ { k=1 }
+    k && /^ *value:/ && n<9 { v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); c=c v " "; n++ }
+    /^}/ && !p { k=0 }
+    END { flush() }' > $W/emoji-all-got.tsv || true
+  paste $W/emoji-all.tsv $W/emoji-all-got.tsv | awk -F'\t' '{
+      split($5, top, " "); r=0; for (i=1; i<=9; i++) if (top[i]==$2) { r=i; break }
+      print (r ? r : "-") "\t" $2 "\t" $3 "\t" $4 "\t" $5 }' > $OUT/emoji-all.tsv
+  awk -F'\t' '$1!="-"&&$1<=5{a++} $1!="-"{b++} END{printf "全部の絵文字: 上位5つ %d、1ページ目 %d / %d\n", a, b, NR}' $OUT/emoji-all.tsv \
+    | tee -a $OUT/emoji.txt
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
