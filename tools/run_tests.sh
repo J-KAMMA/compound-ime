@@ -178,6 +178,12 @@ c)
   printf '%s\n' beddo baggu guzzu doggu hottodoggu eggu wiggu kiddo reddo saddo heddohonn beddonineru baggunoirero \
     hottodoggutabeta doggufu-do > $W/sokuon-loan.txt
   $BATCH $W/sokuon-loan.txt $OUT/sokuon-loan.tsv 4
+  # 確かめ用の表（tests/conversion/holdout。学習にも調整にも使わない。tools/make_holdout_tests.py）。
+  # そのまま打った文と、同じ文に打ち間違いを1つ入れた文。採点はまとめの段（tools/score_categories.py）
+  romaji $T/holdout/holdout.json > $W/holdout.txt
+  $BATCH $W/holdout.txt $OUT/holdout.tsv 4
+  romaji $T/holdout/holdout-typo.json > $W/holdout-typo.txt
+  $BATCH $W/holdout-typo.txt $OUT/holdout-typo.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
