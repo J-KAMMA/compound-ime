@@ -297,6 +297,14 @@ q)
       echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
     done
   done | tee $OUT/tools-keys.txt
+  # 同じ子音を重ねて始まる英字の略語（llm、ssd ...）: ローマ字では重ねた子音が小さい「っ」になる（llm → っlm）。
+  # 打っている途中の表示（typing）と、Enter・Space のあとを記録する（sokuon-keys.txt）
+  for r in llm llmtte llmwotsukau kyouhallmwotsukau ssd ssdgaosoi ssh ffmpeg mmr; do
+    for how in Enter Space; do
+      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSHOW_OUTPUT\nSEND_KEY\t%s\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" "$how" > $W/key.tsv
+      echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
+    done
+  done | tee $OUT/sokuon-keys.txt
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
