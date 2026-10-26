@@ -297,6 +297,13 @@ q)
       echo "== $r + $how"; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; print "preedit: " s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result: " v; r=0}' || true
     done
   done | tee $OUT/tools-keys.txt
+  # 試し: 数字＋重ねた子音の単位（10mm）が 10m m になる段を探す
+  for r in 10mm 5mm 10mmnoneji 10cm mm mmr 3dd; do
+    for sel in MYIME_SELECTOR=1 MYIME_TYPO_MARGIN=off MYIME_NUMBERS=off MYIME_ENGLISH_CONTEXT=off; do
+      printf 'SEND_KEY\tON\nSEND_KEYS\t%s\nSHOW_OUTPUT\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$r" > $W/key.tsv
+      echo "$r $sel: $(export $sel; run_one $W/key.tsv | awk '/^preedit \{/{p=1;s=""} p&&/^    value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); s=s v "|"} p&&/^}/{p=0; printf "preedit=%s ", s} /^result \{/{r=1} r&&/^  value:/{v=$0; sub(/.*value: "/,"",v); sub(/"$/,"",v); print "result=" v; r=0}' || true)"
+    done
+  done | tee $OUT/mm-keys.txt
   ;;
 h)
   # 話し言葉の文（終助詞・縮約・くだけた言い方・疑問・感嘆、300 文ほど）をローマ字で打つ。! と ? は半角で打つ。
