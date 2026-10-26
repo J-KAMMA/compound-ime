@@ -28,6 +28,8 @@ run_mode() {  # <名前> <重み> <出力>
           done
           printf 'RESET_CONTEXT\nSEND_KEY\tON\n'
           printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$sentence"
+          # 学習が効いているかの確かめ: 1語を変換して、先頭のまま確定する。
+          printf 'RESET_CONTEXT\nSEND_KEY\tON\nSEND_KEYS\t%s\nSEND_KEY\tSpace\nSEND_KEY\tEnter\nSHOW_OUTPUT\n' "$word"
         done < "$f"; } > "$f.cmd"
       MYIME_ZENZAI_TIME_LIMIT_MS=0 MYIME_ZENZAI_STATS_FILE="$out.zstats" MYIME_AI_BUDGET_MS=0 \
         MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$model" \
@@ -38,8 +40,10 @@ run_mode() {  # <名前> <重み> <出力>
         /^result \{/ { r = 1 }
         r && /^  value:/ {
           v = $0; sub(/.*value: "/, "", v); sub(/"$/, "", v); r = 0
-          if (++k % 2) before = v
-          else { i = k / 2; printf "%s\t%s\t%s\t%s\t%s\n", s[i], l[i], e[i], before, v }
+          ++k
+          if (k % 3 == 1) before = v
+          else if (k % 3 == 2) after = v
+          else { i = k / 3; printf "%s\t%s\t%s\t%s\t%s\t%s\n", s[i], l[i], e[i], before, after, v }
         }
       ' "$f.out" > "$f.res"
     ) &
