@@ -424,11 +424,14 @@ o)
   # 前の文なし・前の1文・段落の前の文全部・記事の頭から（題名つき、1500 字まで）で変換して正解の数を比べる
   CTXL="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/context-long.tsv"
   $CTXL $OUT/ctxl-without.tsv without 4
-  for mode in with para page; do
-    $CTXL $OUT/ctxl-$mode.tsv $mode 4
-    python3 $REPO/tools/score_context.py $T/context-long.tsv $OUT/ctxl-$mode.tsv $OUT/ctxl-without.tsv \
-      > $OUT/ctxl-$mode-score.txt
-    echo "$mode: $(head -1 $OUT/ctxl-$mode-score.txt)" | tee -a $OUT/ctxl-summary.txt
+  # 人工知能に渡すのを終わりの 80 字にする（MYIME_CTX_NEAR）、画面に出ている語を先頭にする（MYIME_SCREEN_WORDS）
+  for variant in with:with: page:page: page-near:page:MYIME_CTX_NEAR=80 page-words:page:MYIME_CTX_NEAR=80,MYIME_SCREEN_WORDS=1 \
+                 with-words:with:MYIME_SCREEN_WORDS=1 para-words:para:MYIME_CTX_NEAR=80,MYIME_SCREEN_WORDS=1; do
+    name=${variant%%:*}; rest=${variant#*:}; mode=${rest%%:*}; assign=${rest#*:}
+    env ${assign//,/ } $CTXL $OUT/ctxl-$name.tsv $mode 4
+    python3 $REPO/tools/score_context.py $T/context-long.tsv $OUT/ctxl-$name.tsv $OUT/ctxl-without.tsv \
+      > $OUT/ctxl-$name-score.txt
+    echo "$name: $(head -1 $OUT/ctxl-$name-score.txt)" | tee -a $OUT/ctxl-summary.txt
   done
   ;;
 f)
