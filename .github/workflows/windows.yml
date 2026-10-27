@@ -129,6 +129,8 @@ jobs:
           python $R/tools/apply_decimal_point.py $S
           python $R/tools/apply_emoji_context.py $S
           python $R/tools/apply_emoji_renderable.py $S
+          # 入れたあと再起動しなくても使えるように、入力の部品を版ごとの名前で置く
+          python $R/tools/apply_tip_versioned.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           python $R/tools/apply_dict_update.py $S
           # 選び手（段階2b の記録と段階3の組み込み、MYIME_SELECTOR=0 で切る）
