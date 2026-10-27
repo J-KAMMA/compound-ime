@@ -92,6 +92,13 @@ struct TypoPriors {
   // Measured: fixes maddeo and hidda, changes none of ja400, the typo controls
   // or the loanwords in group c (beddo, baggu ...).
   int doubled_voiced = 0;
+  // kOff leaves a kind of slip out.
+  static constexpr int kOff = 1 << 30;
+  // A consonant left out before a vowel ("kiou" for kinou, "saeta" for sareta) and
+  // any key typed in by mistake ("butsai" for butai): set on the dev typo table
+  // (tests/conversion/dev-typo.json). MYIME_TYPO_PRIOR_DC and MYIME_TYPO_PRIOR_EX override them.
+  int dropped_consonant = 3000;
+  int extra_key = 2500;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit

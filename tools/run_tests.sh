@@ -190,6 +190,14 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
+  # 子音の抜け（MYIME_TYPO_PRIOR_DC）と余分な1キー（MYIME_TYPO_PRIOR_EX）の重みの比べ。ja400 も同じ重みで流し、
+  # 打ち間違いのない文が変わらないかを見る
+  romaji $T/ja400.json > $W/ja400-c.txt
+  for p in off:off 2000:1500 4000:3500; do
+    MYIME_TYPO_PRIOR_DC=${p%%:*} MYIME_TYPO_PRIOR_EX=${p##*:} $BATCH $W/dev-typo.txt $OUT/dev-typo-p${p/:/-}.tsv 4
+    MYIME_TYPO_PRIOR_DC=${p%%:*} MYIME_TYPO_PRIOR_EX=${p##*:} $BATCH $W/ja400-c.txt $OUT/ja400-p${p/:/-}.tsv 4
+  done
+  $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
