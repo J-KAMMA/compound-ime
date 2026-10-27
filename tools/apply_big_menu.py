@@ -6,7 +6,7 @@
 ウィンドウズの決まりの大きさの文字で描かれる。画面の拡大率が 100% だと小さくて読みにくい
 （利用者の声 10/27「これが小さすぎる」「ちいさい」）。
 
-項目を自前で描く（MFT_OWNERDRAW）ようにし、メニューの文字の kScale 倍の大きさで描く:
+項目を自前で描く（MFT_OWNERDRAW）ようにし、メニューの文字の kBigMenuScale/10 倍の大きさで描く:
   - 描く知らせ（WM_MEASUREITEM・WM_DRAWITEM）はメニューの持ち主の窓に届く。メニューを出している間だけ
     持ち主の窓の受け口を差し替えて自分で受け、閉じたら元に戻す（同じスレッドの窓なので安全）
   - 色は窓の決まりの色（メニューの地・文字・選択中・押せない）を使う。選ばれている項目には ● を付ける
@@ -34,7 +34,7 @@ def edit(path, old, new, count=1):
 
 edit(M, "#include <algorithm>\n", "#include <algorithm>\n#include <vector>\n")
 edit(M, "// メニューの一番上に出す", r"""// 右クリックのメニューを、決まりの文字の kScale 倍で自前で描く（apply_big_menu.py）。
-constexpr int kBigMenuScale = 18;  // 10 分の 1 の単位（1.8 倍）
+constexpr int kBigMenuScale = 12;  // 10 分の 1 の単位（1.2 倍。1.8 倍は大きすぎた）
 
 struct BigMenu {
   std::vector<std::wstring> texts;
@@ -56,7 +56,7 @@ LRESULT CALLBACK BigMenuProc(HWND window, UINT message, WPARAM wparam, LPARAM lp
       ::GetTextExtentPoint32W(dc, text.c_str(), static_cast<int>(text.size()), &size);
       ::SelectObject(dc, old);
       ::ReleaseDC(window, dc);
-      item->itemHeight = size.cy * 3 / 2;
+      item->itemHeight = size.cy * 4 / 3;
       item->itemWidth = size.cx + item->itemHeight * 2;
       return TRUE;
     }
