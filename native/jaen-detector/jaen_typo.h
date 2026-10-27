@@ -99,6 +99,9 @@ struct TypoPriors {
   // (tests/conversion/dev-typo.json). MYIME_TYPO_PRIOR_DC and MYIME_TYPO_PRIOR_EX override them.
   int dropped_consonant = 3000;
   int extra_key = 2500;
+  // A key typed in by mistake that touches neither key around it ("shuogi" read as
+  // shugi, not shougi; "tepiku" as teiku): off. MYIME_TYPO_PRIOR_EXF overrides it.
+  int extra_key_far = kOff;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit

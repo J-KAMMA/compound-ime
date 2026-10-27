@@ -267,10 +267,17 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
         add(std::move(s), priors.dropped_consonant);
       }
     }
-    if (priors.extra_key != TypoPriors::kOff && text[i] != text[i - 1] && text[i] != '\'') {
-      std::string s = text;  // a key typed in by mistake ("butsai")
-      s.erase(i, 1);
-      add(std::move(s), priors.extra_key);
+    if (text[i] != text[i - 1] && text[i] != '\'') {
+      // A key typed in by mistake ("butsai"): next to a key around it, or any key at extra_key_far.
+      const auto touches = [&](size_t j) {
+        return j < text.size() && Neighbors(text[j]).find(text[i]) != std::string_view::npos;
+      };
+      const int prior = touches(i - 1) || touches(i + 1) ? priors.extra_key : priors.extra_key_far;
+      if (prior != TypoPriors::kOff) {
+        std::string s = text;
+        s.erase(i, 1);
+        add(std::move(s), prior);
+      }
     }
   }
   std::vector<TypoEdit> out;
