@@ -308,6 +308,20 @@ n)
     MYIME_ENGLISH_FOLLOW=off MYIME_ENGLISH_FOLLOW_TTL_MS=3000 $EXPF $OUT/english-follow-expire-off.tsv 4
   fi
   ;;
+v)
+  # 英単語に読まれた打ち間違いを直す語の長さの上限（MYIME_TYPO_EN_MAX）の比べ。英語まじりの表が変わらず、
+  # 調整用の打ち間違いの表が増える長さを探す
+  romaji $T/dev-typo.json > $W/dev-typo.txt
+  romaji $T/jaen200b.json > $W/jaen200b.txt
+  romaji $T/ja400.json > $W/ja400.txt
+  cp $T/jaen270.txt $W/jaen270.txt
+  for f in allenglish-mixed allenglish-ja acronyms acronyms-ja; do grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt; done
+  for m in 3 5 8; do
+    for f in dev-typo jaen270 jaen200b ja400 allenglish-mixed allenglish-ja acronyms acronyms-ja; do
+      MYIME_TYPO_EN_MAX=$m $BATCH $W/$f.txt $OUT/enmax$m-$f.tsv 4
+    done
+  done
+  ;;
 r)
   # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、
   # 型 b（ai: あい、ui: うい: 日本語に読める）。ai は独立した語（後ろが助詞・句読点・文末）なら AI を先頭にし、
