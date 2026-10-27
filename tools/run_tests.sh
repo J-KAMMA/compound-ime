@@ -190,6 +190,15 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
+  # 隣の鍵でない余分な1キー（MYIME_TYPO_PRIOR_EXF、既定は外す）を入れたときの比べ。ja400 と typo150b も同じ重みで流し、
+  # 崩れる文が出ないかを見る
+  romaji $T/ja400.json > $W/ja400-c.txt
+  for x in 2500 4000; do
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-exf$x.tsv 4
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
+  done
+  $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
@@ -299,6 +308,20 @@ n)
     MYIME_ENGLISH_FOLLOW_TTL_MS=3000 $EXPF $OUT/english-follow-expire.tsv 4
     MYIME_ENGLISH_FOLLOW=off MYIME_ENGLISH_FOLLOW_TTL_MS=3000 $EXPF $OUT/english-follow-expire-off.tsv 4
   fi
+  ;;
+v)
+  # 英単語に読まれた打ち間違いを直す語の長さの上限（MYIME_TYPO_EN_MAX）の比べ。英語まじりの表が変わらず、
+  # 調整用の打ち間違いの表が増える長さを探す
+  romaji $T/dev-typo.json > $W/dev-typo.txt
+  romaji $T/jaen200b.json > $W/jaen200b.txt
+  romaji $T/ja400.json > $W/ja400.txt
+  cp $T/jaen270.txt $W/jaen270.txt
+  for f in allenglish-mixed allenglish-ja acronyms acronyms-ja; do grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt; done
+  for m in 3 5 8; do
+    for f in dev-typo jaen270 jaen200b ja400 allenglish-mixed allenglish-ja acronyms acronyms-ja; do
+      MYIME_TYPO_EN_MAX=$m $BATCH $W/$f.txt $OUT/enmax$m-$f.tsv 4
+    done
+  done
   ;;
 r)
   # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、

@@ -382,7 +382,7 @@ jobs:
             fi
           done
           # 調整用の打ち間違いの表（組 c）。直しを止めたとき（unread-off）と並べる
-          for f in dev-typo dev-typo-unread-off; do
+          for f in dev-typo dev-typo-unread-off dev-typo-exf2500 dev-typo-exf4000; do
             if [ -f results/$f.tsv ]; then
               python3 repo/tools/score_categories.py results/$f.tsv repo/tests/conversion/dev-typo.json > results/$f-score.txt
               echo "== $f"; head -8 results/$f-score.txt

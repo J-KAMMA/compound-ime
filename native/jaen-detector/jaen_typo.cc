@@ -259,6 +259,26 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       s.insert(i + 1, 1, v);
       add(std::move(s), priors.dropped_vowel);
     }
+    if (priors.dropped_consonant != TypoPriors::kOff &&
+        std::string_view("aiueo").find(text[i]) != std::string_view::npos) {
+      for (const char c : std::string_view("kstnhmyrwgzdbpj")) {  // a dropped consonant ("kiou")
+        std::string s = text;
+        s.insert(i, 1, c);
+        add(std::move(s), priors.dropped_consonant);
+      }
+    }
+    if (text[i] != text[i - 1] && text[i] != '\'') {
+      // A key typed in by mistake ("butsai"): next to a key around it, or any key at extra_key_far.
+      const auto touches = [&](size_t j) {
+        return j < text.size() && Neighbors(text[j]).find(text[i]) != std::string_view::npos;
+      };
+      const int prior = touches(i - 1) || touches(i + 1) ? priors.extra_key : priors.extra_key_far;
+      if (prior != TypoPriors::kOff) {
+        std::string s = text;
+        s.erase(i, 1);
+        add(std::move(s), prior);
+      }
+    }
   }
   std::vector<TypoEdit> out;
   for (auto& [kana, edit] : found) out.push_back(std::move(edit));
