@@ -1,0 +1,2917 @@
+{
+ "description": "調整用の打ち間違いの表 325 件（ja400.json の文に打ち間違いを1つ。tools/make_dev_typo_tests.py）。種類: doubled_vowel, dropped, swapped, neighbor, extra",
+ "items": [
+  {
+   "id": "dt-j001",
+   "category": "doubled_vowel",
+   "romaji": "kinounokaigideketteishiita",
+   "correct_romaji": "kinounokaigideketteishita",
+   "intended": "昨日の会議で決定した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j002",
+   "category": "dropped",
+   "romaji": "atarashiikiouwotsuikashita",
+   "correct_romaji": "atarashiikinouwotsuikashita",
+   "intended": "新しい機能を追加した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j003",
+   "category": "swapped",
+   "romaji": "karenokaishakuhamcahigatteiru",
+   "correct_romaji": "karenokaishakuhamachigatteiru",
+   "intended": "彼の解釈は間違っている",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j004",
+   "category": "neighbor",
+   "romaji": "kaishanidenwawojaketa",
+   "correct_romaji": "kaishanidenwawokaketa",
+   "intended": "会社に電話をかけた",
+   "alternatives": [
+    "会社に電話を掛けた"
+   ]
+  },
+  {
+   "id": "dt-j005",
+   "category": "extra",
+   "romaji": "koukoyunodoukyuuseiniatta",
+   "correct_romaji": "koukounodoukyuuseiniatta",
+   "intended": "高校の同級生に会った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j006",
+   "category": "doubled_vowel",
+   "romaji": "shinbunnnikoukookuwodashita",
+   "correct_romaji": "shinbunnnikoukokuwodashita",
+   "intended": "新聞に広告を出した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j007",
+   "category": "dropped",
+   "romaji": "funegaanzennikoukoushita",
+   "correct_romaji": "funegaanzennnikoukoushita",
+   "intended": "船が安全に航行した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j008",
+   "category": "swapped",
+   "romaji": "hashidegohanwotabreu",
+   "correct_romaji": "hashidegohanwotaberu",
+   "intended": "箸でご飯を食べる",
+   "alternatives": [
+    "箸でごはんを食べる"
+   ]
+  },
+  {
+   "id": "dt-j009",
+   "category": "neighbor",
+   "romaji": "kawanikakaruhashiwoqatatta",
+   "correct_romaji": "kawanikakaruhashiwowatatta",
+   "intended": "川に架かる橋を渡った",
+   "alternatives": [
+    "川にかかる橋を渡った"
+   ]
+  },
+  {
+   "id": "dt-j010",
+   "category": "extra",
+   "romaji": "michibnohashiwoaruku",
+   "correct_romaji": "michinohashiwoaruku",
+   "intended": "道の端を歩く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j011",
+   "category": "doubled_vowel",
+   "romaji": "igainakekkaniodooroita",
+   "correct_romaji": "igainakekkaniodoroita",
+   "intended": "意外な結果に驚いた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j012",
+   "category": "dropped",
+   "romaji": "kankeishaigaiachiirikinshi",
+   "correct_romaji": "kankeishaigaitachiirikinshi",
+   "intended": "関係者以外立入禁止",
+   "alternatives": [
+    "関係者以外立ち入り禁止"
+   ]
+  },
+  {
+   "id": "dt-j013",
+   "category": "swapped",
+   "romaji": "seihinnnohinshitsuwohosohusuru",
+   "correct_romaji": "seihinnnohinshitsuwohoshousuru",
+   "intended": "製品の品質を保証する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j014",
+   "category": "neighbor",
+   "romaji": "shakaihodhouseidowominaosu",
+   "correct_romaji": "shakaihoshouseidowominaosu",
+   "intended": "社会保障制度を見直す",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j015",
+   "category": "extra",
+   "romaji": "jikonosonfgaiwohoshousuru",
+   "correct_romaji": "jikonosongaiwohoshousuru",
+   "intended": "事故の損害を補償する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j016",
+   "category": "doubled_vowel",
+   "romaji": "konokusurihayokuukiku",
+   "correct_romaji": "konokusurihayokukiku",
+   "intended": "この薬はよく効く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j017",
+   "category": "dropped",
+   "romaji": "ongakuokikunogasukida",
+   "correct_romaji": "ongakuwokikunogasukida",
+   "intended": "音楽を聴くのが好きだ",
+   "alternatives": [
+    "音楽を聞くのが好きだ"
+   ]
+  },
+  {
+   "id": "dt-j018",
+   "category": "swapped",
+   "romaji": "ekimadenmoichiwokiita",
+   "correct_romaji": "ekimadenomichiwokiita",
+   "intended": "駅までの道を聞いた",
+   "alternatives": [
+    "駅までの道を訊いた"
+   ]
+  },
+  {
+   "id": "dt-j019",
+   "category": "neighbor",
+   "romaji": "kyouhatotemoatdui",
+   "correct_romaji": "kyouhatotemoatsui",
+   "intended": "今日はとても暑い",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j020",
+   "category": "extra",
+   "romaji": "atsuiocghawonomu",
+   "correct_romaji": "atsuiochawonomu",
+   "intended": "熱いお茶を飲む",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j021",
+   "category": "doubled_vowel",
+   "romaji": "atsuiihonwoyonda",
+   "correct_romaji": "atsuihonwoyonda",
+   "intended": "厚い本を読んだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j022",
+   "category": "dropped",
+   "romaji": "kaitouyoushininmaewokaku",
+   "correct_romaji": "kaitouyoushininamaewokaku",
+   "intended": "解答用紙に名前を書く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j024",
+   "category": "swapped",
+   "romaji": "reitoushoukhinwokaitousuru",
+   "correct_romaji": "reitoushokuhinwokaitousuru",
+   "intended": "冷凍食品を解凍する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j025",
+   "category": "neighbor",
+   "romaji": "kishanokishagakishadekisjashita",
+   "correct_romaji": "kishanokishagakishadekishashita",
+   "intended": "貴社の記者が汽車で帰社した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j026",
+   "category": "extra",
+   "romaji": "rikanojikannnikagakumnojikkenwosuru",
+   "correct_romaji": "rikanojikannnikagakunojikkenwosuru",
+   "intended": "理科の時間に科学の実験をする",
+   "alternatives": [
+    "理科の時間に化学の実験をする"
+   ]
+  },
+  {
+   "id": "dt-j027",
+   "category": "doubled_vowel",
+   "romaji": "seikakunajikokuwoshiraaberu",
+   "correct_romaji": "seikakunajikokuwoshiraberu",
+   "intended": "正確な時刻を調べる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j028",
+   "category": "dropped",
+   "romaji": "kanojohaseiakugaakarui",
+   "correct_romaji": "kanojohaseikakugaakarui",
+   "intended": "彼女は性格が明るい",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j029",
+   "category": "swapped",
+   "romaji": "chousantoaishouwoshiboru",
+   "correct_romaji": "chousanotaishouwoshiboru",
+   "intended": "調査の対象を絞る",
+   "alternatives": [
+    "調査の対象をしぼる"
+   ]
+  },
+  {
+   "id": "dt-j030",
+   "category": "neighbor",
+   "romaji": "sayuutaishounofezain",
+   "correct_romaji": "sayuutaishounodezain",
+   "intended": "左右対称のデザイン",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j031",
+   "category": "extra",
+   "romaji": "futarinoseikakuhataishoutwekida",
+   "correct_romaji": "futarinoseikakuhataishoutekida",
+   "intended": "二人の性格は対照的だ",
+   "alternatives": [
+    "2人の性格は対照的だ"
+   ]
+  },
+  {
+   "id": "dt-j032",
+   "category": "doubled_vowel",
+   "romaji": "maigonokodomogakeiisatsunihogosareta",
+   "correct_romaji": "maigonokodomogakeisatsunihogosareta",
+   "intended": "迷子の子供が警察に保護された",
+   "alternatives": [
+    "迷子の子どもが警察に保護された"
+   ]
+  },
+  {
+   "id": "dt-j034",
+   "category": "dropped",
+   "romaji": "furubiruwokaishuusuru",
+   "correct_romaji": "furuibiruwokaishuusuru",
+   "intended": "古いビルを改修する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j035",
+   "category": "swapped",
+   "romaji": "kounedekodomogaasobu",
+   "correct_romaji": "kouendekodomogaasobu",
+   "intended": "公園で子供が遊ぶ",
+   "alternatives": [
+    "公園で子どもが遊ぶ"
+   ]
+  },
+  {
+   "id": "dt-j036",
+   "category": "neighbor",
+   "romaji": "daigakudekuoujunokouenwokiita",
+   "correct_romaji": "daigakudekyoujunokouenwokiita",
+   "intended": "大学で教授の講演を聞いた",
+   "alternatives": [
+    "大学で教授の講演を聴いた"
+   ]
+  },
+  {
+   "id": "dt-j037",
+   "category": "extra",
+   "romaji": "butsainokouengahajimaru",
+   "correct_romaji": "butainokouengahajimaru",
+   "intended": "舞台の公演が始まる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j038",
+   "category": "doubled_vowel",
+   "romaji": "ishinoiishihakatai",
+   "correct_romaji": "ishinoishihakatai",
+   "intended": "医師の意志は固い",
+   "alternatives": [
+    "医師の意思は固い"
+   ]
+  },
+  {
+   "id": "dt-j039",
+   "category": "dropped",
+   "romaji": "koujoudekikaiwososasuru",
+   "correct_romaji": "koujoudekikaiwosousasuru",
+   "intended": "工場で機械を操作する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j040",
+   "category": "swapped",
+   "romaji": "keisatsugajkienwosousasuru",
+   "correct_romaji": "keisatsugajikenwosousasuru",
+   "intended": "警察が事件を捜査する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j041",
+   "category": "neighbor",
+   "romaji": "matatonaokikaida",
+   "correct_romaji": "matatonaikikaida",
+   "intended": "またとない機会だ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j042",
+   "category": "extra",
+   "romaji": "rekishinikanshimnwomotsu",
+   "correct_romaji": "rekishinikanshinwomotsu",
+   "intended": "歴史に関心を持つ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j043",
+   "category": "doubled_vowel",
+   "romaji": "karenodoryookunikanshinshita",
+   "correct_romaji": "karenodoryokunikanshinshita",
+   "intended": "彼の努力に感心した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j044",
+   "category": "dropped",
+   "romaji": "shintaiseigahasskushita",
+   "correct_romaji": "shintaiseigahassokushita",
+   "intended": "新体制が発足した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j045",
+   "category": "swapped",
+   "romaji": "jinjiiodugahappyousareta",
+   "correct_romaji": "jinjiidougahappyousareta",
+   "intended": "人事異動が発表された",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j046",
+   "category": "neighbor",
+   "romaji": "kurumadeidoisuru",
+   "correct_romaji": "kurumadeidousuru",
+   "intended": "車で移動する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j047",
+   "category": "extra",
+   "romaji": "futatsunioannnoidouwokuraberu",
+   "correct_romaji": "futatsunoannnoidouwokuraberu",
+   "intended": "二つの案の異同を比べる",
+   "alternatives": [
+    "2つの案の異同を比べる"
+   ]
+  },
+  {
+   "id": "dt-j048",
+   "category": "doubled_vowel",
+   "romaji": "koujinoshinkougaokureteiiru",
+   "correct_romaji": "koujinoshinkougaokureteiru",
+   "intended": "工事の進行が遅れている",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j049",
+   "category": "dropped",
+   "romaji": "ryokokunoshinkouwofukameru",
+   "correct_romaji": "ryoukokunoshinkouwofukameru",
+   "intended": "両国の親交を深める",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j050",
+   "category": "swapped",
+   "romaji": "sobohashinkoushignaatsui",
+   "correct_romaji": "sobohashinkoushingaatsui",
+   "intended": "祖母は信仰心が厚い",
+   "alternatives": [
+    "祖母は信仰心が篤い"
+   ]
+  },
+  {
+   "id": "dt-j051",
+   "category": "neighbor",
+   "romaji": "jidhinnnoyurewokanjita",
+   "correct_romaji": "jishinnnoyurewokanjita",
+   "intended": "地震の揺れを感じた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j052",
+   "category": "extra",
+   "romaji": "jibunnnijishinwomiotsu",
+   "correct_romaji": "jibunnnijishinwomotsu",
+   "intended": "自分に自信を持つ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j053",
+   "category": "doubled_vowel",
+   "romaji": "tokeeinoharigatomatta",
+   "correct_romaji": "tokeinoharigatomatta",
+   "intended": "時計の針が止まった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j054",
+   "category": "dropped",
+   "romaji": "daigakuinnnokaeiwoshuuryoushita",
+   "correct_romaji": "daigakuinnnokateiwoshuuryoushita",
+   "intended": "大学院の課程を修了した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j055",
+   "category": "swapped",
+   "romaji": "seichounokateiwokiorkusuru",
+   "correct_romaji": "seichounokateiwokirokusuru",
+   "intended": "成長の過程を記録する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j056",
+   "category": "neighbor",
+   "romaji": "kateinpjijoudeyasumu",
+   "correct_romaji": "kateinojijoudeyasumu",
+   "intended": "家庭の事情で休む",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j057",
+   "category": "extra",
+   "romaji": "sonokayteihamachigaida",
+   "correct_romaji": "sonokateihamachigaida",
+   "intended": "その仮定は間違いだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j058",
+   "category": "doubled_vowel",
+   "romaji": "kawaanokabanwokatta",
+   "correct_romaji": "kawanokabanwokatta",
+   "intended": "革のかばんを買った",
+   "alternatives": [
+    "革の鞄を買った",
+    "革のカバンを買った"
+   ]
+  },
+  {
+   "id": "dt-j059",
+   "category": "dropped",
+   "romaji": "kawadesakanawotsru",
+   "correct_romaji": "kawadesakanawotsuru",
+   "intended": "川で魚を釣る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j060",
+   "category": "swapped",
+   "romaji": "miknannokawawomuku",
+   "correct_romaji": "mikannnokawawomuku",
+   "intended": "みかんの皮をむく",
+   "alternatives": [
+    "みかんの皮を剥く",
+    "ミカンの皮をむく",
+    "蜜柑の皮をむく"
+   ]
+  },
+  {
+   "id": "dt-j061",
+   "category": "neighbor",
+   "romaji": "ekinitsuitaraeenrakusuru",
+   "correct_romaji": "ekinitsuitararenrakusuru",
+   "intended": "駅に着いたら連絡する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j062",
+   "category": "extra",
+   "romaji": "atarashiishoigotonitsuita",
+   "correct_romaji": "atarashiishigotonitsuita",
+   "intended": "新しい仕事に就いた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j064",
+   "category": "doubled_vowel",
+   "romaji": "asahayakumegasaameta",
+   "correct_romaji": "asahayakumegasameta",
+   "intended": "朝早く目が覚めた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j065",
+   "category": "dropped",
+   "romaji": "kaminijiokaku",
+   "correct_romaji": "kaminijiwokaku",
+   "intended": "紙に字を書く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j066",
+   "category": "swapped",
+   "romaji": "biyuoindekamiwokitta",
+   "correct_romaji": "biyouindekamiwokitta",
+   "intended": "美容院で髪を切った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j068",
+   "category": "neighbor",
+   "romaji": "maiasataijuueohakaru",
+   "correct_romaji": "maiasataijuuwohakaru",
+   "intended": "毎朝体重を量る",
+   "alternatives": [
+    "毎朝体重を測る"
+   ]
+  },
+  {
+   "id": "dt-j069",
+   "category": "extra",
+   "romaji": "mondainokaiketsyuwohakaru",
+   "correct_romaji": "mondainokaiketsuwohakaru",
+   "intended": "問題の解決を図る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j070",
+   "category": "doubled_vowel",
+   "romaji": "kareehaashigahayai",
+   "correct_romaji": "karehaashigahayai",
+   "intended": "彼は足が速い",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j071",
+   "category": "dropped",
+   "romaji": "shukudaiwowsureteshimatta",
+   "correct_romaji": "shukudaiwowasureteshimatta",
+   "intended": "宿題を忘れてしまった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j072",
+   "category": "swapped",
+   "romaji": "saifuwootosihchatta",
+   "correct_romaji": "saifuwootoshichatta",
+   "intended": "財布を落としちゃった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j073",
+   "category": "neighbor",
+   "romaji": "senseinohomerareta",
+   "correct_romaji": "senseinihomerareta",
+   "intended": "先生に褒められた",
+   "alternatives": [
+    "先生にほめられた"
+   ]
+  },
+  {
+   "id": "dt-j074",
+   "category": "extra",
+   "romaji": "kodomoniyasauiwotabesaseru",
+   "correct_romaji": "kodomoniyasaiwotabesaseru",
+   "intended": "子供に野菜を食べさせる",
+   "alternatives": [
+    "子どもに野菜を食べさせる"
+   ]
+  },
+  {
+   "id": "dt-j075",
+   "category": "doubled_vowel",
+   "romaji": "hahahawatashiniiheyawosoujisaseta",
+   "correct_romaji": "hahahawatashiniheyawosoujisaseta",
+   "intended": "母は私に部屋を掃除させた",
+   "alternatives": [
+    "母はわたしに部屋を掃除させた"
+   ]
+  },
+  {
+   "id": "dt-j076",
+   "category": "dropped",
+   "romaji": "konokinokohtaberareru",
+   "correct_romaji": "konokinokohataberareru",
+   "intended": "このきのこは食べられる",
+   "alternatives": [
+    "このキノコは食べられる"
+   ]
+  },
+  {
+   "id": "dt-j077",
+   "category": "swapped",
+   "romaji": "ashitanraakorareru",
+   "correct_romaji": "ashitanarakorareru",
+   "intended": "明日なら来られる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j078",
+   "category": "neighbor",
+   "romaji": "nihongogahanasemssu",
+   "correct_romaji": "nihongogahanasemasu",
+   "intended": "日本語が話せます",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j079",
+   "category": "extra",
+   "romaji": "amenifursaretekomatta",
+   "correct_romaji": "amenifuraretekomatta",
+   "intended": "雨に降られて困った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j080",
+   "category": "doubled_vowel",
+   "romaji": "buchoounisakewonomasareta",
+   "correct_romaji": "buchounisakewonomasareta",
+   "intended": "部長に酒を飲まされた",
+   "alternatives": [
+    "部長にお酒を飲まされた"
+   ]
+  },
+  {
+   "id": "dt-j081",
+   "category": "dropped",
+   "romaji": "ichijikanmomatasaeta",
+   "correct_romaji": "ichijikanmomatasareta",
+   "intended": "一時間も待たされた",
+   "alternatives": [
+    "1時間も待たされた"
+   ]
+  },
+  {
+   "id": "dt-j082",
+   "category": "swapped",
+   "romaji": "motthoayakuikebayokatta",
+   "correct_romaji": "mottohayakuikebayokatta",
+   "intended": "もっと早く行けばよかった",
+   "alternatives": [
+    "もっと早く行けば良かった"
+   ]
+  },
+  {
+   "id": "dt-j083",
+   "category": "neighbor",
+   "romaji": "anomisehatakakunskatta",
+   "correct_romaji": "anomisehatakakunakatta",
+   "intended": "あの店は高くなかった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j084",
+   "category": "extra",
+   "romaji": "heyagashizukadeochitasuku",
+   "correct_romaji": "heyagashizukadeochitsuku",
+   "intended": "部屋が静かで落ち着く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j085",
+   "category": "doubled_vowel",
+   "romaji": "sonooeigahaomoshirokunasasouda",
+   "correct_romaji": "sonoeigahaomoshirokunasasouda",
+   "intended": "その映画は面白くなさそうだ",
+   "alternatives": [
+    "その映画はおもしろくなさそうだ"
+   ]
+  },
+  {
+   "id": "dt-j086",
+   "category": "dropped",
+   "romaji": "neboushinaiyounihaykuneru",
+   "correct_romaji": "neboushinaiyounihayakuneru",
+   "intended": "寝坊しないように早く寝る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j087",
+   "category": "swapped",
+   "romaji": "isogashikerbeatetsudawanakuteii",
+   "correct_romaji": "isogashikerebatetsudawanakuteii",
+   "intended": "忙しければ手伝わなくていい",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j088",
+   "category": "neighbor",
+   "romaji": "madowoaketwoitekudasai",
+   "correct_romaji": "madowoaketeoitekudasai",
+   "intended": "窓を開けておいてください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j089",
+   "category": "extra",
+   "romaji": "denkiwokeshiwasutreta",
+   "correct_romaji": "denkiwokeshiwasureta",
+   "intended": "電気を消し忘れた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j090",
+   "category": "doubled_vowel",
+   "romaji": "kaowoarattekaradeekakeru",
+   "correct_romaji": "kaowoarattekaradekakeru",
+   "intended": "顔を洗ってから出かける",
+   "alternatives": [
+    "顔を洗ってから出掛ける"
+   ]
+  },
+  {
+   "id": "dt-j091",
+   "category": "dropped",
+   "romaji": "anohonhamouonjatta",
+   "correct_romaji": "anohonhamouyonjatta",
+   "intended": "あの本はもう読んじゃった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j092",
+   "category": "swapped",
+   "romaji": "shuppatsunmianiawanakatta",
+   "correct_romaji": "shuppatsunimaniawanakatta",
+   "intended": "出発に間に合わなかった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j093",
+   "category": "neighbor",
+   "romaji": "kutsuwohaitamamasgaranaide",
+   "correct_romaji": "kutsuwohaitamamaagaranaide",
+   "intended": "靴を履いたまま上がらないで",
+   "alternatives": [
+    "靴をはいたまま上がらないで"
+   ]
+  },
+  {
+   "id": "dt-j094",
+   "category": "extra",
+   "romaji": "kazewiohiitarashii",
+   "correct_romaji": "kazewohiitarashii",
+   "intended": "風邪をひいたらしい",
+   "alternatives": [
+    "風邪を引いたらしい"
+   ]
+  },
+  {
+   "id": "dt-j095",
+   "category": "doubled_vowel",
+   "romaji": "nimotsuuwohakobasetekudasai",
+   "correct_romaji": "nimotsuwohakobasetekudasai",
+   "intended": "荷物を運ばせてください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j096",
+   "category": "dropped",
+   "romaji": "namaewoyobarerumadmatsu",
+   "correct_romaji": "namaewoyobarerumadematsu",
+   "intended": "名前を呼ばれるまで待つ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j097",
+   "category": "swapped",
+   "romaji": "sonohanashihashiranaktata",
+   "correct_romaji": "sonohanashihashiranakatta",
+   "intended": "その話は知らなかった",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j098",
+   "category": "neighbor",
+   "romaji": "kinouhasamukattasesu",
+   "correct_romaji": "kinouhasamukattadesu",
+   "intended": "昨日は寒かったです",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j099",
+   "category": "extra",
+   "romaji": "hitorideilkitakunai",
+   "correct_romaji": "hitorideikitakunai",
+   "intended": "一人で行きたくない",
+   "alternatives": [
+    "1人で行きたくない",
+    "ひとりで行きたくない"
+   ]
+  },
+  {
+   "id": "dt-j100",
+   "category": "doubled_vowel",
+   "romaji": "karehamoukaeettahazuda",
+   "correct_romaji": "karehamoukaettahazuda",
+   "intended": "彼はもう帰ったはずだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j101",
+   "category": "dropped",
+   "romaji": "shinbunwoyominagaraasagohanwtabeta",
+   "correct_romaji": "shinbunwoyominagaraasagohanwotabeta",
+   "intended": "新聞を読みながら朝ご飯を食べた",
+   "alternatives": [
+    "新聞を読みながら朝ごはんを食べた"
+   ]
+  },
+  {
+   "id": "dt-j102",
+   "category": "swapped",
+   "romaji": "yokukangaerebaawkaru",
+   "correct_romaji": "yokukangaerebawakaru",
+   "intended": "よく考えれば分かる",
+   "alternatives": [
+    "よく考えればわかる"
+   ]
+  },
+  {
+   "id": "dt-j103",
+   "category": "neighbor",
+   "romaji": "minnnaniwarawarerakunai",
+   "correct_romaji": "minnnaniwarawaretakunai",
+   "intended": "みんなに笑われたくない",
+   "alternatives": [
+    "皆に笑われたくない"
+   ]
+  },
+  {
+   "id": "dt-j104",
+   "category": "extra",
+   "romaji": "nimotsugaomosugirtemotenai",
+   "correct_romaji": "nimotsugaomosugitemotenai",
+   "intended": "荷物が重すぎて持てない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j105",
+   "category": "doubled_vowel",
+   "romaji": "kokodeshashinwotottemoiiidesuka",
+   "correct_romaji": "kokodeshashinwotottemoiidesuka",
+   "intended": "ここで写真を撮ってもいいですか",
+   "alternatives": [
+    "ここで写真を撮っても良いですか"
+   ]
+  },
+  {
+   "id": "dt-j106",
+   "category": "dropped",
+   "romaji": "ashitahaharrudarou",
+   "correct_romaji": "ashitahaharerudarou",
+   "intended": "明日は晴れるだろう",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j107",
+   "category": "swapped",
+   "romaji": "nemuktueshikataganai",
+   "correct_romaji": "nemukuteshikataganai",
+   "intended": "眠くて仕方がない",
+   "alternatives": [
+    "眠くてしかたがない"
+   ]
+  },
+  {
+   "id": "dt-j108",
+   "category": "neighbor",
+   "romaji": "dorobounikabanwonusymareta",
+   "correct_romaji": "dorobounikabanwonusumareta",
+   "intended": "泥棒にかばんを盗まれた",
+   "alternatives": [
+    "泥棒に鞄を盗まれた",
+    "泥棒にカバンを盗まれた"
+   ]
+  },
+  {
+   "id": "dt-j109",
+   "category": "extra",
+   "romaji": "shikennniochitakunakerebabebnkyoushinasai",
+   "correct_romaji": "shikennniochitakunakerebabenkyoushinasai",
+   "intended": "試験に落ちたくなければ勉強しなさい",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j110",
+   "category": "doubled_vowel",
+   "romaji": "okurenaiyoouniisoida",
+   "correct_romaji": "okurenaiyouniisoida",
+   "intended": "遅れないように急いだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j111",
+   "category": "dropped",
+   "romaji": "shiryouwogokakuninkdasai",
+   "correct_romaji": "shiryouwogokakuninkudasai",
+   "intended": "資料をご確認ください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j112",
+   "category": "swapped",
+   "romaji": "osoreirimasugashouhsouomachikudasai",
+   "correct_romaji": "osoreirimasugashoushouomachikudasai",
+   "intended": "恐れ入りますが少々お待ちください",
+   "alternatives": [
+    "恐れ入りますが、少々お待ちください"
+   ]
+  },
+  {
+   "id": "dt-j113",
+   "category": "neighbor",
+   "romaji": "shachougasouossgatteimashita",
+   "correct_romaji": "shachougasouosshatteimashita",
+   "intended": "社長がそうおっしゃっていました",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j114",
+   "category": "extra",
+   "romaji": "sonokrenhazonjiteorimasu",
+   "correct_romaji": "sonokenhazonjiteorimasu",
+   "intended": "その件は存じております",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j115",
+   "category": "doubled_vowel",
+   "romaji": "itsumooosewaninatteorimasu",
+   "correct_romaji": "itsumoosewaninatteorimasu",
+   "intended": "いつもお世話になっております",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j116",
+   "category": "dropped",
+   "romaji": "gorenrakuitadakarigatougozaimasu",
+   "correct_romaji": "gorenrakuitadakiarigatougozaimasu",
+   "intended": "ご連絡いただきありがとうございます",
+   "alternatives": [
+    "ご連絡頂きありがとうございます",
+    "ご連絡いただき有難うございます"
+   ]
+  },
+  {
+   "id": "dt-j117",
+   "category": "swapped",
+   "romaji": "sasoskugohenshinnitadakiarigatougozaimasu",
+   "correct_romaji": "sassokugohenshinnitadakiarigatougozaimasu",
+   "intended": "早速ご返信いただきありがとうございます",
+   "alternatives": [
+    "さっそくご返信いただきありがとうございます",
+    "早速ご返信頂きありがとうございます"
+   ]
+  },
+  {
+   "id": "dt-j118",
+   "category": "neighbor",
+   "romaji": "gotabounotokoromoushiwakegozaumasen",
+   "correct_romaji": "gotabounotokoromoushiwakegozaimasen",
+   "intended": "ご多忙のところ申し訳ございません",
+   "alternatives": [
+    "ご多忙の所申し訳ございません"
+   ]
+  },
+  {
+   "id": "dt-j119",
+   "category": "extra",
+   "romaji": "otesuudesiugagohenshinkudasai",
+   "correct_romaji": "otesuudesugagohenshinkudasai",
+   "intended": "お手数ですがご返信ください",
+   "alternatives": [
+    "お手数ですが、ご返信ください"
+   ]
+  },
+  {
+   "id": "dt-j120",
+   "category": "doubled_vowel",
+   "romaji": "asuukagatteemoyoroshiideshouka",
+   "correct_romaji": "asuukagattemoyoroshiideshouka",
+   "intended": "明日伺ってもよろしいでしょうか",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j121",
+   "category": "dropped",
+   "romaji": "senseigaoieninarimashita",
+   "correct_romaji": "senseigaomieninarimashita",
+   "intended": "先生がお見えになりました",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j122",
+   "category": "swapped",
+   "romaji": "buchouhatadaimasekiwohazuhsiteorimasu",
+   "correct_romaji": "buchouhatadaimasekiwohazushiteorimasu",
+   "intended": "部長はただいま席を外しております",
+   "alternatives": [
+    "部長は只今席を外しております"
+   ]
+  },
+  {
+   "id": "dt-j123",
+   "category": "neighbor",
+   "romaji": "okutteitadaitaahiryouwohaikenshimashita",
+   "correct_romaji": "okutteitadaitashiryouwohaikenshimashita",
+   "intended": "送っていただいた資料を拝見しました",
+   "alternatives": [
+    "送って頂いた資料を拝見しました"
+   ]
+  },
+  {
+   "id": "dt-j124",
+   "category": "extra",
+   "romaji": "goikenwochoudaidelkirebasaiwaidesu",
+   "correct_romaji": "goikenwochoudaidekirebasaiwaidesu",
+   "intended": "ご意見を頂戴できれば幸いです",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j125",
+   "category": "doubled_vowel",
+   "romaji": "nanitozoyoroshikuonegaimoushiageemasu",
+   "correct_romaji": "nanitozoyoroshikuonegaimoushiagemasu",
+   "intended": "何卒よろしくお願い申し上げます",
+   "alternatives": [
+    "なにとぞよろしくお願い申し上げます"
+   ]
+  },
+  {
+   "id": "dt-j126",
+   "category": "dropped",
+   "romaji": "gokentounohodoyoroshikonegaiitashimasu",
+   "correct_romaji": "gokentounohodoyoroshikuonegaiitashimasu",
+   "intended": "ご検討のほどよろしくお願いいたします",
+   "alternatives": [
+    "ご検討のほどよろしくお願い致します"
+   ]
+  },
+  {
+   "id": "dt-j127",
+   "category": "swapped",
+   "romaji": "tenpsuhitafairuwogorankudasai",
+   "correct_romaji": "tenpushitafairuwogorankudasai",
+   "intended": "添付したファイルをご覧ください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j128",
+   "category": "neighbor",
+   "romaji": "okiwotsuketeokarrikudasai",
+   "correct_romaji": "okiwotsuketeokaerikudasai",
+   "intended": "お気をつけてお帰りください",
+   "alternatives": [
+    "お気を付けてお帰りください"
+   ]
+  },
+  {
+   "id": "dt-j129",
+   "category": "extra",
+   "romaji": "gokibpounisoezumoushiwakearimasen",
+   "correct_romaji": "gokibounisoezumoushiwakearimasen",
+   "intended": "ご希望に添えず申し訳ありません",
+   "alternatives": [
+    "ご希望に沿えず申し訳ありません"
+   ]
+  },
+  {
+   "id": "dt-j130",
+   "category": "doubled_vowel",
+   "romaji": "kongotomoyoroshikuonegaiitashiimasu",
+   "correct_romaji": "kongotomoyoroshikuonegaiitashimasu",
+   "intended": "今後ともよろしくお願いいたします",
+   "alternatives": [
+    "今後ともよろしくお願い致します"
+   ]
+  },
+  {
+   "id": "dt-j131",
+   "category": "dropped",
+   "romaji": "enryonauomoushitsukekudasai",
+   "correct_romaji": "enryonakuomoushitsukekudasai",
+   "intended": "遠慮なくお申し付けください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j132",
+   "category": "swapped",
+   "romaji": "oisgoashiitokoroosoreirimasu",
+   "correct_romaji": "oisogashiitokoroosoreirimasu",
+   "intended": "お忙しいところ恐れ入ります",
+   "alternatives": [
+    "お忙しい所恐れ入ります"
+   ]
+  },
+  {
+   "id": "dt-j133",
+   "category": "neighbor",
+   "romaji": "warakushigagoannnaiitashimasu",
+   "correct_romaji": "watakushigagoannnaiitashimasu",
+   "intended": "私がご案内いたします",
+   "alternatives": [
+    "私がご案内致します"
+   ]
+  },
+  {
+   "id": "dt-j134",
+   "category": "extra",
+   "romaji": "senjiytsuhaarigatougozaimashita",
+   "correct_romaji": "senjitsuhaarigatougozaimashita",
+   "intended": "先日はありがとうございました",
+   "alternatives": [
+    "先日は有難うございました"
+   ]
+  },
+  {
+   "id": "dt-j135",
+   "category": "doubled_vowel",
+   "romaji": "goirainokeenshouchiitashimashita",
+   "correct_romaji": "goirainokenshouchiitashimashita",
+   "intended": "ご依頼の件承知いたしました",
+   "alternatives": [
+    "ご依頼の件、承知いたしました",
+    "ご依頼の件承知致しました"
+   ]
+  },
+  {
+   "id": "dt-j137",
+   "category": "dropped",
+   "romaji": "kakuninnnouegorenrakusashiagemsu",
+   "correct_romaji": "kakuninnnouegorenrakusashiagemasu",
+   "intended": "確認の上ご連絡差し上げます",
+   "alternatives": [
+    "確認のうえご連絡差し上げます"
+   ]
+  },
+  {
+   "id": "dt-j138",
+   "category": "swapped",
+   "romaji": "omenikaakretekoueidesu",
+   "correct_romaji": "omenikakaretekoueidesu",
+   "intended": "お目にかかれて光栄です",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j139",
+   "category": "neighbor",
+   "romaji": "gokyouryokuwotamawsrimasuyouonegaimoushiagemasu",
+   "correct_romaji": "gokyouryokuwotamawarimasuyouonegaimoushiagemasu",
+   "intended": "ご協力を賜りますようお願い申し上げます",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j140",
+   "category": "extra",
+   "romaji": "douzomeshiahgattekudasai",
+   "correct_romaji": "douzomeshiagattekudasai",
+   "intended": "どうぞ召し上がってください",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j141",
+   "category": "doubled_vowel",
+   "romaji": "okyakusamagaokoshiniinarimashita",
+   "correct_romaji": "okyakusamagaokoshininarimashita",
+   "intended": "お客様がお越しになりました",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j142",
+   "category": "dropped",
+   "romaji": "gochuumonwouketamawarimshita",
+   "correct_romaji": "gochuumonwouketamawarimashita",
+   "intended": "ご注文を承りました",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j143",
+   "category": "swapped",
+   "romaji": "heishaonseihinwogoshoukaishimasu",
+   "correct_romaji": "heishanoseihinwogoshoukaishimasu",
+   "intended": "弊社の製品をご紹介します",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j144",
+   "category": "neighbor",
+   "romaji": "kishanogohattenwooinorinoushiagemasu",
+   "correct_romaji": "kishanogohattenwooinorimoushiagemasu",
+   "intended": "貴社のご発展をお祈り申し上げます",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j145",
+   "category": "extra",
+   "romaji": "gofubenwookakeshoiteorimasu",
+   "correct_romaji": "gofubenwookakeshiteorimasu",
+   "intended": "ご不便をおかけしております",
+   "alternatives": [
+    "ご不便をお掛けしております"
+   ]
+  },
+  {
+   "id": "dt-j146",
+   "category": "doubled_vowel",
+   "romaji": "shiryouwooookuriitashimasu",
+   "correct_romaji": "shiryouwoookuriitashimasu",
+   "intended": "資料をお送りいたします",
+   "alternatives": [
+    "資料をお送り致します"
+   ]
+  },
+  {
+   "id": "dt-j147",
+   "category": "dropped",
+   "romaji": "gotsugounoyoinihijiwooshirasekudasai",
+   "correct_romaji": "gotsugounoyoinichijiwooshirasekudasai",
+   "intended": "ご都合のよい日時をお知らせください",
+   "alternatives": [
+    "ご都合の良い日時をお知らせください"
+   ]
+  },
+  {
+   "id": "dt-j148",
+   "category": "swapped",
+   "romaji": "mouhsiwakegozaimasengahonjitsuhakyuugyoudesu",
+   "correct_romaji": "moushiwakegozaimasengahonjitsuhakyuugyoudesu",
+   "intended": "申し訳ございませんが本日は休業です",
+   "alternatives": [
+    "申し訳ございませんが、本日は休業です"
+   ]
+  },
+  {
+   "id": "dt-j149",
+   "category": "neighbor",
+   "romaji": "goshitsimongaarebaokigarunidouzo",
+   "correct_romaji": "goshitsumongaarebaokigarunidouzo",
+   "intended": "ご質問があればお気軽にどうぞ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j150",
+   "category": "extra",
+   "romaji": "sakihodoodenwasashiagetaytanakadesu",
+   "correct_romaji": "sakihodoodenwasashiagetatanakadesu",
+   "intended": "先ほどお電話差し上げた田中です",
+   "alternatives": [
+    "先程お電話差し上げた田中です"
+   ]
+  },
+  {
+   "id": "dt-j151",
+   "category": "doubled_vowel",
+   "romaji": "mikkaakannyasumiwototta",
+   "correct_romaji": "mikkakannyasumiwototta",
+   "intended": "三日間休みを取った",
+   "alternatives": [
+    "3日間休みを取った"
+   ]
+  },
+  {
+   "id": "dt-j152",
+   "category": "dropped",
+   "romaji": "juugatsutookanihuppatsusuru",
+   "correct_romaji": "juugatsutookanishuppatsusuru",
+   "intended": "10月10日に出発する",
+   "alternatives": [
+    "十月十日に出発する"
+   ]
+  },
+  {
+   "id": "dt-j153",
+   "category": "swapped",
+   "romaji": "hatachinotanjoubiwmoukaeta",
+   "correct_romaji": "hatachinotanjoubiwomukaeta",
+   "intended": "二十歳の誕生日を迎えた",
+   "alternatives": [
+    "20歳の誕生日を迎えた"
+   ]
+  },
+  {
+   "id": "dt-j154",
+   "category": "neighbor",
+   "romaji": "gozenkujiniaysumaru",
+   "correct_romaji": "gozenkujiniatsumaru",
+   "intended": "午前9時に集まる",
+   "alternatives": [
+    "午前九時に集まる"
+   ]
+  },
+  {
+   "id": "dt-j155",
+   "category": "extra",
+   "romaji": "gogosanjihannnioewaru",
+   "correct_romaji": "gogosanjihannniowaru",
+   "intended": "午後3時半に終わる",
+   "alternatives": [
+    "午後三時半に終わる"
+   ]
+  },
+  {
+   "id": "dt-j156",
+   "category": "doubled_vowel",
+   "romaji": "nedanhasengohyaakuendesu",
+   "correct_romaji": "nedanhasengohyakuendesu",
+   "intended": "値段は1500円です",
+   "alternatives": [
+    "値段は千五百円です",
+    "値段は1,500円です"
+   ]
+  },
+  {
+   "id": "dt-j157",
+   "category": "dropped",
+   "romaji": "ringowomittsuatta",
+   "correct_romaji": "ringowomittsukatta",
+   "intended": "りんごを3つ買った",
+   "alternatives": [
+    "りんごを三つ買った",
+    "リンゴを3つ買った",
+    "リンゴを三つ買った"
+   ]
+  },
+  {
+   "id": "dt-j158",
+   "category": "swapped",
+   "romaji": "sankaimenochousendegoukaukshita",
+   "correct_romaji": "sankaimenochousendegoukakushita",
+   "intended": "3回目の挑戦で合格した",
+   "alternatives": [
+    "三回目の挑戦で合格した"
+   ]
+  },
+  {
+   "id": "dt-j159",
+   "category": "neighbor",
+   "romaji": "futarideryokoubiitta",
+   "correct_romaji": "futarideryokouniitta",
+   "intended": "二人で旅行に行った",
+   "alternatives": [
+    "2人で旅行に行った",
+    "ふたりで旅行に行った"
+   ]
+  },
+  {
+   "id": "dt-j160",
+   "category": "extra",
+   "romaji": "inuwonihikuikatteiru",
+   "correct_romaji": "inuwonihikikatteiru",
+   "intended": "犬を2匹飼っている",
+   "alternatives": [
+    "犬を二匹飼っている"
+   ]
+  },
+  {
+   "id": "dt-j161",
+   "category": "doubled_vowel",
+   "romaji": "toshookandehonwogosatsukarita",
+   "correct_romaji": "toshokandehonwogosatsukarita",
+   "intended": "図書館で本を5冊借りた",
+   "alternatives": [
+    "図書館で本を五冊借りた"
+   ]
+  },
+  {
+   "id": "dt-j162",
+   "category": "dropped",
+   "romaji": "isshukangonihenjisuru",
+   "correct_romaji": "isshuukangonihenjisuru",
+   "intended": "1週間後に返事する",
+   "alternatives": [
+    "一週間後に返事する"
+   ]
+  },
+  {
+   "id": "dt-j163",
+   "category": "swapped",
+   "romaji": "nijuuyokkamadeinteishutsusuru",
+   "correct_romaji": "nijuuyokkamadeniteishutsusuru",
+   "intended": "24日までに提出する",
+   "alternatives": [
+    "二十四日までに提出する"
+   ]
+  },
+  {
+   "id": "dt-j164",
+   "category": "neighbor",
+   "romaji": "tsuitachikaraatarashiishugotoda",
+   "correct_romaji": "tsuitachikaraatarashiishigotoda",
+   "intended": "1日から新しい仕事だ",
+   "alternatives": [
+    "一日から新しい仕事だ"
+   ]
+  },
+  {
+   "id": "dt-j165",
+   "category": "extra",
+   "romaji": "youkanogogoniucjhiawasegaaru",
+   "correct_romaji": "youkanogogoniuchiawasegaaru",
+   "intended": "8日の午後に打ち合わせがある",
+   "alternatives": [
+    "八日の午後に打ち合わせがある"
+   ]
+  },
+  {
+   "id": "dt-j166",
+   "category": "doubled_vowel",
+   "romaji": "hyakuninnijoougasankashita",
+   "correct_romaji": "hyakuninnijougasankashita",
+   "intended": "100人以上が参加した",
+   "alternatives": [
+    "百人以上が参加した"
+   ]
+  },
+  {
+   "id": "dt-j167",
+   "category": "dropped",
+   "romaji": "sanzennennnootsuriomoratta",
+   "correct_romaji": "sanzennennnootsuriwomoratta",
+   "intended": "3000円のおつりをもらった",
+   "alternatives": [
+    "三千円のおつりをもらった",
+    "3,000円のおつりをもらった",
+    "3000円のお釣りをもらった",
+    "三千円のお釣りをもらった"
+   ]
+  },
+  {
+   "id": "dt-j168",
+   "category": "swapped",
+   "romaji": "ichimnanensatsuwokuzusu",
+   "correct_romaji": "ichimannensatsuwokuzusu",
+   "intended": "1万円札を崩す",
+   "alternatives": [
+    "一万円札を崩す",
+    "1万円札をくずす",
+    "一万円札をくずす"
+   ]
+  },
+  {
+   "id": "dt-j169",
+   "category": "neighbor",
+   "romaji": "dainisjouwoyomu",
+   "correct_romaji": "dainishouwoyomu",
+   "intended": "第2章を読む",
+   "alternatives": [
+    "第二章を読む"
+   ]
+  },
+  {
+   "id": "dt-j170",
+   "category": "extra",
+   "romaji": "kurumagasandaitomsatteiru",
+   "correct_romaji": "kurumagasandaitomatteiru",
+   "intended": "車が3台止まっている",
+   "alternatives": [
+    "車が三台止まっている",
+    "車が3台停まっている",
+    "車が三台停まっている"
+   ]
+  },
+  {
+   "id": "dt-j171",
+   "category": "doubled_vowel",
+   "romaji": "enpiitsuwoipponkashite",
+   "correct_romaji": "enpitsuwoipponkashite",
+   "intended": "鉛筆を1本貸して",
+   "alternatives": [
+    "鉛筆を一本貸して"
+   ]
+  },
+  {
+   "id": "dt-j172",
+   "category": "dropped",
+   "romaji": "nanajuppunkkatta",
+   "correct_romaji": "nanajuppunkakatta",
+   "intended": "70分かかった",
+   "alternatives": [
+    "七十分かかった"
+   ]
+  },
+  {
+   "id": "dt-j173",
+   "category": "swapped",
+   "romaji": "goninnnihitorigasansieshita",
+   "correct_romaji": "goninnnihitorigasanseishita",
+   "intended": "5人に1人が賛成した",
+   "alternatives": [
+    "五人に一人が賛成した"
+   ]
+  },
+  {
+   "id": "dt-j174",
+   "category": "neighbor",
+   "romaji": "kokonpkakannnoshucchou",
+   "correct_romaji": "kokonokakannnoshucchou",
+   "intended": "9日間の出張",
+   "alternatives": [
+    "九日間の出張"
+   ]
+  },
+  {
+   "id": "dt-j175",
+   "category": "extra",
+   "romaji": "nisebnnnijuurokunennnokeikaku",
+   "correct_romaji": "nisennnijuurokunennnokeikaku",
+   "intended": "2026年の計画",
+   "alternatives": [
+    "二〇二六年の計画"
+   ]
+  },
+  {
+   "id": "dt-j176",
+   "category": "doubled_vowel",
+   "romaji": "zenbudeyonhyakuningaaatsumatta",
+   "correct_romaji": "zenbudeyonhyakuningaatsumatta",
+   "intended": "全部で400人が集まった",
+   "alternatives": [
+    "全部で四百人が集まった"
+   ]
+  },
+  {
+   "id": "dt-j177",
+   "category": "dropped",
+   "romaji": "yokkamenikazeganotta",
+   "correct_romaji": "yokkamenikazeganaotta",
+   "intended": "4日目に風邪が治った",
+   "alternatives": [
+    "四日目に風邪が治った"
+   ]
+  },
+  {
+   "id": "dt-j178",
+   "category": "swapped",
+   "romaji": "hitotsumenokadowoimginimagaru",
+   "correct_romaji": "hitotsumenokadowomiginimagaru",
+   "intended": "1つ目の角を右に曲がる",
+   "alternatives": [
+    "一つ目の角を右に曲がる"
+   ]
+  },
+  {
+   "id": "dt-j179",
+   "category": "neighbor",
+   "romaji": "gogatsumuikahauasumidesu",
+   "correct_romaji": "gogatsumuikahayasumidesu",
+   "intended": "5月6日は休みです",
+   "alternatives": [
+    "五月六日は休みです"
+   ]
+  },
+  {
+   "id": "dt-j180",
+   "category": "extra",
+   "romaji": "shichigatsuhatsukanikaigigasaru",
+   "correct_romaji": "shichigatsuhatsukanikaigigaaru",
+   "intended": "7月20日に会議がある",
+   "alternatives": [
+    "七月二十日に会議がある"
+   ]
+  },
+  {
+   "id": "dt-j182",
+   "category": "doubled_vowel",
+   "romaji": "raigetsuudesanjussaininaru",
+   "correct_romaji": "raigetsudesanjussaininaru",
+   "intended": "来月で30歳になる",
+   "alternatives": [
+    "来月で三十歳になる"
+   ]
+  },
+  {
+   "id": "dt-j183",
+   "category": "dropped",
+   "romaji": "nikainokagishitsunikitekudasai",
+   "correct_romaji": "nikainokaigishitsunikitekudasai",
+   "intended": "2階の会議室に来てください",
+   "alternatives": [
+    "二階の会議室に来てください"
+   ]
+  },
+  {
+   "id": "dt-j184",
+   "category": "swapped",
+   "romaji": "yojikanemnojugyou",
+   "correct_romaji": "yojikanmenojugyou",
+   "intended": "4時間目の授業",
+   "alternatives": [
+    "四時間目の授業"
+   ]
+  },
+  {
+   "id": "dt-j185",
+   "category": "neighbor",
+   "romaji": "gosemnennikanopurezento",
+   "correct_romaji": "gosennennikanopurezento",
+   "intended": "5000円以下のプレゼント",
+   "alternatives": [
+    "五千円以下のプレゼント",
+    "5,000円以下のプレゼント"
+   ]
+  },
+  {
+   "id": "dt-j186",
+   "category": "extra",
+   "romaji": "denwabsangouhazerokyuuzerokarahajimaru",
+   "correct_romaji": "denwabangouhazerokyuuzerokarahajimaru",
+   "intended": "電話番号は090から始まる",
+   "alternatives": [
+    "電話番号は〇九〇から始まる"
+   ]
+  },
+  {
+   "id": "dt-j187",
+   "category": "doubled_vowel",
+   "romaji": "naisenbangouhaniichisaandesu",
+   "correct_romaji": "naisenbangouhaniichisandesu",
+   "intended": "内線番号は213です",
+   "alternatives": [
+    "内線番号は二一三です"
+   ]
+  },
+  {
+   "id": "dt-j188",
+   "category": "dropped",
+   "romaji": "nijuuhachinichinshimekiri",
+   "correct_romaji": "nijuuhachinichinoshimekiri",
+   "intended": "28日の締め切り",
+   "alternatives": [
+    "二十八日の締め切り",
+    "28日の締切",
+    "二十八日の締切"
+   ]
+  },
+  {
+   "id": "dt-j189",
+   "category": "swapped",
+   "romaji": "jukkoirinotamgao",
+   "correct_romaji": "jukkoirinotamago",
+   "intended": "10個入りの卵",
+   "alternatives": [
+    "十個入りの卵",
+    "10個入りのたまご",
+    "十個入りのたまご"
+   ]
+  },
+  {
+   "id": "dt-j190",
+   "category": "neighbor",
+   "romaji": "renshuuwojukksikurikaeshita",
+   "correct_romaji": "renshuuwojukkaikurikaeshita",
+   "intended": "練習を10回繰り返した",
+   "alternatives": [
+    "練習を十回繰り返した"
+   ]
+  },
+  {
+   "id": "dt-j191",
+   "category": "extra",
+   "romaji": "shinjukuekoidedenshawonorikaeru",
+   "correct_romaji": "shinjukuekidedenshawonorikaeru",
+   "intended": "新宿駅で電車を乗り換える",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j192",
+   "category": "doubled_vowel",
+   "romaji": "kyoutonokiyoomizuderaniitta",
+   "correct_romaji": "kyoutonokiyomizuderaniitta",
+   "intended": "京都の清水寺に行った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j193",
+   "category": "dropped",
+   "romaji": "hokkaidunosapporonisundeiru",
+   "correct_romaji": "hokkaidounosapporonisundeiru",
+   "intended": "北海道の札幌に住んでいる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j194",
+   "category": "swapped",
+   "romaji": "ooskaakarakoubemadedenshadeiku",
+   "correct_romaji": "oosakakarakoubemadedenshadeiku",
+   "intended": "大阪から神戸まで電車で行く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j195",
+   "category": "neighbor",
+   "romaji": "natsumespusekinoshousetsuwoyomu",
+   "correct_romaji": "natsumesousekinoshousetsuwoyomu",
+   "intended": "夏目漱石の小説を読む",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j196",
+   "category": "extra",
+   "romaji": "fukuoksakennnohakataeki",
+   "correct_romaji": "fukuokakennnohakataeki",
+   "intended": "福岡県の博多駅",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j197",
+   "category": "doubled_vowel",
+   "romaji": "nagoyajouwokengaakushita",
+   "correct_romaji": "nagoyajouwokengakushita",
+   "intended": "名古屋城を見学した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j198",
+   "category": "dropped",
+   "romaji": "kaakuranodaibutsuwomita",
+   "correct_romaji": "kamakuranodaibutsuwomita",
+   "intended": "鎌倉の大仏を見た",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j199",
+   "category": "swapped",
+   "romaji": "hiroshimanoistukushimajinja",
+   "correct_romaji": "hiroshimanoitsukushimajinja",
+   "intended": "広島の厳島神社",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j200",
+   "category": "neighbor",
+   "romaji": "akuhabaradedenkiseihinwokau",
+   "correct_romaji": "akihabaradedenkiseihinwokau",
+   "intended": "秋葉原で電気製品を買う",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j201",
+   "category": "extra",
+   "romaji": "ikebukurodemachisawase",
+   "correct_romaji": "ikebukurodemachiawase",
+   "intended": "池袋で待ち合わせ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j202",
+   "category": "doubled_vowel",
+   "romaji": "shinagawakaraashinkansennninoru",
+   "correct_romaji": "shinagawakarashinkansennninoru",
+   "intended": "品川から新幹線に乗る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j203",
+   "category": "dropped",
+   "romaji": "okinawaonahakuukou",
+   "correct_romaji": "okinawanonahakuukou",
+   "intended": "沖縄の那覇空港",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j204",
+   "category": "swapped",
+   "romaji": "sendainogyuutanwotaebta",
+   "correct_romaji": "sendainogyuutanwotabeta",
+   "intended": "仙台の牛たんを食べた",
+   "alternatives": [
+    "仙台の牛タンを食べた"
+   ]
+  },
+  {
+   "id": "dt-j205",
+   "category": "neighbor",
+   "romaji": "tokugawaieyasugabakufuwogiraita",
+   "correct_romaji": "tokugawaieyasugabakufuwohiraita",
+   "intended": "徳川家康が幕府を開いた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j206",
+   "category": "extra",
+   "romaji": "odanobunagamnoshiro",
+   "correct_romaji": "odanobunaganoshiro",
+   "intended": "織田信長の城",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j207",
+   "category": "doubled_vowel",
+   "romaji": "murasakishikibuunogenjimonogatari",
+   "correct_romaji": "murasakishikibunogenjimonogatari",
+   "intended": "紫式部の源氏物語",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j208",
+   "category": "dropped",
+   "romaji": "akutagwaryuunosukenorashoumon",
+   "correct_romaji": "akutagawaryuunosukenorashoumon",
+   "intended": "芥川龍之介の羅生門",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j209",
+   "category": "swapped",
+   "romaji": "miyazawaknejinogingatetsudounoyoru",
+   "correct_romaji": "miyazawakenjinogingatetsudounoyoru",
+   "intended": "宮沢賢治の銀河鉄道の夜",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j210",
+   "category": "neighbor",
+   "romaji": "natsunifujisannninibotta",
+   "correct_romaji": "natsunifujisannninobotta",
+   "intended": "夏に富士山に登った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j211",
+   "category": "extra",
+   "romaji": "biwakohanihonnivchiookiimizuumida",
+   "correct_romaji": "biwakohanihonnichiookiimizuumida",
+   "intended": "琵琶湖は日本一大きい湖だ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j212",
+   "category": "doubled_vowel",
+   "romaji": "kagoshimanosakurajiima",
+   "correct_romaji": "kagoshimanosakurajima",
+   "intended": "鹿児島の桜島",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j213",
+   "category": "dropped",
+   "romaji": "nagankennnomatsumotojou",
+   "correct_romaji": "naganokennnomatsumotojou",
+   "intended": "長野県の松本城",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j214",
+   "category": "swapped",
+   "romaji": "shiuzokanoochahaoishii",
+   "correct_romaji": "shizuokanoochahaoishii",
+   "intended": "静岡のお茶はおいしい",
+   "alternatives": [
+    "静岡のお茶は美味しい"
+   ]
+  },
+  {
+   "id": "dt-j215",
+   "category": "neighbor",
+   "romaji": "ibarakikennbomitoshi",
+   "correct_romaji": "ibarakikennnomitoshi",
+   "intended": "茨城県の水戸市",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j216",
+   "category": "extra",
+   "romaji": "shibuyakaraomotesandoumadesaruku",
+   "correct_romaji": "shibuyakaraomotesandoumadearuku",
+   "intended": "渋谷から表参道まで歩く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j217",
+   "category": "doubled_vowel",
+   "romaji": "chigasakinoumideaasonda",
+   "correct_romaji": "chigasakinoumideasonda",
+   "intended": "茅ヶ崎の海で遊んだ",
+   "alternatives": [
+    "茅ケ崎の海で遊んだ"
+   ]
+  },
+  {
+   "id": "dt-j218",
+   "category": "dropped",
+   "romaji": "yokohamanohodogayku",
+   "correct_romaji": "yokohamanohodogayaku",
+   "intended": "横浜の保土ケ谷区",
+   "alternatives": [
+    "横浜の保土ヶ谷区"
+   ]
+  },
+  {
+   "id": "dt-j219",
+   "category": "swapped",
+   "romaji": "saitamakennnsooukashi",
+   "correct_romaji": "saitamakennnosoukashi",
+   "intended": "埼玉県の草加市",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j220",
+   "category": "neighbor",
+   "romaji": "chibakennmoabikoshi",
+   "correct_romaji": "chibakennnoabikoshi",
+   "intended": "千葉県の我孫子市",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j221",
+   "category": "extra",
+   "romaji": "setagayanotodorokikeuikoku",
+   "correct_romaji": "setagayanotodorokikeikoku",
+   "intended": "世田谷の等々力渓谷",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j222",
+   "category": "doubled_vowel",
+   "romaji": "nikkoutoushouguuwoosanpaishita",
+   "correct_romaji": "nikkoutoushouguuwosanpaishita",
+   "intended": "日光東照宮を参拝した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j223",
+   "category": "dropped",
+   "romaji": "isejinguunomairishita",
+   "correct_romaji": "isejinguuniomairishita",
+   "intended": "伊勢神宮にお参りした",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j224",
+   "category": "swapped",
+   "romaji": "shimanekennnoizumotasiha",
+   "correct_romaji": "shimanekennnoizumotaisha",
+   "intended": "島根県の出雲大社",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j225",
+   "category": "neighbor",
+   "romaji": "nihonginkougakinriqosueoita",
+   "correct_romaji": "nihonginkougakinriwosueoita",
+   "intended": "日本銀行が金利を据え置いた",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j226",
+   "category": "extra",
+   "romaji": "kouchinosakampotoryoumanozou",
+   "correct_romaji": "kouchinosakamotoryoumanozou",
+   "intended": "高知の坂本龍馬の像",
+   "alternatives": [
+    "高知の坂本竜馬の像"
+   ]
+  },
+  {
+   "id": "dt-j227",
+   "category": "doubled_vowel",
+   "romaji": "makuranosouushiwoyonda",
+   "correct_romaji": "makuranosoushiwoyonda",
+   "intended": "枕草子を読んだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j228",
+   "category": "dropped",
+   "romaji": "kawaatayasunarinoyukiguni",
+   "correct_romaji": "kawabatayasunarinoyukiguni",
+   "intended": "川端康成の雪国",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j229",
+   "category": "swapped",
+   "romaji": "hyougoknennohimejijou",
+   "correct_romaji": "hyougokennnohimejijou",
+   "intended": "兵庫県の姫路城",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j230",
+   "category": "neighbor",
+   "romaji": "toukyounoienokouen",
+   "correct_romaji": "toukyounouenokouen",
+   "intended": "東京の上野公園",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j236",
+   "category": "extra",
+   "romaji": "resutoramnwoyoyakushita",
+   "correct_romaji": "resutoranwoyoyakushita",
+   "intended": "レストランを予約した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j240",
+   "category": "doubled_vowel",
+   "romaji": "arubaiitowosagashiteiru",
+   "correct_romaji": "arubaitowosagashiteiru",
+   "intended": "アルバイトを探している",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j241",
+   "category": "dropped",
+   "romaji": "konbinideobentouwokata",
+   "correct_romaji": "konbinideobentouwokatta",
+   "intended": "コンビニでお弁当を買った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j242",
+   "category": "swapped",
+   "romaji": "terebinormiokongamitsukaranai",
+   "correct_romaji": "terebinorimokongamitsukaranai",
+   "intended": "テレビのリモコンが見つからない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j245",
+   "category": "neighbor",
+   "romaji": "baiprinwonaratteiru",
+   "correct_romaji": "baiorinwonaratteiru",
+   "intended": "バイオリンを習っている",
+   "alternatives": [
+    "ヴァイオリンを習っている"
+   ]
+  },
+  {
+   "id": "dt-j247",
+   "category": "extra",
+   "romaji": "webusaitowokoushuinshita",
+   "correct_romaji": "webusaitowokoushinshita",
+   "intended": "ウェブサイトを更新した",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j248",
+   "category": "doubled_vowel",
+   "romaji": "thiisshuwototte",
+   "correct_romaji": "thisshuwototte",
+   "intended": "ティッシュを取って",
+   "alternatives": [
+    "ティッシュをとって"
+   ]
+  },
+  {
+   "id": "dt-j252",
+   "category": "dropped",
+   "romaji": "chekkuinhaanjikaradesu",
+   "correct_romaji": "chekkuinhasanjikaradesu",
+   "intended": "チェックインは3時からです",
+   "alternatives": [
+    "チェックインは三時からです"
+   ]
+  },
+  {
+   "id": "dt-j253",
+   "category": "swapped",
+   "romaji": "shatsuniarionwokakeru",
+   "correct_romaji": "shatsuniaironwokakeru",
+   "intended": "シャツにアイロンをかける",
+   "alternatives": [
+    "シャツにアイロンを掛ける"
+   ]
+  },
+  {
+   "id": "dt-j254",
+   "category": "neighbor",
+   "romaji": "gasorindutandoniyoru",
+   "correct_romaji": "gasorinsutandoniyoru",
+   "intended": "ガソリンスタンドに寄る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j256",
+   "category": "extra",
+   "romaji": "boranthianisamnkasuru",
+   "correct_romaji": "boranthianisankasuru",
+   "intended": "ボランティアに参加する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j257",
+   "category": "doubled_vowel",
+   "romaji": "manshoonnnokanrinin",
+   "correct_romaji": "manshonnnokanrinin",
+   "intended": "マンションの管理人",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j259",
+   "category": "dropped",
+   "romaji": "firumukameradeshashinotoru",
+   "correct_romaji": "firumukameradeshashinwotoru",
+   "intended": "フィルムカメラで写真を撮る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j261",
+   "category": "swapped",
+   "romaji": "soremechcaiijan",
+   "correct_romaji": "soremecchaiijan",
+   "intended": "それめっちゃいいじゃん",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j263",
+   "category": "neighbor",
+   "romaji": "namkatsukaretappoi",
+   "correct_romaji": "nankatsukaretappoi",
+   "intended": "なんか疲れたっぽい",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j264",
+   "category": "extra",
+   "romaji": "ashitaissjhoniikokka",
+   "correct_romaji": "ashitaisshoniikokka",
+   "intended": "明日一緒に行こっか",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j265",
+   "category": "doubled_vowel",
+   "romaji": "majideuukeruwara",
+   "correct_romaji": "majideukeruwara",
+   "intended": "マジでウケる笑",
+   "alternatives": [
+    "まじでウケる笑",
+    "マジでうける笑",
+    "まじでうける笑"
+   ]
+  },
+  {
+   "id": "dt-j266",
+   "category": "dropped",
+   "romaji": "chottoattete",
+   "correct_romaji": "chottomattete",
+   "intended": "ちょっと待ってて",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j267",
+   "category": "swapped",
+   "romaji": "moumurkiamo",
+   "correct_romaji": "moumurikamo",
+   "intended": "もう無理かも",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j268",
+   "category": "neighbor",
+   "romaji": "atiderenrakusurune",
+   "correct_romaji": "atoderenrakusurune",
+   "intended": "後で連絡するね",
+   "alternatives": [
+    "あとで連絡するね"
+   ]
+  },
+  {
+   "id": "dt-j269",
+   "category": "extra",
+   "romaji": "imakarsaikukaramattetene",
+   "correct_romaji": "imakaraikukaramattetene",
+   "intended": "今から行くから待っててね",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j271",
+   "category": "doubled_vowel",
+   "romaji": "tekaakyousamukunai",
+   "correct_romaji": "tekakyousamukunai",
+   "intended": "てか今日寒くない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j272",
+   "category": "dropped",
+   "romaji": "neusugiteshinu",
+   "correct_romaji": "nemusugiteshinu",
+   "intended": "眠すぎて死ぬ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j273",
+   "category": "swapped",
+   "romaji": "nanisorekueru",
+   "correct_romaji": "nanisoreukeru",
+   "intended": "何それウケる",
+   "alternatives": [
+    "なにそれウケる",
+    "何それうける",
+    "なにそれうける"
+   ]
+  },
+  {
+   "id": "dt-j274",
+   "category": "neighbor",
+   "romaji": "shuunatsugohannikouyo",
+   "correct_romaji": "shuumatsugohannikouyo",
+   "intended": "週末ご飯行こうよ",
+   "alternatives": [
+    "週末ごはん行こうよ"
+   ]
+  },
+  {
+   "id": "dt-j275",
+   "category": "extra",
+   "romaji": "yappayametiokuwa",
+   "correct_romaji": "yappayametokuwa",
+   "intended": "やっぱやめとくわ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j278",
+   "category": "doubled_vowel",
+   "romaji": "sonnnanoshiiranshi",
+   "correct_romaji": "sonnnanoshiranshi",
+   "intended": "そんなの知らんし",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j280",
+   "category": "dropped",
+   "romaji": "kyouhagacideisogashii",
+   "correct_romaji": "kyouhagachideisogashii",
+   "intended": "今日はガチで忙しい",
+   "alternatives": [
+    "今日はがちで忙しい"
+   ]
+  },
+  {
+   "id": "dt-j284",
+   "category": "swapped",
+   "romaji": "chottohansahikiiteyo",
+   "correct_romaji": "chottohanashikiiteyo",
+   "intended": "ちょっと話聞いてよ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j286",
+   "category": "neighbor",
+   "romaji": "imananishitebnno",
+   "correct_romaji": "imananishitennno",
+   "intended": "今何してんの",
+   "alternatives": [
+    "今なにしてんの"
+   ]
+  },
+  {
+   "id": "dt-j288",
+   "category": "extra",
+   "romaji": "kobnodougajiwaru",
+   "correct_romaji": "konodougajiwaru",
+   "intended": "この動画じわる",
+   "alternatives": [
+    "この動画ジワる"
+   ]
+  },
+  {
+   "id": "dt-j289",
+   "category": "doubled_vowel",
+   "romaji": "zenzendaijoubuudayo",
+   "correct_romaji": "zenzendaijoubudayo",
+   "intended": "全然大丈夫だよ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j290",
+   "category": "dropped",
+   "romaji": "yabaieboushita",
+   "correct_romaji": "yabaineboushita",
+   "intended": "やばい寝坊した",
+   "alternatives": [
+    "ヤバい寝坊した"
+   ]
+  },
+  {
+   "id": "dt-j291",
+   "category": "swapped",
+   "romaji": "tabunnashitaharerushiranekdo",
+   "correct_romaji": "tabunnashitaharerushirankedo",
+   "intended": "多分明日晴れる知らんけど",
+   "alternatives": [
+    "たぶん明日晴れる知らんけど"
+   ]
+  },
+  {
+   "id": "dt-j293",
+   "category": "neighbor",
+   "romaji": "isshonoganbaroxtu",
+   "correct_romaji": "isshoniganbaroxtu",
+   "intended": "一緒に頑張ろっ",
+   "alternatives": [
+    "一緒にがんばろっ"
+   ]
+  },
+  {
+   "id": "dt-j294",
+   "category": "extra",
+   "romaji": "socchiuittemoii",
+   "correct_romaji": "socchiittemoii",
+   "intended": "そっち行ってもいい",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j295",
+   "category": "doubled_vowel",
+   "romaji": "nandeeyanen",
+   "correct_romaji": "nandeyanen",
+   "intended": "なんでやねん",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j296",
+   "category": "dropped",
+   "romaji": "majdekandoushitawara",
+   "correct_romaji": "majidekandoushitawara",
+   "intended": "マジで感動した笑",
+   "alternatives": [
+    "まじで感動した笑"
+   ]
+  },
+  {
+   "id": "dt-j298",
+   "category": "swapped",
+   "romaji": "ashiathimadattaraasobo",
+   "correct_romaji": "ashitahimadattaraasobo",
+   "intended": "明日暇だったら遊ぼ",
+   "alternatives": [
+    "明日ひまだったら遊ぼ"
+   ]
+  },
+  {
+   "id": "dt-j299",
+   "category": "neighbor",
+   "romaji": "koreoiahisugin",
+   "correct_romaji": "koreoishisugin",
+   "intended": "これおいしすぎん",
+   "alternatives": [
+    "これ美味しすぎん"
+   ]
+  },
+  {
+   "id": "dt-j329",
+   "category": "extra",
+   "romaji": "shikennnokekkaharaishuunoksayoubinihappyousarerusouda",
+   "correct_romaji": "shikennnokekkaharaishuunokayoubinihappyousarerusouda",
+   "intended": "試験の結果は来週の火曜日に発表されるそうだ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j340",
+   "category": "doubled_vowel",
+   "romaji": "karegatochuudeakiramezuunisaigomadeyaritogetakotonikandoushita",
+   "correct_romaji": "karegatochuudeakiramezunisaigomadeyaritogetakotonikandoushita",
+   "intended": "彼が途中で諦めずに最後までやり遂げたことに感動した",
+   "alternatives": [
+    "彼が途中であきらめずに最後までやり遂げたことに感動した"
+   ]
+  },
+  {
+   "id": "dt-j341",
+   "category": "dropped",
+   "romaji": "kokodhakimonowonuidekudasai",
+   "correct_romaji": "kokodehakimonowonuidekudasai",
+   "intended": "ここで履物を脱いでください",
+   "alternatives": [
+    "ここでは着物を脱いでください"
+   ]
+  },
+  {
+   "id": "dt-j342",
+   "category": "swapped",
+   "romaji": "niwnaihaniwaniwatorigairu",
+   "correct_romaji": "niwanihaniwaniwatorigairu",
+   "intended": "庭には二羽鶏がいる",
+   "alternatives": [
+    "庭には二羽ニワトリがいる",
+    "庭には2羽鶏がいる",
+    "庭には2羽ニワトリがいる"
+   ]
+  },
+  {
+   "id": "dt-j343",
+   "category": "neighbor",
+   "romaji": "sumomonomomomomomonouchi",
+   "correct_romaji": "sumomomomomomomomonouchi",
+   "intended": "すもももももももものうち",
+   "alternatives": [
+    "李も桃も桃のうち",
+    "すももも桃も桃のうち"
+   ]
+  },
+  {
+   "id": "dt-j344",
+   "category": "extra",
+   "romaji": "kanojohaishanioitta",
+   "correct_romaji": "kanojohaishaniitta",
+   "intended": "彼女は歯医者に行った",
+   "alternatives": [
+    "彼女は医者に行った"
+   ]
+  },
+  {
+   "id": "dt-j345",
+   "category": "doubled_vowel",
+   "romaji": "kyouhaaiitenkidesune",
+   "correct_romaji": "kyouhaiitenkidesune",
+   "intended": "今日はいい天気ですね",
+   "alternatives": [
+    "今日は良い天気ですね"
+   ]
+  },
+  {
+   "id": "dt-j346",
+   "category": "dropped",
+   "romaji": "tomdachinoieheasobiniiku",
+   "correct_romaji": "tomodachinoieheasobiniiku",
+   "intended": "友達の家へ遊びに行く",
+   "alternatives": [
+    "友だちの家へ遊びに行く"
+   ]
+  },
+  {
+   "id": "dt-j347",
+   "category": "swapped",
+   "romaji": "okashwiookuru",
+   "correct_romaji": "okashiwookuru",
+   "intended": "お菓子を送る",
+   "alternatives": [
+    "お菓子を贈る"
+   ]
+  },
+  {
+   "id": "dt-j348",
+   "category": "neighbor",
+   "romaji": "asaitoutowookosu",
+   "correct_romaji": "asaotoutowookosu",
+   "intended": "朝弟を起こす",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j349",
+   "category": "extra",
+   "romaji": "oniwawoosioujisuru",
+   "correct_romaji": "oniwawoosoujisuru",
+   "intended": "お庭をお掃除する",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j350",
+   "category": "doubled_vowel",
+   "romaji": "ookiiookamiwooiikaketa",
+   "correct_romaji": "ookiiookamiwooikaketa",
+   "intended": "大きいオオカミを追いかけた",
+   "alternatives": [
+    "大きい狼を追いかけた"
+   ]
+  },
+  {
+   "id": "dt-j351",
+   "category": "dropped",
+   "romaji": "watashihawatashdesu",
+   "correct_romaji": "watashihawatashidesu",
+   "intended": "私は私です",
+   "alternatives": [
+    "わたしはわたしです"
+   ]
+  },
+  {
+   "id": "dt-j352",
+   "category": "swapped",
+   "romaji": "konnnihciha",
+   "correct_romaji": "konnnichiha",
+   "intended": "こんにちは",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j353",
+   "category": "neighbor",
+   "romaji": "minasabkonbanha",
+   "correct_romaji": "minasankonbanha",
+   "intended": "皆さんこんばんは",
+   "alternatives": [
+    "みなさんこんばんは"
+   ]
+  },
+  {
+   "id": "dt-j354",
+   "category": "extra",
+   "romaji": "hahahaishanuiitta",
+   "correct_romaji": "hahahaishaniitta",
+   "intended": "母は歯医者に行った",
+   "alternatives": [
+    "母は医者に行った"
+   ]
+  },
+  {
+   "id": "dt-j355",
+   "category": "doubled_vowel",
+   "romaji": "anihahanashigaanagai",
+   "correct_romaji": "anihahanashiganagai",
+   "intended": "兄は話が長い",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j356",
+   "category": "dropped",
+   "romaji": "oishiimonowtabetai",
+   "correct_romaji": "oishiimonowotabetai",
+   "intended": "おいしいものを食べたい",
+   "alternatives": [
+    "美味しいものを食べたい",
+    "おいしい物を食べたい",
+    "美味しい物を食べたい"
+   ]
+  },
+  {
+   "id": "dt-j357",
+   "category": "swapped",
+   "romaji": "kaishaehnotoiawase",
+   "correct_romaji": "kaishahenotoiawase",
+   "intended": "会社への問い合わせ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j358",
+   "category": "neighbor",
+   "romaji": "konosakijashiranai",
+   "correct_romaji": "konosakihashiranai",
+   "intended": "この先は知らない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j359",
+   "category": "extra",
+   "romaji": "futaenishitekubinikakwerujuzu",
+   "correct_romaji": "futaenishitekubinikakerujuzu",
+   "intended": "二重にして首に掛ける数珠",
+   "alternatives": [
+    "二重にして首にかける数珠"
+   ]
+  },
+  {
+   "id": "dt-j360",
+   "category": "doubled_vowel",
+   "romaji": "kanojonihaahanashitenai",
+   "correct_romaji": "kanojonihahanashitenai",
+   "intended": "彼女には話してない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j361",
+   "category": "dropped",
+   "romaji": "ishahashademohaisha",
+   "correct_romaji": "ishahaishademohaisha",
+   "intended": "医者は医者でも歯医者",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j362",
+   "category": "swapped",
+   "romaji": "tewoarattekaraokashiwoatberu",
+   "correct_romaji": "tewoarattekaraokashiwotaberu",
+   "intended": "手を洗ってからお菓子を食べる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j363",
+   "category": "neighbor",
+   "romaji": "ewokalunogasukida",
+   "correct_romaji": "ewokakunogasukida",
+   "intended": "絵を描くのが好きだ",
+   "alternatives": [
+    "絵をかくのが好きだ",
+    "絵を書くのが好きだ"
+   ]
+  },
+  {
+   "id": "dt-j364",
+   "category": "extra",
+   "romaji": "ekiheikumixchiwooshiete",
+   "correct_romaji": "ekiheikumichiwooshiete",
+   "intended": "駅へ行く道を教えて",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j365",
+   "category": "doubled_vowel",
+   "romaji": "iehekaeruutochuu",
+   "correct_romaji": "iehekaerutochuu",
+   "intended": "家へ帰る途中",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j366",
+   "category": "dropped",
+   "romaji": "korehawaashinodesu",
+   "correct_romaji": "korehawatashinodesu",
+   "intended": "これは私のです",
+   "alternatives": [
+    "これはわたしのです"
+   ]
+  },
+  {
+   "id": "dt-j367",
+   "category": "swapped",
+   "romaji": "niwadehahaahgahanawoueteiru",
+   "correct_romaji": "niwadehahahagahanawoueteiru",
+   "intended": "庭では母が花を植えている",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j368",
+   "category": "neighbor",
+   "romaji": "asojodehashiwowataru",
+   "correct_romaji": "asokodehashiwowataru",
+   "intended": "あそこで橋を渡る",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j369",
+   "category": "extra",
+   "romaji": "machidehahaishagsasukunai",
+   "correct_romaji": "machidehahaishagasukunai",
+   "intended": "町では歯医者が少ない",
+   "alternatives": [
+    "街では歯医者が少ない"
+   ]
+  },
+  {
+   "id": "dt-j370",
+   "category": "doubled_vowel",
+   "romaji": "oosakaheehashinkansendeiku",
+   "correct_romaji": "oosakahehashinkansendeiku",
+   "intended": "大阪へは新幹線で行く",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j371",
+   "category": "dropped",
+   "romaji": "isogabaaware",
+   "correct_romaji": "isogabamaware",
+   "intended": "急がば回れ",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j372",
+   "category": "swapped",
+   "romaji": "sarumkoikaraochiru",
+   "correct_romaji": "sarumokikaraochiru",
+   "intended": "猿も木から落ちる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j373",
+   "category": "neighbor",
+   "romaji": "nekonikonan",
+   "correct_romaji": "nekonikoban",
+   "intended": "猫に小判",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j374",
+   "category": "extra",
+   "romaji": "issekinicjhou",
+   "correct_romaji": "issekinichou",
+   "intended": "一石二鳥",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j375",
+   "category": "doubled_vowel",
+   "romaji": "jigouujitoku",
+   "correct_romaji": "jigoujitoku",
+   "intended": "自業自得",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j376",
+   "category": "dropped",
+   "romaji": "isinouenimosannnen",
+   "correct_romaji": "ishinouenimosannnen",
+   "intended": "石の上にも三年",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j377",
+   "category": "swapped",
+   "romaji": "zednaimimon",
+   "correct_romaji": "zendaimimon",
+   "intended": "前代未聞",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j378",
+   "category": "neighbor",
+   "romaji": "hanayorodango",
+   "correct_romaji": "hanayoridango",
+   "intended": "花より団子",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j379",
+   "category": "extra",
+   "romaji": "nanakoroboiyaoki",
+   "correct_romaji": "nanakorobiyaoki",
+   "intended": "七転び八起き",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j380",
+   "category": "doubled_vowel",
+   "romaji": "ichigooichie",
+   "correct_romaji": "ichigoichie",
+   "intended": "一期一会",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j381",
+   "category": "dropped",
+   "romaji": "shicitenbattou",
+   "correct_romaji": "shichitenbattou",
+   "intended": "七転八倒",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j382",
+   "category": "swapped",
+   "romaji": "gyofnuori",
+   "correct_romaji": "gyofunori",
+   "intended": "漁夫の利",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j383",
+   "category": "neighbor",
+   "romaji": "ishibashiwotstaitewataru",
+   "correct_romaji": "ishibashiwotataitewataru",
+   "intended": "石橋を叩いて渡る",
+   "alternatives": [
+    "石橋をたたいて渡る"
+   ]
+  },
+  {
+   "id": "dt-j384",
+   "category": "extra",
+   "romaji": "nemimimnimizu",
+   "correct_romaji": "nemiminimizu",
+   "intended": "寝耳に水",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j385",
+   "category": "doubled_vowel",
+   "romaji": "karehakaoogahiroi",
+   "correct_romaji": "karehakaogahiroi",
+   "intended": "彼は顔が広い",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j386",
+   "category": "dropped",
+   "romaji": "imaegahanasenai",
+   "correct_romaji": "imategahanasenai",
+   "intended": "今手が離せない",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j387",
+   "category": "swapped",
+   "romaji": "mimgiaitaihanashi",
+   "correct_romaji": "mimigaitaihanashi",
+   "intended": "耳が痛い話",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j388",
+   "category": "neighbor",
+   "romaji": "honegaoeerushigoto",
+   "correct_romaji": "honegaorerushigoto",
+   "intended": "骨が折れる仕事",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j389",
+   "category": "extra",
+   "romaji": "kigaokebnainakama",
+   "correct_romaji": "kigaokenainakama",
+   "intended": "気が置けない仲間",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j390",
+   "category": "doubled_vowel",
+   "romaji": "isshooukenmeihashitta",
+   "correct_romaji": "isshoukenmeihashitta",
+   "intended": "一生懸命走った",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j391",
+   "category": "dropped",
+   "romaji": "shinkitten",
+   "correct_romaji": "shinkiitten",
+   "intended": "心機一転",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j392",
+   "category": "swapped",
+   "romaji": "ikduouon",
+   "correct_romaji": "ikudouon",
+   "intended": "異口同音",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j394",
+   "category": "neighbor",
+   "romaji": "yudantaoteki",
+   "correct_romaji": "yudantaiteki",
+   "intended": "油断大敵",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j395",
+   "category": "extra",
+   "romaji": "kabenimimiarishoujinimesari",
+   "correct_romaji": "kabenimimiarishoujinimeari",
+   "intended": "壁に耳あり障子に目あり",
+   "alternatives": [
+    "壁に耳あり、障子に目あり"
+   ]
+  },
+  {
+   "id": "dt-j396",
+   "category": "doubled_vowel",
+   "romaji": "amefuttejikaatamaru",
+   "correct_romaji": "amefuttejikatamaru",
+   "intended": "雨降って地固まる",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j397",
+   "category": "dropped",
+   "romaji": "nouarutakahatsumewoakusu",
+   "correct_romaji": "nouarutakahatsumewokakusu",
+   "intended": "能ある鷹は爪を隠す",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j398",
+   "category": "swapped",
+   "romaji": "chirimotsumorebayamatonrau",
+   "correct_romaji": "chirimotsumorebayamatonaru",
+   "intended": "塵も積もれば山となる",
+   "alternatives": [
+    "ちりも積もれば山となる"
+   ]
+  },
+  {
+   "id": "dt-j399",
+   "category": "neighbor",
+   "romaji": "sannninnyorebamonjunpchie",
+   "correct_romaji": "sannninnyorebamonjunochie",
+   "intended": "三人寄れば文殊の知恵",
+   "alternatives": []
+  },
+  {
+   "id": "dt-j400",
+   "category": "extra",
+   "romaji": "kikiioppatsu",
+   "correct_romaji": "kikiippatsu",
+   "intended": "危機一髪",
+   "alternatives": []
+  }
+ ]
+}
