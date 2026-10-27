@@ -190,13 +190,13 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
-  # 隣の鍵でない余分な1キー（MYIME_TYPO_PRIOR_EXF、既定は外す）を入れたときの比べ。ja400 と typo150b も同じ重みで流し、
-  # 崩れる文が出ないかを見る
+  # 直しを採る点差（MYIME_TYPO_MARGIN、既定 3000）を下げたときの比べ。ja400 と typo150b も同じ点差で流し、
+  # 打ち間違いのない文や前からの表が崩れないかを見る
   romaji $T/ja400.json > $W/ja400-c.txt
-  for x in 2500 4000; do
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-exf$x.tsv 4
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
+  for m in 1000 1500 2000 2500; do
+    MYIME_TYPO_MARGIN=$m $BATCH $W/dev-typo.txt $OUT/dev-typo-m$m.tsv 4
+    MYIME_TYPO_MARGIN=$m $BATCH $W/ja400-c.txt $OUT/ja400-m$m.tsv 4
+    MYIME_TYPO_MARGIN=$m $BATCH $W/typo150b.txt $OUT/typo150b-m$m.tsv 4
   done
   $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
