@@ -327,7 +327,7 @@ class TestExclusion:
                 if text:
                     readings.add(text)
 
-        for path in sorted(test_dir.glob("*.json")):
+        for path in sorted(test_dir.rglob("*.json")):  # holdout/ などの下のフォルダも
             data = json.loads(path.read_text(encoding="utf-8"))
             items = data["items"] if isinstance(data, dict) else data
             for item in items:
