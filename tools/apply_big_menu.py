@@ -9,7 +9,8 @@
 項目を自前で描く（MFT_OWNERDRAW）ようにし、メニューの文字の kBigMenuScale/10 倍の大きさで描く:
   - 描く知らせ（WM_MEASUREITEM・WM_DRAWITEM）はメニューの持ち主の窓に届く。メニューを出している間だけ
     持ち主の窓の受け口を差し替えて自分で受け、閉じたら元に戻す（同じスレッドの窓なので安全）
-  - 色は窓の決まりの色（メニューの地・文字・選択中・押せない）を使う。選ばれている項目には ● を付ける
+  - 地の色はウィンドウズが塗った色を読み、暗い・明るいに合わせて文字の色を決める（ウィンドウズ 11 の
+    メニューに似せる: 選んでいる項目は角の丸い帯、選ばれている種類は小さな点）
   - 区切り線はウィンドウズが描く
 apply_version_display.py（一番上に版の名前を出す）のあとに流す。
 """
@@ -41,8 +42,15 @@ struct BigMenu {
   std::vector<bool> checked;
   HFONT font = nullptr;
   WNDPROC original = nullptr;
+  bool have_background = false;
+  COLORREF background = 0;  // ウィンドウズが塗ったメニューの地の色（暗い・明るいはアプリによる）
 };
 thread_local BigMenu* g_big_menu = nullptr;  // メニューを出している間だけ
+
+COLORREF Shift(COLORREF color, int amount) {
+  const auto channel = [&](int value) { return static_cast<BYTE>(std::clamp(value + amount, 0, 255)); };
+  return RGB(channel(GetRValue(color)), channel(GetGValue(color)), channel(GetBValue(color)));
+}
 
 LRESULT CALLBACK BigMenuProc(HWND window, UINT message, WPARAM wparam, LPARAM lparam) {
   BigMenu* big = g_big_menu;
@@ -56,7 +64,8 @@ LRESULT CALLBACK BigMenuProc(HWND window, UINT message, WPARAM wparam, LPARAM lp
       ::GetTextExtentPoint32W(dc, text.c_str(), static_cast<int>(text.size()), &size);
       ::SelectObject(dc, old);
       ::ReleaseDC(window, dc);
-      item->itemHeight = size.cy * 4 / 3;
+      // ウィンドウズ 11 のメニューと同じく、行の高さは文字のおよそ 2 倍、左に印の場所、右に余白
+      item->itemHeight = size.cy * 9 / 5;
       item->itemWidth = size.cx + item->itemHeight * 2;
       return TRUE;
     }
@@ -67,20 +76,48 @@ LRESULT CALLBACK BigMenuProc(HWND window, UINT message, WPARAM wparam, LPARAM lp
       const size_t index = item->itemData - 1;
       const bool selected = (item->itemState & ODS_SELECTED) != 0;
       const bool grayed = (item->itemState & (ODS_GRAYED | ODS_DISABLED)) != 0;
-      ::FillRect(item->hDC, &item->rcItem,
-                 ::GetSysColorBrush(selected && !grayed ? COLOR_HIGHLIGHT : COLOR_MENU));
-      ::SetBkMode(item->hDC, TRANSPARENT);
-      ::SetTextColor(item->hDC, ::GetSysColor(grayed     ? COLOR_GRAYTEXT
-                                              : selected ? COLOR_HIGHLIGHTTEXT
-                                                         : COLOR_MENUTEXT));
-      HGDIOBJ old = ::SelectObject(item->hDC, big->font);
       RECT rect = item->rcItem;
-      const int mark = rect.bottom - rect.top;
-      if (big->checked[index]) {
-        RECT mark_rect = {rect.left, rect.top, rect.left + mark, rect.bottom};
-        ::DrawTextW(item->hDC, L"●", 1, &mark_rect, DT_CENTER | DT_VCENTER | DT_SINGLELINE);
+      const int height = rect.bottom - rect.top;
+      // 地の色は、ウィンドウズが項目の外に塗った色を読む（アプリが暗いメニューなら暗い）
+      if (!big->have_background) {
+        const COLORREF sampled = ::GetPixel(item->hDC, rect.left, rect.top);
+        big->background = sampled == CLR_INVALID ? ::GetSysColor(COLOR_MENU) : sampled;
+        big->have_background = true;
       }
-      rect.left += mark;
+      const COLORREF background = big->background;
+      const bool dark = GetRValue(background) * 299 + GetGValue(background) * 587 + GetBValue(background) * 114 <
+                        128 * 1000;
+      HBRUSH fill = ::CreateSolidBrush(background);
+      ::FillRect(item->hDC, &rect, fill);
+      ::DeleteObject(fill);
+      if (selected && !grayed) {  // 選んでいる項目は、角の丸い少し違う色の帯
+        const int inset = height / 8;
+        HBRUSH band = ::CreateSolidBrush(Shift(background, dark ? 20 : -14));
+        HGDIOBJ old_brush = ::SelectObject(item->hDC, band);
+        HGDIOBJ old_pen = ::SelectObject(item->hDC, ::GetStockObject(NULL_PEN));
+        ::RoundRect(item->hDC, rect.left + inset, rect.top + inset / 2, rect.right - inset + 1,
+                    rect.bottom - inset / 2 + 1, height / 4, height / 4);
+        ::SelectObject(item->hDC, old_pen);
+        ::SelectObject(item->hDC, old_brush);
+        ::DeleteObject(band);
+      }
+      const COLORREF text_color = grayed ? (dark ? RGB(0x9d, 0x9d, 0x9d) : RGB(0x6d, 0x6d, 0x6d))
+                                         : (dark ? RGB(0xff, 0xff, 0xff) : RGB(0x1a, 0x1a, 0x1a));
+      if (big->checked[index]) {  // 選ばれている入力の種類には、小さな点
+        const int dot = (std::max)(4, height / 6);
+        const int cx = rect.left + height / 2, cy = (rect.top + rect.bottom) / 2;
+        HBRUSH brush = ::CreateSolidBrush(text_color);
+        HGDIOBJ old_brush = ::SelectObject(item->hDC, brush);
+        HGDIOBJ old_pen = ::SelectObject(item->hDC, ::GetStockObject(NULL_PEN));
+        ::Ellipse(item->hDC, cx - dot / 2, cy - dot / 2, cx + dot / 2 + 1, cy + dot / 2 + 1);
+        ::SelectObject(item->hDC, old_pen);
+        ::SelectObject(item->hDC, old_brush);
+        ::DeleteObject(brush);
+      }
+      ::SetBkMode(item->hDC, TRANSPARENT);
+      ::SetTextColor(item->hDC, text_color);
+      HGDIOBJ old = ::SelectObject(item->hDC, big->font);
+      rect.left += height;
       const std::wstring& text = big->texts[index];
       ::DrawTextW(item->hDC, text.c_str(), static_cast<int>(text.size()), &rect,
                   DT_LEFT | DT_VCENTER | DT_SINGLELINE | DT_NOPREFIX);
