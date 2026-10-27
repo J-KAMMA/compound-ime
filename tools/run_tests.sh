@@ -184,14 +184,8 @@ c)
   $BATCH $W/holdout.txt $OUT/holdout.tsv 4
   romaji $T/holdout/holdout-typo.json > $W/holdout-typo.txt
   $BATCH $W/holdout-typo.txt $OUT/holdout-typo.tsv 4
-  # 試し: 読めない打ち間違いを辞書の費用で直す（MYIME_TYPO_UNREAD、境目 0 と 2000）
-  romaji $T/ja400.json > $W/ja400.txt
-  for m in 0 2000; do
-    for f in holdout-typo holdout typo150 typo150b ja400; do
-      MYIME_TYPO_UNREAD=$m $BATCH $W/$f.txt $OUT/unread-$m-$f.tsv 4
-    done
-  done
-  $BATCH $W/ja400.txt $OUT/ja400-c.tsv 4
+  # 読めない打ち間違いの直しを止めたとき（MYIME_TYPO_UNREAD=off、今までの直し方）との比べ
+  MYIME_TYPO_UNREAD=off $BATCH $W/holdout-typo.txt $OUT/holdout-typo-unread-off.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
