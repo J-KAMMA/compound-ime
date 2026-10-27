@@ -62,12 +62,26 @@ edit(E, """  bool ConvertWithContext(const ConversionOptions& options, Segments*
       return value != nullptr && std::string_view(value) == "1";
     }();
     if (!enabled || screen.empty() || segments == nullptr) return;
+    // MYIME_SCREEN_MIN: the fewest characters of such a word; MYIME_SCREEN_COUNT: how many
+    // times it must be in the text.
+    static const size_t min_chars = [] {
+      const char* value = std::getenv("MYIME_SCREEN_MIN");
+      return value != nullptr ? static_cast<size_t>(std::strtol(value, nullptr, 10)) : size_t{2};
+    }();
+    static const size_t min_count = [] {
+      const char* value = std::getenv("MYIME_SCREEN_COUNT");
+      return value != nullptr ? static_cast<size_t>(std::strtol(value, nullptr, 10)) : size_t{1};
+    }();
     const auto on_screen = [&](const converter::Candidate& candidate) {
       const std::string& word = candidate.content_value;
-      if (Util::CharsLen(word) < 2 ||
+      if (Util::CharsLen(word) < min_chars ||
           !(Util::ContainsScriptType(word, Util::KANJI) || Util::ContainsScriptType(word, Util::KATAKANA)))
         return false;
-      return screen.find(word) != std::string_view::npos;
+      size_t found = 0;
+      for (size_t at = screen.find(word); at != std::string_view::npos && found < min_count;
+           at = screen.find(word, at + word.size()))
+        ++found;
+      return found >= min_count;
     };
     for (size_t i = 0; i < segments->conversion_segments_size(); ++i) {
       auto* segment = segments->mutable_conversion_segment(i);

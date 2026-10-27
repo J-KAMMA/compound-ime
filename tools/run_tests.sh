@@ -425,8 +425,11 @@ o)
   CTXL="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/context-long.tsv"
   $CTXL $OUT/ctxl-without.tsv without 4
   # 人工知能に渡すのを終わりの 80 字にする（MYIME_CTX_NEAR）、画面に出ている語を先頭にする（MYIME_SCREEN_WORDS）
-  for variant in with:with: page:page: page-near:page:MYIME_CTX_NEAR=80 page-words:page:MYIME_CTX_NEAR=80,MYIME_SCREEN_WORDS=1 \
-                 with-words:with:MYIME_SCREEN_WORDS=1 para-words:para:MYIME_CTX_NEAR=80,MYIME_SCREEN_WORDS=1; do
+  # （MYIME_SCREEN_MIN: 語の最少字数、MYIME_SCREEN_COUNT: 前の文字に出ている最少回数）
+  N=MYIME_CTX_NEAR=80,MYIME_SCREEN_WORDS=1
+  for variant in with:with: page-near:page:MYIME_CTX_NEAR=80 page-m3:page:$N,MYIME_SCREEN_MIN=3 \
+                 page-c2:page:$N,MYIME_SCREEN_COUNT=2 page-m3c2:page:$N,MYIME_SCREEN_MIN=3,MYIME_SCREEN_COUNT=2 \
+                 page-m3c3:page:$N,MYIME_SCREEN_MIN=3,MYIME_SCREEN_COUNT=3 with-m3:with:MYIME_SCREEN_WORDS=1,MYIME_SCREEN_MIN=3; do
     name=${variant%%:*}; rest=${variant#*:}; mode=${rest%%:*}; assign=${rest#*:}
     env ${assign//,/ } $CTXL $OUT/ctxl-$name.tsv $mode 4
     python3 $REPO/tools/score_context.py $T/context-long.tsv $OUT/ctxl-$name.tsv $OUT/ctxl-without.tsv \
