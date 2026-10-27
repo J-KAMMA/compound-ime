@@ -138,6 +138,8 @@ jobs:
           python $R/tools/apply_selector_stage3.py $S $W/myime/src
           python $R/tools/apply_context_gate.py $W/myime/src
           python $R/tools/apply_batch_score.py $W/myime/src
+          # 画面の文字を変換に使う（試験用、MYIME_CTX_NEAR・MYIME_SCREEN_WORDS。既定は今までどおり）
+          python $R/tools/apply_screen_words.py $S
           # 版の番号は version.bzl に書く（--action_env だと全部の組み立て結果の鍵が変わり、控えが効かない）
           IFS=. read -r MA MI BU RE <<< "$VERSION"
           sed -i -e "s/^BUILD_OSS = .*/BUILD_OSS = $BU/" -e "s/^REVISION = .*/REVISION = $RE/" $S/version.bzl

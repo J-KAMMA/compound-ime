@@ -133,6 +133,8 @@ jobs:
           $PY $W/repo/tools/apply_batch_score.py $W/myime/src
           # 変換1回の時間を段ごとに測る仕組み（MYIME_PROFILE のときだけ動く。普段の変換結果は変わらない）
           $PY $W/repo/tools/apply_latency_profile.py $S $W/myime/src
+          # 画面の文字を変換に使う（試験用、MYIME_CTX_NEAR・MYIME_SCREEN_WORDS。既定は今までどおり）
+          $PY $W/repo/tools/apply_screen_words.py $S
 
       - name: llama.cpp と変換エンジン
         run: |

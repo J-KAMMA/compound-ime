@@ -95,15 +95,6 @@ class MozcWithAzooKeyConverter final : public ImmutableConverterInterface {
                           std::string_view left_context,
                           std::string_view right_context) const override {
     if (!segments || !mozc_->Convert(options, segments)) return false;
-    // The text before the cursor may be long (the page on the screen). The neural model
-    // reads only the near part of it; the whole of it names the words already in use,
-    // which go first when this returns (PreferScreenWords).
-    struct ScreenWords {
-      std::string_view screen;
-      Segments* segments;
-      ~ScreenWords() { PreferScreenWords(screen, segments); }
-    } screen_words{left_context, segments};
-    left_context = NearContext(left_context);
     if (!azoo_ || options.request_type != RequestType::CONVERSION ||
         options.used_in_predictor_realtime_conversion || options.create_partial_candidates ||
         options.max_conversion_candidates_size <= 0)
@@ -218,46 +209,6 @@ class MozcWithAzooKeyConverter final : public ImmutableConverterInterface {
     return true;
   }
  private:
-  // MYIME_CTX_NEAR: the most characters of the left context the neural model reads (the
-  // end of it); unset or 0 passes all of it.
-  static std::string_view NearContext(std::string_view left) {
-    static const size_t limit = [] {
-      const char* value = std::getenv("MYIME_CTX_NEAR");
-      return value != nullptr ? static_cast<size_t>(std::strtol(value, nullptr, 10)) : size_t{0};
-    }();
-    if (limit == 0 || Util::CharsLen(left) <= limit) return left;
-    return Util::Utf8SubString(left, Util::CharsLen(left) - limit);
-  }
-  // MYIME_SCREEN_WORDS=1: a segment whose first candidate is not in the text before the
-  // cursor, but another candidate of the same reading is (a word of two or more
-  // characters with kanji or katakana, among the first 30), takes that one first.
-  static void PreferScreenWords(std::string_view screen, Segments* segments) {
-    static const bool enabled = [] {
-      const char* value = std::getenv("MYIME_SCREEN_WORDS");
-      return value != nullptr && std::string_view(value) == "1";
-    }();
-    if (!enabled || screen.empty()) return;
-    const auto on_screen = [&](const converter::Candidate& candidate) {
-      const std::string& word = candidate.content_value;
-      if (Util::CharsLen(word) < 2 ||
-          !(Util::ContainsScriptType(word, Util::KANJI) || Util::ContainsScriptType(word, Util::KATAKANA)))
-        return false;
-      return screen.find(word) != std::string_view::npos;
-    };
-    for (size_t i = 0; i < segments->conversion_segments_size(); ++i) {
-      auto* segment = segments->mutable_conversion_segment(i);
-      if (segment->candidates_size() < 2 || segment->segment_type() == Segment::FIXED_VALUE ||
-          segment->segment_type() == Segment::SUBMITTED || on_screen(segment->candidate(0)))
-        continue;
-      const size_t count = std::min<size_t>(segment->candidates_size(), 30);
-      for (size_t j = 1; j < count; ++j) {
-        if (segment->candidate(j).key == segment->candidate(0).key && on_screen(segment->candidate(j))) {
-          segment->move_candidate(static_cast<int>(j), 0);
-          break;
-        }
-      }
-    }
-  }
   bool CompleteLiteralVerb(const Segment& original, const Segment& supplemental) const {
     if (original.candidates_size() == 0 ||
         !pos_matcher_.IsWeakCompoundVerbSuffix(original.candidate(0).lid) ||
