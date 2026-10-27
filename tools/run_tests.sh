@@ -193,7 +193,7 @@ c)
   # 点差が足りない直し（MYIME_TYPO_GRAY 以上 3000 未満）を、かなの並びの自然さ（MYIME_TYPO_KANA_GAIN）で採るときの比べ。
   # ja400 と typo150b も同じ条件で流し、崩れる文が出ないかを見る
   romaji $T/ja400.json > $W/ja400-c.txt
-  for v in g1000k0:1000:0 g1000k2:1000:2 g1500k0:1500:0 g1500k2:1500:2 g2000k0:2000:0; do
+  for v in off:-1:2 g500k2:500:2 g700k2:700:2 g1000k1:1000:1 g1000k3:1000:3; do
     name=${v%%:*}; rest=${v#*:}; g=${rest%%:*}; k=${rest#*:}
     for f in dev-typo ja400-c typo150b holdout-typo; do
       MYIME_TYPO_GRAY=$g MYIME_TYPO_KANA_GAIN=$k $BATCH $W/$f.txt $OUT/$f-$name.tsv 4
