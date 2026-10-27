@@ -65,7 +65,9 @@ jobs:
                    00004:16bfb8cfc7b53084fb0e76ebaf9e3ab8e82d775a045e7781f96494a2277e2dae \
                    00005:98fd014a7863168c5d23b8df3de874654bf1d858e5e67ffd003864ade5ae5723 \
                    00006:ea69e7a0ec68d5d3279a30820fb5bd496759daa32ec4f03146ff62a414ca5420 \
-                   00008:859bb8856808e91d47cbf17f0c1ec5bfaf5ec8fb9f576c2f365bd49bda1daf7b \n                   00009:296ce0665517bbd706bbf42e97f520aa413870df35a2eab77eca07d70174ed0d \n                   00010:b13eb0cf6f28099844ba2d651cf429ad000eb1ba90bbb3243e9d22a92bef7eab; do
+                   00008:859bb8856808e91d47cbf17f0c1ec5bfaf5ec8fb9f576c2f365bd49bda1daf7b \
+                   00009:296ce0665517bbd706bbf42e97f520aa413870df35a2eab77eca07d70174ed0d \
+                   00010:b13eb0cf6f28099844ba2d651cf429ad000eb1ba90bbb3243e9d22a92bef7eab; do
             n=${f%%:*}
             curl -fsSL -o wiki/train-$n-of-00015.parquet $WIKI_BASE/train-$n-of-00015.parquet
             echo "${f##*:}  wiki/train-$n-of-00015.parquet" | sha256sum -c
