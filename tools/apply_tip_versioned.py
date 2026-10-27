@@ -35,6 +35,12 @@ def edit(path, old, new, count=1):
     raise SystemExit(f"{path}: expected {count} match(es) for {old[:70]!r}, found {text.count(old)}")
 
 
+# 消すとき（REMOVE=ALL）は再起動を求める決まり（ScheduleReboot）が、新しい版へ入れ替えるときの古い版の削除でも
+# 動き、1.157 では入れ替えだけで「再起動が必要」と出た。入れ替えのときは求めない（効くのは、この決まりを持つ版を
+# 次に入れ替えるときから）
+edit(W, '<ScheduleReboot After="InstallFinalize" Condition="(REMOVE=&quot;ALL&quot;)" />',
+     '<ScheduleReboot After="InstallFinalize" Condition="(REMOVE=&quot;ALL&quot;) AND (NOT UPGRADINGPRODUCTCODE)" />')
+
 # インストーラー: 版つきの名前で置き、インストーラーの管理から外す
 for name, bits in (("mozc_tip32", "32"), ("mozc_tip64", "64")):
     edit(W, f'''<Component Id="MozcTIP{bits}" Permanent="no" Bitness="always{bits}">
