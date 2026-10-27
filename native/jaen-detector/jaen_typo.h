@@ -44,6 +44,16 @@ int UnreadKeys(const std::vector<Chunk>& chunks);
 // reading) by less than |margin| (natural log), or its average log-probability
 // per kana (end mark included) is below |floor|. Only lowercase romaji typed in
 // kana mode is considered.
+// The one-key edits FixTypo weighs, one per reading (the best-scored keys for
+// it), with the kana model's score; empty when FixTypo would not look at |raw|.
+struct UnreadTypoEdit {
+  std::string keys;
+  std::string kana;
+  double score = 0;     // |model|'s log-probability, less the vowel penalty
+  bool vowel = false;   // a vowel was put in (a missing vowel is a rarer slip)
+};
+std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                            const KanaModel& model);
 std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
                                    const KanaModel& model, double margin = 3.0,
                                    double floor = -4.5);

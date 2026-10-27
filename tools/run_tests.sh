@@ -184,6 +184,12 @@ c)
   $BATCH $W/holdout.txt $OUT/holdout.tsv 4
   romaji $T/holdout/holdout-typo.json > $W/holdout-typo.txt
   $BATCH $W/holdout-typo.txt $OUT/holdout-typo.tsv 4
+  # 読めない打ち間違いの直しを止めたとき（MYIME_TYPO_UNREAD=off、今までの直し方）との比べ
+  MYIME_TYPO_UNREAD=off $BATCH $W/holdout-typo.txt $OUT/holdout-typo-unread-off.tsv 4
+  # 調整用の打ち間違いの表（ja400 の文から。tools/make_dev_typo_tests.py）。境目や重みはこちらで決める
+  romaji $T/dev-typo.json > $W/dev-typo.txt
+  $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
+  MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
   ;;
 d1|d2)
   # 同じ文を別の打ち方（訓令式、l や x の小さいかな、ltu、xn、n'）で打っても結果が同じか
