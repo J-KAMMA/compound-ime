@@ -659,7 +659,16 @@ int main() {
     };
     Expect(edit("tsuduukete", "tsudukete") == jaen::TypoPriors{}.doubled_vowel, "a doubled vowel may be dropped cheaply (つづうけて)");
     Expect(edit("ashitadesu", "shitadesu") == std::nullopt, "the first key is never edited");
-    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
+    Expect(edit("kaigoidesu", "kaigidesu") == jaen::TypoPriors{}.extra_key, "a key next to a key around it may be dropped at extra_key");
+    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key touching neither key around it is not dropped");
+    Expect(edit("kiouhadesu", "kinouhadesu") == jaen::TypoPriors{}.dropped_consonant, "a consonant left out (kiou for kinou)");
+    {
+      jaen::TypoPriors off;
+      off.extra_key = off.dropped_consonant = jaen::TypoPriors::kOff;
+      bool offered = false;
+      for (const jaen::TypoEdit& e : jaen::ReadableTypoEdits("kaigoidesu", Parse, off)) offered |= e.keys == "kaigidesu";
+      Expect(!offered, "with extra_key off, a key is dropped only where it was typed twice");
+    }
     Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
     Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou is never made uo");
     Expect(edit("kuokadesu", "koukadesu") == jaen::TypoPriors{}.swapped_uo, "uo to ou costs more than other swaps (chuo for ちゅうおう)");

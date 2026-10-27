@@ -3282,6 +3282,24 @@ edit("converter/converter.cc", """        fixed_any = true;
         }
       }
     }""")
+# 英語の短い語に読まれた打ち間違い（「kusurihasohkugo」の has|oh）: MYIME_TYPO_UNREAD があれば、入力全体を
+# 1キー直してかなで読めるなら直す（FixTypoReadAsEnglish）。直したあとは1つの日本語の部分として読み直す
+edit("converter/converter.cc", """  std::vector<std::string> texts;
+  bool fixed_any = false;
+""", """  std::vector<std::string> texts;
+  bool fixed_any = false;
+  if (std::optional<std::string> fixed =
+          FixTypoReadAsEnglish(modules(), raw, pieces, EnglishLexicon(), parse, TypoKanaModel())) {
+    raw = *std::move(fixed);
+    pieces.assign(1, jaen::Piece{0, raw.size(), false});
+    split = true;
+    fixed_any = true;
+    if (typo_fixed) *typo_fixed = true;
+  }
+""")
+# 読めない打ち間違い（「agerughitsuyou」）も、MYIME_TYPO_UNREAD があれば辞書の費用で直し方を選ぶ（FixUnreadTypo）
+edit("converter/converter.cc", "jaen::FixTypo(text, parse, TypoKanaModel())",
+     "FixUnreadTypo(modules(), text, parse, TypoKanaModel())")
 edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
 edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
 # 読みの費用の記憶（打鍵をまたいで使い回す）に使う
