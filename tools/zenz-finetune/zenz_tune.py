@@ -28,7 +28,7 @@ PAD_ID = 1
 PROFILES = {
     "A100": {"precision": "bf16", "micro": 128, "tok_s": 110_000, "units_per_hour": 11.77},
     "L4": {"precision": "bf16", "micro": 64, "tok_s": 45_000, "units_per_hour": 4.82},
-    "T4": {"precision": "fp16", "micro": 16, "tok_s": 13_500, "units_per_hour": 1.76},  # 64 では長い問題の束で記憶が足りなくなった（2026-10-15、400歩目）
+    "T4": {"precision": "fp16", "micro": 16, "tok_s": 12_300, "units_per_hour": 1.76},  # tok_s は実測（40万問・2周で約85分）。micro は 64 では長い問題の束で記憶が足りなくなった（2026-10-15、400歩目）
 }
 
 
@@ -61,17 +61,56 @@ def gpu_profile(effective_batch: int = 128) -> dict:
     return profile
 
 
-def estimate(profile: dict, n_train: int, epochs: int, avg_tokens: float = 70,
-             data_built: bool = False, tok_s: float | None = None) -> dict:
-    """全体の時間（分）とコンピューティング ユニットの見積り。"""
+AVG_TOKENS = 71.5          # 1問の平均の字数（300万問の試運転の実測: 71.49。ウィキペディアだけの割合なら 78）。⑧で実際の平均に直す
+BUILD_PROBLEMS_PER_MIN = 60_000   # 問題作り（CPU 1 つ分）の速さ。GitHub Actions の実測は約 20万〜60万問/分で、Colab はその 1/3 ほどと見込む
+BUILD_PROCESSES = 2
+
+
+def estimate(profile: dict, n_train: int, epochs: int, avg_tokens: float = AVG_TOKENS,
+             data_built: bool = False, tok_s: float | None = None, run_minutes: float | None = None) -> dict:
+    """全体の時間（分）とコンピューティング ユニットの見積り。
+    run_minutes を渡すと、1回の接続で学習できる時間をそれだけと見て、何回に分かれるかも返す。"""
     speed = tok_s or profile["tok_s"]
     train_minutes = n_train * epochs * avg_tokens / speed / 60
-    # 準備（道具・材料・元の模型）10分、問題作り 15分、評価 10分、GGUF 化 10分
-    fixed = 10 + (0 if data_built else 15) + 10 + 10
-    total = train_minutes + fixed
+    # 問題作り（CPU。GPU は使わないので CPU のランタイムで先に作ると、GPU の枠を使わない）
+    build_minutes = 0 if data_built else n_train / (BUILD_PROBLEMS_PER_MIN * BUILD_PROCESSES)
+    # 準備（道具・材料・元の模型）10分、評価 10分、GGUF 化 10分
+    fixed = 10 + 10 + 10
+    total = train_minutes + build_minutes + fixed
+    gpu_minutes = train_minutes + fixed          # 問題作りを CPU のランタイムでやる場合に GPU をつなぐ時間
     rate = profile.get("units_per_hour")
-    return {"train_minutes": train_minutes, "total_minutes": total,
-            "units": None if rate is None else total / 60 * rate}
+    return {"train_minutes": train_minutes, "build_minutes": build_minutes, "total_minutes": total,
+            "units": None if rate is None else total / 60 * rate,
+            "units_gpu_only": None if rate is None else gpu_minutes / 60 * rate,
+            "runs": None if not run_minutes else math.ceil(train_minutes / run_minutes)}
+
+
+# ------------------------------------------------------------------ Google ドライブの容量の見積り
+
+CHECKPOINT_GB = 1.1        # 模型（fp32）と最適化の状態。実測（README: 約1.1GB ずつ）
+MODEL_GB = 0.37            # 学習できる形の模型（fp32、約9100万個の重み）
+GGUF_GB = 0.075
+JSONL_GZ_BYTES = 76        # 1問あたりの jsonl.gz のバイト数（300万問の試運転の実測: 75.8）
+NPZ_BYTES_PER_TOKEN = 0.98  # 数字にした練習問題（npz、圧縮）の 1字あたりのバイト数（300万問の試運転の実測: 0.98）
+
+
+def drive_plan(n_train: int, keep: int = 1, avg_tokens: float = AVG_TOKENS, data_on_drive: bool = True) -> dict:
+    """Google ドライブに置くものの大きさ（GB）の見積り。keep は残すチェックポイントの数。
+    チェックポイントは、新しいものを書き終えてから古いものを消すので、保存の最中は keep+1 個分になる。"""
+    gb = 1e9
+    rows = [
+        ("材料の控え（元の GGUF・分かち方・ローマ字表・取り出した文）", 0.12),
+        ("学習できる形の元の模型（base）", MODEL_GB),
+        ("学習後の模型（final）", MODEL_GB),
+        ("できた GGUF 2 つと説明書き（result）", 2 * GGUF_GB + 0.01),
+    ]
+    if data_on_drive:
+        rows += [("練習問題（jsonl.gz の部品）", n_train * JSONL_GZ_BYTES / gb),
+                 ("数字にした練習問題（npz）", n_train * avg_tokens * NPZ_BYTES_PER_TOKEN / gb)]
+    steady = sum(v for _, v in rows) + keep * CHECKPOINT_GB
+    peak = steady + CHECKPOINT_GB
+    return {"rows": rows + [(f"チェックポイント（最新の {keep} 個。保存の最中は {keep + 1} 個分）", keep * CHECKPOINT_GB)],
+            "steady_gb": steady, "peak_gb": peak}
 
 # ------------------------------------------------------------------ GGUF
 
@@ -241,7 +280,8 @@ class Examples:
         return self.ids[s:s + int(self.length[i])], int(self.prompt_len[i])
 
     def save(self, path):
-        np.savez(path, ids=self.ids, starts=self.starts, prompt_len=self.prompt_len, length=self.length,
+        # 圧縮して書く（数百万問でもドライブに置ける大きさにする）。読むときは np.load が自動で戻す
+        np.savez_compressed(path, ids=self.ids, starts=self.starts, prompt_len=self.prompt_len, length=self.length,
                  kinds=self.kinds, kind_names=np.array(self.kind_names))
 
     @classmethod
@@ -255,31 +295,67 @@ class Examples:
                         self.kinds[indices], self.kind_names)
 
 
-def load_examples(jsonl_path, tokenizer, end_id: int, max_len: int = 256) -> tuple[Examples, int]:
+def read_jsonl(path):
+    """1行1問の jsonl（.gz も可）を1問ずつ返す。"""
+    import gzip
+    opener = gzip.open if str(path).endswith(".gz") else open
+    with opener(path, "rt", encoding="utf-8") as handle:
+        for line in handle:
+            if line.strip():
+                yield json.loads(line)
+
+
+def load_examples(jsonl_paths, tokenizer, end_id: int, max_len: int = 256, chunk: int = 50_000,
+                  progress: int = 500_000) -> tuple[Examples, int]:
     """問いと正解を数字にする。正解の後ろに文の終わりの記号を付ける。
-    実行時と同じく、問いの前に始まりの記号は付けない（GGUF の add_bos_token は False）。"""
-    records = [json.loads(line) for line in open(jsonl_path, encoding="utf-8") if line.strip()]
-    prompts = tokenizer([r["prompt"] for r in records], add_special_tokens=False)["input_ids"]
-    outputs = tokenizer([r["output"] for r in records], add_special_tokens=False)["input_ids"]
-    kind_names = sorted({r["kind"] for r in records})
-    kind_index = {k: i for i, k in enumerate(kind_names)}
-    ids, starts, prompt_len, length, kinds = [], [], [], [], []
-    dropped, pos = 0, 0
-    for record, p, o in zip(records, prompts, outputs):
-        seq = list(p) + list(o) + [end_id]
-        if len(seq) > max_len or not o:
-            dropped += 1
-            continue
-        starts.append(pos)
-        prompt_len.append(len(p))
-        length.append(len(seq))
-        kinds.append(kind_index[record["kind"]])
-        ids.extend(seq)
-        pos += len(seq)
-    ex = Examples(np.array(ids, dtype=np.int32), np.array(starts, dtype=np.int64),
-                  np.array(prompt_len, dtype=np.int32), np.array(length, dtype=np.int32),
-                  np.array(kinds, dtype=np.int16), kind_names)
-    return ex, dropped
+    実行時と同じく、問いの前に始まりの記号は付けない（GGUF の add_bos_token は False）。
+    jsonl_paths は1つのパスか、パスの並び（数百万問を部品に分けたもの。.gz も可）。chunk 問ずつ数字にして、
+    メモリを抑える（300万問でも 1GB ほど）。字の番号は 65536 未満なら 2 バイトで持つ。"""
+    if isinstance(jsonl_paths, (str, os.PathLike)):
+        jsonl_paths = [jsonl_paths]
+    id_dtype = np.uint16 if len(tokenizer) < 65536 else np.int32
+    kind_index, kind_names = {}, []
+    id_parts, prompt_len, length, kinds = [], [], [], []
+    state = {"dropped": 0, "pos": 0, "seen": 0}
+    starts = []
+
+    def flush(records):
+        if not records:
+            return
+        prompts = tokenizer([r["prompt"] for r in records], add_special_tokens=False)["input_ids"]
+        outputs = tokenizer([r["output"] for r in records], add_special_tokens=False)["input_ids"]
+        ids = []
+        for record, p, o in zip(records, prompts, outputs):
+            seq = list(p) + list(o) + [end_id]
+            if len(seq) > max_len or not o:
+                state["dropped"] += 1
+                continue
+            if record["kind"] not in kind_index:
+                kind_index[record["kind"]] = len(kind_names)
+                kind_names.append(record["kind"])
+            starts.append(state["pos"])
+            prompt_len.append(len(p))
+            length.append(len(seq))
+            kinds.append(kind_index[record["kind"]])
+            ids.extend(seq)
+            state["pos"] += len(seq)
+        id_parts.append(np.array(ids, dtype=id_dtype))
+
+    batch = []
+    for path in jsonl_paths:
+        for record in read_jsonl(path):
+            batch.append(record)
+            state["seen"] += 1
+            if len(batch) >= chunk:
+                flush(batch)
+                batch = []
+                if progress and state["seen"] % progress < chunk:
+                    print(f"  数字にした問題 {state['seen']:,}", flush=True)
+    flush(batch)
+    ex = Examples(np.concatenate(id_parts) if id_parts else np.zeros(0, dtype=id_dtype),
+                  np.array(starts, dtype=np.int64), np.array(prompt_len, dtype=np.int32),
+                  np.array(length, dtype=np.int32), np.array(kinds, dtype=np.int16), kind_names)
+    return ex, state["dropped"]
 
 
 def collate(examples: Examples, indices, device):
@@ -334,13 +410,17 @@ def _latest_checkpoint(root: Path):
 
 def train(base_dir, train_ex: Examples, valid_ex: Examples, ckpt_root, final_dir, *, epochs: int, lr: float,
           profile: dict, seed: int, checkpoint_minutes: float = 20, warmup_ratio: float = 0.03,
-          weight_decay: float = 0.01, keep: int = 2, gradient_checkpointing: bool = False,
+          weight_decay: float = 0.01, keep: int = 1, gradient_checkpointing: bool = False,
           max_steps: int | None = None, log_every: int = 50, stop_after_seconds: float | None = None):
-    """途中で切れても、ckpt_root の最新のチェックポイントから続ける。終われば final_dir に保存。"""
+    """途中で切れても、ckpt_root の最新のチェックポイントから続ける。終われば final_dir に保存。
+    チェックポイントは最新の keep 個だけ残す（既定 1。Google ドライブの空きが少ないため）。
+    stop_after_seconds を渡すと、その時間で止めて保存し、None を返す（もう一度呼ぶと続きから）。"""
     import torch
     from transformers import GPT2LMHeadModel
     ckpt_root, final_dir = Path(ckpt_root), Path(final_dir)
     ckpt_root.mkdir(parents=True, exist_ok=True)
+    for stale in ckpt_root.glob("tmp-*"):   # 保存の途中で切れた書きかけ（約1.1GB）。残すとドライブを圧迫する
+        shutil.rmtree(stale, ignore_errors=True)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     if device.type == "cuda":
         torch.backends.cuda.matmul.allow_tf32 = True
@@ -370,9 +450,9 @@ def train(base_dir, train_ex: Examples, valid_ex: Examples, ckpt_root, final_dir
         optimizer.load_state_dict(extra["optimizer"])
         scheduler.load_state_dict(extra["scheduler"])
         scaler.load_state_dict(extra["scaler"])
-        torch.set_rng_state(extra["rng_cpu"])
+        torch.set_rng_state(extra["rng_cpu"].cpu().to(torch.uint8))
         if device.type == "cuda" and extra.get("rng_cuda") is not None:
-            torch.cuda.set_rng_state(extra["rng_cuda"])
+            torch.cuda.set_rng_state(extra["rng_cuda"].cpu().to(torch.uint8))
         state = json.loads((latest / "state.json").read_text(encoding="utf-8"))
         print(f"続きから始めます: {latest.name}（{state['step']}/{total_steps} 歩、{state['epoch'] + 1} 回目の途中）")
     else:
@@ -578,6 +658,24 @@ def print_report(base: dict, tuned: dict | None = None):
 # ------------------------------------------------------------------ 取得と llama.cpp の道具
 
 
+def part_done(data_dir, name: str) -> bool:
+    """練習問題の部品 name（text、wiki0of2 …）が作り終わっているか（目録 part-<name>.json は最後に書かれる）。"""
+    return (Path(data_dir) / f"part-{name}.json").exists()
+
+
+def data_ready(data_dir) -> bool:
+    """練習問題が（集め終わって）そろっているか。昔の形（train.jsonl だけ）も読む。"""
+    manifest = Path(data_dir) / "manifest.json"
+    if not manifest.exists():
+        return False
+    try:
+        info = json.loads(manifest.read_text(encoding="utf-8"))
+    except ValueError:
+        return False
+    names = [f["name"] for f in info.get("train_files") or [{"name": "train.jsonl"}]] + ["valid.jsonl"]
+    return all((Path(data_dir) / n).exists() for n in names)
+
+
 def download(url: str, path, sha256: str | None = None) -> Path:
     """取ってきて SHA256 を確かめる。すでに正しいものがあれば取り直さない。"""
     import urllib.request
@@ -615,15 +713,33 @@ def llama_simple_answer(binary, model_path, prompt: str, n_predict: int = 48) ->
     return tail
 
 
+def materials_text(manifest: dict) -> str:
+    """manifest.json の出典から、MODEL_CARD.md の「学習の材料」の行を作る（出典・版・利用条件・表示）。"""
+    lines, attribution = [], {}
+    for source in (manifest.get("domain") or {}).get("sources", []):
+        attribution[source["name"]] = source.get("attribution")
+    for source in manifest.get("sources", []):
+        name = source["name"]
+        if name.startswith("tools/data/") or name.endswith(".tsv") and "romanji" in name:
+            continue
+        line = f"  - {name}: {source.get('license', '')}"
+        if source.get("commit"):
+            line += f"（版 {source['commit']}）"
+        if attribution.get(name):
+            line += f"。表示: {attribution[name]}"
+        lines.append(line)
+    return "\n".join(lines)
+
+
 MODEL_CARD = """# {name}
 
 コンパウンドIME の試験用に、zenz-v3.2-small を追加学習したかな漢字変換の模型です（試作品）。
 
 - 元の模型: Miwa-Keita/zenz-v3.2-small-gguf（{base_url}）。zenz は ku-nlp/gpt2-small-japanese-char
   （CC BY-SA 4.0）をもとに Miwa Keita さん（azooKey の作者）が学習した模型です。
-- 学習の材料: ウィキペディア日本語版（CC BY-SA。記事の著者に帰属。データセット wikimedia/wikipedia
-  20231101.ja）、コンパウンドIME のリポジトリの一覧（MIT）。読みは SudachiPy・SudachiDict（Apache-2.0）で付けました。
-  試験の文（tests/conversion/）は学習に入れていません。詳しくは manifest.json。
+- 学習の材料（出典の表示。試験の文 tests/conversion/ は学習に入れていません。詳しくは manifest.json）:
+{materials}
+  読みは SudachiPy・SudachiDict（Apache-2.0）で付けました。コンパウンドIME のリポジトリの一覧は MIT です。
 - 利用条件: CC BY-SA 4.0（https://creativecommons.org/licenses/by-sa/4.0/deed.ja）。配るときは、
   この説明（出典の表示）を付け、同じ条件で配ってください。元の模型の配布ページは Apache-2.0 と表示していますが、
   もとになった模型と材料が CC BY-SA のため、こちらは CC BY-SA 4.0 として扱います。

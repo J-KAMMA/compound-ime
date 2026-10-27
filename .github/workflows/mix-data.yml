@@ -1,0 +1,164 @@
+# zenz の追加学習（数百万問）の練習問題を、出典ごとの割合を指定して作れるかを確かめる。手動で動く。
+# （確かめの規則を直して再実行。2回目）
+# 材料は版を固定して取り出す（ウィキペディアの複数の分割＝SHA256、RealPersonaChat＝コミット、分野の文書＝コミット。
+# Tatoeba は古い版が消えるので、取った版の SHA-256 と日付を記録する）。リポジトリには材料を入れない。
+# Colab の finetune.ipynb ⑤⑦ と同じ手順・同じ引数で作る。学習は Colab で別にやる。結果は成果物 mix-data に残る。
+#  1. 小さな規模（既定 2万問）: 出典ごとの問題が作れること・試験の文との重なりの除外が全部の出典に効くこと・
+#     manifest.json に出典・版・利用条件・件数が出ることを確かめる（試験の文をわざと混ぜて、1文も残らないことも見る）
+#  2. 本番の規模（既定 300万問）を、Colab と同じ部品の分け方（text と wiki を2工程）で作り、出典ごとに作れる数・
+#     足りない数・かかった時間・数字にした大きさを測る（Colab の時間とドライブの容量の見積りの根拠）
+name: Mix data
+
+on:
+  # 実験の枝 exp/finetune-mix では、この流れのファイルを変えて push したときも動く
+  # （main に入るまで、gh workflow run で呼べないため）
+  push:
+    branches: ['exp/finetune-mix', 'exp/finetune-v5']
+    paths: ['.github/workflows/mix-data.yml']
+  workflow_dispatch:
+    inputs:
+      small_size:
+        description: 小さな規模の練習問題の数
+        default: '20000'
+      full_size:
+        description: 本番の規模の練習問題の数（0 なら作らない）
+        default: '3000000'
+      allow_other_dump:
+        description: Tatoeba の書き出しが入れ替わっていても今の版で作る（true / false）
+        default: 'true'
+
+permissions:
+  contents: read
+
+env:
+  MIX: wiki=0.645,persona=0.22,tatoeba=0.027,domain=0.10,synthetic=0.006
+  # v5: 問題の種類の割合と表記をそろえる割合（finetune.ipynb ① の KIND_WEIGHTS・ORTHO_SHARE と同じ）
+  KINDS: wiki_whole=0.54,homophone=0.14,casual=0.24,modern_words=0.32,english_phrases=0.17,business=0.07,counter=0.20
+  ORTHO: '0.8'
+  PASSES: wiki=2,persona=3,tatoeba=3,domain=3,synthetic=1
+  WIKI_BASE: https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja
+  TOKENIZER_BASE: https://huggingface.co/Miwa-Keita/zenz-v3.1-small/resolve/344612e331bf3ba752a9bfef6633c93c6b933ebb
+  PYTHONUTF8: '1'
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - name: 道具
+        run: |
+          set -eo pipefail
+          python3 -m venv venv && venv/bin/pip -q install "sudachipy==0.6.11" "sudachidict-core==20260428" "pyarrow==21.0.0" \
+            "numpy" "transformers==4.57.6"
+          nproc; free -g | head -2; df -h . | tail -1
+      - name: 文書（分野の文書と RealPersonaChat。版を固定）
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/zenz-finetune/fetch_domain_sources.py --out src
+      - name: 材料（ウィキペディア 5 分割・ローマ字表・分かち方の部品・Tatoeba）
+        run: |
+          set -eo pipefail
+          mkdir -p wiki tokenizer
+          # finetune.ipynb ① の WIKI_FILES と同じ（train-00003 と train-00011 は試験の材料なので入れない）
+          for f in 00007:b112e83cf73327ba2246fd9c31eb1af501e51bac8450d8420963e29132d9b04b \
+                   00004:16bfb8cfc7b53084fb0e76ebaf9e3ab8e82d775a045e7781f96494a2277e2dae \
+                   00005:98fd014a7863168c5d23b8df3de874654bf1d858e5e67ffd003864ade5ae5723 \
+                   00006:ea69e7a0ec68d5d3279a30820fb5bd496759daa32ec4f03146ff62a414ca5420 \
+                   00008:859bb8856808e91d47cbf17f0c1ec5bfaf5ec8fb9f576c2f365bd49bda1daf7b; do
+            n=${f%%:*}
+            curl -fsSL -o wiki/train-$n-of-00015.parquet $WIKI_BASE/train-$n-of-00015.parquet
+            echo "${f##*:}  wiki/train-$n-of-00015.parquet" | sha256sum -c
+          done
+          curl -fsSL -o romanji-hiragana.tsv \
+            https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data/preedit/romanji-hiragana.tsv
+          echo "fcb900e311d32ced05499c86e236d1084fb0c0937398deb6311fc6c7287a7821  romanji-hiragana.tsv" | sha256sum -c
+          for f in vocab.json:67fd752abb091e649a9bb08bcb2b52b27cd6e3893ff5ee6e391e5555c0a90e0f \
+                   merges.txt:dde8cf4cc72f4d6eb7461a1c7dde6847916f0ad405395238aaf67501e2803ca7 \
+                   tokenizer_config.json:bd7ac21f1da24ee416971702ffdd9c8489f0327914a067c65561f59c142f848d \
+                   special_tokens_map.json:f17f705b191ddb9aef0b42e40869d325d79b2a1e229e0d51d72698b5d3e4fc90; do
+            curl -fsSL -o tokenizer/${f%%:*} $TOKENIZER_BASE/${f%%:*}
+            echo "${f##*:}  tokenizer/${f%%:*}" | sha256sum -c
+          done
+          curl -fsSL -o jpn_sentences.tsv.bz2 https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2
+          GOT=$(sha256sum jpn_sentences.tsv.bz2 | cut -d' ' -f1)
+          WANT=ba55cb50f7d51f46769a9ab95b1bf40e2e09e75898d02ad1d84d19903af9a0d1
+          echo "Tatoeba SHA-256: $GOT（2026-10-10 の版は $WANT）"
+          echo "DUMP_SHA=$GOT" >> $GITHUB_ENV
+          if [ "$GOT" != "$WANT" ] && [ "${{ inputs.allow_other_dump || 'true' }}" != "true" ]; then
+            echo "Tatoeba の書き出しが入れ替わっている。新しい版で作るなら allow_other_dump を true にする" >&2
+            exit 1
+          fi
+          MOD=$(curl -fsSL -I https://downloads.tatoeba.org/exports/per_language/jpn/jpn_sentences.tsv.bz2 | grep -i '^last-modified' | cut -d' ' -f2- | tr -d '\r')
+          echo "DUMP_DATE=$(date -u -d "$MOD" +%F)" >> $GITHUB_ENV
+          ls -la wiki
+      - name: 文を取り出す（分野・Tatoeba・RealPersonaChat）
+        run: |
+          set -eo pipefail
+          mkdir -p text
+          venv/bin/python tools/zenz-finetune/domain_text.py --src-root src --out text --only mdn python kubernetes react rust ethereum
+          venv/bin/python tools/zenz-finetune/persona_text.py --src-root src --out text
+          venv/bin/python tools/colloquial_text.py --tatoeba jpn_sentences.tsv.bz2 --table romanji-hiragana.tsv \
+            --out-dir tatoeba --count 300 --dump-sha256 "$DUMP_SHA" --dump-date "$DUMP_DATE"
+          cp tatoeba/colloquial-counts.json text/
+          cat text/sentences.jsonl tatoeba/colloquial-train.jsonl text/persona-train.jsonl > text/all.jsonl
+          wc -l text/sentences.jsonl tatoeba/colloquial-train.jsonl text/persona-train.jsonl text/all.jsonl
+      - name: 試験の文を混ぜる入れ物（除外が全部の出典に効くかの確かめ用）
+        run: |
+          set -eo pipefail
+          venv/bin/python tools/zenz-finetune/check_dataset.py probe --out probe
+          cat text/all.jsonl probe/probe-sentences.jsonl > text/all-probe.jsonl
+      - name: 1. 小さな規模（部品に分けて作る → 集める → 確かめる）
+        run: |
+          set -eo pipefail
+          SIZE=${{ inputs.small_size || '20000' }}
+          COMMON="--out small --romaji-table romanji-hiragana.tsv --domain-text text/all-probe.jsonl --mix $MIX --max-passes $PASSES --kind-weights $KINDS --ortho-share $ORTHO --size $SIZE --progress 5000"
+          WIKI="probe/probe-wiki.txt wiki/train-00007-of-00015.parquet wiki/train-00004-of-00015.parquet"
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --only-source synthetic domain tatoeba persona --part text --show 1
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --wiki $WIKI --only-source wiki --slice 0/2 --part wiki0 --show 1 & P0=$!
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --wiki $WIKI --only-source wiki --slice 1/2 --part wiki1
+          wait $P0
+          venv/bin/python tools/zenz-finetune/build_dataset.py --out small --merge-parts
+          venv/bin/python tools/zenz-finetune/check_dataset.py verify --data small --romaji-table romanji-hiragana.tsv \
+            --probe probe --expect-sources wiki,persona,tatoeba,domain,synthetic
+          venv/bin/python tools/zenz-finetune/measure_dataset.py --data small --tokenizer tokenizer
+          ls -la small
+      - name: 2. 本番の規模（Colab と同じ分け方（text と wiki の2工程））
+        run: |
+          set -eo pipefail
+          SIZE=${{ inputs.full_size || (github.event_name == 'push' && '0' || '3000000') }}
+          if [ "$SIZE" = "0" ]; then exit 0; fi
+          COMMON="--out full --romaji-table romanji-hiragana.tsv --size $SIZE --seed 20261015 --mix $MIX --max-passes $PASSES --kind-weights $KINDS --ortho-share $ORTHO --progress 5000"
+          WIKI="wiki/train-00007-of-00015.parquet wiki/train-00004-of-00015.parquet wiki/train-00005-of-00015.parquet wiki/train-00006-of-00015.parquet wiki/train-00008-of-00015.parquet"
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --domain-text text/all.jsonl \
+            --only-source synthetic domain tatoeba persona --part text
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --english-only-exact --wiki $WIKI \
+            --only-source wiki --slice 0/2 --part wiki0of2 > full-wiki0.log 2>&1 & P0=$!
+          time venv/bin/python tools/zenz-finetune/build_dataset.py $COMMON --english-only-exact --wiki $WIKI \
+            --only-source wiki --slice 1/2 --part wiki1of2 > full-wiki1.log 2>&1
+          wait $P0
+          tail -n 5 full-wiki0.log; tail -n 5 full-wiki1.log
+          time venv/bin/python tools/zenz-finetune/build_dataset.py --out full --merge-parts
+          ls -la full
+          du -sh full
+      - name: 2b. 本番の規模の確かめ（除外・目録）と、数字にした大きさと速さ
+        run: |
+          set -eo pipefail
+          SIZE=${{ inputs.full_size || (github.event_name == 'push' && '0' || '3000000') }}
+          if [ "$SIZE" = "0" ]; then exit 0; fi
+          time venv/bin/python tools/zenz-finetune/check_dataset.py verify --data full --romaji-table romanji-hiragana.tsv \
+            --expect-sources wiki,persona,tatoeba,domain,synthetic
+          time venv/bin/python tools/zenz-finetune/measure_dataset.py --data full --tokenizer tokenizer
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mix-data
+          path: |
+            small/
+            full/*.json
+            full/excluded*.txt
+            full-wiki*.log
+            text/*.json
+            tatoeba/colloquial-counts.json
+            probe/probe.json
+          retention-days: 14

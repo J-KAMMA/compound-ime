@@ -364,7 +364,7 @@ def main(argv=None):
     records, counts = [], {}
     for source in config["sources"]:
         name = source["name"]
-        if source.get("kind") == "external":
+        if source.get("kind") in ("external", "dialogue"):
             continue  # git の文書ではない出典（Tatoeba など）。tools/colloquial_text.py が別に文を取り出す
         if args.only and name not in args.only:
             continue
