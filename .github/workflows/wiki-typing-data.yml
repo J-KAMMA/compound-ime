@@ -43,6 +43,9 @@ jobs:
             https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja/train-00003-of-00015.parquet
           sha256sum wiki3.parquet
           venv/bin/python tools/context_test.py --wiki wiki3.parquet --table romanji-hiragana.tsv --out out/context.tsv --count 1000
+          # 同じ文に、段落の前の文全部と記事の頭からの文を足したもの（画面の文字を渡したときの見積り）
+          venv/bin/python tools/context_test.py --wiki wiki3.parquet --table romanji-hiragana.tsv --out out/context-long.tsv --count 1000 --long
+          cmp <(grep -v '^#' out/context.tsv) <(grep -v '^#' out/context-long.tsv | cut -f1-3)
           head -4 out/context.tsv
       - uses: actions/upload-artifact@v4
         with:

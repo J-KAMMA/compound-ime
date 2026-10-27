@@ -10,6 +10,11 @@ context matters); the sentence before it in the same paragraph (up to 80
 characters) is the context. Test sentences of tests/conversion are left out.
 Output: target romaji<TAB>target<TAB>context. Sentences are from Wikipedia
 (CC BY-SA 4.0).
+
+--long adds two wider contexts for the same rows (the text on the screen when
+typing into a long document): the paragraph so far (up to 400 characters) and
+the article so far with its title (up to 1500 characters, line breaks as a
+space). The rows picked do not change.
 """
 import argparse
 import random
@@ -33,6 +38,7 @@ def main():
     ap.add_argument("--out", required=True)
     ap.add_argument("--count", type=int, default=1000)
     ap.add_argument("--seed", type=int, default=20261016)
+    ap.add_argument("--long", action="store_true")
     args = ap.parse_args()
     table = rv.load_table(args.table)
     rev = rv.reverse_table(table)
@@ -42,8 +48,10 @@ def main():
     groups = bd.load_homophone_groups(repo / "tools/data/homophone-cues.tsv")
     rng = random.Random(args.seed)
     picked, others = [], []
-    for _, text in bd.iter_wiki_articles(args.wiki, rng):
+    for title, text in bd.iter_wiki_articles(args.wiki, rng):
+        earlier = [title]
         for paragraph in bd.split_paragraphs(text):
+            earlier.append("".join(paragraph))
             for i in range(1, len(paragraph)):
                 before, sentence = paragraph[i - 1], paragraph[i]
                 if len(before) > 80 or not (10 <= len(sentence) <= 40) or not SURFACE.fullmatch(sentence):
@@ -60,6 +68,10 @@ def main():
                 if not raw or rv.to_kana(raw, table) != kana:
                     continue
                 row = f"{raw}\t{sentence}\t{before}"
+                if args.long:
+                    so_far = "".join(paragraph[:i])
+                    page = " ".join(earlier[:-1] + [so_far])
+                    row += f"\t{so_far[-400:]}\t{page[-1500:]}"
                 (picked if bd.homophone_hit(sentence, groups) else others).append(row)
                 break  # one pair per paragraph
             if len(picked) >= args.count:
@@ -69,7 +81,8 @@ def main():
     rows = picked[: args.count]
     rows += others[: max(0, args.count - len(rows))]
     header = ("# ウィキペディア日本語版（CC BY-SA 4.0、https://ja.wikipedia.org/）の文。"
-              "変換する文のローマ字<TAB>元の文<TAB>前の文。tools/context_test.py で作成。\n")
+              "変換する文のローマ字<TAB>元の文<TAB>前の文" + ("<TAB>段落の前の文全部<TAB>記事の頭から" if args.long else "")
+              + "。tools/context_test.py で作成。\n")
     Path(args.out).write_text(header + "\n".join(rows) + "\n", encoding="utf-8", newline="\n")
     print(f"{len(rows)} pairs ({len(picked)} with a homophone)")
 
