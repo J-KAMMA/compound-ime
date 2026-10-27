@@ -3282,6 +3282,9 @@ edit("converter/converter.cc", """        fixed_any = true;
         }
       }
     }""")
+# 読めない打ち間違い（「agerughitsuyou」）も、MYIME_TYPO_UNREAD があれば辞書の費用で直し方を選ぶ（FixUnreadTypo）
+edit("converter/converter.cc", "jaen::FixTypo(text, parse, TypoKanaModel())",
+     "FixUnreadTypo(modules(), text, parse, TypoKanaModel())")
 edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
 edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
 # 読みの費用の記憶（打鍵をまたいで使い回す）に使う
