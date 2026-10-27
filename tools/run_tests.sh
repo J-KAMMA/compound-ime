@@ -190,13 +190,14 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
-  # 隣の鍵でない余分な1キー（MYIME_TYPO_PRIOR_EXF、既定は外す）を入れたときの比べ。ja400 と typo150b も同じ重みで流し、
-  # 崩れる文が出ないかを見る
+  # 点差が足りない直し（MYIME_TYPO_GRAY 以上 3000 未満）を、かなの並びの自然さ（MYIME_TYPO_KANA_GAIN）で採るときの比べ。
+  # ja400 と typo150b も同じ条件で流し、崩れる文が出ないかを見る
   romaji $T/ja400.json > $W/ja400-c.txt
-  for x in 2500 4000; do
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-exf$x.tsv 4
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
-    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
+  for v in g1000k0:1000:0 g1000k2:1000:2 g1000k4:1000:4 g1500k2:1500:2 g500k4:500:4; do
+    name=${v%%:*}; rest=${v#*:}; g=${rest%%:*}; k=${rest#*:}
+    for f in dev-typo ja400-c typo150b holdout-typo; do
+      MYIME_TYPO_GRAY=$g MYIME_TYPO_KANA_GAIN=$k $BATCH $W/$f.txt $OUT/$f-$name.tsv 4
+    done
   done
   $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
