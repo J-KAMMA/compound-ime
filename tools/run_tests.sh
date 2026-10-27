@@ -10,6 +10,7 @@
 #   t: 〜ておくの縮約（〜とく・〜どく）と、〜になってる・担う。tests/conversion/toku.tsv、naru.tsv
 #      （tools/make_toku_tests.py）。採点は h と同じ道具（tools/score_colloquial.py）
 #   f: 前後の文がある試験（tests/conversion/context.tsv を前の文あり・なしで。tools/context_convert.sh）
+#   o: 画面の文字を渡したときの見積り（前の文なし・1文・段落・記事の頭から。tests/conversion/context-long.tsv）
 #   e1, e2: ウィキペディアの文をローマ字で打ち込む（前半と後半）（tests/conversion/wiki-typing.tsv。tools/wiki_typing_test.py）
 #   g: プログラミングと仮想通貨の文をローマ字で打ち込む（tests/conversion/domain-prog.tsv、domain-crypto.tsv、道具の名前の domain-tools.tsv。tools/domain_typing_test.py）
 #   m: 英単語と重なるローマ字（tests/conversion/allenglish-mixed.tsv の英語にしたい文、allenglish-ja.tsv の日本語だけの文。
@@ -417,6 +418,18 @@ y)
     MYIME_RESEG_SYMBOL=0 MYIME_AI_DUMP=$OUT/ai-old.txt MYIME_RESEGMENT_LOG=$OUT/reseg-old.txt $BATCH $W/colloquial.txt $OUT/old.tsv 4
     MYIME_AI_DUMP=$OUT/ai-new.txt MYIME_RESEGMENT_LOG=$OUT/reseg-new.txt $BATCH $W/colloquial.txt $OUT/new.tsv 4
   fi
+  ;;
+o)
+  # 画面の文字を渡したときの見積り（tests/conversion/context-long.tsv。tools/context_test.py --long）。同じ 1000 文を、
+  # 前の文なし・前の1文・段落の前の文全部・記事の頭から（題名つき、1500 字まで）で変換して正解の数を比べる
+  CTXL="bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/context-long.tsv"
+  $CTXL $OUT/ctxl-without.tsv without 4
+  for mode in with para page; do
+    $CTXL $OUT/ctxl-$mode.tsv $mode 4
+    python3 $REPO/tools/score_context.py $T/context-long.tsv $OUT/ctxl-$mode.tsv $OUT/ctxl-without.tsv \
+      > $OUT/ctxl-$mode-score.txt
+    echo "$mode: $(head -1 $OUT/ctxl-$mode-score.txt)" | tee -a $OUT/ctxl-summary.txt
+  done
   ;;
 f)
   # 前の文を入力欄の前の文として渡したときと渡さないときの正解の数を比べる

@@ -23,7 +23,7 @@ def main():
     with_, without = load(sys.argv[2]), load(sys.argv[3])
     a = b = 0
     better, worse = [], []
-    for raw, original, _before in cases:
+    for raw, original, *_context in cases:
         x, y = with_.get(raw), without.get(raw)
         a += x == original
         b += y == original

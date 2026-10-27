@@ -1,7 +1,7 @@
 #!/bin/bash
-# context_convert.sh <session_handler_main> <engine dir> <model.gguf> <context.tsv> <out.tsv> <with|without> [並列数]
+# context_convert.sh <session_handler_main> <engine dir> <model.gguf> <context.tsv> <out.tsv> <with|without|para|page> [並列数]
 # 前後の文がある試験: context.tsv（ローマ字<TAB>元の文<TAB>前の文）の各行を、with では前の文を
-# 入力欄の前の文として渡して、without では渡さずに変換・確定し、「ローマ字<TAB>文節|…<TAB>確定」を書く。
+# 入力欄の前の文として渡して（para・page は4・5列目の段落の前の文全部・記事の頭から）、without では渡さずに変換・確定し、「ローマ字<TAB>文節|…<TAB>確定」を書く。
 set -e
 EXE=$1; ENGINE=$2; MODEL=$3; IN=$4; OUT=$5; MODE=$6; P=${7:-4}
 w=$(mktemp -d); grep -v '^#' "$IN" > $w/all.tsv
@@ -9,8 +9,10 @@ split -l $(( ($(wc -l < $w/all.tsv) + P - 1) / P )) $w/all.tsv $w/part.
 for f in $w/part.*; do
   ( cut -f1 $f > $f.inputs
     { printf 'SEND_KEY\tON\n'
-      while IFS=$'\t' read -r raw _ before; do
+      while IFS=$'\t' read -r raw _ before para page; do
         [ "$MODE" = with ] && printf 'SET_PRECEDING_TEXT\t%s\n' "$before"
+        [ "$MODE" = para ] && printf 'SET_PRECEDING_TEXT\t%s\n' "$para"
+        [ "$MODE" = page ] && printf 'SET_PRECEDING_TEXT\t%s\n' "$page"
         printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\nCLEAR_ALL\nRESET_CONTEXT\nSET_PRECEDING_TEXT\nSEND_KEY\tON\n' "$raw"
       done < $f; } > $f.cmd
     MYIME_ZENZAI_TIME_LIMIT_MS="${MYIME_ZENZAI_TIME_LIMIT_MS:-0}" MYIME_ZENZAI_STATS_FILE="$OUT.zstats" MYIME_AI_BUDGET_MS=0 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
