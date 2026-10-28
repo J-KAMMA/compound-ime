@@ -161,6 +161,7 @@ b)
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
+  MYIME_TYPO_GRAY=-1 $BATCH $W/reported.txt $OUT/reported-gray-off.tsv 1
   python3 $REPO/tools/score_categories.py $OUT/reported.tsv $T/reported.json
   ;;
 c)
