@@ -2788,9 +2788,13 @@ proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.ts
 # 小文字の形で表示の形を引けるようにする。普通の英単語（SCOWL の common-words.txt）は除く。
 _common_path = lexdir / "common-words.txt"
 _common = set(_common_path.read_text(encoding="ascii").split()) if _common_path.exists() else set()
+# 英単語の一覧にある語（manga、haiku、opera）も、厳選の語（ブランド）でなければ打った形のままにする。
+_plain = set((lexdir / "english-lexicon.txt").read_text(encoding="ascii").split()) - set(
+    (lexdir / "curated-words.txt").read_text(encoding="ascii").split())
 for row in proper_nouns:
     shown, typed_form = row[0], row[1]
-    if not typed_form and shown.isascii() and shown.isalpha() and shown.lower() not in _common:
+    if (not typed_form and shown.isascii() and shown.isalpha() and len(shown) >= 3
+            and shown.lower() not in _common and shown.lower() not in _plain):
         typed_form = shown.lower()
     if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
         (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
@@ -4631,9 +4635,14 @@ edit("engine/engine.cc", """  static void PreferWholePhrase(const ConversionOpti
     const converter::Candidate& top = segment->candidate(0);
     size_t end = 0;
     while (end < top.value.size() && top.value[end] >= 'a' && top.value[end] <= 'z') ++end;
-    if (end < 2 || end == top.value.size() || static_cast<unsigned char>(top.value[end]) < 0x80) return;
+    if (end < 3 || end == top.value.size() || static_cast<unsigned char>(top.value[end]) < 0x80) return;
     const std::string_view official = converter::BrandCasing(std::string_view(top.value).substr(0, end));
-    if (official.empty()) return;
+    // Only a change of case (Wi-Fi would move the segment's inner boundaries),
+    // and never a short unit (cm, ml stay lowercase: end >= 3 above).
+    if (official.size() != end || official == std::string_view(top.value).substr(0, end)) return;
+    for (size_t i = 0; i < end; ++i) {
+      if ((official[i] | 0x20) != top.value[i]) return;
+    }
     converter::Candidate cased = top;
     cased.value = std::string(official) + top.value.substr(end);
     if (cased.content_value.compare(0, end, top.value, 0, end) == 0)
