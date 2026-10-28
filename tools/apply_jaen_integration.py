@@ -2784,8 +2784,14 @@ for line in (REPO / "tools/data/domain-casing.tsv").read_text(encoding="utf-8").
 second_pairs = []
 proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.tsv").read_text(encoding="utf-8").splitlines()
                 if line and not line.startswith("#")]
+# 英語として取れない名前（打つ形が空: adidas、ferrari）も、ほかの一覧で英語として取れたときのために、
+# 小文字の形で表示の形を引けるようにする。普通の英単語（SCOWL の common-words.txt）は除く。
+_common_path = lexdir / "common-words.txt"
+_common = set(_common_path.read_text(encoding="ascii").split()) if _common_path.exists() else set()
 for row in proper_nouns:
     shown, typed_form = row[0], row[1]
+    if not typed_form and shown.isascii() and shown.isalpha() and shown.lower() not in _common:
+        typed_form = shown.lower()
     if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
         (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
         _cased.add(typed_form)
@@ -2873,6 +2879,14 @@ edit("converter/converter.cc", """      if (const std::string_view official = Br
       }
       if (const std::string_view official = BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
           !official.empty() && !EnglishLexicon().FindPlace(typed)) {""")
+
+
+# 地名も公式の書き方を先に出す（madrid -> Madrid、tokyo -> Tokyo）。漢字（東京）はそのあとに足す。
+edit("converter/converter.cc", """BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""", """BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty()) {""")
+edit("converter/converter.cc", """      // typed second ("youtube" -> YouTube, youtube). Place names stay as typed.""",
+     """      // typed second ("youtube" -> YouTube, youtube; "madrid" -> Madrid).""")
 
 
 # 英語が見つかった短い入力（opencode、geminicli）で、打った英字そのものを4番目の候補に必ず入れる。
