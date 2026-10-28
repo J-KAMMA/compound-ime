@@ -41,6 +41,7 @@ def main():
     common = set()  # level 20 or less: the common words (hero, safe, idea; not omen, redo)
     level_of = {}
     signal = set()
+    cased = {}  # 大文字を含む名前（Madrid、NASA）: 小文字の形 -> 書き方
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:
         root = "scowl-2020.12.07/"
         copyright_text = tar.extractfile(root + "Copyright").read()
@@ -58,7 +59,11 @@ def main():
             if (kind.startswith(("english-", "american-")) and kind.endswith(("-words", "-upper", "-proper-names"))
                     and level.isdigit() and int(level) <= args.signal_level):
                 text = tar.extractfile(member).read().decode("iso-8859-1")
-                signal.update(w.lower() for w in text.split() if len(w) >= 3 and WORD.fullmatch(w.lower()))
+                for w in text.split():
+                    if len(w) >= 3 and WORD.fullmatch(w.lower()):
+                        signal.add(w.lower())
+                        if w != w.lower():
+                            cased.setdefault(w.lower(), set()).add(w)
     curated = set()
     for name in ("jaen-extra-words.txt", "jaen-brand-words.txt"):
         extra = Path(__file__).with_name("data") / name
@@ -82,6 +87,9 @@ def main():
     (args.out / "curated-words.txt").write_text("".join(w + "\n" for w in sorted(curated)), encoding="ascii")
     signal -= words
     (args.out / "signal-words.txt").write_text("".join(w + "\n" for w in sorted(signal)), encoding="ascii")
+    # 大文字を含む書き方が1つだけで、小文字の形が普通の語でない名前（madrid -> Madrid）。
+    names = sorted(f"{w}\t{next(iter(forms))}\n" for w, forms in cased.items() if len(forms) == 1 and w in signal)
+    (args.out / "cased-names.tsv").write_text("".join(names), encoding="ascii")
     (args.out / "common-words.txt").write_text("".join(w + "\n" for w in sorted(common)), encoding="ascii")
     (args.out / "SCOWL-Copyright.txt").write_bytes(copyright_text)
     probe = "hero safe idea radio menu area zone dune mute share kiwi bike issue omen redo name home note token kite base".split()

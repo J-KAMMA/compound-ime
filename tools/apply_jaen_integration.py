@@ -2795,6 +2795,15 @@ for row in proper_nouns:
     if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
         (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
         _cased.add(typed_form)
+# SCOWL の固有名詞・大文字の語（build_english_lexicon.py の cased-names.tsv: madrid -> Madrid）も、
+# ほかの表にないときに使う。
+_cased_path = lexdir / "cased-names.tsv"
+if _cased_path.exists():
+    for line in _cased_path.read_text(encoding="ascii").splitlines():
+        typed, shown = line.split("\t")
+        if typed not in _cased and typed not in _common and "'" not in shown:
+            pairs.append([typed, shown])
+            _cased.add(typed)
 assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs + second_pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"
