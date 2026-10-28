@@ -224,6 +224,22 @@
    "intended": "、だけ後から追加した",
    "alternatives": ["、だけあとから追加した"],
    "note": "2026-10-28 利用者: 同じ（読点のあと）"
+  },
+  {
+   "id": "r030",
+   "category": "reported",
+   "romaji": "arxivdeatsumete",
+   "intended": "arXivで集めて",
+   "alternatives": ["arxivで集めて", "ArXivで集めて"],
+   "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
+  },
+  {
+   "id": "r031",
+   "category": "reported",
+   "romaji": "aideiawoarxivdeatsumete",
+   "intended": "アイデアをarXivで集めて",
+   "alternatives": ["アイデアをarxivで集めて", "アイデアをArXivで集めて"],
+   "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
   }
  ]
 }
