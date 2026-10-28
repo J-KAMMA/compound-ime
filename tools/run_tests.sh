@@ -161,7 +161,6 @@ b)
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
-  MYIME_TYPO_GRAY=-1 $BATCH $W/reported.txt $OUT/reported-gray-off.tsv 1
   python3 $REPO/tools/score_categories.py $OUT/reported.tsv $T/reported.json
   ;;
 c)
@@ -191,14 +190,13 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
-  # 点差が足りない直し（MYIME_TYPO_GRAY 以上 3000 未満）を、かなの並びの自然さ（MYIME_TYPO_KANA_GAIN）で採るときの比べ。
-  # ja400 と typo150b も同じ条件で流し、崩れる文が出ないかを見る
+  # 隣の鍵でない余分な1キー（MYIME_TYPO_PRIOR_EXF、既定は外す）を入れたときの比べ。ja400 と typo150b も同じ重みで流し、
+  # 崩れる文が出ないかを見る
   romaji $T/ja400.json > $W/ja400-c.txt
-  for v in off:-1:2 g500k2:500:2 g700k2:700:2 g1000k1:1000:1 g1000k3:1000:3; do
-    name=${v%%:*}; rest=${v#*:}; g=${rest%%:*}; k=${rest#*:}
-    for f in dev-typo ja400-c typo150b holdout-typo; do
-      MYIME_TYPO_GRAY=$g MYIME_TYPO_KANA_GAIN=$k $BATCH $W/$f.txt $OUT/$f-$name.tsv 4
-    done
+  for x in 2500 4000; do
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-exf$x.tsv 4
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
+    MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
   done
   $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
