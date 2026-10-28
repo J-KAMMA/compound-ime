@@ -161,6 +161,9 @@ b)
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
+  # 外れたときの切り分け: 打ち間違いの直しなし・人工知能なし
+  MYIME_TYPO_MARGIN=off MYIME_TYPO_UNREAD=off $BATCH $W/reported.txt $OUT/reported-typo-off.tsv 1
+  bash $REPO/tools/batch_convert.sh $E/session_handler_main $E /nonexistent.gguf $W/reported.txt $OUT/reported-no-ai.tsv 1 || true
   python3 $REPO/tools/score_categories.py $OUT/reported.tsv $T/reported.json
   ;;
 c)
