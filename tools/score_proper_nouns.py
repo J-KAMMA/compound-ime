@@ -5,7 +5,10 @@
 
 sentences: results.tsv is the output of tools/batch_convert.sh (ローマ字<TAB>文節|…<TAB>確定). Counts the
   sentences that are exactly as expected and the sentences that have the name in its official spelling
-  (the rest of the sentence may differ in kanji or kana), by kind of name and by origin.
+  (the rest of the sentence may differ in kanji or kana), by kind of name and by origin. A name whose
+  spelling is also the Hepburn romaji of one of its Japanese readings (Toyota: とよた, Hitachi: ひたち)
+  may be written in kanji or kana instead (トヨタ, 日立) in tests/conversion/proper-nouns.tsv: typed
+  alone it cannot be told from Japanese.
 candidates: results.tsv is the output of tools/candidates_convert.sh (ローマ字<TAB>候補<TAB>候補 ...).
   Counts the tests whose expected spelling is the first candidate, among the first 3, and among the first 9 (one page), and among all
   the candidates listed (at most 30), by way of typing.
@@ -13,6 +16,38 @@ Both list the first 60 misses. The results are matched to the tests by order (sa
 """
 import sys
 from collections import defaultdict
+from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).parent))
+from build_hepburn_names import drop_long, hepburn  # noqa: E402
+
+
+def japanese_names():
+    """The names of tools/data/proper-nouns.tsv spelled as the romaji of one of their readings."""
+    names = set()
+    for line in (Path(__file__).parent / "data/proper-nouns.tsv").read_text(encoding="utf-8").splitlines():
+        row = line.split("\t")
+        if line.startswith("#") or len(row) < 4:
+            continue
+        spelled = row[0].lower().replace(" ", "")
+        for reading in row[3].split("|"):
+            try:
+                if spelled in (hepburn(reading), hepburn(drop_long(reading))):
+                    names.add(row[0])
+            except TypeError:  # a reading with a mark hepburn() does not spell (っ before ー)
+                pass
+    return names
+
+
+def written_in_japanese(name, expected, out):
+    """Whether |out| is |expected| with |name| written without Latin letters (トヨタ for Toyota)."""
+    at = expected.find(name)
+    if at < 0:
+        return False
+    before, after = expected[:at], expected[at + len(name):]
+    middle = out[len(before):len(out) - len(after)] if len(out) > len(before) + len(after) else ""
+    return (out.startswith(before) and out.endswith(after) and middle != ""
+            and not any(c.isascii() and c.isalpha() for c in middle))
 
 
 def read_tests(path):
@@ -24,7 +59,7 @@ def read_results(path):
     return [line.rstrip("\n").split("\t") for line in open(path, encoding="utf-8") if line.strip()]
 
 
-def sentences(tests, results, label):
+def sentences(tests, results, label, japanese=frozenset()):
     groups = defaultdict(lambda: [0, 0, 0])  # exact, name right, all
     misses = []
     results = results + [[]] * (len(tests) - len(results))  # a test without a result is a miss
@@ -32,6 +67,8 @@ def sentences(tests, results, label):
         raw, expected, kind, name, origin = test[:5]
         out = got[2] if len(got) >= 3 else ""
         exact, named = out == expected, name in out
+        if not named and name in japanese and written_in_japanese(name, expected, out):
+            exact = named = True
         for key in ("全部", f"分野 {kind}", f"由来 {origin}"):
             g = groups[key]
             g[0] += exact
@@ -92,7 +129,11 @@ def main():
     for test, got in zip(tests, results):
         if got and test[0] != got[0]:
             sys.exit(f"order differs: {test[0]} / {got[0]}")
-    (sentences if kind == "sentences" else candidates)(tests, results, label)
+    if kind == "candidates":
+        candidates(tests, results, label)
+    else:
+        # Only the proper noun sentences (the acronym tests want AI, never 愛).
+        sentences(tests, results, label, japanese_names() if Path(test_path).name == "proper-nouns.tsv" else frozenset())
 
 
 if __name__ == "__main__":
