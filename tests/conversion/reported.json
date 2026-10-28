@@ -240,6 +240,38 @@
    "intended": "アイデアをarXivで集めて",
    "alternatives": ["アイデアをarxivで集めて", "アイデアをArXivで集めて"],
    "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
+  },
+  {
+   "id": "r032",
+   "category": "reported",
+   "romaji": "honwoarxivdeatsumete",
+   "intended": "本をarXivで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r033",
+   "category": "reported",
+   "romaji": "aideawoarxiv",
+   "intended": "アイデアをarXiv",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r034",
+   "category": "reported",
+   "romaji": "korehaarxivdesu",
+   "intended": "これはarXivです",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r035",
+   "category": "reported",
+   "romaji": "aideawogoogledeatsumete",
+   "intended": "アイデアをGoogleで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
   }
  ]
 }
