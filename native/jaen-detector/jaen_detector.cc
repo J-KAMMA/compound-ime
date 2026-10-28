@@ -850,11 +850,23 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
 
   // A lexicon word of 3+ letters running over edge e of a span ("dog" over
   // the start of "gand" in dogandcat): a rarer word there is not taken.
-  const auto word_across = [&](size_t e) {
+  // A particle typed as its two keys on chunk edges (ha of kinou|ha|mbed).
+  const auto particle_at = [&](size_t a) {
+    static constexpr std::string_view kKeys[] = {"ha", "ga", "wo", "ni", "de", "to", "mo", "no", "he", "ya"};
+    if (a + 2 > n || !boundary[a] || !boundary[a + 2]) return false;
+    const std::string key{Lower(raw[a]), Lower(raw[a + 1])};
+    return std::ranges::find(kKeys, key) != std::end(kKeys);
+  };
+  // |e| is where a name starts (|end| false) or ends (true).
+  const auto word_across = [&](size_t e, bool end) {
     for (size_t a = e >= kMaxWordLength ? e - kMaxWordLength : 0; a < e; ++a) {
       for (size_t b = std::max(e + 1, a + 3); b <= std::min(n, a + kMaxWordLength); ++b) {
         // Only the second n of "nn" past the edge ("inn" over "berlin|ni").
         if (b == e + 1 && Lower(raw[e - 1]) == 'n' && Lower(raw[e]) == 'n') continue;
+        // A word made of the particle just before or after the edge and the name
+        // ("ham" over ha|mbed, "gab" over ga|bios, "bedde" over mbed|de): the particle
+        // stays Japanese.
+        if (end ? b <= e + 2 && particle_at(e) : a + 2 == e && particle_at(a)) continue;
         if (lexicon.Contains(std::string_view(raw).substr(a, b - a))) return true;
       }
     }
@@ -958,7 +970,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         }
       } else if (signal_only) {
         const bool named = word.size() >= 6 && lexicon.IsNamed(word);
-        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && (named || (!word_across(i) && !word_across(j)))) {
+        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && (named || (!word_across(i, false) && !word_across(j, true)))) {
           cost = kSpanCost - length;
         }
       } else if (const int64_t sign = ForeignCost(parse(word)); sign > 0) {
