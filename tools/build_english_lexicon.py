@@ -42,6 +42,7 @@ def main():
     level_of = {}
     signal = set()
     cased = {}  # 大文字を含む名前（Madrid、NASA）: 小文字の形 -> 書き方
+    plain = set()  # どの段階でも小文字で載る語（serrano は唐辛子でもある）
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:
         root = "scowl-2020.12.07/"
         copyright_text = tar.extractfile(root + "Copyright").read()
@@ -56,6 +57,8 @@ def main():
                     level_of[w] = min(level_of.get(w, 99), int(level))
                 if int(level) <= 20:
                     common.update(found)
+            if kind.startswith(("english-", "american-")) and kind.endswith("-words") and level.isdigit():
+                plain.update(w for w in tar.extractfile(member).read().decode("iso-8859-1").split() if WORD.fullmatch(w))
             if (kind.startswith(("english-", "american-")) and kind.endswith(("-words", "-upper", "-proper-names"))
                     and level.isdigit() and int(level) <= args.signal_level):
                 text = tar.extractfile(member).read().decode("iso-8859-1")
@@ -87,8 +90,10 @@ def main():
     (args.out / "curated-words.txt").write_text("".join(w + "\n" for w in sorted(curated)), encoding="ascii")
     signal -= words
     (args.out / "signal-words.txt").write_text("".join(w + "\n" for w in sorted(signal)), encoding="ascii")
-    # 大文字を含む書き方が1つだけで、小文字の形が普通の語でない名前（madrid -> Madrid）。
-    names = sorted(f"{w}\t{next(iter(forms))}\n" for w, forms in cased.items() if len(forms) == 1 and w in signal)
+    # 大文字を含む書き方が1つだけで、小文字の形がどこにも語として載らない5文字以上の名前（madrid -> Madrid）。
+    # 短い名前（kay、stu、nam）は打ち間違いの日本語を英語にしてしまうので入れない。
+    names = sorted(f"{w}\t{next(iter(forms))}\n" for w, forms in cased.items()
+                   if len(forms) == 1 and w in signal and w not in plain and len(w) >= 5)
     (args.out / "cased-names.tsv").write_text("".join(names), encoding="ascii")
     (args.out / "common-words.txt").write_text("".join(w + "\n" for w in sorted(common)), encoding="ascii")
     (args.out / "SCOWL-Copyright.txt").write_bytes(copyright_text)
