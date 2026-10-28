@@ -4614,6 +4614,40 @@ void PublishZenzaiStatus(const AzooKeyStatus& status) {
   LogZenzaiMemoryLockOnce(status);
 """)
 
+# 人工知能の区画で組み直すと、英語の名前と助詞が1文節（chromeの、googleは）になり、人工知能が書いた
+# 小文字のまま出ていた。先頭の英字が公式の書き方を持つ名前なら、その書き方の候補を先に出す。
+edit("engine/engine.cc", """    segments->clear_conversion_segments();
+    for (auto& segment : rebuilt) *segments->add_segment() = std::move(segment);
+    return true;""", """    segments->clear_conversion_segments();
+    for (auto& segment : rebuilt) {
+      PutBrandCasingFirst(&segment);
+      *segments->add_segment() = std::move(segment);
+    }
+    return true;""")
+edit("engine/engine.cc", """  static void PreferWholePhrase(const ConversionOptions& options,""", """  // "chromeの" -> "Chromeの": the English letters at the start of the first
+  // candidate, spelled as the brand or name table has them.
+  static void PutBrandCasingFirst(Segment* segment) {
+    if (segment->candidates_size() == 0) return;
+    const converter::Candidate& top = segment->candidate(0);
+    size_t end = 0;
+    while (end < top.value.size() && top.value[end] >= 'a' && top.value[end] <= 'z') ++end;
+    if (end < 2 || end == top.value.size() || static_cast<unsigned char>(top.value[end]) < 0x80) return;
+    const std::string_view official = converter::BrandCasing(std::string_view(top.value).substr(0, end));
+    if (official.empty()) return;
+    converter::Candidate cased = top;
+    cased.value = std::string(official) + top.value.substr(end);
+    if (cased.content_value.compare(0, end, top.value, 0, end) == 0)
+      cased.content_value = std::string(official) + cased.content_value.substr(end);
+    for (size_t i = 1; i < segment->candidates_size(); ++i) {
+      if (segment->candidate(i).value == cased.value) {
+        segment->move_candidate(static_cast<int>(i), 0);
+        return;
+      }
+    }
+    *segment->insert_candidate(0) = std::move(cased);
+  }
+  static void PreferWholePhrase(const ConversionOptions& options,""")
+
 # 変換エンジン（Swift）に時間の上限とメモリ固定を足す（作業ツリーが MyIME の src を持つとき）
 swift_src = src.resolve().parents[1] / "src"
 if (swift_src / "AzooKeyKanaKanjiConverter").is_dir():
