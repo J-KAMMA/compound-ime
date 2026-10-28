@@ -857,16 +857,19 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
     const std::string key{Lower(raw[a]), Lower(raw[a + 1])};
     return std::ranges::find(kKeys, key) != std::end(kKeys);
   };
-  // |e| is where a name starts (|end| false) or ends (true).
-  const auto word_across = [&](size_t e, bool end) {
+  // |e| is where a name starts (|end| false) or ends (true). |strong|: the name has a
+  // key no Japanese typing makes.
+  const auto word_across = [&](size_t e, bool end, bool strong) {
     for (size_t a = e >= kMaxWordLength ? e - kMaxWordLength : 0; a < e; ++a) {
       for (size_t b = std::max(e + 1, a + 3); b <= std::min(n, a + kMaxWordLength); ++b) {
         // Only the second n of "nn" past the edge ("inn" over "berlin|ni").
         if (b == e + 1 && Lower(raw[e - 1]) == 'n' && Lower(raw[e]) == 'n') continue;
         // A word made of the particle just before the name, or its vowel, and the name's
         // head ("ham" over ha|mbed, "oar" over wo|arxiv): the particle stays Japanese.
-        // Not after the name: that let "jim" through over sakurajim|ga.
+        // After the name only when it cannot be Japanese ("bad" over rba|de, "two" over
+        // winrt|wo): "ton" over vito|ni keeps ヴィト.
         if (!end && e >= 2 && a + 2 >= e && particle_at(e - 2)) continue;
+        if (end && strong && b <= e + 2 && particle_at(e)) continue;
         if (lexicon.Contains(std::string_view(raw).substr(a, b - a))) return true;
       }
     }
@@ -970,7 +973,9 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         }
       } else if (signal_only) {
         const bool named = word.size() >= 6 && lexicon.IsNamed(word);
-        if (boundary[i] && boundary[j] && ForeignCost(parse(word)) > 0 && (named || (!word_across(i, false) && !word_across(j, true)))) {
+        int64_t sign = 0;
+        if (boundary[i] && boundary[j] && (sign = ForeignCost(parse(word))) > 0 &&
+            (named || (!word_across(i, false, false) && !word_across(j, true, sign >= kForeignCost)))) {
           cost = kSpanCost - length;
         }
       } else if (const int64_t sign = ForeignCost(parse(word)); sign > 0) {

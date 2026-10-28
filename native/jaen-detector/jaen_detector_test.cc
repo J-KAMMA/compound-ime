@@ -134,8 +134,8 @@ int main() {
   {
     // A name after a particle is not stopped by a word made of the particle and the name.
     jaen::Lexicon names;
-    for (const char* w : {"ham", "bed", "gab", "tom", "oar"}) names.Add(w);
-    for (const char* w : {"mbed", "bios", "mrna", "arxiv"}) names.AddSignalOnly(w);
+    for (const char* w : {"ham", "bed", "gab", "tom", "oar", "bad", "ton"}) names.Add(w);
+    for (const char* w : {"mbed", "bios", "mrna", "arxiv", "rba", "vito"}) names.AddSignalOnly(w);
     const auto named = [&](std::string_view raw) {
       return Text(std::string(raw), jaen::SplitEnglish(Parse(raw), names, Parse), true);
     };
@@ -143,6 +143,8 @@ int main() {
     Expect(named("koregabiosdesu") == "bios|", "ga|bios: not gab + ios");
     Expect(named("tomodachitomrnawotsukatta") == "mrna|", "to|mrna: not tom + rna");
     Expect(named("aideawoarxivdeatsumete") == "arxiv|", "wo|arxiv: not oar + xiv");
+    Expect(named("rbadeshirabeta") == "rba|", "rba|de: not stopped by bad");
+    Expect(named("vitonitaihosareta").empty(), "vito|ni: ton keeps it Japanese");
   }
   Expect(english("samewomita").empty(), "romaji-readable word stays Japanese");
   Expect(english("mademachimasu").empty(), "Japanese reading stays");
