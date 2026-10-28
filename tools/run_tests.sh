@@ -713,6 +713,26 @@ w)
   done
   python3 $REPO/tools/long_latency_report.py $OUT | tee $OUT/long-latency-report.txt
   ;;
+e3)
+  # 文の頭・途中・終わりの英字の語（tests/conversion/english-mid.tsv、tools/make_english_mid_tests.py）。
+  # 語の前の助詞ごとに、英字のまま出た数を数える（大文字・小文字の違いは別に数える）
+  grep -v '^#' $T/english-mid.tsv | cut -f1 > $W/english-mid.txt
+  $BATCH $W/english-mid.txt $OUT/english-mid.tsv 4
+  python3 - $T/english-mid.tsv $OUT/english-mid.tsv <<'PY' | tee $OUT/english-mid-summary.txt
+import sys, collections
+cases = [l.rstrip("\n").split("\t") for l in open(sys.argv[1], encoding="utf-8") if not l.startswith("#")]
+got = {l.split("\t")[0]: l.rstrip("\n").split("\t")[-1] for l in open(sys.argv[2], encoding="utf-8")}
+exact, loose, total = collections.Counter(), collections.Counter(), collections.Counter()
+for raw, shown, kind in cases:
+    out = got.get(raw, "")
+    total[kind] += 1
+    exact[kind] += shown in out
+    loose[kind] += shown.lower() in out.lower()
+for kind in total:
+    print(f"{kind}\t英字のまま {loose[kind]}/{total[kind]}（形も同じ {exact[kind]}）")
+print(f"合計\t英字のまま {sum(loose.values())}/{sum(total.values())}（形も同じ {sum(exact.values())}）")
+PY
+  ;;
 *)
   echo "組は a1、a2、b、c、d1、d2、e1、e2、f、g、h、i、j、k、l、m、n、p、q、r、s、t、u、w、x、y のどれか" >&2; exit 2 ;;
 esac
