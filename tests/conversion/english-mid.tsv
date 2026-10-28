@@ -1,0 +1,1501 @@
+# 英字の語（tools/data/jaen-modern-words.tsv）を型に入れた文。tools/make_english_mid_tests.py で作成。ローマ字<TAB>表示する形<TAB>型
+snsdeshirabeta	SNS	head
+korewosnsdeshirabeta	SNS	wo
+kinouhasnswotsukatta	SNS	ha
+koregasnsdesu	SNS	ga
+kaishanisnsgaaru	SNS	ni
+soredesnswotsukau	SNS	de
+tomodachitosnswotsukatta	SNS	to
+watashimosnswotsukau	SNS	mo
+honnosnswosagasu	SNS	no
+tsukattanohasns	SNS	tail
+jbadeshirabeta	JBA	head
+korewojbadeshirabeta	JBA	wo
+kinouhajbawotsukatta	JBA	ha
+koregajbadesu	JBA	ga
+kaishanijbagaaru	JBA	ni
+soredejbawotsukau	JBA	de
+tomodachitojbawotsukatta	JBA	to
+watashimojbawotsukau	JBA	mo
+honnojbawosagasu	JBA	no
+tsukattanohajba	JBA	tail
+wmsdeshirabeta	WMS	head
+korewowmsdeshirabeta	WMS	wo
+kinouhawmswotsukatta	WMS	ha
+koregawmsdesu	WMS	ga
+kaishaniwmsgaaru	WMS	ni
+soredewmswotsukau	WMS	de
+tomodachitowmswotsukatta	WMS	to
+watashimowmswotsukau	WMS	mo
+honnowmswosagasu	WMS	no
+tsukattanohawms	WMS	tail
+biosdeshirabeta	BIOS	head
+korewobiosdeshirabeta	BIOS	wo
+kinouhabioswotsukatta	BIOS	ha
+koregabiosdesu	BIOS	ga
+kaishanibiosgaaru	BIOS	ni
+soredebioswotsukau	BIOS	de
+tomodachitobioswotsukatta	BIOS	to
+watashimobioswotsukau	BIOS	mo
+honnobioswosagasu	BIOS	no
+tsukattanohabios	BIOS	tail
+edrdeshirabeta	EDR	head
+korewoedrdeshirabeta	EDR	wo
+kinouhaedrwotsukatta	EDR	ha
+koregaedrdesu	EDR	ga
+kaishaniedrgaaru	EDR	ni
+soredeedrwotsukau	EDR	de
+tomodachitoedrwotsukatta	EDR	to
+watashimoedrwotsukau	EDR	mo
+honnoedrwosagasu	EDR	no
+tsukattanohaedr	EDR	tail
+usbcdeshirabeta	USB-C	head
+korewousbcdeshirabeta	USB-C	wo
+kinouhausbcwotsukatta	USB-C	ha
+koregausbcdesu	USB-C	ga
+kaishaniusbcgaaru	USB-C	ni
+soredeusbcwotsukau	USB-C	de
+tomodachitousbcwotsukatta	USB-C	to
+watashimousbcwotsukau	USB-C	mo
+honnousbcwosagasu	USB-C	no
+tsukattanohausbc	USB-C	tail
+ctadeshirabeta	CTA	head
+korewoctadeshirabeta	CTA	wo
+kinouhactawotsukatta	CTA	ha
+koregactadesu	CTA	ga
+kaishanictagaaru	CTA	ni
+soredectawotsukau	CTA	de
+tomodachitoctawotsukatta	CTA	to
+watashimoctawotsukau	CTA	mo
+honnoctawosagasu	CTA	no
+tsukattanohacta	CTA	tail
+ssgdeshirabeta	SSG	head
+korewossgdeshirabeta	SSG	wo
+kinouhassgwotsukatta	SSG	ha
+koregassgdesu	SSG	ga
+kaishanissggaaru	SSG	ni
+soredessgwotsukau	SSG	de
+tomodachitossgwotsukatta	SSG	to
+watashimossgwotsukau	SSG	mo
+honnossgwosagasu	SSG	no
+tsukattanohassg	SSG	tail
+mitdeshirabeta	MIT	head
+korewomitdeshirabeta	MIT	wo
+kinouhamitwotsukatta	MIT	ha
+koregamitdesu	MIT	ga
+kaishanimitgaaru	MIT	ni
+soredemitwotsukau	MIT	de
+tomodachitomitwotsukatta	MIT	to
+watashimomitwotsukau	MIT	mo
+honnomitwosagasu	MIT	no
+tsukattanohamit	MIT	tail
+cssdeshirabeta	CSS	head
+korewocssdeshirabeta	CSS	wo
+kinouhacsswotsukatta	CSS	ha
+koregacssdesu	CSS	ga
+kaishanicssgaaru	CSS	ni
+soredecsswotsukau	CSS	de
+tomodachitocsswotsukatta	CSS	to
+watashimocsswotsukau	CSS	mo
+honnocsswosagasu	CSS	no
+tsukattanohacss	CSS	tail
+mmsdeshirabeta	MMS	head
+korewommsdeshirabeta	MMS	wo
+kinouhammswotsukatta	MMS	ha
+koregammsdesu	MMS	ga
+kaishanimmsgaaru	MMS	ni
+soredemmswotsukau	MMS	de
+tomodachitommswotsukatta	MMS	to
+watashimommswotsukau	MMS	mo
+honnommswosagasu	MMS	no
+tsukattanohamms	MMS	tail
+ebitdadeshirabeta	EBITDA	head
+korewoebitdadeshirabeta	EBITDA	wo
+kinouhaebitdawotsukatta	EBITDA	ha
+koregaebitdadesu	EBITDA	ga
+kaishaniebitdagaaru	EBITDA	ni
+soredeebitdawotsukau	EBITDA	de
+tomodachitoebitdawotsukatta	EBITDA	to
+watashimoebitdawotsukau	EBITDA	mo
+honnoebitdawosagasu	EBITDA	no
+tsukattanohaebitda	EBITDA	tail
+nhldeshirabeta	NHL	head
+korewonhldeshirabeta	NHL	wo
+kinouhanhlwotsukatta	NHL	ha
+koreganhldesu	NHL	ga
+kaishaninhlgaaru	NHL	ni
+soredenhlwotsukau	NHL	de
+tomodachitonhlwotsukatta	NHL	to
+watashimonhlwotsukau	NHL	mo
+honnonhlwosagasu	NHL	no
+tsukattanohanhl	NHL	tail
+espndeshirabeta	ESPN	head
+korewoespndeshirabeta	ESPN	wo
+kinouhaespnwotsukatta	ESPN	ha
+koregaespndesu	ESPN	ga
+kaishaniespngaaru	ESPN	ni
+soredeespnwotsukau	ESPN	de
+tomodachitoespnwotsukatta	ESPN	to
+watashimoespnwotsukau	ESPN	mo
+honnoespnwosagasu	ESPN	no
+tsukattanohaespn	ESPN	tail
+zozotowndeshirabeta	ZOZOTOWN	head
+korewozozotowndeshirabeta	ZOZOTOWN	wo
+kinouhazozotownwotsukatta	ZOZOTOWN	ha
+koregazozotowndesu	ZOZOTOWN	ga
+kaishanizozotowngaaru	ZOZOTOWN	ni
+soredezozotownwotsukau	ZOZOTOWN	de
+tomodachitozozotownwotsukatta	ZOZOTOWN	to
+watashimozozotownwotsukau	ZOZOTOWN	mo
+honnozozotownwosagasu	ZOZOTOWN	no
+tsukattanohazozotown	ZOZOTOWN	tail
+uscpadeshirabeta	USCPA	head
+korewouscpadeshirabeta	USCPA	wo
+kinouhauscpawotsukatta	USCPA	ha
+koregauscpadesu	USCPA	ga
+kaishaniuscpagaaru	USCPA	ni
+soredeuscpawotsukau	USCPA	de
+tomodachitouscpawotsukatta	USCPA	to
+watashimouscpawotsukau	USCPA	mo
+honnouscpawosagasu	USCPA	no
+tsukattanohauscpa	USCPA	tail
+dexdeshirabeta	DEX	head
+korewodexdeshirabeta	DEX	wo
+kinouhadexwotsukatta	DEX	ha
+koregadexdesu	DEX	ga
+kaishanidexgaaru	DEX	ni
+sorededexwotsukau	DEX	de
+tomodachitodexwotsukatta	DEX	to
+watashimodexwotsukau	DEX	mo
+honnodexwosagasu	DEX	no
+tsukattanohadex	DEX	tail
+lmaodeshirabeta	LMAO	head
+korewolmaodeshirabeta	LMAO	wo
+kinouhalmaowotsukatta	LMAO	ha
+koregalmaodesu	LMAO	ga
+kaishanilmaogaaru	LMAO	ni
+soredelmaowotsukau	LMAO	de
+tomodachitolmaowotsukatta	LMAO	to
+watashimolmaowotsukau	LMAO	mo
+honnolmaowosagasu	LMAO	no
+tsukattanohalmao	LMAO	tail
+mrnadeshirabeta	mRNA	head
+korewomrnadeshirabeta	mRNA	wo
+kinouhamrnawotsukatta	mRNA	ha
+koregamrnadesu	mRNA	ga
+kaishanimrnagaaru	mRNA	ni
+soredemrnawotsukau	mRNA	de
+tomodachitomrnawotsukatta	mRNA	to
+watashimomrnawotsukau	mRNA	mo
+honnomrnawosagasu	mRNA	no
+tsukattanohamrna	mRNA	tail
+qoldeshirabeta	QOL	head
+korewoqoldeshirabeta	QOL	wo
+kinouhaqolwotsukatta	QOL	ha
+koregaqoldesu	QOL	ga
+kaishaniqolgaaru	QOL	ni
+soredeqolwotsukau	QOL	de
+tomodachitoqolwotsukatta	QOL	to
+watashimoqolwotsukau	QOL	mo
+honnoqolwosagasu	QOL	no
+tsukattanohaqol	QOL	tail
+accdeshirabeta	ACC	head
+korewoaccdeshirabeta	ACC	wo
+kinouhaaccwotsukatta	ACC	ha
+koregaaccdesu	ACC	ga
+kaishaniaccgaaru	ACC	ni
+soredeaccwotsukau	ACC	de
+tomodachitoaccwotsukatta	ACC	to
+watashimoaccwotsukau	ACC	mo
+honnoaccwosagasu	ACC	no
+tsukattanohaacc	ACC	tail
+spcdeshirabeta	SPC	head
+korewospcdeshirabeta	SPC	wo
+kinouhaspcwotsukatta	SPC	ha
+koregaspcdesu	SPC	ga
+kaishanispcgaaru	SPC	ni
+soredespcwotsukau	SPC	de
+tomodachitospcwotsukatta	SPC	to
+watashimospcwotsukau	SPC	mo
+honnospcwosagasu	SPC	no
+tsukattanohaspc	SPC	tail
+bitbucketdeshirabeta	Bitbucket	head
+korewobitbucketdeshirabeta	Bitbucket	wo
+kinouhabitbucketwotsukatta	Bitbucket	ha
+koregabitbucketdesu	Bitbucket	ga
+kaishanibitbucketgaaru	Bitbucket	ni
+soredebitbucketwotsukau	Bitbucket	de
+tomodachitobitbucketwotsukatta	Bitbucket	to
+watashimobitbucketwotsukau	Bitbucket	mo
+honnobitbucketwosagasu	Bitbucket	no
+tsukattanohabitbucket	Bitbucket	tail
+buildkitedeshirabeta	Buildkite	head
+korewobuildkitedeshirabeta	Buildkite	wo
+kinouhabuildkitewotsukatta	Buildkite	ha
+koregabuildkitedesu	Buildkite	ga
+kaishanibuildkitegaaru	Buildkite	ni
+soredebuildkitewotsukau	Buildkite	de
+tomodachitobuildkitewotsukatta	Buildkite	to
+watashimobuildkitewotsukau	Buildkite	mo
+honnobuildkitewosagasu	Buildkite	no
+tsukattanohabuildkite	Buildkite	tail
+pagerdutydeshirabeta	PagerDuty	head
+korewopagerdutydeshirabeta	PagerDuty	wo
+kinouhapagerdutywotsukatta	PagerDuty	ha
+koregapagerdutydesu	PagerDuty	ga
+kaishanipagerdutygaaru	PagerDuty	ni
+soredepagerdutywotsukau	PagerDuty	de
+tomodachitopagerdutywotsukatta	PagerDuty	to
+watashimopagerdutywotsukau	PagerDuty	mo
+honnopagerdutywosagasu	PagerDuty	no
+tsukattanohapagerduty	PagerDuty	tail
+emrdeshirabeta	EMR	head
+korewoemrdeshirabeta	EMR	wo
+kinouhaemrwotsukatta	EMR	ha
+koregaemrdesu	EMR	ga
+kaishaniemrgaaru	EMR	ni
+soredeemrwotsukau	EMR	de
+tomodachitoemrwotsukatta	EMR	to
+watashimoemrwotsukau	EMR	mo
+honnoemrwosagasu	EMR	no
+tsukattanohaemr	EMR	tail
+styledcomponentsdeshirabeta	styled-components	head
+korewostyledcomponentsdeshirabeta	styled-components	wo
+kinouhastyledcomponentswotsukatta	styled-components	ha
+koregastyledcomponentsdesu	styled-components	ga
+kaishanistyledcomponentsgaaru	styled-components	ni
+soredestyledcomponentswotsukau	styled-components	de
+tomodachitostyledcomponentswotsukatta	styled-components	to
+watashimostyledcomponentswotsukau	styled-components	mo
+honnostyledcomponentswosagasu	styled-components	no
+tsukattanohastyledcomponents	styled-components	tail
+vitestdeshirabeta	Vitest	head
+korewovitestdeshirabeta	Vitest	wo
+kinouhavitestwotsukatta	Vitest	ha
+koregavitestdesu	Vitest	ga
+kaishanivitestgaaru	Vitest	ni
+soredevitestwotsukau	Vitest	de
+tomodachitovitestwotsukatta	Vitest	to
+watashimovitestwotsukau	Vitest	mo
+honnovitestwosagasu	Vitest	no
+tsukattanohavitest	Vitest	tail
+lodashdeshirabeta	Lodash	head
+korewolodashdeshirabeta	Lodash	wo
+kinouhalodashwotsukatta	Lodash	ha
+koregalodashdesu	Lodash	ga
+kaishanilodashgaaru	Lodash	ni
+soredelodashwotsukau	Lodash	de
+tomodachitolodashwotsukatta	Lodash	to
+watashimolodashwotsukau	Lodash	mo
+honnolodashwosagasu	Lodash	no
+tsukattanohalodash	Lodash	tail
+lottiedeshirabeta	Lottie	head
+korewolottiedeshirabeta	Lottie	wo
+kinouhalottiewotsukatta	Lottie	ha
+koregalottiedesu	Lottie	ga
+kaishanilottiegaaru	Lottie	ni
+soredelottiewotsukau	Lottie	de
+tomodachitolottiewotsukatta	Lottie	to
+watashimolottiewotsukau	Lottie	mo
+honnolottiewosagasu	Lottie	no
+tsukattanohalottie	Lottie	tail
+kotlinmultiplatformdeshirabeta	Kotlin Multiplatform	head
+korewokotlinmultiplatformdeshirabeta	Kotlin Multiplatform	wo
+kinouhakotlinmultiplatformwotsukatta	Kotlin Multiplatform	ha
+koregakotlinmultiplatformdesu	Kotlin Multiplatform	ga
+kaishanikotlinmultiplatformgaaru	Kotlin Multiplatform	ni
+soredekotlinmultiplatformwotsukau	Kotlin Multiplatform	de
+tomodachitokotlinmultiplatformwotsukatta	Kotlin Multiplatform	to
+watashimokotlinmultiplatformwotsukau	Kotlin Multiplatform	mo
+honnokotlinmultiplatformwosagasu	Kotlin Multiplatform	no
+tsukattanohakotlinmultiplatform	Kotlin Multiplatform	tail
+virtualenvdeshirabeta	virtualenv	head
+korewovirtualenvdeshirabeta	virtualenv	wo
+kinouhavirtualenvwotsukatta	virtualenv	ha
+koregavirtualenvdesu	virtualenv	ga
+kaishanivirtualenvgaaru	virtualenv	ni
+soredevirtualenvwotsukau	virtualenv	de
+tomodachitovirtualenvwotsukatta	virtualenv	to
+watashimovirtualenvwotsukau	virtualenv	mo
+honnovirtualenvwosagasu	virtualenv	no
+tsukattanohavirtualenv	virtualenv	tail
+onnxruntimedeshirabeta	ONNX Runtime	head
+korewoonnxruntimedeshirabeta	ONNX Runtime	wo
+kinouhaonnxruntimewotsukatta	ONNX Runtime	ha
+koregaonnxruntimedesu	ONNX Runtime	ga
+kaishanionnxruntimegaaru	ONNX Runtime	ni
+soredeonnxruntimewotsukau	ONNX Runtime	de
+tomodachitoonnxruntimewotsukatta	ONNX Runtime	to
+watashimoonnxruntimewotsukau	ONNX Runtime	mo
+honnoonnxruntimewosagasu	ONNX Runtime	no
+tsukattanohaonnxruntime	ONNX Runtime	tail
+dspydeshirabeta	DSPy	head
+korewodspydeshirabeta	DSPy	wo
+kinouhadspywotsukatta	DSPy	ha
+koregadspydesu	DSPy	ga
+kaishanidspygaaru	DSPy	ni
+sorededspywotsukau	DSPy	de
+tomodachitodspywotsukatta	DSPy	to
+watashimodspywotsukau	DSPy	mo
+honnodspywosagasu	DSPy	no
+tsukattanohadspy	DSPy	tail
+controlnetdeshirabeta	ControlNet	head
+korewocontrolnetdeshirabeta	ControlNet	wo
+kinouhacontrolnetwotsukatta	ControlNet	ha
+koregacontrolnetdesu	ControlNet	ga
+kaishanicontrolnetgaaru	ControlNet	ni
+soredecontrolnetwotsukau	ControlNet	de
+tomodachitocontrolnetwotsukatta	ControlNet	to
+watashimocontrolnetwotsukau	ControlNet	mo
+honnocontrolnetwosagasu	ControlNet	no
+tsukattanohacontrolnet	ControlNet	tail
+spyderdeshirabeta	Spyder	head
+korewospyderdeshirabeta	Spyder	wo
+kinouhaspyderwotsukatta	Spyder	ha
+koregaspyderdesu	Spyder	ga
+kaishanispydergaaru	Spyder	ni
+soredespyderwotsukau	Spyder	de
+tomodachitospyderwotsukatta	Spyder	to
+watashimospyderwotsukau	Spyder	mo
+honnospyderwosagasu	Spyder	no
+tsukattanohaspyder	Spyder	tail
+gradledeshirabeta	Gradle	head
+korewogradledeshirabeta	Gradle	wo
+kinouhagradlewotsukatta	Gradle	ha
+koregagradledesu	Gradle	ga
+kaishanigradlegaaru	Gradle	ni
+soredegradlewotsukau	Gradle	de
+tomodachitogradlewotsukatta	Gradle	to
+watashimogradlewotsukau	Gradle	mo
+honnogradlewosagasu	Gradle	no
+tsukattanohagradle	Gradle	tail
+prologdeshirabeta	Prolog	head
+korewoprologdeshirabeta	Prolog	wo
+kinouhaprologwotsukatta	Prolog	ha
+koregaprologdesu	Prolog	ga
+kaishaniprologgaaru	Prolog	ni
+soredeprologwotsukau	Prolog	de
+tomodachitoprologwotsukatta	Prolog	to
+watashimoprologwotsukau	Prolog	mo
+honnoprologwosagasu	Prolog	no
+tsukattanohaprolog	Prolog	tail
+inertiajsdeshirabeta	Inertia.js	head
+korewoinertiajsdeshirabeta	Inertia.js	wo
+kinouhainertiajswotsukatta	Inertia.js	ha
+koregainertiajsdesu	Inertia.js	ga
+kaishaniinertiajsgaaru	Inertia.js	ni
+soredeinertiajswotsukau	Inertia.js	de
+tomodachitoinertiajswotsukatta	Inertia.js	to
+watashimoinertiajswotsukau	Inertia.js	mo
+honnoinertiajswosagasu	Inertia.js	no
+tsukattanohainertiajs	Inertia.js	tail
+winrtdeshirabeta	WinRT	head
+korewowinrtdeshirabeta	WinRT	wo
+kinouhawinrtwotsukatta	WinRT	ha
+koregawinrtdesu	WinRT	ga
+kaishaniwinrtgaaru	WinRT	ni
+soredewinrtwotsukau	WinRT	de
+tomodachitowinrtwotsukatta	WinRT	to
+watashimowinrtwotsukau	WinRT	mo
+honnowinrtwosagasu	WinRT	no
+tsukattanohawinrt	WinRT	tail
+wxwidgetsdeshirabeta	wxWidgets	head
+korewowxwidgetsdeshirabeta	wxWidgets	wo
+kinouhawxwidgetswotsukatta	wxWidgets	ha
+koregawxwidgetsdesu	wxWidgets	ga
+kaishaniwxwidgetsgaaru	wxWidgets	ni
+soredewxwidgetswotsukau	wxWidgets	de
+tomodachitowxwidgetswotsukatta	wxWidgets	to
+watashimowxwidgetswotsukau	wxWidgets	mo
+honnowxwidgetswosagasu	wxWidgets	no
+tsukattanohawxwidgets	wxWidgets	tail
+hoppscotchdeshirabeta	Hoppscotch	head
+korewohoppscotchdeshirabeta	Hoppscotch	wo
+kinouhahoppscotchwotsukatta	Hoppscotch	ha
+koregahoppscotchdesu	Hoppscotch	ga
+kaishanihoppscotchgaaru	Hoppscotch	ni
+soredehoppscotchwotsukau	Hoppscotch	de
+tomodachitohoppscotchwotsukatta	Hoppscotch	to
+watashimohoppscotchwotsukau	Hoppscotch	mo
+honnohoppscotchwosagasu	Hoppscotch	no
+tsukattanohahoppscotch	Hoppscotch	tail
+zorinosdeshirabeta	Zorin OS	head
+korewozorinosdeshirabeta	Zorin OS	wo
+kinouhazorinoswotsukatta	Zorin OS	ha
+koregazorinosdesu	Zorin OS	ga
+kaishanizorinosgaaru	Zorin OS	ni
+soredezorinoswotsukau	Zorin OS	de
+tomodachitozorinoswotsukatta	Zorin OS	to
+watashimozorinoswotsukau	Zorin OS	mo
+honnozorinoswosagasu	Zorin OS	no
+tsukattanohazorinos	Zorin OS	tail
+osxdeshirabeta	OS X	head
+korewoosxdeshirabeta	OS X	wo
+kinouhaosxwotsukatta	OS X	ha
+koregaosxdesu	OS X	ga
+kaishaniosxgaaru	OS X	ni
+soredeosxwotsukau	OS X	de
+tomodachitoosxwotsukatta	OS X	to
+watashimoosxwotsukau	OS X	mo
+honnoosxwosagasu	OS X	no
+tsukattanohaosx	OS X	tail
+mbeddeshirabeta	Mbed	head
+korewombeddeshirabeta	Mbed	wo
+kinouhambedwotsukatta	Mbed	ha
+koregambeddesu	Mbed	ga
+kaishanimbedgaaru	Mbed	ni
+soredembedwotsukau	Mbed	de
+tomodachitombedwotsukatta	Mbed	to
+watashimombedwotsukau	Mbed	mo
+honnombedwosagasu	Mbed	no
+tsukattanohambed	Mbed	tail
+appimagedeshirabeta	AppImage	head
+korewoappimagedeshirabeta	AppImage	wo
+kinouhaappimagewotsukatta	AppImage	ha
+koregaappimagedesu	AppImage	ga
+kaishaniappimagegaaru	AppImage	ni
+soredeappimagewotsukau	AppImage	de
+tomodachitoappimagewotsukatta	AppImage	to
+watashimoappimagewotsukau	AppImage	mo
+honnoappimagewosagasu	AppImage	no
+tsukattanohaappimage	AppImage	tail
+gitflowdeshirabeta	git-flow	head
+korewogitflowdeshirabeta	git-flow	wo
+kinouhagitflowwotsukatta	git-flow	ha
+koregagitflowdesu	git-flow	ga
+kaishanigitflowgaaru	git-flow	ni
+soredegitflowwotsukau	git-flow	de
+tomodachitogitflowwotsukatta	git-flow	to
+watashimogitflowwotsukau	git-flow	mo
+honnogitflowwosagasu	git-flow	no
+tsukattanohagitflow	git-flow	tail
+devpoddeshirabeta	DevPod	head
+korewodevpoddeshirabeta	DevPod	wo
+kinouhadevpodwotsukatta	DevPod	ha
+koregadevpoddesu	DevPod	ga
+kaishanidevpodgaaru	DevPod	ni
+sorededevpodwotsukau	DevPod	de
+tomodachitodevpodwotsukatta	DevPod	to
+watashimodevpodwotsukau	DevPod	mo
+honnodevpodwosagasu	DevPod	no
+tsukattanohadevpod	DevPod	tail
+codecatalystdeshirabeta	CodeCatalyst	head
+korewocodecatalystdeshirabeta	CodeCatalyst	wo
+kinouhacodecatalystwotsukatta	CodeCatalyst	ha
+koregacodecatalystdesu	CodeCatalyst	ga
+kaishanicodecatalystgaaru	CodeCatalyst	ni
+soredecodecatalystwotsukau	CodeCatalyst	de
+tomodachitocodecatalystwotsukatta	CodeCatalyst	to
+watashimocodecatalystwotsukau	CodeCatalyst	mo
+honnocodecatalystwosagasu	CodeCatalyst	no
+tsukattanohacodecatalyst	CodeCatalyst	tail
+blobstoragedeshirabeta	Blob Storage	head
+korewoblobstoragedeshirabeta	Blob Storage	wo
+kinouhablobstoragewotsukatta	Blob Storage	ha
+koregablobstoragedesu	Blob Storage	ga
+kaishaniblobstoragegaaru	Blob Storage	ni
+soredeblobstoragewotsukau	Blob Storage	de
+tomodachitoblobstoragewotsukatta	Blob Storage	to
+watashimoblobstoragewotsukau	Blob Storage	mo
+honnoblobstoragewosagasu	Blob Storage	no
+tsukattanohablobstorage	Blob Storage	tail
+planetscaledeshirabeta	PlanetScale	head
+korewoplanetscaledeshirabeta	PlanetScale	wo
+kinouhaplanetscalewotsukatta	PlanetScale	ha
+koregaplanetscaledesu	PlanetScale	ga
+kaishaniplanetscalegaaru	PlanetScale	ni
+soredeplanetscalewotsukau	PlanetScale	de
+tomodachitoplanetscalewotsukatta	PlanetScale	to
+watashimoplanetscalewotsukau	PlanetScale	mo
+honnoplanetscalewosagasu	PlanetScale	no
+tsukattanohaplanetscale	PlanetScale	tail
+redisdeshirabeta	Redis	head
+koreworedisdeshirabeta	Redis	wo
+kinouharediswotsukatta	Redis	ha
+koregaredisdesu	Redis	ga
+kaishaniredisgaaru	Redis	ni
+sorederediswotsukau	Redis	de
+tomodachitorediswotsukatta	Redis	to
+watashimorediswotsukau	Redis	mo
+honnorediswosagasu	Redis	no
+tsukattanoharedis	Redis	tail
+mongodbcompassdeshirabeta	MongoDB Compass	head
+korewomongodbcompassdeshirabeta	MongoDB Compass	wo
+kinouhamongodbcompasswotsukatta	MongoDB Compass	ha
+koregamongodbcompassdesu	MongoDB Compass	ga
+kaishanimongodbcompassgaaru	MongoDB Compass	ni
+soredemongodbcompasswotsukau	MongoDB Compass	de
+tomodachitomongodbcompasswotsukatta	MongoDB Compass	to
+watashimomongodbcompasswotsukau	MongoDB Compass	mo
+honnomongodbcompasswosagasu	MongoDB Compass	no
+tsukattanohamongodbcompass	MongoDB Compass	tail
+authjsdeshirabeta	Auth.js	head
+korewoauthjsdeshirabeta	Auth.js	wo
+kinouhaauthjswotsukatta	Auth.js	ha
+koregaauthjsdesu	Auth.js	ga
+kaishaniauthjsgaaru	Auth.js	ni
+soredeauthjswotsukau	Auth.js	de
+tomodachitoauthjswotsukatta	Auth.js	to
+watashimoauthjswotsukau	Auth.js	mo
+honnoauthjswosagasu	Auth.js	no
+tsukattanohaauthjs	Auth.js	tail
+owaspzapdeshirabeta	OWASP ZAP	head
+korewoowaspzapdeshirabeta	OWASP ZAP	wo
+kinouhaowaspzapwotsukatta	OWASP ZAP	ha
+koregaowaspzapdesu	OWASP ZAP	ga
+kaishaniowaspzapgaaru	OWASP ZAP	ni
+soredeowaspzapwotsukau	OWASP ZAP	de
+tomodachitoowaspzapwotsukatta	OWASP ZAP	to
+watashimoowaspzapwotsukau	OWASP ZAP	mo
+honnoowaspzapwosagasu	OWASP ZAP	no
+tsukattanohaowaspzap	OWASP ZAP	tail
+ubiquitideshirabeta	Ubiquiti	head
+korewoubiquitideshirabeta	Ubiquiti	wo
+kinouhaubiquitiwotsukatta	Ubiquiti	ha
+koregaubiquitidesu	Ubiquiti	ga
+kaishaniubiquitigaaru	Ubiquiti	ni
+soredeubiquitiwotsukau	Ubiquiti	de
+tomodachitoubiquitiwotsukatta	Ubiquiti	to
+watashimoubiquitiwotsukau	Ubiquiti	mo
+honnoubiquitiwosagasu	Ubiquiti	no
+tsukattanohaubiquiti	Ubiquiti	tail
+graphvizdeshirabeta	Graphviz	head
+korewographvizdeshirabeta	Graphviz	wo
+kinouhagraphvizwotsukatta	Graphviz	ha
+koregagraphvizdesu	Graphviz	ga
+kaishanigraphvizgaaru	Graphviz	ni
+soredegraphvizwotsukau	Graphviz	de
+tomodachitographvizwotsukatta	Graphviz	to
+watashimographvizwotsukau	Graphviz	mo
+honnographvizwosagasu	Graphviz	no
+tsukattanohagraphviz	Graphviz	tail
+lualatexdeshirabeta	LuaLaTeX	head
+korewolualatexdeshirabeta	LuaLaTeX	wo
+kinouhalualatexwotsukatta	LuaLaTeX	ha
+koregalualatexdesu	LuaLaTeX	ga
+kaishanilualatexgaaru	LuaLaTeX	ni
+soredelualatexwotsukau	LuaLaTeX	de
+tomodachitolualatexwotsukatta	LuaLaTeX	to
+watashimolualatexwotsukau	LuaLaTeX	mo
+honnolualatexwosagasu	LuaLaTeX	no
+tsukattanohalualatex	LuaLaTeX	tail
+gptstoredeshirabeta	GPT Store	head
+korewogptstoredeshirabeta	GPT Store	wo
+kinouhagptstorewotsukatta	GPT Store	ha
+koregagptstoredesu	GPT Store	ga
+kaishanigptstoregaaru	GPT Store	ni
+soredegptstorewotsukau	GPT Store	de
+tomodachitogptstorewotsukatta	GPT Store	to
+watashimogptstorewotsukau	GPT Store	mo
+honnogptstorewosagasu	GPT Store	no
+tsukattanohagptstore	GPT Store	tail
+stabilityaideshirabeta	Stability AI	head
+korewostabilityaideshirabeta	Stability AI	wo
+kinouhastabilityaiwotsukatta	Stability AI	ha
+koregastabilityaidesu	Stability AI	ga
+kaishanistabilityaigaaru	Stability AI	ni
+soredestabilityaiwotsukau	Stability AI	de
+tomodachitostabilityaiwotsukatta	Stability AI	to
+watashimostabilityaiwotsukau	Stability AI	mo
+honnostabilityaiwosagasu	Stability AI	no
+tsukattanohastabilityai	Stability AI	tail
+omniversedeshirabeta	Omniverse	head
+korewoomniversedeshirabeta	Omniverse	wo
+kinouhaomniversewotsukatta	Omniverse	ha
+koregaomniversedesu	Omniverse	ga
+kaishaniomniversegaaru	Omniverse	ni
+soredeomniversewotsukau	Omniverse	de
+tomodachitoomniversewotsukatta	Omniverse	to
+watashimoomniversewotsukau	Omniverse	mo
+honnoomniversewosagasu	Omniverse	no
+tsukattanohaomniverse	Omniverse	tail
+coolermasterdeshirabeta	Cooler Master	head
+korewocoolermasterdeshirabeta	Cooler Master	wo
+kinouhacoolermasterwotsukatta	Cooler Master	ha
+koregacoolermasterdesu	Cooler Master	ga
+kaishanicoolermastergaaru	Cooler Master	ni
+soredecoolermasterwotsukau	Cooler Master	de
+tomodachitocoolermasterwotsukatta	Cooler Master	to
+watashimocoolermasterwotsukau	Cooler Master	mo
+honnocoolermasterwosagasu	Cooler Master	no
+tsukattanohacoolermaster	Cooler Master	tail
+adobefontsdeshirabeta	Adobe Fonts	head
+korewoadobefontsdeshirabeta	Adobe Fonts	wo
+kinouhaadobefontswotsukatta	Adobe Fonts	ha
+koregaadobefontsdesu	Adobe Fonts	ga
+kaishaniadobefontsgaaru	Adobe Fonts	ni
+soredeadobefontswotsukau	Adobe Fonts	de
+tomodachitoadobefontswotsukatta	Adobe Fonts	to
+watashimoadobefontswotsukau	Adobe Fonts	mo
+honnoadobefontswosagasu	Adobe Fonts	no
+tsukattanohaadobefonts	Adobe Fonts	tail
+typetalkdeshirabeta	Typetalk	head
+korewotypetalkdeshirabeta	Typetalk	wo
+kinouhatypetalkwotsukatta	Typetalk	ha
+koregatypetalkdesu	Typetalk	ga
+kaishanitypetalkgaaru	Typetalk	ni
+soredetypetalkwotsukau	Typetalk	de
+tomodachitotypetalkwotsukatta	Typetalk	to
+watashimotypetalkwotsukau	Typetalk	mo
+honnotypetalkwosagasu	Typetalk	no
+tsukattanohatypetalk	Typetalk	tail
+nvidiabroadcastdeshirabeta	NVIDIA Broadcast	head
+korewonvidiabroadcastdeshirabeta	NVIDIA Broadcast	wo
+kinouhanvidiabroadcastwotsukatta	NVIDIA Broadcast	ha
+koreganvidiabroadcastdesu	NVIDIA Broadcast	ga
+kaishaninvidiabroadcastgaaru	NVIDIA Broadcast	ni
+soredenvidiabroadcastwotsukau	NVIDIA Broadcast	de
+tomodachitonvidiabroadcastwotsukatta	NVIDIA Broadcast	to
+watashimonvidiabroadcastwotsukau	NVIDIA Broadcast	mo
+honnonvidiabroadcastwosagasu	NVIDIA Broadcast	no
+tsukattanohanvidiabroadcast	NVIDIA Broadcast	tail
+unrealenginedeshirabeta	Unreal Engine	head
+korewounrealenginedeshirabeta	Unreal Engine	wo
+kinouhaunrealenginewotsukatta	Unreal Engine	ha
+koregaunrealenginedesu	Unreal Engine	ga
+kaishaniunrealenginegaaru	Unreal Engine	ni
+soredeunrealenginewotsukau	Unreal Engine	de
+tomodachitounrealenginewotsukatta	Unreal Engine	to
+watashimounrealenginewotsukau	Unreal Engine	mo
+honnounrealenginewosagasu	Unreal Engine	no
+tsukattanohaunrealengine	Unreal Engine	tail
+marvelousdesignerdeshirabeta	Marvelous Designer	head
+korewomarvelousdesignerdeshirabeta	Marvelous Designer	wo
+kinouhamarvelousdesignerwotsukatta	Marvelous Designer	ha
+koregamarvelousdesignerdesu	Marvelous Designer	ga
+kaishanimarvelousdesignergaaru	Marvelous Designer	ni
+soredemarvelousdesignerwotsukau	Marvelous Designer	de
+tomodachitomarvelousdesignerwotsukatta	Marvelous Designer	to
+watashimomarvelousdesignerwotsukau	Marvelous Designer	mo
+honnomarvelousdesignerwosagasu	Marvelous Designer	no
+tsukattanohamarvelousdesigner	Marvelous Designer	tail
+misskeydeshirabeta	Misskey	head
+korewomisskeydeshirabeta	Misskey	wo
+kinouhamisskeywotsukatta	Misskey	ha
+koregamisskeydesu	Misskey	ga
+kaishanimisskeygaaru	Misskey	ni
+soredemisskeywotsukau	Misskey	de
+tomodachitomisskeywotsukatta	Misskey	to
+watashimomisskeywotsukau	Misskey	mo
+honnomisskeywosagasu	Misskey	no
+tsukattanohamisskey	Misskey	tail
+musixmatchdeshirabeta	Musixmatch	head
+korewomusixmatchdeshirabeta	Musixmatch	wo
+kinouhamusixmatchwotsukatta	Musixmatch	ha
+koregamusixmatchdesu	Musixmatch	ga
+kaishanimusixmatchgaaru	Musixmatch	ni
+soredemusixmatchwotsukau	Musixmatch	de
+tomodachitomusixmatchwotsukatta	Musixmatch	to
+watashimomusixmatchwotsukau	Musixmatch	mo
+honnomusixmatchwosagasu	Musixmatch	no
+tsukattanohamusixmatch	Musixmatch	tail
+iphonesedeshirabeta	iPhone SE	head
+korewoiphonesedeshirabeta	iPhone SE	wo
+kinouhaiphonesewotsukatta	iPhone SE	ha
+koregaiphonesedesu	iPhone SE	ga
+kaishaniiphonesegaaru	iPhone SE	ni
+soredeiphonesewotsukau	iPhone SE	de
+tomodachitoiphonesewotsukatta	iPhone SE	to
+watashimoiphonesewotsukau	iPhone SE	mo
+honnoiphonesewosagasu	iPhone SE	no
+tsukattanohaiphonese	iPhone SE	tail
+appleiddeshirabeta	Apple ID	head
+korewoappleiddeshirabeta	Apple ID	wo
+kinouhaappleidwotsukatta	Apple ID	ha
+koregaappleiddesu	Apple ID	ga
+kaishaniappleidgaaru	Apple ID	ni
+soredeappleidwotsukau	Apple ID	de
+tomodachitoappleidwotsukatta	Apple ID	to
+watashimoappleidwotsukau	Apple ID	mo
+honnoappleidwosagasu	Apple ID	no
+tsukattanohaappleid	Apple ID	tail
+googlemapsdeshirabeta	Google Maps	head
+korewogooglemapsdeshirabeta	Google Maps	wo
+kinouhagooglemapswotsukatta	Google Maps	ha
+koregagooglemapsdesu	Google Maps	ga
+kaishanigooglemapsgaaru	Google Maps	ni
+soredegooglemapswotsukau	Google Maps	de
+tomodachitogooglemapswotsukatta	Google Maps	to
+watashimogooglemapswotsukau	Google Maps	mo
+honnogooglemapswosagasu	Google Maps	no
+tsukattanohagooglemaps	Google Maps	tail
+googlescholardeshirabeta	Google Scholar	head
+korewogooglescholardeshirabeta	Google Scholar	wo
+kinouhagooglescholarwotsukatta	Google Scholar	ha
+koregagooglescholardesu	Google Scholar	ga
+kaishanigooglescholargaaru	Google Scholar	ni
+soredegooglescholarwotsukau	Google Scholar	de
+tomodachitogooglescholarwotsukatta	Google Scholar	to
+watashimogooglescholarwotsukau	Google Scholar	mo
+honnogooglescholarwosagasu	Google Scholar	no
+tsukattanohagooglescholar	Google Scholar	tail
+surfacebookdeshirabeta	Surface Book	head
+korewosurfacebookdeshirabeta	Surface Book	wo
+kinouhasurfacebookwotsukatta	Surface Book	ha
+koregasurfacebookdesu	Surface Book	ga
+kaishanisurfacebookgaaru	Surface Book	ni
+soredesurfacebookwotsukau	Surface Book	de
+tomodachitosurfacebookwotsukatta	Surface Book	to
+watashimosurfacebookwotsukau	Surface Book	mo
+honnosurfacebookwosagasu	Surface Book	no
+tsukattanohasurfacebook	Surface Book	tail
+alexadeshirabeta	Alexa	head
+korewoalexadeshirabeta	Alexa	wo
+kinouhaalexawotsukatta	Alexa	ha
+koregaalexadesu	Alexa	ga
+kaishanialexagaaru	Alexa	ni
+soredealexawotsukau	Alexa	de
+tomodachitoalexawotsukatta	Alexa	to
+watashimoalexawotsukau	Alexa	mo
+honnoalexawosagasu	Alexa	no
+tsukattanohaalexa	Alexa	tail
+xperiadeshirabeta	Xperia	head
+korewoxperiadeshirabeta	Xperia	wo
+kinouhaxperiawotsukatta	Xperia	ha
+koregaxperiadesu	Xperia	ga
+kaishanixperiagaaru	Xperia	ni
+soredexperiawotsukau	Xperia	de
+tomodachitoxperiawotsukatta	Xperia	to
+watashimoxperiawotsukau	Xperia	mo
+honnoxperiawosagasu	Xperia	no
+tsukattanohaxperia	Xperia	tail
+gtunedeshirabeta	G-Tune	head
+korewogtunedeshirabeta	G-Tune	wo
+kinouhagtunewotsukatta	G-Tune	ha
+koregagtunedesu	G-Tune	ga
+kaishanigtunegaaru	G-Tune	ni
+soredegtunewotsukau	G-Tune	de
+tomodachitogtunewotsukatta	G-Tune	to
+watashimogtunewotsukau	G-Tune	mo
+honnogtunewosagasu	G-Tune	no
+tsukattanohagtune	G-Tune	tail
+alipaydeshirabeta	Alipay	head
+korewoalipaydeshirabeta	Alipay	wo
+kinouhaalipaywotsukatta	Alipay	ha
+koregaalipaydesu	Alipay	ga
+kaishanialipaygaaru	Alipay	ni
+soredealipaywotsukau	Alipay	de
+tomodachitoalipaywotsukatta	Alipay	to
+watashimoalipaywotsukau	Alipay	mo
+honnoalipaywosagasu	Alipay	no
+tsukattanohaalipay	Alipay	tail
+trivagodeshirabeta	Trivago	head
+korewotrivagodeshirabeta	Trivago	wo
+kinouhatrivagowotsukatta	Trivago	ha
+koregatrivagodesu	Trivago	ga
+kaishanitrivagogaaru	Trivago	ni
+soredetrivagowotsukau	Trivago	de
+tomodachitotrivagowotsukatta	Trivago	to
+watashimotrivagowotsukau	Trivago	mo
+honnotrivagowosagasu	Trivago	no
+tsukattanohatrivago	Trivago	tail
+jcommobiledeshirabeta	J:COM MOBILE	head
+korewojcommobiledeshirabeta	J:COM MOBILE	wo
+kinouhajcommobilewotsukatta	J:COM MOBILE	ha
+koregajcommobiledesu	J:COM MOBILE	ga
+kaishanijcommobilegaaru	J:COM MOBILE	ni
+soredejcommobilewotsukau	J:COM MOBILE	de
+tomodachitojcommobilewotsukatta	J:COM MOBILE	to
+watashimojcommobilewotsukau	J:COM MOBILE	mo
+honnojcommobilewosagasu	J:COM MOBILE	no
+tsukattanohajcommobile	J:COM MOBILE	tail
+atcoderdeshirabeta	AtCoder	head
+korewoatcoderdeshirabeta	AtCoder	wo
+kinouhaatcoderwotsukatta	AtCoder	ha
+koregaatcoderdesu	AtCoder	ga
+kaishaniatcodergaaru	AtCoder	ni
+soredeatcoderwotsukau	AtCoder	de
+tomodachitoatcoderwotsukatta	AtCoder	to
+watashimoatcoderwotsukau	AtCoder	mo
+honnoatcoderwosagasu	AtCoder	no
+tsukattanohaatcoder	AtCoder	tail
+descriptdeshirabeta	Descript	head
+korewodescriptdeshirabeta	Descript	wo
+kinouhadescriptwotsukatta	Descript	ha
+koregadescriptdesu	Descript	ga
+kaishanidescriptgaaru	Descript	ni
+sorededescriptwotsukau	Descript	de
+tomodachitodescriptwotsukatta	Descript	to
+watashimodescriptwotsukau	Descript	mo
+honnodescriptwosagasu	Descript	no
+tsukattanohadescript	Descript	tail
+focustododeshirabeta	Focus To-Do	head
+korewofocustododeshirabeta	Focus To-Do	wo
+kinouhafocustodowotsukatta	Focus To-Do	ha
+koregafocustododesu	Focus To-Do	ga
+kaishanifocustodogaaru	Focus To-Do	ni
+soredefocustodowotsukau	Focus To-Do	de
+tomodachitofocustodowotsukatta	Focus To-Do	to
+watashimofocustodowotsukau	Focus To-Do	mo
+honnofocustodowosagasu	Focus To-Do	no
+tsukattanohafocustodo	Focus To-Do	tail
+livechatdeshirabeta	LiveChat	head
+korewolivechatdeshirabeta	LiveChat	wo
+kinouhalivechatwotsukatta	LiveChat	ha
+koregalivechatdesu	LiveChat	ga
+kaishanilivechatgaaru	LiveChat	ni
+soredelivechatwotsukau	LiveChat	de
+tomodachitolivechatwotsukatta	LiveChat	to
+watashimolivechatwotsukau	LiveChat	mo
+honnolivechatwosagasu	LiveChat	no
+tsukattanohalivechat	LiveChat	tail
+arkhedeshirabeta	Arkhe	head
+korewoarkhedeshirabeta	Arkhe	wo
+kinouhaarkhewotsukatta	Arkhe	ha
+koregaarkhedesu	Arkhe	ga
+kaishaniarkhegaaru	Arkhe	ni
+soredearkhewotsukau	Arkhe	de
+tomodachitoarkhewotsukatta	Arkhe	to
+watashimoarkhewotsukau	Arkhe	mo
+honnoarkhewosagasu	Arkhe	no
+tsukattanohaarkhe	Arkhe	tail
+soundcoredeshirabeta	Soundcore	head
+korewosoundcoredeshirabeta	Soundcore	wo
+kinouhasoundcorewotsukatta	Soundcore	ha
+koregasoundcoredesu	Soundcore	ga
+kaishanisoundcoregaaru	Soundcore	ni
+soredesoundcorewotsukau	Soundcore	de
+tomodachitosoundcorewotsukatta	Soundcore	to
+watashimosoundcorewotsukau	Soundcore	mo
+honnosoundcorewosagasu	Soundcore	no
+tsukattanohasoundcore	Soundcore	tail
+nintendoaccountdeshirabeta	Nintendo Account	head
+korewonintendoaccountdeshirabeta	Nintendo Account	wo
+kinouhanintendoaccountwotsukatta	Nintendo Account	ha
+koreganintendoaccountdesu	Nintendo Account	ga
+kaishaninintendoaccountgaaru	Nintendo Account	ni
+soredenintendoaccountwotsukau	Nintendo Account	de
+tomodachitonintendoaccountwotsukatta	Nintendo Account	to
+watashimonintendoaccountwotsukau	Nintendo Account	mo
+honnonintendoaccountwosagasu	Nintendo Account	no
+tsukattanohanintendoaccount	Nintendo Account	tail
+readwisedeshirabeta	Readwise	head
+koreworeadwisedeshirabeta	Readwise	wo
+kinouhareadwisewotsukatta	Readwise	ha
+koregareadwisedesu	Readwise	ga
+kaishanireadwisegaaru	Readwise	ni
+soredereadwisewotsukau	Readwise	de
+tomodachitoreadwisewotsukatta	Readwise	to
+watashimoreadwisewotsukau	Readwise	mo
+honnoreadwisewosagasu	Readwise	no
+tsukattanohareadwise	Readwise	tail
+foxitdeshirabeta	Foxit	head
+korewofoxitdeshirabeta	Foxit	wo
+kinouhafoxitwotsukatta	Foxit	ha
+koregafoxitdesu	Foxit	ga
+kaishanifoxitgaaru	Foxit	ni
+soredefoxitwotsukau	Foxit	de
+tomodachitofoxitwotsukatta	Foxit	to
+watashimofoxitwotsukau	Foxit	mo
+honnofoxitwosagasu	Foxit	no
+tsukattanohafoxit	Foxit	tail
+springerdeshirabeta	Springer	head
+korewospringerdeshirabeta	Springer	wo
+kinouhaspringerwotsukatta	Springer	ha
+koregaspringerdesu	Springer	ga
+kaishanispringergaaru	Springer	ni
+soredespringerwotsukau	Springer	de
+tomodachitospringerwotsukatta	Springer	to
+watashimospringerwotsukau	Springer	mo
+honnospringerwosagasu	Springer	no
+tsukattanohaspringer	Springer	tail
+keyboardmaestrodeshirabeta	Keyboard Maestro	head
+korewokeyboardmaestrodeshirabeta	Keyboard Maestro	wo
+kinouhakeyboardmaestrowotsukatta	Keyboard Maestro	ha
+koregakeyboardmaestrodesu	Keyboard Maestro	ga
+kaishanikeyboardmaestrogaaru	Keyboard Maestro	ni
+soredekeyboardmaestrowotsukau	Keyboard Maestro	de
+tomodachitokeyboardmaestrowotsukatta	Keyboard Maestro	to
+watashimokeyboardmaestrowotsukau	Keyboard Maestro	mo
+honnokeyboardmaestrowosagasu	Keyboard Maestro	no
+tsukattanohakeyboardmaestro	Keyboard Maestro	tail
+msiafterburnerdeshirabeta	MSI Afterburner	head
+korewomsiafterburnerdeshirabeta	MSI Afterburner	wo
+kinouhamsiafterburnerwotsukatta	MSI Afterburner	ha
+koregamsiafterburnerdesu	MSI Afterburner	ga
+kaishanimsiafterburnergaaru	MSI Afterburner	ni
+soredemsiafterburnerwotsukau	MSI Afterburner	de
+tomodachitomsiafterburnerwotsukatta	MSI Afterburner	to
+watashimomsiafterburnerwotsukau	MSI Afterburner	mo
+honnomsiafterburnerwosagasu	MSI Afterburner	no
+tsukattanohamsiafterburner	MSI Afterburner	tail
+uncyclopediadeshirabeta	Uncyclopedia	head
+korewouncyclopediadeshirabeta	Uncyclopedia	wo
+kinouhauncyclopediawotsukatta	Uncyclopedia	ha
+koregauncyclopediadesu	Uncyclopedia	ga
+kaishaniuncyclopediagaaru	Uncyclopedia	ni
+soredeuncyclopediawotsukau	Uncyclopedia	de
+tomodachitouncyclopediawotsukatta	Uncyclopedia	to
+watashimouncyclopediawotsukau	Uncyclopedia	mo
+honnouncyclopediawosagasu	Uncyclopedia	no
+tsukattanohauncyclopedia	Uncyclopedia	tail
+bnbdeshirabeta	BNB	head
+korewobnbdeshirabeta	BNB	wo
+kinouhabnbwotsukatta	BNB	ha
+koregabnbdesu	BNB	ga
+kaishanibnbgaaru	BNB	ni
+soredebnbwotsukau	BNB	de
+tomodachitobnbwotsukatta	BNB	to
+watashimobnbwotsukau	BNB	mo
+honnobnbwosagasu	BNB	no
+tsukattanohabnb	BNB	tail
+vechaindeshirabeta	VeChain	head
+korewovechaindeshirabeta	VeChain	wo
+kinouhavechainwotsukatta	VeChain	ha
+koregavechaindesu	VeChain	ga
+kaishanivechaingaaru	VeChain	ni
+soredevechainwotsukau	VeChain	de
+tomodachitovechainwotsukatta	VeChain	to
+watashimovechainwotsukau	VeChain	mo
+honnovechainwosagasu	VeChain	no
+tsukattanohavechain	VeChain	tail
+grtdeshirabeta	GRT	head
+korewogrtdeshirabeta	GRT	wo
+kinouhagrtwotsukatta	GRT	ha
+koregagrtdesu	GRT	ga
+kaishanigrtgaaru	GRT	ni
+soredegrtwotsukau	GRT	de
+tomodachitogrtwotsukatta	GRT	to
+watashimogrtwotsukau	GRT	mo
+honnogrtwosagasu	GRT	no
+tsukattanohagrt	GRT	tail
+fttdeshirabeta	FTT	head
+korewofttdeshirabeta	FTT	wo
+kinouhafttwotsukatta	FTT	ha
+koregafttdesu	FTT	ga
+kaishanifttgaaru	FTT	ni
+soredefttwotsukau	FTT	de
+tomodachitofttwotsukatta	FTT	to
+watashimofttwotsukau	FTT	mo
+honnofttwosagasu	FTT	no
+tsukattanohaftt	FTT	tail
+bitpointdeshirabeta	BITPOINT	head
+korewobitpointdeshirabeta	BITPOINT	wo
+kinouhabitpointwotsukatta	BITPOINT	ha
+koregabitpointdesu	BITPOINT	ga
+kaishanibitpointgaaru	BITPOINT	ni
+soredebitpointwotsukau	BITPOINT	de
+tomodachitobitpointwotsukatta	BITPOINT	to
+watashimobitpointwotsukau	BITPOINT	mo
+honnobitpointwosagasu	BITPOINT	no
+tsukattanohabitpoint	BITPOINT	tail
+tradingviewdeshirabeta	TradingView	head
+korewotradingviewdeshirabeta	TradingView	wo
+kinouhatradingviewwotsukatta	TradingView	ha
+koregatradingviewdesu	TradingView	ga
+kaishanitradingviewgaaru	TradingView	ni
+soredetradingviewwotsukau	TradingView	de
+tomodachitotradingviewwotsukatta	TradingView	to
+watashimotradingviewwotsukau	TradingView	mo
+honnotradingviewwosagasu	TradingView	no
+tsukattanohatradingview	TradingView	tail
+apydeshirabeta	APY	head
+korewoapydeshirabeta	APY	wo
+kinouhaapywotsukatta	APY	ha
+koregaapydesu	APY	ga
+kaishaniapygaaru	APY	ni
+soredeapywotsukau	APY	de
+tomodachitoapywotsukatta	APY	to
+watashimoapywotsukau	APY	mo
+honnoapywosagasu	APY	no
+tsukattanohaapy	APY	tail
+lfgdeshirabeta	LFG	head
+korewolfgdeshirabeta	LFG	wo
+kinouhalfgwotsukatta	LFG	ha
+koregalfgdesu	LFG	ga
+kaishanilfggaaru	LFG	ni
+soredelfgwotsukau	LFG	de
+tomodachitolfgwotsukatta	LFG	to
+watashimolfgwotsukau	LFG	mo
+honnolfgwosagasu	LFG	no
+tsukattanohalfg	LFG	tail
+solanafoundationdeshirabeta	Solana Foundation	head
+korewosolanafoundationdeshirabeta	Solana Foundation	wo
+kinouhasolanafoundationwotsukatta	Solana Foundation	ha
+koregasolanafoundationdesu	Solana Foundation	ga
+kaishanisolanafoundationgaaru	Solana Foundation	ni
+soredesolanafoundationwotsukau	Solana Foundation	de
+tomodachitosolanafoundationwotsukatta	Solana Foundation	to
+watashimosolanafoundationwotsukau	Solana Foundation	mo
+honnosolanafoundationwosagasu	Solana Foundation	no
+tsukattanohasolanafoundation	Solana Foundation	tail
+goatseusdeshirabeta	Goatseus	head
+korewogoatseusdeshirabeta	Goatseus	wo
+kinouhagoatseuswotsukatta	Goatseus	ha
+koregagoatseusdesu	Goatseus	ga
+kaishanigoatseusgaaru	Goatseus	ni
+soredegoatseuswotsukau	Goatseus	de
+tomodachitogoatseuswotsukatta	Goatseus	to
+watashimogoatseuswotsukau	Goatseus	mo
+honnogoatseuswosagasu	Goatseus	no
+tsukattanohagoatseus	Goatseus	tail
+ifreenextdeshirabeta	iFreeNEXT	head
+korewoifreenextdeshirabeta	iFreeNEXT	wo
+kinouhaifreenextwotsukatta	iFreeNEXT	ha
+koregaifreenextdesu	iFreeNEXT	ga
+kaishaniifreenextgaaru	iFreeNEXT	ni
+soredeifreenextwotsukau	iFreeNEXT	de
+tomodachitoifreenextwotsukatta	iFreeNEXT	to
+watashimoifreenextwotsukau	iFreeNEXT	mo
+honnoifreenextwosagasu	iFreeNEXT	no
+tsukattanohaifreenext	iFreeNEXT	tail
+ctraderdeshirabeta	cTrader	head
+korewoctraderdeshirabeta	cTrader	wo
+kinouhactraderwotsukatta	cTrader	ha
+koregactraderdesu	cTrader	ga
+kaishanictradergaaru	cTrader	ni
+soredectraderwotsukau	cTrader	de
+tomodachitoctraderwotsukatta	cTrader	to
+watashimoctraderwotsukau	cTrader	mo
+honnoctraderwosagasu	cTrader	no
+tsukattanohactrader	cTrader	tail
+rbadeshirabeta	RBA	head
+koreworbadeshirabeta	RBA	wo
+kinouharbawotsukatta	RBA	ha
+koregarbadesu	RBA	ga
+kaishanirbagaaru	RBA	ni
+sorederbawotsukau	RBA	de
+tomodachitorbawotsukatta	RBA	to
+watashimorbawotsukau	RBA	mo
+honnorbawosagasu	RBA	no
+tsukattanoharba	RBA	tail
+sasbdeshirabeta	SASB	head
+korewosasbdeshirabeta	SASB	wo
+kinouhasasbwotsukatta	SASB	ha
+koregasasbdesu	SASB	ga
+kaishanisasbgaaru	SASB	ni
+soredesasbwotsukau	SASB	de
+tomodachitosasbwotsukatta	SASB	to
+watashimosasbwotsukau	SASB	mo
+honnosasbwosagasu	SASB	no
+tsukattanohasasb	SASB	tail
+airwallexdeshirabeta	Airwallex	head
+korewoairwallexdeshirabeta	Airwallex	wo
+kinouhaairwallexwotsukatta	Airwallex	ha
+koregaairwallexdesu	Airwallex	ga
+kaishaniairwallexgaaru	Airwallex	ni
+soredeairwallexwotsukau	Airwallex	de
+tomodachitoairwallexwotsukatta	Airwallex	to
+watashimoairwallexwotsukau	Airwallex	mo
+honnoairwallexwosagasu	Airwallex	no
+tsukattanohaairwallex	Airwallex	tail
+fredperrydeshirabeta	Fred Perry	head
+korewofredperrydeshirabeta	Fred Perry	wo
+kinouhafredperrywotsukatta	Fred Perry	ha
+koregafredperrydesu	Fred Perry	ga
+kaishanifredperrygaaru	Fred Perry	ni
+soredefredperrywotsukau	Fred Perry	de
+tomodachitofredperrywotsukatta	Fred Perry	to
+watashimofredperrywotsukau	Fred Perry	mo
+honnofredperrywosagasu	Fred Perry	no
+tsukattanohafredperry	Fred Perry	tail
+snowpeakdeshirabeta	Snow Peak	head
+korewosnowpeakdeshirabeta	Snow Peak	wo
+kinouhasnowpeakwotsukatta	Snow Peak	ha
+koregasnowpeakdesu	Snow Peak	ga
+kaishanisnowpeakgaaru	Snow Peak	ni
+soredesnowpeakwotsukau	Snow Peak	de
+tomodachitosnowpeakwotsukatta	Snow Peak	to
+watashimosnowpeakwotsukau	Snow Peak	mo
+honnosnowpeakwosagasu	Snow Peak	no
+tsukattanohasnowpeak	Snow Peak	tail
+parabootdeshirabeta	Paraboot	head
+korewoparabootdeshirabeta	Paraboot	wo
+kinouhaparabootwotsukatta	Paraboot	ha
+koregaparabootdesu	Paraboot	ga
+kaishaniparabootgaaru	Paraboot	ni
+soredeparabootwotsukau	Paraboot	de
+tomodachitoparabootwotsukatta	Paraboot	to
+watashimoparabootwotsukau	Paraboot	mo
+honnoparabootwosagasu	Paraboot	no
+tsukattanohaparaboot	Paraboot	tail
+marcjacobsdeshirabeta	Marc Jacobs	head
+korewomarcjacobsdeshirabeta	Marc Jacobs	wo
+kinouhamarcjacobswotsukatta	Marc Jacobs	ha
+koregamarcjacobsdesu	Marc Jacobs	ga
+kaishanimarcjacobsgaaru	Marc Jacobs	ni
+soredemarcjacobswotsukau	Marc Jacobs	de
+tomodachitomarcjacobswotsukatta	Marc Jacobs	to
+watashimomarcjacobswotsukau	Marc Jacobs	mo
+honnomarcjacobswosagasu	Marc Jacobs	no
+tsukattanohamarcjacobs	Marc Jacobs	tail
+icbdeshirabeta	ICB	head
+korewoicbdeshirabeta	ICB	wo
+kinouhaicbwotsukatta	ICB	ha
+koregaicbdesu	ICB	ga
+kaishaniicbgaaru	ICB	ni
+soredeicbwotsukau	ICB	de
+tomodachitoicbwotsukatta	ICB	to
+watashimoicbwotsukau	ICB	mo
+honnoicbwosagasu	ICB	no
+tsukattanohaicb	ICB	tail
+abercrombiedeshirabeta	Abercrombie	head
+korewoabercrombiedeshirabeta	Abercrombie	wo
+kinouhaabercrombiewotsukatta	Abercrombie	ha
+koregaabercrombiedesu	Abercrombie	ga
+kaishaniabercrombiegaaru	Abercrombie	ni
+soredeabercrombiewotsukau	Abercrombie	de
+tomodachitoabercrombiewotsukatta	Abercrombie	to
+watashimoabercrombiewotsukau	Abercrombie	mo
+honnoabercrombiewosagasu	Abercrombie	no
+tsukattanohaabercrombie	Abercrombie	tail
+tagheuerdeshirabeta	Tag Heuer	head
+korewotagheuerdeshirabeta	Tag Heuer	wo
+kinouhatagheuerwotsukatta	Tag Heuer	ha
+koregatagheuerdesu	Tag Heuer	ga
+kaishanitagheuergaaru	Tag Heuer	ni
+soredetagheuerwotsukau	Tag Heuer	de
+tomodachitotagheuerwotsukatta	Tag Heuer	to
+watashimotagheuerwotsukau	Tag Heuer	mo
+honnotagheuerwosagasu	Tag Heuer	no
+tsukattanohatagheuer	Tag Heuer	tail
+threeppydeshirabeta	THREEPPY	head
+korewothreeppydeshirabeta	THREEPPY	wo
+kinouhathreeppywotsukatta	THREEPPY	ha
+koregathreeppydesu	THREEPPY	ga
+kaishanithreeppygaaru	THREEPPY	ni
+soredethreeppywotsukau	THREEPPY	de
+tomodachitothreeppywotsukatta	THREEPPY	to
+watashimothreeppywotsukau	THREEPPY	mo
+honnothreeppywosagasu	THREEPPY	no
+tsukattanohathreeppy	THREEPPY	tail
+matteldeshirabeta	Mattel	head
+korewomatteldeshirabeta	Mattel	wo
+kinouhamattelwotsukatta	Mattel	ha
+koregamatteldesu	Mattel	ga
+kaishanimattelgaaru	Mattel	ni
+soredemattelwotsukau	Mattel	de
+tomodachitomattelwotsukatta	Mattel	to
+watashimomattelwotsukau	Mattel	mo
+honnomattelwosagasu	Mattel	no
+tsukattanohamattel	Mattel	tail
+ghiblideshirabeta	Ghibli	head
+korewoghiblideshirabeta	Ghibli	wo
+kinouhaghibliwotsukatta	Ghibli	ha
+koregaghiblidesu	Ghibli	ga
+kaishanighibligaaru	Ghibli	ni
+soredeghibliwotsukau	Ghibli	de
+tomodachitoghibliwotsukatta	Ghibli	to
+watashimoghibliwotsukau	Ghibli	mo
+honnoghibliwosagasu	Ghibli	no
+tsukattanohaghibli	Ghibli	tail
+arabicadeshirabeta	% Arabica	head
+korewoarabicadeshirabeta	% Arabica	wo
+kinouhaarabicawotsukatta	% Arabica	ha
+koregaarabicadesu	% Arabica	ga
+kaishaniarabicagaaru	% Arabica	ni
+soredearabicawotsukau	% Arabica	de
+tomodachitoarabicawotsukatta	% Arabica	to
+watashimoarabicawotsukau	% Arabica	mo
+honnoarabicawosagasu	% Arabica	no
+tsukattanohaarabica	% Arabica	tail
+carlsbergdeshirabeta	Carlsberg	head
+korewocarlsbergdeshirabeta	Carlsberg	wo
+kinouhacarlsbergwotsukatta	Carlsberg	ha
+koregacarlsbergdesu	Carlsberg	ga
+kaishanicarlsberggaaru	Carlsberg	ni
+soredecarlsbergwotsukau	Carlsberg	de
+tomodachitocarlsbergwotsukatta	Carlsberg	to
+watashimocarlsbergwotsukau	Carlsberg	mo
+honnocarlsbergwosagasu	Carlsberg	no
+tsukattanohacarlsberg	Carlsberg	tail
+remymartindeshirabeta	Rémy Martin	head
+koreworemymartindeshirabeta	Rémy Martin	wo
+kinouharemymartinwotsukatta	Rémy Martin	ha
+koregaremymartindesu	Rémy Martin	ga
+kaishaniremymartingaaru	Rémy Martin	ni
+sorederemymartinwotsukau	Rémy Martin	de
+tomodachitoremymartinwotsukatta	Rémy Martin	to
+watashimoremymartinwotsukau	Rémy Martin	mo
+honnoremymartinwosagasu	Rémy Martin	no
+tsukattanoharemymartin	Rémy Martin	tail
+mcdonaldsdeshirabeta	McDonald's	head
+korewomcdonaldsdeshirabeta	McDonald's	wo
+kinouhamcdonaldswotsukatta	McDonald's	ha
+koregamcdonaldsdesu	McDonald's	ga
+kaishanimcdonaldsgaaru	McDonald's	ni
+soredemcdonaldswotsukau	McDonald's	de
+tomodachitomcdonaldswotsukatta	McDonald's	to
+watashimomcdonaldswotsukau	McDonald's	mo
+honnomcdonaldswosagasu	McDonald's	no
+tsukattanohamcdonalds	McDonald's	tail
+seicomartdeshirabeta	Seicomart	head
+korewoseicomartdeshirabeta	Seicomart	wo
+kinouhaseicomartwotsukatta	Seicomart	ha
+koregaseicomartdesu	Seicomart	ga
+kaishaniseicomartgaaru	Seicomart	ni
+soredeseicomartwotsukau	Seicomart	de
+tomodachitoseicomartwotsukatta	Seicomart	to
+watashimoseicomartwotsukau	Seicomart	mo
+honnoseicomartwosagasu	Seicomart	no
+tsukattanohaseicomart	Seicomart	tail
+diptyquedeshirabeta	Diptyque	head
+korewodiptyquedeshirabeta	Diptyque	wo
+kinouhadiptyquewotsukatta	Diptyque	ha
+koregadiptyquedesu	Diptyque	ga
+kaishanidiptyquegaaru	Diptyque	ni
+soredediptyquewotsukau	Diptyque	de
+tomodachitodiptyquewotsukatta	Diptyque	to
+watashimodiptyquewotsukau	Diptyque	mo
+honnodiptyquewosagasu	Diptyque	no
+tsukattanohadiptyque	Diptyque	tail
+medihealdeshirabeta	Mediheal	head
+korewomedihealdeshirabeta	Mediheal	wo
+kinouhamedihealwotsukatta	Mediheal	ha
+koregamedihealdesu	Mediheal	ga
+kaishanimedihealgaaru	Mediheal	ni
+soredemedihealwotsukau	Mediheal	de
+tomodachitomedihealwotsukatta	Mediheal	to
+watashimomedihealwotsukau	Mediheal	mo
+honnomedihealwosagasu	Mediheal	no
+tsukattanohamediheal	Mediheal	tail
+stepwgndeshirabeta	Step WGN	head
+korewostepwgndeshirabeta	Step WGN	wo
+kinouhastepwgnwotsukatta	Step WGN	ha
+koregastepwgndesu	Step WGN	ga
+kaishanistepwgngaaru	Step WGN	ni
+soredestepwgnwotsukau	Step WGN	de
+tomodachitostepwgnwotsukatta	Step WGN	to
+watashimostepwgnwotsukau	Step WGN	mo
+honnostepwgnwosagasu	Step WGN	no
+tsukattanohastepwgn	Step WGN	tail
+chryslerdeshirabeta	Chrysler	head
+korewochryslerdeshirabeta	Chrysler	wo
+kinouhachryslerwotsukatta	Chrysler	ha
+koregachryslerdesu	Chrysler	ga
+kaishanichryslergaaru	Chrysler	ni
+soredechryslerwotsukau	Chrysler	de
+tomodachitochryslerwotsukatta	Chrysler	to
+watashimochryslerwotsukau	Chrysler	mo
+honnochryslerwosagasu	Chrysler	no
+tsukattanohachrysler	Chrysler	tail
+advandeshirabeta	ADVAN	head
+korewoadvandeshirabeta	ADVAN	wo
+kinouhaadvanwotsukatta	ADVAN	ha
+koregaadvandesu	ADVAN	ga
+kaishaniadvangaaru	ADVAN	ni
+soredeadvanwotsukau	ADVAN	de
+tomodachitoadvanwotsukatta	ADVAN	to
+watashimoadvanwotsukau	ADVAN	mo
+honnoadvanwosagasu	ADVAN	no
+tsukattanohaadvan	ADVAN	tail
+fujifilmdeshirabeta	FUJIFILM	head
+korewofujifilmdeshirabeta	FUJIFILM	wo
+kinouhafujifilmwotsukatta	FUJIFILM	ha
+koregafujifilmdesu	FUJIFILM	ga
+kaishanifujifilmgaaru	FUJIFILM	ni
+soredefujifilmwotsukau	FUJIFILM	de
+tomodachitofujifilmwotsukatta	FUJIFILM	to
+watashimofujifilmwotsukau	FUJIFILM	mo
+honnofujifilmwosagasu	FUJIFILM	no
+tsukattanohafujifilm	FUJIFILM	tail
+bluemicrophonesdeshirabeta	Blue Microphones	head
+korewobluemicrophonesdeshirabeta	Blue Microphones	wo
+kinouhabluemicrophoneswotsukatta	Blue Microphones	ha
+koregabluemicrophonesdesu	Blue Microphones	ga
+kaishanibluemicrophonesgaaru	Blue Microphones	ni
+soredebluemicrophoneswotsukau	Blue Microphones	de
+tomodachitobluemicrophoneswotsukatta	Blue Microphones	to
+watashimobluemicrophoneswotsukau	Blue Microphones	mo
+honnobluemicrophoneswosagasu	Blue Microphones	no
+tsukattanohabluemicrophones	Blue Microphones	tail
+ehxdeshirabeta	EHX	head
+korewoehxdeshirabeta	EHX	wo
+kinouhaehxwotsukatta	EHX	ha
+koregaehxdesu	EHX	ga
+kaishaniehxgaaru	EHX	ni
+soredeehxwotsukau	EHX	de
+tomodachitoehxwotsukatta	EHX	to
+watashimoehxwotsukau	EHX	mo
+honnoehxwosagasu	EHX	no
+tsukattanohaehx	EHX	tail
+larcencieldeshirabeta	L'Arc~en~Ciel	head
+korewolarcencieldeshirabeta	L'Arc~en~Ciel	wo
+kinouhalarcencielwotsukatta	L'Arc~en~Ciel	ha
+koregalarcencieldesu	L'Arc~en~Ciel	ga
+kaishanilarcencielgaaru	L'Arc~en~Ciel	ni
+soredelarcencielwotsukau	L'Arc~en~Ciel	de
+tomodachitolarcencielwotsukatta	L'Arc~en~Ciel	to
+watashimolarcencielwotsukau	L'Arc~en~Ciel	mo
+honnolarcencielwosagasu	L'Arc~en~Ciel	no
+tsukattanohalarcenciel	L'Arc~en~Ciel	tail
+twsdeshirabeta	TWS	head
+korewotwsdeshirabeta	TWS	wo
+kinouhatwswotsukatta	TWS	ha
+koregatwsdesu	TWS	ga
+kaishanitwsgaaru	TWS	ni
+soredetwswotsukau	TWS	de
+tomodachitotwswotsukatta	TWS	to
+watashimotwswotsukau	TWS	mo
+honnotwswosagasu	TWS	no
+tsukattanohatws	TWS	tail
+botwdeshirabeta	BotW	head
+korewobotwdeshirabeta	BotW	wo
+kinouhabotwwotsukatta	BotW	ha
+koregabotwdesu	BotW	ga
+kaishanibotwgaaru	BotW	ni
+soredebotwwotsukau	BotW	de
+tomodachitobotwwotsukatta	BotW	to
+watashimobotwwotsukau	BotW	mo
+honnobotwwosagasu	BotW	no
+tsukattanohabotw	BotW	tail
+dbzdeshirabeta	DBZ	head
+korewodbzdeshirabeta	DBZ	wo
+kinouhadbzwotsukatta	DBZ	ha
+koregadbzdesu	DBZ	ga
+kaishanidbzgaaru	DBZ	ni
+sorededbzwotsukau	DBZ	de
+tomodachitodbzwotsukatta	DBZ	to
+watashimodbzwotsukau	DBZ	mo
+honnodbzwosagasu	DBZ	no
+tsukattanohadbz	DBZ	tail
+lobotomycorporationdeshirabeta	Lobotomy Corporation	head
+korewolobotomycorporationdeshirabeta	Lobotomy Corporation	wo
+kinouhalobotomycorporationwotsukatta	Lobotomy Corporation	ha
+koregalobotomycorporationdesu	Lobotomy Corporation	ga
+kaishanilobotomycorporationgaaru	Lobotomy Corporation	ni
+soredelobotomycorporationwotsukau	Lobotomy Corporation	de
+tomodachitolobotomycorporationwotsukatta	Lobotomy Corporation	to
+watashimolobotomycorporationwotsukau	Lobotomy Corporation	mo
+honnolobotomycorporationwosagasu	Lobotomy Corporation	no
+tsukattanohalobotomycorporation	Lobotomy Corporation	tail
+codwarzonedeshirabeta	CoD:Warzone	head
+korewocodwarzonedeshirabeta	CoD:Warzone	wo
+kinouhacodwarzonewotsukatta	CoD:Warzone	ha
+koregacodwarzonedesu	CoD:Warzone	ga
+kaishanicodwarzonegaaru	CoD:Warzone	ni
+soredecodwarzonewotsukau	CoD:Warzone	de
+tomodachitocodwarzonewotsukatta	CoD:Warzone	to
+watashimocodwarzonewotsukau	CoD:Warzone	mo
+honnocodwarzonewosagasu	CoD:Warzone	no
+tsukattanohacodwarzone	CoD:Warzone	tail
+stumbleguysdeshirabeta	Stumble Guys	head
+korewostumbleguysdeshirabeta	Stumble Guys	wo
+kinouhastumbleguyswotsukatta	Stumble Guys	ha
+koregastumbleguysdesu	Stumble Guys	ga
+kaishanistumbleguysgaaru	Stumble Guys	ni
+soredestumbleguyswotsukau	Stumble Guys	de
+tomodachitostumbleguyswotsukatta	Stumble Guys	to
+watashimostumbleguyswotsukau	Stumble Guys	mo
+honnostumbleguyswosagasu	Stumble Guys	no
+tsukattanohastumbleguys	Stumble Guys	tail
+algsdeshirabeta	ALGS	head
+korewoalgsdeshirabeta	ALGS	wo
+kinouhaalgswotsukatta	ALGS	ha
+koregaalgsdesu	ALGS	ga
+kaishanialgsgaaru	ALGS	ni
+soredealgswotsukau	ALGS	de
+tomodachitoalgswotsukatta	ALGS	to
+watashimoalgswotsukau	ALGS	mo
+honnoalgswosagasu	ALGS	no
+tsukattanohaalgs	ALGS	tail
+dwgkiadeshirabeta	DWG KIA	head
+korewodwgkiadeshirabeta	DWG KIA	wo
+kinouhadwgkiawotsukatta	DWG KIA	ha
+koregadwgkiadesu	DWG KIA	ga
+kaishanidwgkiagaaru	DWG KIA	ni
+sorededwgkiawotsukau	DWG KIA	de
+tomodachitodwgkiawotsukatta	DWG KIA	to
+watashimodwgkiawotsukau	DWG KIA	mo
+honnodwgkiawosagasu	DWG KIA	no
+tsukattanohadwgkia	DWG KIA	tail
+projectdivadeshirabeta	Project DIVA	head
+korewoprojectdivadeshirabeta	Project DIVA	wo
+kinouhaprojectdivawotsukatta	Project DIVA	ha
+koregaprojectdivadesu	Project DIVA	ga
+kaishaniprojectdivagaaru	Project DIVA	ni
+soredeprojectdivawotsukau	Project DIVA	de
+tomodachitoprojectdivawotsukatta	Project DIVA	to
+watashimoprojectdivawotsukau	Project DIVA	mo
+honnoprojectdivawosagasu	Project DIVA	no
+tsukattanohaprojectdiva	Project DIVA	tail
+bethesdadeshirabeta	Bethesda	head
+korewobethesdadeshirabeta	Bethesda	wo
+kinouhabethesdawotsukatta	Bethesda	ha
+koregabethesdadesu	Bethesda	ga
+kaishanibethesdagaaru	Bethesda	ni
+soredebethesdawotsukau	Bethesda	de
+tomodachitobethesdawotsukatta	Bethesda	to
+watashimobethesdawotsukau	Bethesda	mo
+honnobethesdawosagasu	Bethesda	no
+tsukattanohabethesda	Bethesda	tail
+ncsoftdeshirabeta	NCSOFT	head
+korewoncsoftdeshirabeta	NCSOFT	wo
+kinouhancsoftwotsukatta	NCSOFT	ha
+koregancsoftdesu	NCSOFT	ga
+kaishanincsoftgaaru	NCSOFT	ni
+soredencsoftwotsukau	NCSOFT	de
+tomodachitoncsoftwotsukatta	NCSOFT	to
+watashimoncsoftwotsukau	NCSOFT	mo
+honnoncsoftwosagasu	NCSOFT	no
+tsukattanohancsoft	NCSOFT	tail
+kleientertainmentdeshirabeta	Klei Entertainment	head
+korewokleientertainmentdeshirabeta	Klei Entertainment	wo
+kinouhakleientertainmentwotsukatta	Klei Entertainment	ha
+koregakleientertainmentdesu	Klei Entertainment	ga
+kaishanikleientertainmentgaaru	Klei Entertainment	ni
+soredekleientertainmentwotsukau	Klei Entertainment	de
+tomodachitokleientertainmentwotsukatta	Klei Entertainment	to
+watashimokleientertainmentwotsukau	Klei Entertainment	mo
+honnokleientertainmentwosagasu	Klei Entertainment	no
+tsukattanohakleientertainment	Klei Entertainment	tail
+ballondordeshirabeta	Ballon d'Or	head
+korewoballondordeshirabeta	Ballon d'Or	wo
+kinouhaballondorwotsukatta	Ballon d'Or	ha
+koregaballondordesu	Ballon d'Or	ga
+kaishaniballondorgaaru	Ballon d'Or	ni
+soredeballondorwotsukau	Ballon d'Or	de
+tomodachitoballondorwotsukatta	Ballon d'Or	to
+watashimoballondorwotsukau	Ballon d'Or	mo
+honnoballondorwosagasu	Ballon d'Or	no
+tsukattanohaballondor	Ballon d'Or	tail
+sanfreccehiroshimadeshirabeta	Sanfrecce Hiroshima	head
+korewosanfreccehiroshimadeshirabeta	Sanfrecce Hiroshima	wo
+kinouhasanfreccehiroshimawotsukatta	Sanfrecce Hiroshima	ha
+koregasanfreccehiroshimadesu	Sanfrecce Hiroshima	ga
+kaishanisanfreccehiroshimagaaru	Sanfrecce Hiroshima	ni
+soredesanfreccehiroshimawotsukau	Sanfrecce Hiroshima	de
+tomodachitosanfreccehiroshimawotsukatta	Sanfrecce Hiroshima	to
+watashimosanfreccehiroshimawotsukau	Sanfrecce Hiroshima	mo
+honnosanfreccehiroshimawosagasu	Sanfrecce Hiroshima	no
+tsukattanohasanfreccehiroshima	Sanfrecce Hiroshima	tail
+astrosdeshirabeta	Astros	head
+korewoastrosdeshirabeta	Astros	wo
+kinouhaastroswotsukatta	Astros	ha
+koregaastrosdesu	Astros	ga
+kaishaniastrosgaaru	Astros	ni
+soredeastroswotsukau	Astros	de
+tomodachitoastroswotsukatta	Astros	to
+watashimoastroswotsukau	Astros	mo
+honnoastroswosagasu	Astros	no
+tsukattanohaastros	Astros	tail
+usopendeshirabeta	US Open	head
+korewousopendeshirabeta	US Open	wo
+kinouhausopenwotsukatta	US Open	ha
+koregausopendesu	US Open	ga
+kaishaniusopengaaru	US Open	ni
+soredeusopenwotsukau	US Open	de
+tomodachitousopenwotsukatta	US Open	to
+watashimousopenwotsukau	US Open	mo
+honnousopenwosagasu	US Open	no
+tsukattanohausopen	US Open	tail
+indycardeshirabeta	IndyCar	head
+korewoindycardeshirabeta	IndyCar	wo
+kinouhaindycarwotsukatta	IndyCar	ha
+koregaindycardesu	IndyCar	ga
+kaishaniindycargaaru	IndyCar	ni
+soredeindycarwotsukau	IndyCar	de
+tomodachitoindycarwotsukatta	IndyCar	to
+watashimoindycarwotsukau	IndyCar	mo
+honnoindycarwosagasu	IndyCar	no
+tsukattanohaindycar	IndyCar	tail
+bjjdeshirabeta	BJJ	head
+korewobjjdeshirabeta	BJJ	wo
+kinouhabjjwotsukatta	BJJ	ha
+koregabjjdesu	BJJ	ga
+kaishanibjjgaaru	BJJ	ni
+soredebjjwotsukau	BJJ	de
+tomodachitobjjwotsukatta	BJJ	to
+watashimobjjwotsukau	BJJ	mo
+honnobjjwosagasu	BJJ	no
+tsukattanohabjj	BJJ	tail
