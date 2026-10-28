@@ -184,6 +184,30 @@
    "intended": "話しといた。",
    "alternatives": [],
    "note": "2026-10-24 見直し: 一覧にない動詞の 〜といた が辞書になかった"
+  },
+  {
+   "id": "r025",
+   "category": "reported",
+   "romaji": "deatsumete",
+   "intended": "で集めて",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
+  },
+  {
+   "id": "r026",
+   "category": "reported",
+   "romaji": "minnnadeatsumete",
+   "intended": "みんなで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
+  },
+  {
+   "id": "r027",
+   "category": "reported",
+   "romaji": "gakkoudeatsumeteta.",
+   "intended": "学校で集めてた。",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
   }
  ]
 }
