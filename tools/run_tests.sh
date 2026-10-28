@@ -161,6 +161,13 @@ b)
   # 利用者が見つけた失敗（毎回確かめる）
   romaji $T/reported.json > $W/reported.txt
   $BATCH $W/reported.txt $OUT/reported.tsv 1
+  # 前の文があるときの報告（tests/conversion/reported-context.tsv）。2列目と同じなら正解
+  bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL $T/reported-context.tsv $OUT/reported-context.tsv with 1
+  grep -v '^#' $T/reported-context.tsv | paste - $OUT/reported-context.tsv \
+    | awk -F'\t' '{print ($2==$6 ? "ok" : "NG") "\t" $1 "\t" $3 "\t" $6}' | tee $OUT/reported-context-score.txt
+  # 外れたときの切り分け: 打ち間違いの直しなし・人工知能なし
+  MYIME_TYPO_MARGIN=off MYIME_TYPO_UNREAD=off $BATCH $W/reported.txt $OUT/reported-typo-off.tsv 1
+  bash $REPO/tools/batch_convert.sh $E/session_handler_main $E /nonexistent.gguf $W/reported.txt $OUT/reported-no-ai.tsv 1 || true
   python3 $REPO/tools/score_categories.py $OUT/reported.tsv $T/reported.json
   ;;
 c)

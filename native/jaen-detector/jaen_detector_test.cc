@@ -662,6 +662,8 @@ int main() {
     Expect(edit("kaigoidesu", "kaigidesu") == jaen::TypoPriors{}.extra_key, "a key next to a key around it may be dropped at extra_key");
     Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key touching neither key around it is not dropped");
     Expect(edit("kiouhadesu", "kinouhadesu") == jaen::TypoPriors{}.dropped_consonant, "a consonant left out (kiou for kinou)");
+    Expect(edit("dakeatokara", "dakeeatokara") != jaen::TypoPriors{}.long_vowel, "no long vowel is put in after e before another vowel (だけあとから)");
+    Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "a long vowel left out before a consonant (okii)");
     {
       jaen::TypoPriors off;
       off.extra_key = off.dropped_consonant = jaen::TypoPriors::kOff;

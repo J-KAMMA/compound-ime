@@ -214,10 +214,13 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       found[*kana] = {std::move(keys), *kana, prior};
     }
   };
-  // A long vowel left out, also after the first key ("okii" for ookii).
+  // A long vowel left out, also after the first key ("okii" for ookii). Not after an e
+  // before another vowel: "dakeatokara" is だけあとから, not だけえあとから ("gakkoe" for
+  // gakkoue stays).
   for (size_t i = 0; i < text.size(); ++i) {
     const char c = text[i];
     if (std::string_view("aiueo").find(c) == std::string_view::npos) continue;
+    if (c == 'e' && i + 1 < text.size() && std::string_view("aiueo").find(text[i + 1]) != std::string_view::npos) continue;
     std::string longer{c};
     if (c == 'o' || c == 'u') longer = c == 'u' ? "u" : "ou";
     if (c == 'e') longer = "ei";
