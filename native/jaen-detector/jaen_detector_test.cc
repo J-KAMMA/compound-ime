@@ -130,6 +130,15 @@ int main() {
     Expect(Text("qwenwotamesu", jaen::SplitEnglish(chunks, lexicon, Parse), true) == "qwen|",
            "a q word may end inside the chunk nwo (qwen|wo)");
   }
+  {
+    // A name ending in the particle's key ("mbed|de"): the composer reads the two d's as っで in one chunk.
+    jaen::Lexicon names;
+    names.AddSignalOnly("mbed");
+    const std::vector<Chunk> chunks = {{"m", "ん", ""}, {"be", "べ", ""}, {"dde", "っで", ""},
+                                       {"su", "す", ""}, {"", "", ""}};
+    Expect(Text("mbeddesu", jaen::SplitEnglish(chunks, names, Parse), true) == "mbed|",
+           "a name may end inside the chunk dde (mbed|de)");
+  }
 
   {
     // A name after a particle is not stopped by a word made of the particle and the name.

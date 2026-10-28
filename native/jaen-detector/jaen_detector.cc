@@ -418,7 +418,7 @@ LatticeResult RunLattice(const JapaneseModel& model, std::string_view kana, cons
 namespace {
 struct ChunkMarks {
   std::string raw;
-  std::vector<bool> boundary, blocked, no_start, no_end, unread, small_start;
+  std::vector<bool> boundary, blocked, no_start, no_end, unread, small_start, double_edge;
   std::vector<bool> edge;  // 打った文字の区切りそのもの（boundary は、かなの塊の中の切れ目も含む）
   std::vector<std::string> kana, kana_all;
   std::vector<size_t> kana_at, kana_all_at;
@@ -434,6 +434,7 @@ ChunkMarks MarkChunks(const std::vector<Chunk>& chunks) {
   std::vector<bool> no_end(1, false);    // no English word ends at i
   std::vector<bool> unread;              // unread[k]: raw key k was left unread (no kana)
   std::vector<bool> small_start(1, false);  // small_start[i]: a loanword kana chunk (IsKanaForLoanword) starts at i
+  std::vector<bool> double_edge(1, false);  // double_edge[i]: i is after the first key of a doubled-key chunk ("dde")
   std::vector<std::string> kana;        // the typed kana, one character each
   std::vector<size_t> kana_at(1, 0);    // kana_at[i]: kana count before raw edge i
   std::vector<std::string> kana_all;    // 文脈で決める段用: 上と同じで、最後の n（ん）も入れる
@@ -450,6 +451,7 @@ ChunkMarks MarkChunks(const std::vector<Chunk>& chunks) {
     no_end.resize(raw.size() + 1, false);
     unread.resize(raw.size(), chunk.conversion.empty());
     small_start.resize(raw.size() + 1, false);
+    double_edge.resize(raw.size() + 1, false);
     small_start[raw.size() - chunk.raw.size()] = IsKanaForLoanword(chunk);
     boundary[raw.size()] = true;
     blocked[raw.size()] = false;
@@ -481,6 +483,7 @@ ChunkMarks MarkChunks(const std::vector<Chunk>& chunks) {
     if (chunk.conversion.starts_with("っ") && !small && r.size() == 3 && Lower(r[0]) == Lower(r[1]) &&
         IsVowel(r[2])) {
       no_end[start + 2] = true;
+      double_edge[start + 1] = true;
     }
     for (size_t at = 0; at < chunk.conversion.size();) {
       const unsigned char lead = chunk.conversion[at];
@@ -509,6 +512,7 @@ ChunkMarks MarkChunks(const std::vector<Chunk>& chunks) {
   marks.no_end = std::move(no_end);
   marks.unread = std::move(unread);
   marks.small_start = std::move(small_start);
+  marks.double_edge = std::move(double_edge);
   marks.kana = std::move(kana);
   marks.kana_all = std::move(kana_all);
   marks.kana_at = std::move(kana_at);
@@ -532,6 +536,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
   const std::vector<bool>& no_end = marks.no_end;
   const std::vector<bool>& unread = marks.unread;
   const std::vector<bool>& small_start = marks.small_start;
+  const std::vector<bool>& double_edge = marks.double_edge;
   const std::vector<std::string>& kana = marks.kana;
   const std::vector<size_t>& kana_at = marks.kana_at;
   const auto kana_text = [&](size_t a, size_t b) {
@@ -974,7 +979,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       } else if (signal_only) {
         const bool named = word.size() >= 6 && lexicon.IsNamed(word);
         int64_t sign = 0;
-        if (boundary[i] && boundary[j] && (sign = ForeignCost(parse(word))) > 0 &&
+        if (boundary[i] && (boundary[j] || double_edge[j]) && (sign = ForeignCost(parse(word))) > 0 &&
             (named || (!word_across(i, false, false) && !word_across(j, true, sign >= kForeignCost)))) {
           cost = kSpanCost - length;
         }
