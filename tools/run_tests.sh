@@ -332,6 +332,16 @@ v)
       MYIME_TYPO_EN_MAX=$m $BATCH $W/$f.txt $OUT/enmax$m-$f.tsv 4
     done
   done
+  # 登録語・略語・長い語に読まれた打ち間違い（machia|aws|eta）を直す厳しい規則の境目（MYIME_TYPO_EN_LISTED、
+  # 既定 6000、off で止める）の比べ。正しく打った英語まじりの表（english-mid・domain・proper-nouns など）が
+  # off と変わらず、打ち間違いの表が増える境目を探す
+  romaji $T/holdout/holdout-typo.json > $W/holdout-typo.txt
+  for f in english-mid domain-prog domain-tools proper-nouns; do grep -v '^#' $T/$f.tsv | cut -f1 > $W/$f.txt; done
+  for m in off 4000 6000 9000; do
+    for f in dev-typo holdout-typo jaen270 jaen200b allenglish-mixed acronyms english-mid domain-prog domain-tools proper-nouns; do
+      MYIME_TYPO_EN_LISTED=$m $BATCH $W/$f.txt $OUT/enlisted$m-$f.tsv 4
+    done
+  done
   ;;
 r)
   # 小文字で打たれやすい英字の略語。型 a（api、url、html、ok、id: 打った並びに英字が残る）は英語として取って大文字の書き方を先頭に、

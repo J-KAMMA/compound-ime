@@ -702,6 +702,40 @@ int main() {
     Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "also after the first key (okii for ookii)");
     Expect(edit("kyohan'demo", "kyouhan'demo") == jaen::TypoPriors{}.long_vowel, "keys with n' for ん are edited too");
     Expect(edit("kazukidesu", "kaxukidesu") == std::nullopt, "no fix brings in an x or l small kana (z next to x)");
+    {
+      // A slip read as a listed word or acronym (FixTypoReadAsEnglish's stricter test): only one
+      // English run between Japanese pieces, not before a particle, with the edit in or next to it.
+      using Run = std::optional<std::pair<size_t, size_t>>;
+      const std::vector<Piece> machiawase = {{0, 11, false}, {11, 14, true}, {14, 17, false}};
+      Expect(jaen::EnglishRunBetweenJapanese("ekidemachiaawseta", machiawase) == Run{{11, 14}},
+             "machia|aws|eta: aws between Japanese is the run");
+      Expect(!jaen::EnglishRunBetweenJapanese("awsnosetteiwosuru", {{0, 3, true}, {3, 17, false}}),
+             "aws at the start stays English (awsのせっていをする)");
+      Expect(!jaen::EnglishRunBetweenJapanese("kinouawsnosettei", {{0, 5, false}, {5, 8, true}, {8, 16, false}}),
+             "aws right before の stays English (きのうawsのせってい)");
+      Expect(!jaen::EnglishRunBetweenJapanese("korehahouse", {{0, 6, false}, {6, 11, true}}),
+             "a word at the end stays English");
+      Expect(!jaen::EnglishRunBetweenJapanese("ahouseihouse", {{0, 1, false}, {1, 6, true}, {6, 7, false},
+                                                             {7, 12, true}}),
+             "two English runs are not one slip");
+      Expect(jaen::EnglishRunBetweenJapanese("konokusurihasohkugo", {{0, 10, false}, {10, 13, true},
+                                                                    {13, 15, true}, {15, 19, false}}) ==
+                 Run{{10, 15}},
+             "has|oh next to each other is one run");
+      Expect(!jaen::EnglishRunBetweenJapanese("kinouawsdeshita", {{0, 5, false}, {5, 8, true}, {8, 15, false}}),
+             "before で stays English");
+      Expect(jaen::EditNear("ekidemachiaawseta", "ekidemachiawaseta", 11, 14), "a swap inside aws");
+      Expect(jaen::EditNear("abcxyzdef", "abxxyzdef", 3, 6), "the key just before the run");
+      Expect(jaen::EditNear("abcxyzdef", "abcxyzxef", 3, 6), "the key just after the run");
+      Expect(!jaen::EditNear("abcxyzdef", "axcxyzdef", 3, 6), "two keys before the run is elsewhere");
+      Expect(!jaen::EditNear("abcxyzdefg", "abcxyzdeqg", 3, 6), "two keys after the run is elsewhere");
+      Expect(jaen::EditNear("abcxyzdef", "abcxyazdef", 3, 6), "a key put in inside the run");
+      Expect(jaen::EditNear("abcxyzdef", "abcxydef", 3, 6), "a key dropped inside the run");
+      Expect(!jaen::EditNear("abc", "abc", 0, 3), "no edit");
+      Expect(jaen::StartsWithParticleSpelling("nosettei") && jaen::StartsWithParticleSpelling("wookuru") &&
+                 !jaen::StartsWithParticleSpelling("eta") && !jaen::StartsWithParticleSpelling("kugo"),
+             "particle spellings");
+    }
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");
