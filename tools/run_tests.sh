@@ -225,6 +225,11 @@ d1|d2)
   ;;
 e1|e2)
   # ウィキペディアの文をローマ字で打つ（前半と後半。採点はまとめの段で）
+  # 辞書にない外来語をカタカナ1語にする決め方（tools/apply_loanword_katakana.py）の単体試験は g++ で動く
+  if [ "$GROUP" = e1 ]; then
+    g++ -std=c++20 -O2 $REPO/native/jaen-detector/loanword_katakana_test.cc -o $W/loanword_katakana_test
+    $W/loanword_katakana_test | tee $OUT/loanword-katakana.txt
+  fi
   if [ -f $T/wiki-typing.tsv ]; then
     grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
     half=$(( ($(wc -l < $W/wiki.txt) + 1) / 2 ))
