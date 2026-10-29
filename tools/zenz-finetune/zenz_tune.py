@@ -27,7 +27,7 @@ PAD_ID = 1
 # tok_s は学習の速さの仮の値（1 秒あたりの文字数）。実際の値は学習を始めてから測って出し直す。
 PROFILES = {
     "A100": {"precision": "bf16", "micro": 128, "tok_s": 110_000, "units_per_hour": 11.77},
-    "L4": {"precision": "bf16", "micro": 64, "tok_s": 45_000, "units_per_hour": 4.82},
+    "L4": {"precision": "bf16", "micro": 64, "tok_s": 45_000, "units_per_hour": 1.5},  # 1時間あたりは利用者の記録（2026-10、Colab Pro の表示で約1.5）。tok_s は未測定の仮の値
     "T4": {"precision": "fp16", "micro": 16, "tok_s": 12_300, "units_per_hour": 1.76},  # tok_s は実測（40万問・2周で約85分）。micro は 64 では長い問題の束で記憶が足りなくなった（2026-10-15、400歩目）
 }
 

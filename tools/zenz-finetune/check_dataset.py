@@ -34,13 +34,14 @@ def test_sentences(repo: Path):
     """tests/conversion/ の、日本語の文（表記）を集める。出所の名前つき。"""
     out = []
     test_dir = repo / "tests" / "conversion"
-    for path in sorted(test_dir.glob("*.json")):
+    for path in sorted(test_dir.rglob("*.json")):   # holdout/ などの下のフォルダも
         data = json.loads(path.read_text(encoding="utf-8"))
         for item in (data["items"] if isinstance(data, dict) else data):
             if item.get("intended"):
                 out.append((path.name, item["intended"]))
     for name, column in (("context.tsv", 1), ("colloquial.tsv", 1), ("wiki-typing.tsv", 1), ("domain-prog.tsv", 1),
-                         ("domain-crypto.tsv", 1), ("expected-windows-139.tsv", 2), ("variants.tsv", 3)):
+                         ("domain-crypto.tsv", 1), ("expected-windows-139.tsv", 2), ("variants.tsv", 3),
+                         ("toku.tsv", 1), ("naru.tsv", 1), ("holdout/holdout.tsv", 1)):
         path = test_dir / name
         if path.exists():
             for line in path.read_text(encoding="utf-8").splitlines():
@@ -63,6 +64,16 @@ def make_probe(repo: Path, out: Path, per_file: int = 60):
         if counts[name] > per_file:
             continue
         sentences.append((name, re.sub(r"[。！？]+$", "", text) + "。"))
+    # 近い文の確かめ用（v6 の --near-exclusion）: 句読点を除いて12字以上の試験の文の、真ん中の1字を「の」に替えた文
+    # （1字替えると 3字のつながりが最大3つ変わる。12字以上なら Dice が 0.6 を必ず超える＝除かれるはずの文）
+    near = []
+    for name, text in sentences:
+        body = text[:-1]
+        if len(bd.norm_surface(body)) >= 12:
+            mid = len(body) // 2
+            variant = body[:mid] + ("の" if body[mid] != "の" else "が") + body[mid + 1:] + "。"
+            near.append((name + ":near", variant))
+    sentences += near
     # ウィキペディアの記事の形: 5文ずつ
     articles = []
     for i in range(0, len(sentences), 5):
@@ -78,7 +89,8 @@ def make_probe(repo: Path, out: Path, per_file: int = 60):
         for row in rows:
             handle.write(json.dumps(row, ensure_ascii=False) + "\n")
     (out / "probe.json").write_text(json.dumps({"sentences": len(sentences), "by_file": counts,
-                                                  "texts": [t for _, t in sentences]}, ensure_ascii=False) + "\n",
+                                                  "texts": [t for n, t in sentences if not n.endswith(":near")],
+                                                  "near_texts": [t for n, t in sentences if n.endswith(":near")]}, ensure_ascii=False) + "\n",
                                     encoding="utf-8")
     print(f"probe: 試験の文 {len(sentences)} 文（ファイル別 {counts}）を、wiki 記事 {len(articles)} と文の一覧 {len(rows)} 行にしました")
 
@@ -104,14 +116,21 @@ def verify(args) -> int:
     repo, data = Path(args.repo), Path(args.data)
     manifest = json.loads((data / "manifest.json").read_text(encoding="utf-8"))
     problems = []
+    near = bool(manifest["settings"].get("near_exclusion"))
     exclusion = bd.TestExclusion(repo / "tests" / "conversion", bd.load_romaji_table(Path(args.romaji_table)),
-                                 extra_files=args.extra_test, ascii_containment=False)
+                                 extra_files=args.extra_test, ascii_containment=False, near=near)
     probe_index, probe_total = None, 0
     if args.probe:
         probe = json.loads((Path(args.probe) / "probe.json").read_text(encoding="utf-8"))
         probe_total = len(probe["texts"])
         probe_index = bd.SubstringIndex(bd.norm_surface(t) for t in probe["texts"] if len(bd.norm_surface(t)) >= 4)
         probe_exact = {bd.norm_surface(t) for t in probe["texts"]}
+        if near:   # 近い文も除くなら、わざと混ぜた「近い文」も残ってはいけない
+            near_texts = probe.get("near_texts", [])
+            probe_total += len(near_texts)
+            probe_exact |= {bd.norm_surface(t) for t in near_texts}
+            probe_index = bd.SubstringIndex([bd.norm_surface(t) for t in probe["texts"] + near_texts
+                                             if len(bd.norm_surface(t)) >= 4])
     files = [data / f["name"] for f in manifest["train_files"]] + [data / "valid.jsonl"]
     whole_kinds = ("_whole", "_context")   # homophone・mixed_english は文の一部の問題も含むので除く
     total = hits_whole = hits_other = probe_hits = 0

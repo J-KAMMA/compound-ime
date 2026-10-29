@@ -87,8 +87,15 @@ DEFAULT_WEIGHTS = {
     "english_phrases": 0.02, # 英語の決まった言い回しを文脈に含む文（english-phrases.txt）
     "business": 0.06,        # ビジネス文（貴社・拝啓・お取引など。business-phrases.tsv の文を型に入れる）
     "counter": 0.06,         # 数＋助数詞（一杯・二羽・三日間など。counters.tsv の読みを型に入れる）
+    # v6 で足した種類（既定は 0 = 作らない。v5 までの作り方は変わらない。--kind-weights で割合を付ける）
+    "homophone_dict": 0.0,   # Mozc の辞書で同じ読みに別の漢字の表記がある語（同音語）を含む文。難しい同音語を多めに（--lexicon）
+    "proper_noun": 0.0,      # 固有名詞（人名・地名など）を含む文。読みと表記の組が Mozc にもあるものだけ（--lexicon）
+    "typo_whole": 0.0,       # 打ち間違えた読み（ローマ字で1字の打ち間違い。かなに読めるもの）→ 正しい文
 }
 SYNTHETIC_KINDS = ("casual", "modern_words", "english_phrases", "business", "counter")
+# 絵文字入りの話し言葉（v6）。RealPersonaChat・Tatoeba の文に、Mozc の絵文字の表（--emoji-data）で合う絵文字を足す。
+# 絵文字は確定済みの文字として左の文脈に入る（実行時と同じ）。emoji_pick は「えもじ」と打ったときに前の文に合う絵文字を選ぶ練習
+EMOJI_WEIGHTS = {"emoji_context": 0.8, "emoji_pick": 0.2}
 # 分野の文書（プログラミング・仮想通貨。tools/zenz-finetune/domain_text.py で取り出した文）の問題。
 # --domain-text を付けたときだけ作り、全体の --domain-share（既定 0.5）をこの4種類で分ける。
 DOMAIN_WEIGHTS = {
@@ -98,7 +105,8 @@ DOMAIN_WEIGHTS = {
     "domain_english": 0.35,  # 英字の言葉（git、npm、Python など）を含む文の、日本語の部分。英字は文脈側
 }
 DOMAIN_KINDS = tuple(DOMAIN_WEIGHTS)
-WIKI_KINDS = ("wiki_whole", "wiki_context", "wiki_span", "homophone", "mixed_english")
+WIKI_KINDS = ("wiki_whole", "wiki_context", "wiki_span", "homophone", "mixed_english",
+              "homophone_dict", "proper_noun", "typo_whole")
 
 # ---- 出典の混ぜ方（--mix wiki=0.55,tatoeba=0.2,... の名前）
 # 文の一覧（sentences.jsonl）から作る出典: 問題の形（whole 文全体、context 前の文つき、span 文の一部、
@@ -112,11 +120,12 @@ SOURCE_KINDS = {
     "wiki": {k: DEFAULT_WEIGHTS[k] for k in WIKI_KINDS},
     "synthetic": {k: DEFAULT_WEIGHTS[k] for k in SYNTHETIC_KINDS},   # 自作の一覧（話し言葉・略語・言い回し）
     **TEXT_SHAPES,
+    "emoji": EMOJI_WEIGHTS,
 }
 TEXT_SOURCES = tuple(TEXT_SHAPES)
 KIND_SOURCE = {kind: source for source, kinds in SOURCE_KINDS.items() for kind in kinds}
 # 出典ごとの「同じ文から作る問題の形の数」の上限（材料が足りないときだけ、この回数まで文を使い回す）
-DEFAULT_MAX_PASSES = {"wiki": 2, "synthetic": 1, "domain": 3, "tatoeba": 3, "persona": 3}
+DEFAULT_MAX_PASSES = {"wiki": 2, "synthetic": 1, "domain": 3, "tatoeba": 3, "persona": 3, "emoji": 2}
 # --mix を付けないときの出典の割合（昔の指定: 分野の文があれば --domain-share を分野に、残りを wiki と synthetic に）
 LEGACY_BASE_MIX = {"wiki": 0.86, "synthetic": 0.14}
 
@@ -268,6 +277,57 @@ class SubstringIndex:
         return None
 
 
+class NearIndex:
+    """試験の文に「近い文」（一部の字を言い換えた文、試験の文の大部分を含む文）を見つける（v6）。
+
+    文字の3字のつながり（3-gram）の集まりで比べる。試験の文 t と練習の文 c について、
+      重なり率（Dice）= 2|G(t)∩G(c)| / (|G(t)|+|G(c)|) が DICE 以上、または
+      試験の文の 3-gram のうち c に入っている割合 |G(t)∩G(c)| / |G(t)| が COVER 以上
+    なら「近い」とする。正規化した表記が MIN_CHARS 字未満の試験の文は調べない（短い文は「同じ」と「含む」で足りる）。
+    多くの試験の文に出る 3-gram（である、した。など）は索引に入れず、候補は珍しい 3-gram を MIN_SHARED 個以上
+    共有する試験の文だけにして速くする（重なりの計算は全部の 3-gram で行う）。"""
+
+    N = 3
+    MIN_CHARS = 8
+    DICE = 0.6
+    COVER = 0.8
+    COMMON = 300       # この数より多くの試験の文に出る 3-gram は索引に入れない
+    MIN_SHARED = 2
+
+    def __init__(self, texts):
+        self.texts = [t for t in sorted(set(texts)) if len(t) >= self.MIN_CHARS]
+        self.grams: list[frozenset] = []
+        postings: dict[str, list[int]] = {}
+        for index, text in enumerate(self.texts):
+            grams = self.grams_of(text)
+            self.grams.append(grams)
+            for gram in sorted(grams):
+                postings.setdefault(gram, []).append(index)
+        self.index = {g: ids for g, ids in postings.items() if len(ids) <= self.COMMON}
+        self.dropped_common = len(postings) - len(self.index)
+
+    @classmethod
+    def grams_of(cls, text: str) -> frozenset:
+        return frozenset(text[i:i + cls.N] for i in range(len(text) - cls.N + 1))
+
+    def find(self, text: str) -> str | None:
+        if len(text) < self.MIN_CHARS or not self.grams:
+            return None
+        grams = self.grams_of(text)
+        shared: dict[int, int] = {}
+        for gram in grams:
+            for index in self.index.get(gram, ()):
+                shared[index] = shared.get(index, 0) + 1
+        for index in sorted(shared):   # 並びを決めて、毎回同じ文を理由に挙げる
+            if shared[index] < self.MIN_SHARED:
+                continue
+            test = self.grams[index]
+            overlap = len(test & grams)
+            if overlap / len(test) >= self.COVER or 2 * overlap / (len(test) + len(grams)) >= self.DICE:
+                return self.texts[index]
+        return None
+
+
 class TestExclusion:
     """tests/conversion/ の文と表記・読みが同じか、それを含む文を見つける。
 
@@ -286,7 +346,7 @@ class TestExclusion:
     READING_MIN = 6
 
     def __init__(self, test_dir: Path, romaji_table: dict, english_to_katakana=None, ignore=(), extra_files=(),
-                 ascii_containment=True):
+                 ascii_containment=True, near=False):
         english_to_katakana = english_to_katakana or {}
         self.files = []
         surfaces, readings = set(), set()
@@ -409,12 +469,16 @@ class TestExclusion:
 
         self.surface_index = SubstringIndex(s for s in surfaces if contains_checked(s, self.SURFACE_MIN))
         self.reading_index = SubstringIndex(r for r in readings if contains_checked(r, self.READING_MIN))
+        # v6: 近い文（言い換え・大部分を含む文）も除く。near=False で v5 までと同じ（同じ・含むだけ）
+        self.near_index = NearIndex(s for s in surfaces if japanese.search(s)) if near else None
         self.stats = {
             "files_unhandled": self.unhandled,
             "surface_keys": len(surfaces),
             "surface_keys_checked_by_containment": sum(contains_checked(s, self.SURFACE_MIN) for s in surfaces),
             "reading_keys": len(readings),
             "reading_keys_checked_by_containment": sum(contains_checked(r, self.READING_MIN) for r in readings),
+            "near": ({"surface_keys": len(self.near_index.texts), "ngram": NearIndex.N, "dice": NearIndex.DICE,
+                      "cover": NearIndex.COVER, "min_chars": NearIndex.MIN_CHARS} if self.near_index else None),
         }
 
     def blocked(self, surface: str, readings=()) -> str | None:
@@ -424,6 +488,10 @@ class TestExclusion:
         hit = self.surface_index.find(s)
         if hit:
             return f"表記を含む: {hit}"
+        if self.near_index is not None:
+            hit = self.near_index.find(s)
+            if hit:
+                return f"表記が近い: {hit}"
         for reading in readings:
             r = norm_reading(reading)
             if not r:
@@ -770,6 +838,139 @@ def mixed_english_example(tokens, kata_map, rng, before=""):
     whole_reading = "".join(p[1] if p[1] is not None else p[0] for p in pieces)
     return example("mixed_english", reading, surface, left, right), (whole, whole_reading)
 
+# ---------------------------------------------------------------- v6: 同音語・固有名詞・打ち間違い・絵文字
+
+KANJI_RE = re.compile(r"[一-鿿々〆ヶ]")
+
+
+def load_lexicon(path: Path) -> dict:
+    """mozc_lexicon.py の語の一覧: 読み（ひらがな）→ {表記: 費用}。"""
+    lexicon: dict[str, dict[str, int]] = {}
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("#"):
+            continue
+        reading, surface, cost = line.rstrip("\n").split("\t")
+        lexicon.setdefault(reading, {})[surface] = int(cost)
+    return lexicon
+
+
+def lexicon_hits(tokens, lexicon):
+    """文の中の、Mozc で同音の別表記がある語（同音語）と、Mozc で確かめられた固有名詞の位置。
+    同音語は (位置, 難しいか)。難しい＝その表記の費用が、同じ読みのほかの漢字の表記のどれかより大きい
+    （ふつうに変換すると別の語が先に出やすい。専門語・歴史語・人名に多い）。"""
+    homophones, names = [], []
+    for i, token in enumerate(tokens):
+        if not KANJI_RE.search(token.surface):
+            continue
+        entries = lexicon.get(to_hiragana(token.reading))
+        if not entries or token.surface not in entries:
+            continue
+        if token.pos1 == "固有名詞":
+            names.append(i)
+        if token.pos0 == "名詞" and len(token.surface) >= 2:
+            others = [cost for surface, cost in entries.items() if surface != token.surface]
+            if others:
+                homophones.append((i, entries[token.surface] > min(others)))
+    return homophones, names
+
+
+def span_around(tokens, index, rng):
+    """index の語を含む文節から 1〜2 文節を問う範囲（始まり, 終わり）。"""
+    starts = bunsetsu_starts(tokens)
+    bounds = starts + [len(tokens)]
+    first = max(i for i, s in enumerate(starts) if s <= index)
+    last = min(len(starts), first + rng.choice((1, 1, 2)))
+    return bounds[first], bounds[last]
+
+
+TYPO_KINDS = ("doubled_vowel", "dropped", "swapped", "neighbor", "extra")
+_TYPO_TOOLS = None
+
+
+def typo_tools():
+    """tools/make_holdout_tests.py の打ち間違いの作り方とローマ字の書き方（1回だけ読み込む）。"""
+    global _TYPO_TOOLS
+    if _TYPO_TOOLS is None:
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
+        from make_holdout_tests import add_typo, romaji
+        _TYPO_TOOLS = (add_typo, romaji)
+    return _TYPO_TOOLS
+
+
+def typo_reading(reading_katakana: str, rng, table: dict):
+    """読み（カタカナ）をローマ字にして1字打ち間違え、Mozc のローマ字表でかなに戻す。
+    かなに読めないもの（英字が残る）・変わらないものは None。tests/conversion/holdout と同じ5種類
+    （tools/make_holdout_tests.py の add_typo。文は別なので、試験と同じ文にはならない）。"""
+    add_typo, romaji = typo_tools()
+    hira = to_hiragana(reading_katakana)
+    try:
+        typed = romaji(hira)
+    except SystemExit:
+        return None, None
+    kind = rng.choice(TYPO_KINDS)
+    try:
+        wrong = add_typo(typed, kind, rng)
+    except (IndexError, ValueError):
+        return None, kind
+    kana = romaji_to_kana(wrong, table)
+    if kana == hira or re.search(r"[a-z]", kana) or not READING_OK.match(to_katakana(kana)):
+        return None, kind
+    return to_katakana(kana), kind
+
+
+NUMERAL_WORDS = set("一二三四五六七八九十百千万億")
+EMOJI_GENERIC = {"！": ("😊", "😆", "✨", "👍"), "？": ("🤔", "😳", "👀"),
+                 "": ("😊", "😂", "🙏", "👍", "💦", "✨", "🥺", "😅")}
+
+
+def load_emoji_table(path: Path, max_version: float = 12.0):
+    """Mozc の emoji_data.tsv から、言葉 → 絵文字（辞書の順の最初）。言葉の列（6列目）と読み（3列目）を使う
+    （tools/apply_emoji_context.py と同じ列）。どの端末でも出せるよう、Emoji の版が max_version 以下のものだけ。
+    短いひらがな（2字以下）と、25 個より多くの絵文字に付く言葉は使わない。"""
+    words: dict[str, list[str]] = {}
+    for line in open(path, encoding="utf-8"):
+        if line.startswith("#"):
+            continue
+        cols = line.rstrip("\n").split("\t")
+        if len(cols) < 7 or not cols[1]:
+            continue
+        try:
+            version = float(cols[6].lstrip("E"))
+        except ValueError:
+            continue
+        if version > max_version or "⃣" in cols[1] or any(0x1F100 <= ord(ch) <= 0x1F2FF for ch in cols[1]):
+            continue   # 囲み数字・囲み文字（🈯 など）は話し言葉に合わないので使わない
+        found = []
+        for word in cols[5].split() + cols[2].split():
+            if word.isascii() or re.search(r"[（）()0-9０-９]", word) or word in NUMERAL_WORDS:
+                continue
+            if re.fullmatch(r"[ぁ-ゖー]+", word) and len(word) <= 3:
+                continue   # 短いひらがな（して、いい など）は文のどこにでもある
+            found.append(word)
+            # 寒い→寒、眠い→眠: 言葉の終わりのひらがなを外した語幹（寒く、眠くて にも合わせる）
+            stem = re.sub(r"[ぁ-ゖ]+$", "", word)
+            if stem != word and KANJI_RE.search(stem[-1:]) and stem not in NUMERAL_WORDS:
+                found.append(stem)
+        for word in found:
+            listed = words.setdefault(word, [])
+            if cols[1] not in listed:
+                listed.append(cols[1])
+    return {w: e[0] for w, e in sorted(words.items()) if len(e) <= 25}
+
+
+def emoji_for(text: str, table: dict, rng):
+    """文に合う絵文字。文の中の、表にある最も長い言葉の絵文字。なければ None。"""
+    best = ""
+    for size in range(min(8, len(text)), 0, -1):
+        for i in range(len(text) - size + 1):
+            word = text[i:i + size]
+            if word in table and (size >= 2 or KANJI_RE.match(word)):
+                best = word
+                break
+        if best:
+            break
+    return table[best] if best else None
+
 # ---------------------------------------------------------------- 自作の一覧からの問題
 # 型: (前の表記, 前の読み, 後の表記, 後の読み)。読みはひらがな。一般的な言い回しとして
 # この台本で書いたもので、試験の文は見ていない（重なれば TestExclusion が捨てる）。
@@ -845,10 +1046,12 @@ class Builder:
         for name in ("katakana-english-common.tsv", "katakana-english.tsv"):
             for katakana, english in load_katakana_english(self.data_dir / name).items():
                 english_to_katakana.setdefault(english.lower().replace(" ", ""), katakana)
+        self.romaji_table = load_romaji_table(Path(args.romaji_table))
         self.exclusion = TestExclusion(self.repo / "tests" / "conversion",
-                                       load_romaji_table(Path(args.romaji_table)), english_to_katakana,
+                                       self.romaji_table, english_to_katakana,
                                        extra_files=args.extra_test,
-                                       ascii_containment=not (args.domain_text or args.english_only_exact))
+                                       ascii_containment=not (args.domain_text or args.english_only_exact),
+                                       near=args.near_exclusion)
         # 種類ごとの割合（出典の中での割合）。--kind-weights で上書きできる
         self.kind_weights = {source: dict(kinds) for source, kinds in SOURCE_KINDS.items()}
         for item in (args.kind_weights.split(",") if args.kind_weights else []):
@@ -905,6 +1108,15 @@ class Builder:
         self.wiki_stats = None
         self.reader_versions = None
         self._reader = None
+        # v6: Mozc の辞書の語の一覧（同音語・固有名詞を選ぶ）と、絵文字の表
+        self.lexicon = load_lexicon(Path(args.lexicon)) if args.lexicon else {}
+        for kind in ("homophone_dict", "proper_noun"):
+            if self.quota.get(kind) and not self.lexicon:
+                raise SystemExit(f"{kind} の問題を作るには --lexicon（mozc_lexicon.py の語の一覧）が要ります")
+        if "emoji" in self.run_sources and not (args.emoji_data and args.domain_text):
+            raise SystemExit("emoji の問題を作るには --emoji-data（Mozc の emoji_data.tsv）と --domain-text が要ります")
+        self.v6_stats = {"typo": {}, "homophone_dict_hard": 0, "homophone_dict_easy": 0, "proper_noun": 0,
+                         "emoji": {}}
 
     def reader(self):
         if self._reader is None:
@@ -960,11 +1172,15 @@ class Builder:
         return True
 
     def full(self, kind) -> bool:
+        if not self.quota.get(kind):   # 割合 0 の種類（v6 で足した種類を使わないとき）は作らない
+            return True
         return len(self.train[kind]) >= self.quota[kind] and (
             len(self.valid[kind]) >= self.valid_cap or self.valid_fraction[kind] == 0)
 
     def is_open(self, kind) -> bool:
         """まだ問題を足せる種類か。2周目からは練習用だけ見る（確かめ用は1周目で集める）。"""
+        if not self.quota.get(kind):
+            return False
         if len(self.train[kind]) < self.quota[kind]:
             return True
         return self.pass_no == 1 and self.valid_fraction[kind] > 0 and len(self.valid[kind]) < self.valid_cap
@@ -1116,8 +1332,49 @@ class Builder:
                            "fill_added": self.fill_added, "slice": list(self.part)}
         self.note_shortfall("wiki")
 
+    def v6_forms(self, kind, sentence, tokens, reading, previous, index):
+        """同音語・固有名詞の問題: 文全体 50%、前の文つき 25%、その語を含む文節だけ（左右は文脈）25%。"""
+        roll = self.rng.random()
+        if roll < 0.5:
+            return example(kind, reading, sentence)
+        if roll < 0.75 and previous:
+            return example(kind, reading, sentence, previous)
+        start, end = span_around(tokens, index, self.rng)
+        return span_example(kind, tokens, start, end, previous if self.rng.random() < 0.5 else "")
+
+    def wiki_v6(self, group, sentence, tokens, reading, previous) -> bool:
+        """v6 で足した種類の問題を作れたら True（その文はほかの種類に使わない）。"""
+        rng = self.rng
+        if not self.full("typo_whole") and rng.random() < self.args.typo_rate:
+            wrong, typo_kind = typo_reading(reading, rng, self.romaji_table)
+            stats = self.v6_stats["typo"]
+            stats[f"{typo_kind}:{'ok' if wrong else 'unreadable'}"] = stats.get(f"{typo_kind}:{'ok' if wrong else 'unreadable'}", 0) + 1
+            if wrong and len(wrong) <= READING_MAX and self.check(sentence, [wrong]):
+                record = example("typo_whole", wrong, sentence, previous if previous and rng.random() < 0.3 else "")
+                if self.add("typo_whole", record, group):
+                    return True
+        if not self.lexicon or (self.full("homophone_dict") and self.full("proper_noun")):
+            return False
+        homophones, names = lexicon_hits(tokens, self.lexicon)
+        if names and not self.full("proper_noun") and rng.random() < self.args.name_rate:
+            if self.add("proper_noun", self.v6_forms("proper_noun", sentence, tokens, reading, previous,
+                                                     rng.choice(names)), group):
+                self.v6_stats["proper_noun"] += 1
+                return True
+        hard = [i for i, is_hard in homophones if is_hard]
+        easy = [i for i, is_hard in homophones if not is_hard]
+        if not self.full("homophone_dict") and (hard or (easy and rng.random() < self.args.easy_homophone_rate)):
+            index = rng.choice(hard) if hard else rng.choice(easy)
+            if self.add("homophone_dict", self.v6_forms("homophone_dict", sentence, tokens, reading, previous, index),
+                        group):
+                self.v6_stats["homophone_dict_hard" if hard else "homophone_dict_easy"] += 1
+                return True
+        return False
+
     def wiki_sentence(self, group, sentence, tokens, reading, previous, kata_map, groups):
         rng = self.rng
+        if self.wiki_v6(group, sentence, tokens, reading, previous):
+            return
         if not self.full("homophone") and homophone_hit(sentence, groups):
             roll = rng.random()
             if roll < 0.6:
@@ -1295,9 +1552,96 @@ class Builder:
         for g in self.text_groups:
             self.note_shortfall(g)
 
+    # ---- 絵文字入りの話し言葉（v6）
+    def build_emoji(self):
+        """RealPersonaChat・Tatoeba の文（--domain-text の persona・tatoeba の行）に絵文字を足した問題。
+        emoji_context: 絵文字で終わる前の文（または同じ文の前半）を左の文脈にして、続きを変換する。
+        emoji_pick: 文を左の文脈にして、読み「エモジ」→ 文の言葉に合う絵文字（Mozc の絵文字の表で引けたときだけ）。"""
+        sys.path.insert(0, str(Path(__file__).resolve().parent))
+        from domain_text import pieces_of
+        rng, reader = self.rng, self.reader()
+        table = load_emoji_table(Path(self.args.emoji_data))
+        config = json.loads(Path(self.args.domain_config).read_text(encoding="utf-8"))
+        group_of = {s["name"]: s.get("mix", "domain") for s in config["sources"]}
+        rows = []
+        for line in open(self.args.domain_text, encoding="utf-8"):
+            row = json.loads(line)
+            if row["split"] == "train" and group_of.get(row["source"]) in ("persona", "tatoeba"):
+                rows.append(row)
+        stats = self.v6_stats["emoji"]
+        stats["rows"] = len(rows)
+        stats["table_words"] = len(table)
+
+        def bump(key):
+            stats[key] = stats.get(key, 0) + 1
+
+        def mark(text):
+            found = emoji_for(text, table, rng)
+            if found is None:
+                bump("generic")
+                found = rng.choice(EMOJI_GENERIC.get(text[-1:], EMOJI_GENERIC[""]))
+            else:
+                bump("keyword")
+            return found * (2 if rng.random() < 0.1 else 1)
+
+        def attach(text):   # 話し言葉では絵文字の前の句点を省くことが多いので、半分は句点を外す
+            body = text[:-1] if text.endswith("。") and rng.random() < 0.5 else text
+            return body + mark(text.rstrip("。"))
+
+        kinds = list(SOURCE_KINDS["emoji"])
+        for pass_no in range(1, self.max_passes["emoji"] + 1):
+            self.pass_no = pass_no
+            if not any(self.is_open(k) for k in kinds):
+                break
+            order = list(range(len(rows)))
+            rng.shuffle(order)
+            for n in order:
+                if not any(self.is_open(k) for k in kinds):
+                    break
+                row = rows[n]
+                text, prev = row["text"], row.get("prev", "")
+                if any(kind == "en" for kind, _ in (pieces_of(text) or [("en", "")])):
+                    continue
+                tokens = reader.analyze(text)
+                if not tokens:
+                    continue
+                tokens, text = self.apply_orthography(tokens, text)
+                reading = "".join(t.reading for t in tokens)
+                if len(reading) > READING_MAX or not self.check(text, [reading]):
+                    continue
+                if prev and (not self.check(prev, [""]) or self.exclusion.blocked(prev + text)):
+                    prev = ""
+                group = f"emoji:{row['source']}:{row['doc']}"
+                picked = emoji_for(text, table, rng)
+                if picked and self.is_open("emoji_pick") and rng.random() < 0.35:
+                    record = example("emoji_pick", "エモジ", picked, (attach(prev) if prev else "") + text)
+                    if self.add("emoji_pick", record, group):
+                        bump("pick")
+                        continue
+                if not self.is_open("emoji_context"):
+                    continue
+                if prev:
+                    record = example("emoji_context", reading, text, attach(prev))
+                else:   # 同じ文の前半＋絵文字を左の文脈に、後半を変換する
+                    starts = [s for s in bunsetsu_starts(tokens)[1:]
+                              if len("".join(t.surface for t in tokens[:s])) >= 3]
+                    if not starts:
+                        continue
+                    cut = rng.choice(starts)
+                    head = "".join(t.surface for t in tokens[:cut])
+                    rest = "".join(t.surface for t in tokens[cut:])
+                    if not re.search(r"[ぁ-ゖァ-ヺ一-鿿]", rest):
+                        continue
+                    record = example("emoji_context", "".join(t.reading for t in tokens[cut:]), rest, attach(head))
+                if self.add("emoji_context", record, group):
+                    bump("context_prev" if prev else "context_split")
+        self.note_shortfall("emoji")
+
     def run(self):
         if "synthetic" in self.run_sources:
             self.build_synthetic()
+        if "emoji" in self.run_sources:
+            self.build_emoji()
         self.build_text()
         if "wiki" in self.run_sources:
             self.build_wiki()
@@ -1388,6 +1732,14 @@ class Builder:
                                      for p in args.extra_test if Path(p).exists()],
                 "sources": text_sources,
             }
+        if self.lexicon:
+            sources.append({"name": Path(args.lexicon).name, "sha256": sha256_file(Path(args.lexicon)),
+                            "use": "同音語・固有名詞を含む文を選ぶ（読みと表記の組の確かめ）。練習問題には入らない",
+                            "license": "Mozc の dictionary_oss（BSD-3-Clause 系。unok/mozc 2d993fd5）から mozc_lexicon.py で作成"})
+        if "emoji" in self.run_sources:
+            sources.append({"name": Path(args.emoji_data).name, "sha256": sha256_file(Path(args.emoji_data)),
+                            "use": "話し言葉の文に足す絵文字を、文の言葉から選ぶ",
+                            "license": "Mozc の emoji_data.tsv（BSD-3-Clause 系・Unicode のデータ。unok/mozc 2d993fd5）"})
         sources.append({"name": Path(args.romaji_table).name, "sha256": sha256_file(Path(args.romaji_table)),
                         "use": "試験の文のローマ字をかなにする（除外の検査だけに使う）",
                         "license": "Mozc の romanji-hiragana.tsv（BSD-3-Clause）"})
@@ -1398,13 +1750,16 @@ class Builder:
                          "valid_per_kind": args.valid_per_kind, "mix": {k: round(v, 6) for k, v in self.mix.items()},
                          "kind_weights": self.kind_weights, "max_passes": self.max_passes,
                          "fill_wiki": not args.no_fill_wiki, "sudachi_dict": args.sudachi_dict,
-                         "max_articles": args.max_articles, "ortho_share": args.ortho_share},
+                         "max_articles": args.max_articles, "ortho_share": args.ortho_share,
+                         "near_exclusion": args.near_exclusion, "typo_rate": args.typo_rate,
+                         "name_rate": args.name_rate, "easy_homophone_rate": args.easy_homophone_rate},
             "planned": self.planned, "quota_final": self.quota,
             "train_by_kind": {k: len(v) for k, v in self.train.items()},
             "valid_by_kind": {k: len(v) for k, v in self.valid.items()},
             "shortfall": self.shortfall, "fill_added": self.fill_added,
             "wiki": self.wiki_stats, "domain": domain, "rejected": self.rejected,
             "orthography": {"share": self.ortho_share, **self.ortho_stats} if self.ortho_rules else None,
+            "v6": self.v6_stats,
             "excluded_sentences": self.excluded_count, "reader": self.reader_versions,
             "exclusion": {"files": [{"name": p.name, "sha256": sha256_file(p)} for p in self.exclusion.files],
                           "keys": self.exclusion.stats},
@@ -1456,8 +1811,9 @@ def assemble_manifest(fragments: list, repo: Path, script: Path) -> dict:
         pass
     first = fragments[0]
     train_by_kind, valid_by_kind, planned, rejected = {}, {}, {}, {}
-    wiki, domain, sources, ortho = None, None, {}, None
+    wiki, domain, sources, ortho, v6 = None, None, {}, None, {}
     for fragment in fragments:
+        add_counts(v6, fragment.get("v6") or {})
         if fragment.get("orthography"):
             ortho = add_counts(ortho or {}, {k: v for k, v in fragment["orthography"].items() if k != "share"})
             ortho["share"] = fragment["orthography"]["share"]
@@ -1511,10 +1867,13 @@ def assemble_manifest(fragments: list, repo: Path, script: Path) -> dict:
         "wiki": wiki,
         "domain": domain,
         "orthography": ortho,
+        "v6": v6 or None,
         "rejected": rejected,
         "test_exclusion": {
             "rule": "tests/conversion/ の文と、表記または読みが同じか、それを含む文は使わない"
-                    f"（含むの検査は表記{TestExclusion.SURFACE_MIN}文字以上・読み{TestExclusion.READING_MIN}文字以上の文）",
+                    f"（含むの検査は表記{TestExclusion.SURFACE_MIN}文字以上・読み{TestExclusion.READING_MIN}文字以上の文）"
+                    + ("。近い文（3字のつながりの Dice 0.6 以上、または試験の文の 3字のつながりの 8 割以上を含む文。"
+                       f"{NearIndex.MIN_CHARS}字以上の試験の文）も使わない" if first["settings"].get("near_exclusion") else ""),
             "files": first["exclusion"]["files"],
             "keys": first["exclusion"]["keys"],
             "excluded_sentences": sum(f["excluded_sentences"] for f in fragments),
@@ -1560,6 +1919,8 @@ def print_summary(manifest: dict):
         ortho = manifest["orthography"]
         print(f"表記をそろえた文: {ortho.get('sentences_changed', 0)} / 見た文 {ortho.get('sentences_seen', 0)}"
               f"（割合 {ortho['share']}）  直した語:", ortho.get("words", {}))
+    if manifest.get("v6"):
+        print("v6 の種類の内訳:", manifest["v6"])
     if manifest.get("domain"):
         print("文の一覧の出典ごと（練習用・確かめ用）:",
               {s["id"]: (s["train_examples"], s["valid_examples"]) for s in manifest["domain"]["sources"]})
@@ -1607,6 +1968,17 @@ def main(argv=None):
     parser.add_argument("--domain-config", default=str(here / "domain_sources.json"), help="文の出どころ（版・利用条件）の一覧")
     parser.add_argument("--extra-test", nargs="*", default=[],
                         help="リポジトリの tests/conversion にまだない試験のファイル（作った直後の domain-*.tsv など）。その文も除く")
+    # v6
+    parser.add_argument("--near-exclusion", action="store_true",
+                        help="試験の文に近い文（3字のつながりの重なりが大きい文）も除く（NearIndex。v6 から）")
+    parser.add_argument("--lexicon", default="", help="mozc_lexicon.py が作る語の一覧（homophone_dict・proper_noun に要る）")
+    parser.add_argument("--emoji-data", default="", help="Mozc の src/data/emoji/emoji_data.tsv（emoji の出典に要る）")
+    parser.add_argument("--typo-rate", type=float, default=0.12,
+                        help="ウィキペディアの文のうち、打ち間違いの問題（typo_whole）を作ってみる割合")
+    parser.add_argument("--name-rate", type=float, default=0.5,
+                        help="固有名詞を含む文のうち、proper_noun の問題にする割合（残りはほかの種類に回す）")
+    parser.add_argument("--easy-homophone-rate", type=float, default=0.15,
+                        help="易しい同音語（その表記が同じ読みでいちばん先に出る）だけを含む文を homophone_dict に使う割合")
     args = parser.parse_args(argv)
     if hasattr(sys.stdout, "reconfigure"):
         sys.stdout.reconfigure(encoding="utf-8")
