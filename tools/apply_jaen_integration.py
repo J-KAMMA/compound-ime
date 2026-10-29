@@ -4619,4 +4619,20 @@ if (swift_src / "AzooKeyKanaKanjiConverter").is_dir():
 else:
     print("warning: MyIME の src が見つからないので、人工知能の時間の上限（Swift 側）は足していません")
 
+# 人工知能の1位の文を Mozc の文節に当てはめられず、組み直しも断られたときは、2位以下の文を探さず Mozc の順のままに
+# する。断られたあとに採っていた下位の文は、ウィキペディアの打ち込みで 129 文のうち正解が 14 文だけだった（多くは
+# 全部ひらがなの文や、1位よりさらに崩れた文）。MYIME_AI_REFUSE_KEEP=0 で今までどおり下位の文も探す。
+edit("engine/engine.cc", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))
+        return;
+      if (!selected) continue;""", """          ResegmentToWholePhrase(options, mozc, pos, *candidate, key, segments))
+        return;
+      if (!selected && candidate_index == 1 && indices.empty()) {
+        static const bool keep_mozc = [] {
+          const char* value = std::getenv("MYIME_AI_REFUSE_KEEP");
+          return !value || std::string_view(value) != "0";
+        }();
+        if (keep_mozc) return;
+      }
+      if (!selected) continue;""")
+
 print("applied")
