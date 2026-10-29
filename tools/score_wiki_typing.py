@@ -12,8 +12,12 @@ should be none and are all listed. For a test with a third column, the count is
 also given for each source and for sentences with and without English words
 (git, npm, Python ...) in the original.
 """
+import os
 import re
 import sys
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from lenient_match import lenient_match  # noqa: E402
 
 LETTER = re.compile(r"[A-Za-zＡ-Ｚａ-ｚ]")
 
@@ -31,7 +35,7 @@ def main():
         p = line.rstrip("\n").split("\t")
         if len(p) >= 3:
             got[p[0]] = p[2]
-    total = exact = 0
+    total = exact = lenient = 0
     letters = []
     groups = {}  # 出典、英字入り、日本語だけ → [一致, 全部]
     misses = []
@@ -42,6 +46,7 @@ def main():
         total += 1
         ok = out == original
         exact += ok
+        lenient += ok or lenient_match(out, original)
         keys = ([f"出典 {source}"] if source else []) + (
             ["英字入りの文" if LETTER.search(original) else "日本語だけの文"] if source else [])
         for key in keys:
@@ -53,6 +58,7 @@ def main():
         if not LETTER.search(original) and LETTER.search(out):
             letters.append(f"  {raw} → {out}（元: {original}）")
     print(f"{label}: 元の文と同じ {exact}/{total}、英字が混じった {len(letters)}")
+    print(f"ゆるい一致（表記ゆれは同じとみなす）: {lenient}/{total}")
     for key in sorted(groups):
         same, count = groups[key]
         print(f"  {key}: {same}/{count}")
