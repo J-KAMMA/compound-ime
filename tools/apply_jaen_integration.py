@@ -4423,6 +4423,18 @@ edit("engine/engine.cc", """      if (const Util::ScriptType script = Util::GetS
           script == Util::KATAKANA || script == Util::HIRAGANA || katakana_with_symbols(candidate->value)) {
         if (candidate_index == 0) return;""")
 
+# ひらがなの読みそのままに句読点が付いた文（…ばしょである。）も同じく見張りをすり抜け、長い文で漢字の文が
+# Mozc の文節に当てはまらないと、全部ひらがなの文が選ばれていた（ウィキペディアの打ち込みで 40 文）。
+# 漢字・英字・数字が1つもなく、かなと記号だけの文はかなの文として扱う。
+edit("engine/engine.cc", """          if (hiragana || kanji || letter_or_digit) return false;
+        }
+        return katakana;
+      };""", """          if (kanji || letter_or_digit) return false;
+          katakana |= hiragana;
+        }
+        return katakana;
+      };""")
+
 # 人工知能の文を Mozc の文節に組み直すとき（ResegmentToWholePhrase）、人工知能の文にカタカナが
 # Mozc の最上位より多いと一律に断っていた（チュブ を 中部 に替えさせないため）。そのため
 # 今夜トムから絶対電話があるわ。 のように人工知能が正しく答えても、トム で断られ、文全体が
