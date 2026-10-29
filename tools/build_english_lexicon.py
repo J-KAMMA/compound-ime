@@ -42,7 +42,7 @@ def main():
     level_of = {}
     signal = set()
     cased = {}  # 大文字を含む名前（Madrid、NASA）: 小文字の形 -> 書き方
-    plain = set()  # どの段階でも小文字で載る語（serrano は唐辛子でもある）
+    plain = set()  # 段階 --signal-level までに小文字で載る語（serrano は唐辛子でもある）
     with tarfile.open(fileobj=io.BytesIO(data)) as tar:
         root = "scowl-2020.12.07/"
         copyright_text = tar.extractfile(root + "Copyright").read()
@@ -57,7 +57,7 @@ def main():
                     level_of[w] = min(level_of.get(w, 99), int(level))
                 if int(level) <= 20:
                     common.update(found)
-            if kind.startswith(("english-", "american-")) and kind.endswith("-words") and level.isdigit():
+            if kind.startswith(("english-", "american-")) and kind.endswith("-words") and level.isdigit() and int(level) <= args.signal_level:
                 plain.update(w for w in tar.extractfile(member).read().decode("iso-8859-1").split() if WORD.fullmatch(w))
             if (kind.startswith(("english-", "american-")) and kind.endswith(("-words", "-upper", "-proper-names"))
                     and level.isdigit() and int(level) <= args.signal_level):
