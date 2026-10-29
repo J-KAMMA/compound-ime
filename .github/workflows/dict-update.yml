@@ -2,6 +2,8 @@
 #
 #   data    固有名詞（Wikidata）を取り直し、追加の辞書（supplement.tsv）と英語の一覧（english-extra.tsv）を作り、
 #           目録を作って署名する。取り直した一覧の行数が、いまの一覧から大きく外れたらここで止める。
+#           日本語の名前（Wikidata の日本語のラベルと読み P1814）と住所（日本郵便の郵便番号データ）も取り、
+#           追加の辞書に足す（tools/fetch_wikidata_ja.py、tools/fetch_japanpost.py、tools/build_ja_dictionary.py）。
 #   test    変換の試験（linux-test.yml）を、同じ変換エンジンで「いまの辞書」と「新しい辞書」の両方で流す。
 #           同時に流す数は linux-test.yml の max-parallel: 16。
 #   gate    2つの結果を比べる（tools/dict_quality_gate.py。基準は tools/data/dict-gate.json）。
@@ -25,6 +27,14 @@ on:
       groups:
         description: 新しい辞書を比べる試験の組（JSON の配列。空なら既定）
         default: ''
+      ja_words:
+        description: 日本語の名前（Wikidata）と住所（日本郵便）を取って追加の辞書に足す（false なら足さない）
+        type: boolean
+        default: true
+      publish:
+        description: 通ったら下書きの配布ページに置き、通らなければ issue を作る（false なら試験と判定だけ。枝での試しに）
+        type: boolean
+        default: true
 
 concurrency:
   group: dict-update
@@ -132,6 +142,24 @@ jobs:
           fi
           wc -l $W/new/proper-nouns.tsv
 
+      - name: 日本語の名前（Wikidata）と住所（日本郵便）を取って、追加の辞書の行にする
+        # 月1回の自動のとき（inputs が空）と、手動で ja_words が true のとき
+        if: ${{ github.event_name == 'schedule' || inputs.ja_words }}
+        run: |
+          set -eo pipefail
+          W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
+          mkdir -p $W/new
+          # 片方が取れなくても、もう片方は足す（取れなかった元は、この回は足さない。警告に出す）
+          ARGS=""
+          if $PY $T/fetch_wikidata_ja.py --out $W/jawd; then ARGS="$ARGS --wikidata $W/jawd/ja-wikidata-raw.tsv"
+          else echo "::warning::Wikidata の日本語の名前が取れなかった。この回は足さない"; fi
+          if $PY $T/fetch_japanpost.py --out $W/postal; then ARGS="$ARGS --postal $W/postal/postal-raw.tsv"
+          else echo "::warning::日本郵便の郵便番号データが取れなかった。この回は足さない"; fi
+          [ -n "$ARGS" ] || exit 0
+          $PY $T/build_ja_dictionary.py --mozc $S $ARGS \
+            --out-wikidata $W/new/ja-wikidata.tsv --out-postal $W/new/ja-postal.tsv --report $W/ja-report.md
+          cat $W/ja-report.md >> $GITHUB_STEP_SUMMARY
+
       - name: 追加の辞書と英語の一覧を作る。いまの一覧（本体に焼き込んである分）と行数を比べる
         run: |
           set -eo pipefail
@@ -149,8 +177,11 @@ jobs:
             cmp $W/old/supplement.tsv $W/new/supplement.tsv || { echo "取り直さないのに追加の辞書がいまの dictionary14 と違う"; diff $W/old/supplement.tsv $W/new/supplement.tsv | head -20; exit 1; }
             cmp $W/old/english-extra.tsv $W/new/english-extra.tsv || { echo "取り直さないのに英語の一覧が違う"; exit 1; }
           fi
-          # 止める基準 その1（試験を流す前に）
+          # 止める基準 その1（試験を流す前に）。日本語の名前・住所（ja-*.tsv）は行数の上限・下限だけ
           $PY $T/dict_quality_gate.py data --old-dir $W/old --new-dir $W/new --summary $W/gate-data.md
+          # 配る追加の辞書 = 固有名詞の分（焼き込みの dictionary14 と同じ作り方）＋ 日本語の名前・住所（あれば）
+          cat $W/new/supplement.tsv $(ls $W/new/ja-wikidata.tsv $W/new/ja-postal.tsv 2>/dev/null) > $W/new/supplement-release.tsv
+          wc -l $W/new/supplement.tsv $W/new/supplement-release.tsv
 
       - name: 目録を作って署名する
         env:
@@ -160,12 +191,13 @@ jobs:
           W=$GITHUB_WORKSPACE; S=$W/myime/mozc/src; PY=$W/venv/bin/python; T=$W/repo/tools
           read POS_SHA POS_COUNT < <($PY $T/make_dict_release.py pos-info $S/data/dictionary_oss/id.def)
           V=${{ steps.v.outputs.version }}
-          $PY $T/make_dict_release.py build --supplement $W/new/supplement.tsv --english $W/new/english-extra.tsv \
+          $PY $T/make_dict_release.py build --supplement $W/new/supplement-release.tsv --english $W/new/english-extra.tsv \
             --version $V --pos-table-sha $POS_SHA --pos-count $POS_COUNT \
             --url-base https://github.com/${{ github.repository }}/releases/download/dict-$V --out $W/release
           PUB=$(grep -v '^#' $T/dict-update/public-key.txt | grep -v '^$' | head -1)
           $PY $T/make_dict_release.py verify $W/release --public-key $PUB --pos-table-sha $POS_SHA --pos-count $POS_COUNT
           mkdir -p $W/sources && cp $W/new/proper-nouns.tsv $W/gate-data.md $W/sources/
+          for f in $W/new/ja-wikidata.tsv $W/new/ja-postal.tsv $W/ja-report.md; do [ -f $f ] && cp $f $W/sources/ || true; done
           cat $W/release/manifest.txt
 
       - uses: actions/upload-artifact@v4
@@ -186,7 +218,7 @@ jobs:
     permissions:
       contents: write
     with:
-      groups: ${{ inputs.groups || '["a1","a2","b","e1","e2","g","h","k","m","r","t"]' }}
+      groups: ${{ inputs.groups || '["a1","a2","b","e1","e2","f","g","h","k","m","r","t"]' }}
       dict_candidate: dict-release
 
   gate:
@@ -218,10 +250,12 @@ jobs:
           # 試験の組のどれかが落ちたときは、結果がそろっていない。比べる前に止める
           TEST_RESULT="${{ needs.test.result }}"
           set +e
-          # 取り直さない流し方では中身が同じはずなので、結果が1行も変わらないことも求める
+          # 取り直さず日本語の名前・住所も足さない流し方では中身が同じはずなので、結果が1行も変わらないことも求める
           SAME=""
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.refetch }}" = "false" ]; then SAME="--identical"; fi
-          python3 tools/dict_quality_gate.py scores --base base --cand cand --summary gate-report.md --json gate.json $SAME
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.refetch }}" = "false" ] && [ "${{ inputs.ja_words }}" = "false" ]; then SAME="--identical"; fi
+          # 足した日本語の名前・住所が、普通の文の試験に新しく出た文を数える（押しのけ。上限は dict-gate.json の added_words）
+          ADDED=$(ls sources/ja-wikidata.tsv sources/ja-postal.tsv 2>/dev/null || true)
+          python3 tools/dict_quality_gate.py scores --base base --cand cand --summary gate-report.md --json gate.json $SAME ${ADDED:+--added $ADDED}
           RC=$?
           set -e
           if [ "$TEST_RESULT" != "success" ]; then
@@ -230,6 +264,7 @@ jobs:
             RC=1
           fi
           { echo; echo '### 取り直した一覧の行数'; echo; sed -n '3,$p' sources/gate-data.md; } >> gate-report.md
+          if [ -f sources/ja-report.md ]; then { echo; cat sources/ja-report.md; } >> gate-report.md; fi
           cat gate-report.md >> $GITHUB_STEP_SUMMARY
           if [ $RC -eq 0 ]; then echo "passed=true" >> $GITHUB_OUTPUT; else echo "passed=false" >> $GITHUB_OUTPUT; fi
       - uses: actions/upload-artifact@v4
@@ -242,7 +277,7 @@ jobs:
   # 悪くならなかったときだけ、下書きの配布ページに置く。公開は、中身を見てから dict-publish.yml を手で流す。
   publish:
     needs: [data, test, gate]
-    if: ${{ needs.gate.outputs.passed == 'true' && needs.test.result == 'success' }}
+    if: ${{ needs.gate.outputs.passed == 'true' && needs.test.result == 'success' && (github.event_name == 'schedule' || inputs.publish) }}
     runs-on: ubuntu-24.04
     permissions:
       contents: write
@@ -269,7 +304,7 @@ jobs:
             echo "辞書の自動更新（$V）。**下書き**です（公開は、中身を見てから Actions の「Dictionary publish」を手で流す）。"
             echo
             echo "- manifest.txt / manifest.txt.sig: 目録と署名（Ed25519）。本体はこれを見て、辞書を取って入れ替えます"
-            echo "- supplement.tsv: 追加の辞書（固有名詞と、日本語に読める略語の読み）"
+            echo "- supplement.tsv: 追加の辞書（固有名詞、日本語に読める略語の読み、日本語の名前（Wikidata）と住所（日本郵便の郵便番号データ））"
             echo "- english-extra.tsv: 英語の一覧（英単語、名前、言い回し、表示の形）"
             echo "- proper-nouns.tsv: 作り直した固有名詞の一覧（次の版の本体に焼き込むときは tools/data/proper-nouns.tsv に入れる）"
             echo "- gate-report.md: いまの辞書と比べた試験の結果"
@@ -284,7 +319,7 @@ jobs:
   # 置かなかったとき（取得や作成の失敗、基準に届かない、試験が流れない）は issue で知らせる
   notify:
     needs: [data, test, gate, publish]
-    if: ${{ always() && !cancelled() && needs.publish.result != 'success' }}
+    if: ${{ always() && !cancelled() && needs.publish.result != 'success' && (github.event_name == 'schedule' || inputs.publish) }}
     runs-on: ubuntu-24.04
     permissions:
       issues: write

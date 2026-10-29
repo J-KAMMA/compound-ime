@@ -103,11 +103,39 @@ def main():
         (old / "proper-nouns.tsv").write_text("# c\n" + "x\n" * 100, encoding="utf-8")
         r = run("data", "--old-dir", str(old), "--new-dir", str(new))
         check(r.returncode == 1 and "下限" in r.stdout, "行数が下限より少ない一覧は止まる")
+        (new / "proper-nouns.tsv").write_text("# c\n" + "x\n" * 10500, encoding="utf-8")
+        (old / "proper-nouns.tsv").write_text("# c\n" + "x\n" * 10000, encoding="utf-8")
+        r = run("data", "--old-dir", str(old), "--new-dir", str(new))
+        check(r.returncode == 0 and "取っていない" in r.stdout, "日本語の名前・住所を取らなかった回は比べない（optional）")
+        (new / "ja-wikidata.tsv").write_text("x\n" * 5000, encoding="utf-8")
+        (new / "ja-postal.tsv").write_text("x\n" * 200000, encoding="utf-8")
+        r = run("data", "--old-dir", str(old), "--new-dir", str(new))
+        check(r.returncode == 1 and "上限" in r.stdout and "| ja-wikidata.tsv | - | 5000 | - | OK |" in r.stdout,
+              "日本語の住所が上限より多ければ止まる（いまの一覧がないので比は見ない）")
+        # 足した語が普通の文に新しく出た数（--added）
+        added = tmp / "ja-postal-added.tsv"
+        added.write_text("うっぷるいちょう\t3\t3\t15000\t十六島町\nかえる\t3\t3\t9000\t蛙会\n", encoding="utf-8")
+        base_files, cand_files = sample(), sample()
+        base_files["ja400.tsv"] = "kaeru\tx\t家に帰る\nuppu\tx\t十六島町\nc\tx\t同じ\n"
+        cand_files["ja400.tsv"] = "kaeru\tx\t家に蛙会\nuppu\tx\t十六島町\nc\tx\t同じ\n"
+        write(tmp / "add-base", base_files)
+        write(tmp / "add-cand", cand_files)
+        r = run("scores", "--base", str(tmp / "add-base"), "--cand", str(tmp / "add-cand"), "--added", str(added))
+        check(r.returncode == 0 and "新しく出た文: 1 文" in r.stdout and "蛙会" in r.stdout,
+              "足した語が普通の文に新しく出たら数える（上限までは通る）")
+        strict = json.loads((HERE / "data/dict-gate.json").read_text(encoding="utf-8"))
+        strict["added_words"]["max_sentences"] = 0
+        rules_path = tmp / "rules.json"
+        rules_path.write_text(json.dumps(strict, ensure_ascii=False), encoding="utf-8")
+        r = run("scores", "--base", str(tmp / "add-base"), "--cand", str(tmp / "add-cand"), "--added", str(added),
+                "--rules", str(rules_path))
+        check(r.returncode == 1 and "足した語が普通の文に新しく出た: 1 文" in r.stdout, "上限を超えたら止まる")
     # 採点の道具の出力の言葉が変わっていないか（変わったら、基準の正規表現も直す）
     rules = json.loads((HERE / "data/dict-gate.json").read_text(encoding="utf-8"))
     sources = {"proper": "score_proper_nouns.py", "cand": "score_proper_nouns.py", "acronyms": "score_proper_nouns.py", "domain-tools-cand": "score_proper_nouns.py",
                "allenglish": "score_allenglish.py", "ja400": "score_categories.py", "wiki": "score_wiki_typing.py", "domain": "score_wiki_typing.py",
-               "colloquial": "score_colloquial.py", "katakana-english": "score_katakana_english.py"}
+               "colloquial": "score_colloquial.py", "katakana-english": "score_katakana_english.py",
+               "holdout": "score_categories.py", "context": "score_context.py", "ja-names": "score_proper_nouns.py"}
     for metric in rules["metrics"]:
         key = next(k for k in sources if metric["file"].startswith(k))
         literal = [w for w in __import__("re").findall(r"[ぁ-んァ-ヶ一-龠]+|\d?[ぁ-んァ-ヶ一-龠]+", metric["pattern"]) if w]

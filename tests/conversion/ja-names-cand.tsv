@@ -1,0 +1,25 @@
+# 日本語の名前・住所の試験（候補）。名前だけを読みで打って変換したときの候補に、期待する表記があるか（tools/score_proper_nouns.py candidates）。
+# 月1回の追加の辞書に足す日本語の名前（Wikidata の日本語のラベルと読み P1814）と住所（日本郵便の郵便番号データ）の確かめ。手で選んだ。
+# Mozc の辞書にもうあるものも混ざる（それは、いまの辞書でも候補にある）。足した語で増えるのは、いまの辞書になかったもの。
+# 列: ローマ字<TAB>期待する候補<TAB>方式<TAB>分野<TAB>由来
+uppuruichou	十六島町	kana	town	postal
+hanatenhigashi	放出東	kana	town	postal
+kyoubatechou	京終町	kana	town	postal
+nozoki	及位	kana	town	postal
+higashiimoarai	東一口	kana	town	postal
+gokiso	御器所	kana	town	postal
+kumata	杭全	kana	town	postal
+uriwari	瓜破	kana	town	postal
+kisaichi	私市	kana	town	postal
+shishibone	鹿骨	kana	town	postal
+toneri	舎人	kana	town	postal
+makinotomitarou	牧野富太郎	kana	person	wikidata
+shibusawaeiichi	渋沢栄一	kana	person	wikidata
+kitasatoshibasaburou	北里柴三郎	kana	person	wikidata
+tsudaumeko	津田梅子	kana	person	wikidata
+minakatakumagusu	南方熊楠	kana	person	wikidata
+inoutadataka	伊能忠敬	kana	person	wikidata
+katsushikahokusai	葛飾北斎	kana	person	wikidata
+kimetsunoyaiba	鬼滅の刃	kana	work	wikidata
+shirakamisanchi	白神山地	kana	place	wikidata
+gokayama	五箇山	kana	place	wikidata

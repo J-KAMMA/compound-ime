@@ -20,6 +20,8 @@ g++ -std=c++20 -O1 -g -Wall -Wextra -pthread -I "$R/native" $SRC "$R/native/dict
 $PY "$R/tools/dict_update_scenarios.py" tool "$W/dict_update_tool"
 echo "== 配布物を作る道具（make_dict_release.py）の確かめ"
 $PY "$R/tools/test_make_dict_release.py"
+echo "== 日本語の名前・住所を追加の辞書の行にする道具（build_ja_dictionary.py、fetch_japanpost.py の読み取り。通信しない）"
+$PY "$R/tools/test_build_ja_dictionary.py"
 echo "== 月1回の自動更新の候補を入れる環境変数（tools/dict_candidate_env.sh。run_tests.sh の DICT_CANDIDATE_DIR と同じ）"
 $PY - "$R" "$W" "$W/dict_update_tool" <<'PYEOF'
 import os, subprocess, sys
