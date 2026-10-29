@@ -3463,8 +3463,12 @@ edit("prediction/dictionary_predictor.cc", """bool IsDebug(const ConversionReque
   return request.config().verbose_level() >= 1;
 }""")
 
-# Product identity: CompoundIME (separate script, last).
+# 辞書にない外来語の読み（えんまーたーる）を、細切れの漢字（閻魔ータール）でなくカタカナ1語にする
+# （別の script。converter/immutable_converter.cc はほかで触らない）。
 import subprocess  # noqa: E402
+subprocess.run([sys.executable, str(REPO / "tools/apply_loanword_katakana.py"), str(src)], check=True)
+
+# Product identity: CompoundIME (separate script, last).
 subprocess.run([sys.executable, str(REPO / "tools/apply_compound_branding.py"), str(src)], check=True)
 
 # Linux 対応（製品名の変更のあと）: 節: Linux でも変換エンジン（azooKey）を使えるようにする。
