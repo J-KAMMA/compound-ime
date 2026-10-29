@@ -2788,13 +2788,26 @@ proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.ts
 # 小文字の形で表示の形を引けるようにする。普通の英単語（SCOWL の common-words.txt）は除く。
 _common_path = lexdir / "common-words.txt"
 _common = set(_common_path.read_text(encoding="ascii").split()) if _common_path.exists() else set()
+# 英単語の一覧にある語（manga、haiku、opera）も、厳選の語（ブランド）でなければ打った形のままにする。
+_plain = set((lexdir / "english-lexicon.txt").read_text(encoding="ascii").split()) - set(
+    (lexdir / "curated-words.txt").read_text(encoding="ascii").split())
 for row in proper_nouns:
     shown, typed_form = row[0], row[1]
-    if not typed_form and shown.isascii() and shown.isalpha() and shown.lower() not in _common:
+    if (not typed_form and shown.isascii() and shown.isalpha() and len(shown) >= 3
+            and shown.lower() not in _common and shown.lower() not in _plain):
         typed_form = shown.lower()
     if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
         (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
         _cased.add(typed_form)
+# SCOWL の固有名詞・大文字の語（build_english_lexicon.py の cased-names.tsv: madrid -> Madrid）も、
+# ほかの表にないときに使う。
+_cased_path = lexdir / "cased-names.tsv"
+if _cased_path.exists():
+    for line in _cased_path.read_text(encoding="ascii").splitlines():
+        typed, shown = line.split("\t")
+        if typed not in _cased and typed not in _common and "'" not in shown:
+            pairs.append([typed, shown])
+            _cased.add(typed)
 assert all(len(p) == 2 and '"' not in p[0] + p[1] and "\\" not in p[0] + p[1] for p in pairs + second_pairs)
 (src / "converter/brand_casing_data.inc").write_text(
     "// Generated from tools/data/brand-casing.tsv (sorted by the typed form).\n"
@@ -4861,6 +4874,44 @@ edit("converter/converter.cc", """  std::string raw;
   }
   bool split = !pieces.empty();
 """)
+# 人工知能の区画で組み直すと、英語の名前と助詞が1文節（chromeの、googleは）になり、人工知能が書いた
+# 小文字のまま出ていた。先頭の英字が公式の書き方を持つ名前なら、その書き方の候補を先に出す。
+edit("engine/engine.cc", """    segments->clear_conversion_segments();
+    for (auto& segment : rebuilt) *segments->add_segment() = std::move(segment);
+    return true;""", """    segments->clear_conversion_segments();
+    for (auto& segment : rebuilt) {
+      PutBrandCasingFirst(&segment);
+      *segments->add_segment() = std::move(segment);
+    }
+    return true;""")
+edit("engine/engine.cc", """  static void PreferWholePhrase(const ConversionOptions& options,""", """  // "chromeの" -> "Chromeの": the English letters at the start of the first
+  // candidate, spelled as the brand or name table has them.
+  static void PutBrandCasingFirst(Segment* segment) {
+    if (segment->candidates_size() == 0) return;
+    const converter::Candidate& top = segment->candidate(0);
+    size_t end = 0;
+    while (end < top.value.size() && top.value[end] >= 'a' && top.value[end] <= 'z') ++end;
+    if (end < 3 || end == top.value.size() || static_cast<unsigned char>(top.value[end]) < 0x80) return;
+    const std::string_view official = converter::BrandCasing(std::string_view(top.value).substr(0, end));
+    // Only a change of case (Wi-Fi would move the segment's inner boundaries),
+    // and never a short unit (cm, ml stay lowercase: end >= 3 above).
+    if (official.size() != end || official == std::string_view(top.value).substr(0, end)) return;
+    for (size_t i = 0; i < end; ++i) {
+      if ((official[i] | 0x20) != top.value[i]) return;
+    }
+    converter::Candidate cased = top;
+    cased.value = std::string(official) + top.value.substr(end);
+    if (cased.content_value.compare(0, end, top.value, 0, end) == 0)
+      cased.content_value = std::string(official) + cased.content_value.substr(end);
+    for (size_t i = 1; i < segment->candidates_size(); ++i) {
+      if (segment->candidate(i).value == cased.value) {
+        segment->move_candidate(static_cast<int>(i), 0);
+        return;
+      }
+    }
+    *segment->insert_candidate(0) = std::move(cased);
+  }
+  static void PreferWholePhrase(const ConversionOptions& options,""")
 
 # 変換エンジン（Swift）に時間の上限とメモリ固定を足す（作業ツリーが MyIME の src を持つとき）
 swift_src = src.resolve().parents[1] / "src"
