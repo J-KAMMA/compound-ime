@@ -13,8 +13,13 @@
 取らないもの
 - 読みがかなでない、読みが3かなより短い、表記が2文字より短いか24文字より長い、表記に漢字がない（かなだけの
   表記は Mozc が読みから作れる）、表記に英字・数字・記号がある（英字の名前は proper-nouns.tsv の係）。
-- 表記の中のかなが、読みの中に同じ順で出ない（ラベルと読みが別の物を指している）。読みが表記に比べて
-  短すぎる・長すぎる。
+- 表記の中のかなが、読みの中に同じ順で出ない（ラベルと読みが別の物を指している）。
+- 読みが表記を覆わない: 表記のかなの部分はそのまま、漢字の並び n 字は n〜5n かな（4字以上は n + (n-2)//2 から）
+  に当てはまらない（ブルサ県 を ぶるさ、鎮西大社諏訪神社 を すわじんじゃ、電気電子工学 を でんしこうがく）。
+- 読みが外来語の形（ー がある）で、表記が漢字だけ（視覚芸術 を びじゅあるあーと）。
+- Wikidata だけ: 読みを、Mozc の辞書にある部分の読み（1〜6字。連濁・促音も）でたどれない（別名・通称。
+  憲宗 を りじゅん）。辞書でたどれなくてよい漢字は --free-kanji-per 字（既定3）ごとに1字（2字の表記は0字）。
+  住所は日本郵便の公式の読みなので、この確かめはしない（十六島 うっぷるい のような読みを残す）。
 - Mozc の辞書（焼き込みの dictionary14.txt まで全部）に同じ（読み、表記）がある。
 - よく使う語の別の読み: 表記が Mozc に費用 --common-cost 未満であり、その読みが Mozc のその表記の読みにない
   （「日本」を やまと で、のような珍しい読み。普通の語の表記を、知らない読みで出してしまう）。
@@ -99,10 +104,93 @@ def reading_problem(surface, reading, min_reading):
         if pos < 0:
             return "表記のかなが読みにない"
         pos += len(k)
-    core = sum(1 for ch in surface if ch not in "ヶヵ・")
-    if len(reading) < core * 0.75 or len(reading) > len(surface) * 6:
-        return "読みの長さが表記と合わない"
+    if "ー" in reading and not any(is_kana(ch) for ch in surface):
+        return "読みが外来語の形（表記は漢字だけ）"
+    if not re.fullmatch(structure_pattern(surface), reading):
+        return "読みが表記を覆わない（かなと漢字の並び・字数）"
     return None
+
+
+def kanji_run_bounds(n):
+    """漢字 n 字の並びの読みの長さの下限と上限。2字までは1字1かなまで（江戸 えど）、それより長い並びは
+    平均1.5かな以上（電気電子工学 を でんしこうがく では覆わない）。上限は1字5かな（承 うけたまわ）。"""
+    return (n if n <= 3 else n + (n - 2) // 2), 5 * n
+
+
+def structure_pattern(surface):
+    """表記の並び（かなの部分はそのまま、漢字の並びは字数に合う長さ）に読みが合うかの正規表現。
+    ブルサ県 を ぶるさ（県 の読みがない）、鎮西大社諏訪神社 を すわじんじゃ（短すぎる）は合わない。"""
+    parts, run = [], 0
+    for ch in surface + "\0":
+        if is_kanji(ch):
+            run += 1
+            continue
+        if run:
+            lo, hi = kanji_run_bounds(run)
+            parts.append(f".{{{lo},{hi}}}")
+            run = 0
+        if ch == "\0" or ch == "・":
+            continue
+        if ch in "ヶヵ":
+            parts.append("[がけかこ]")
+        else:
+            parts.append(re.escape(to_hiragana(ch)))
+    return "".join(parts)
+
+
+VOICED = dict(zip("かきくけこさしすせそたちつてとはひふへほ", "がぎぐげござじずぜぞだぢづでどばびぶべぼ"))
+VOICED.update(zip("はひふへほ", "ばびぶべぼ"))
+SEMI = dict(zip("はひふへほ", "ぱぴぷぺぽ"))
+
+
+def reading_variants(r, first):
+    """辞書の読み r の、語の中での形（連濁: かわ → がわ、促音: いち → いっ）。"""
+    out = {r}
+    if not first and r and r[0] in VOICED:
+        out.add(VOICED[r[0]] + r[1:])
+        if r[0] in SEMI:
+            out.add(SEMI[r[0]] + r[1:])
+    for v in list(out):
+        if len(v) >= 2 and v[-1] in "つくちき":
+            out.add(v[:-1] + "っ")
+    return out
+
+
+def coverage_penalty(surface, reading, surface_readings, allowed, max_seg=6):
+    """表記を前から、Mozc の辞書にある部分の読み（1字〜max_seg 字。連濁・促音も）とかなでたどって、読みを
+    覆えるか。辞書でたどれない漢字1字（1〜4かなを読む）ごとに1を数え、一番少ない数を返す（allowed を超えたら
+    allowed + 1）。視覚芸術 を びじゅあるあーと、憲宗 を りじゅん のような別名・通称の読みを見つける。"""
+    chars = [ch for ch in surface if ch != "・"]
+    n, m = len(chars), len(reading)
+    best = {(0, 0): 0}
+    for i in range(n):
+        states = sorted((j, p) for (ii, j), p in best.items() if ii == i)
+        for j, p in states:
+            def go(i2, j2, p2):
+                if j2 <= m and p2 <= allowed and best.get((i2, j2), allowed + 1) > p2:
+                    best[(i2, j2)] = p2
+            ch = chars[i]
+            if not is_kanji(ch):
+                if ch in "ヶヵ":
+                    for k in "がけかこ":
+                        if reading.startswith(k, j):
+                            go(i + 1, j + 1, p)
+                else:
+                    h = to_hiragana(ch)
+                    if reading.startswith(h, j):
+                        go(i + 1, j + len(h), p)
+                continue
+            for k in range(1, max_seg + 1):
+                if i + k > n or not all(is_kanji(c) for c in chars[i:i + k]):
+                    break
+                for r in surface_readings.get("".join(chars[i:i + k]), ()):
+                    for v in reading_variants(r, i == 0):
+                        if reading.startswith(v, j):
+                            go(i + k, j + len(v), p)
+            cost = 0 if ch == "々" else 1  # 々 は前の字の読みを繰り返す
+            for length in range(1, 5):
+                go(i + 1, j + length, p + cost)
+    return best.get((n, m), allowed + 1)
 
 
 def load_mozc(data, skip=()):
@@ -167,7 +255,7 @@ class Builder:
         self.taken = set()  # 前の元（Wikidata）で入れた（読み、表記）
         self.collide = []   # 一般語と同じ読みに入れた語（報告用）
 
-    def build(self, rows, source):
+    def build(self, rows, source, check_coverage=False):
         """rows: [(表記, 読み, 種類, 並べる値)] → {(読み, 表記): (lid, rid, cost)}"""
         args = self.args
         picked = {}
@@ -178,10 +266,14 @@ class Builder:
             if why is None and (reading, surface) in self.taken:
                 why = "Wikidata の行と同じ"
             if why is None and self.surface_min.get(surface, MAX_COST + 1) < args.common_cost \
-                    and reading not in self.surface_readings[surface]:
+                    and reading not in self.surface_readings.get(surface, ()):
                 why = "よく使う語の別の読み"
             if why is None and reading not in self.max_cost and len(reading) < 4:
                 why = "Mozc にない短い読み"
+            if why is None and check_coverage:
+                allowed = sum(1 for ch in surface if is_kanji(ch) and ch != "々") // args.free_kanji_per
+                if coverage_penalty(surface, reading, self.surface_readings, allowed) > allowed:
+                    why = "読みを辞書の字の読みでたどれない（別名・通称）"
             if why:
                 self.reasons[f"{source}: {why}"] += 1
                 continue
@@ -230,9 +322,11 @@ def main():
     parser.add_argument("--new-cost", type=int, default=15000)
     parser.add_argument("--common-cost", type=int, default=5000)
     parser.add_argument("--min-reading", type=int, default=3)
+    parser.add_argument("--free-kanji-per", type=int, default=3,
+                        help="Wikidata の読みで、辞書でたどれなくてよい漢字は この字数ごとに1字（2字の表記は0字）")
     args = parser.parse_args()
     builder = Builder(args.mozc, args)
-    wikidata = builder.build(read_wikidata(args.wikidata), "Wikidata") if args.wikidata else {}
+    wikidata = builder.build(read_wikidata(args.wikidata), "Wikidata", check_coverage=True) if args.wikidata else {}
     postal = builder.build(read_postal(args.postal), "住所") if args.postal else {}
     # 元を渡さなかった側は書かない（取れなかった回。門の その1 は、ない一覧を比べない）
     if args.wikidata:

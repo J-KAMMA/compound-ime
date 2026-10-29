@@ -1,6 +1,9 @@
 # 日本語の名前・住所の試験（候補）。名前だけを読みで打って変換したときの候補に、期待する表記があるか（tools/score_proper_nouns.py candidates）。
 # 月1回の追加の辞書に足す日本語の名前（Wikidata の日本語のラベルと読み P1814）と住所（日本郵便の郵便番号データ）の確かめ。手で選んだ。
 # Mozc の辞書にもうあるものも混ざる（それは、いまの辞書でも候補にある）。足した語で増えるのは、いまの辞書になかったもの。
+# 先頭の21件は手で選んだ。残りの83件（由来 wikidata、2026-10-30）は Wikidata から選んだ: 日本の人（言語版2〜4、1850〜1985年生まれ、
+# 漢字4〜5字）と、なくなった日本の市町村（漢字の名前＋村・町）。P1814 の読みが表記の並びと字数に合うもの（tools/build_ja_dictionary.py の
+# structure_pattern）だけ。よく知られた名前（伊集院静 など）は除いた。Mozc の辞書にないことは手元では確かめていない（辞書を落とさないため）。
 # 列: ローマ字<TAB>期待する候補<TAB>方式<TAB>分野<TAB>由来
 uppuruichou	十六島町	kana	town	postal
 hanatenhigashi	放出東	kana	town	postal
@@ -23,3 +26,86 @@ katsushikahokusai	葛飾北斎	kana	person	wikidata
 kimetsunoyaiba	鬼滅の刃	kana	work	wikidata
 shirakamisanchi	白神山地	kana	place	wikidata
 gokayama	五箇山	kana	place	wikidata
+tomitayoshirou	富田芳郎	kana	person	wikidata
+kozakurahideki	小櫻秀樹	kana	person	wikidata
+yamanouchitetsuya	山内鉄也	kana	person	wikidata
+asamitoshio	浅見俊雄	kana	person	wikidata
+arisakaryuusuke	有坂隆祐	kana	person	wikidata
+konishinoriyuki	小西紀行	kana	person	wikidata
+hakutahiroko	白田博子	kana	person	wikidata
+hirakawashigeko	平川滋子	kana	person	wikidata
+mitokouzou	三戸耕三	kana	person	wikidata
+miyamotokazushi	宮本和志	kana	person	wikidata
+houraimakiko	宝来麻紀子	kana	person	wikidata
+ogishimatatsuya	荻島達也	kana	person	wikidata
+isobeseiji	磯部清次	kana	person	wikidata
+suenagayuuta	末永雄太	kana	person	wikidata
+fujimuranobuko	藤村信子	kana	person	wikidata
+kobayashiteiichi	小林貞一	kana	person	wikidata
+kuwaharahiroaki	桑原洋明	kana	person	wikidata
+nodairaichirou	野平一郎	kana	person	wikidata
+kawaguchikeishi	川口馨士	kana	person	wikidata
+nakatomishinnichi	中冨伸一	kana	person	wikidata
+tomorikatsuyoshi	友利勝良	kana	person	wikidata
+miyagawaakira	宮川彬良	kana	person	wikidata
+sakatamasahiro	坂田雅弘	kana	person	wikidata
+nagoakihiko	名護明彦	kana	person	wikidata
+furusawataiho	古沢太穂	kana	person	wikidata
+izakiyuusuke	伊崎右典	kana	person	wikidata
+tsurudaisaku	都留泰作	kana	person	wikidata
+itoukeiichi	伊藤桂一	kana	person	wikidata
+utagawakunitoshi	歌川国歳	kana	person	wikidata
+irokawatakehiro	色川武大	kana	person	wikidata
+taharakeiichi	田原桂一	kana	person	wikidata
+hiraiyasutarou	平井泰太郎	kana	person	wikidata
+noborikawaseijinn	登川誠仁	kana	person	wikidata
+matsunoarimi	松野有里巳	kana	person	wikidata
+mochidamoriji	持田盛二	kana	person	wikidata
+kuramotomasahiro	倉本昌弘	kana	person	wikidata
+araiayaka	新井彩可	kana	person	wikidata
+kawasakishouko	川崎小虎	kana	person	wikidata
+hoshinotennchi	星野天知	kana	person	wikidata
+juumonnjibishinn	十文字美信	kana	person	wikidata
+tsushimakyouichi	津島恭一	kana	person	wikidata
+izakihisato	伊崎央登	kana	person	wikidata
+asoumamiko	麻生真宮子	kana	person	wikidata
+maruseppuchou	丸瀬布町	kana	place	wikidata
+kinomotochou	木之本町	kana	place	wikidata
+shinnyoshitomimura	新吉富村	kana	place	wikidata
+mitouchou	美東町	kana	place	wikidata
+eigennjichou	永源寺町	kana	place	wikidata
+ogatsuchou	雄勝町	kana	place	wikidata
+ochiaimachi	落合町	kana	place	wikidata
+fukunomachi	福野町	kana	place	wikidata
+yodobashichou	淀橋町	kana	place	wikidata
+homimura	保見村	kana	place	wikidata
+kuradomura	倉戸村	kana	place	wikidata
+fuurennchou	風連町	kana	place	wikidata
+asashinamura	浅科村	kana	place	wikidata
+hirochimura	広地村	kana	place	wikidata
+katakaimachi	片貝町	kana	place	wikidata
+geihokuchou	芸北町	kana	place	wikidata
+sotomechou	外海町	kana	place	wikidata
+kitanakadoorimura	北中通村	kana	place	wikidata
+kitaoonomimura	北大呑村	kana	place	wikidata
+inochou	伊野町	kana	place	wikidata
+kawaimura	川井村	kana	place	wikidata
+kounannchou	甲南町	kana	place	wikidata
+shusseimura	出精村	kana	place	wikidata
+motohakonemura	元箱根村	kana	place	wikidata
+kanosemachi	鹿瀬町	kana	place	wikidata
+tomoaimura	供合村	kana	place	wikidata
+haibarachou	榛原町	kana	place	wikidata
+katsumotochou	勝本町	kana	place	wikidata
+hasunumamura	蓮沼村	kana	place	wikidata
+fukubesonn	福部村	kana	place	wikidata
+maemiyamura	前宮村	kana	place	wikidata
+kiyotakechou	清武町	kana	place	wikidata
+hamasakachou	浜坂町	kana	place	wikidata
+isojimamura	伊曾島村	kana	place	wikidata
+adumimura	安曇村	kana	place	wikidata
+sakuragawamura	佐倉河村	kana	place	wikidata
+iritoonomura	入遠野村	kana	place	wikidata
+yachiyosonn	八千代村	kana	place	wikidata
+yuuchou	由宇町	kana	place	wikidata
+oogoemachi	大越町	kana	place	wikidata
