@@ -4917,4 +4917,15 @@ if (swift_src / "AzooKeyKanaKanjiConverter").is_dir():
 else:
     print("warning: MyIME の src が見つからないので、人工知能の時間の上限（Swift 側）は足していません")
 
+# 入力の頭の google・chrome・android だけ、Mozc の文字の組み立てが英字に切り替えて読みを英字のまま変換に渡す
+# （ModeSwitchingHandler）。読みと打った文字が合わないので英語の切り分けを通らず、「chromeの」が小文字のまま
+# 助詞と1文節になっていた。ほかの名前（Firefox、Madrid）と同じ道（英語の文節、公式の書き方を先に）に乗せる。
+edit("composer/mode_switching_handler.cc", """  if (key == "google" || key == "Google" ||
+      key == "Chrome" || key == "chrome" ||
+      key == "Android" || key == "android") {
+      return {PREFERRED_ALPHANUMERIC, REVERT_TO_PREVIOUS_MODE};
+  }
+
+""", "")
+
 print("applied")
