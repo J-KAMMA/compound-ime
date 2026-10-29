@@ -4846,7 +4846,7 @@ edit(C, '''    if (segment.context_history_scope().has_value()) {
       // Passive acceptance must not create or refresh scoped history.
       const bool reranked =''', '''    if (HistoryTrace()) {
       std::fprintf(stderr, "history finish: key=%s value=%s reranked=%d segments=%zu scope=%s\\n",
-                   segment.key().c_str(), segment.candidate(0).value.c_str(),
+                   std::string(segment.key()).c_str(), segment.candidate(0).value.c_str(),
                    (segment.candidate(0).attributes & converter::Attribute::RERANKED) != 0,
                    target_segments.conversion_segments_size(), ScopeState(segment));
     }
@@ -4865,7 +4865,7 @@ edit(C, '''    size_t max_candidates_size = 0;
     if (HistoryTrace()) {
       size_t trace_size = 0;
       std::fprintf(stderr, "history rewrite: key=%s top=%s top_content_key=%s span=%zu segments=%zu scope=%s triggered=%d\\n",
-                   segment->key().c_str(), segment->candidate(0).value.c_str(),
+                   std::string(segment->key()).c_str(), segment->candidate(0).value.c_str(),
                    segment->candidate(0).content_key.c_str(),
                    static_cast<size_t>(segment->candidate(0).effective_converted_segment_count()),
                    segments->conversion_segments_size(), ScopeState(*segment),
@@ -4876,7 +4876,7 @@ edit(C, '''    modified |= SortCandidates(scores, segment, keep_first);''', ''' 
     modified |= SortCandidates(scores, segment, keep_first);
     if (HistoryTrace()) {
       std::fprintf(stderr, "history scores: key=%s best=%s score=%u context=%d keep_first=%d now_first=%s\\n",
-                   segment->key().c_str(), trace_best.c_str(), scores[0].score,
+                   std::string(segment->key()).c_str(), trace_best.c_str(), scores[0].score,
                    scores[0].context, keep_first, segment->candidate(0).value.c_str());
     }''')
 
