@@ -208,6 +208,12 @@ c)
     MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
     MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
   done
+  # 子音の抜けの上乗せ（MYIME_TYPO_PRIOR_DC、既定 1000。前は 3000）を変えたときの比べ。ja400 と typo150b も同じ重みで流す
+  for x in 0 2000 3000; do
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-dc$x.tsv 4
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/ja400-c.txt $OUT/ja400-dc$x.tsv 4
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/typo150b.txt $OUT/typo150b-dc$x.tsv 4
+  done
   $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
 d1|d2)
@@ -224,6 +230,10 @@ e1|e2)
     half=$(( ($(wc -l < $W/wiki.txt) + 1) / 2 ))
     if [ "$GROUP" = e1 ]; then head -n $half $W/wiki.txt > $W/w.txt; else tail -n +$((half + 1)) $W/wiki.txt > $W/w.txt; fi
     $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
+    # 64 キーより長いローマ字の区間も区切って打ち間違いを直す（MYIME_TYPO_LONG、既定で入）を止めたときとの比べ。
+    # 長い区間がある文だけを流し、wiki-typing の同じ行と比べる（正しく打った文なので、変わった行は誤った直し）
+    grep -E "[a-z'-]{65,}" $W/w.txt > $W/w-long.txt || true
+    MYIME_TYPO_LONG=off $BATCH $W/w-long.txt $OUT/wiki-long-off-${GROUP#e}.tsv 4
   fi
   ;;
 g)
@@ -447,6 +457,14 @@ f)
     t1=$(date +%s.%N)
     $CTX $OUT/context-without.tsv without 4
     python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with.tsv $OUT/context-without.tsv | tee $OUT/context-score.txt | head -30
+    # 前の文の語（エドサル、伴馬、帰還）を先頭にする段（MYIME_CONTEXT_WORDS）を止めたときとの比べ。
+    # 単体試験（Mozc を組み立てずに g++ で動く）も
+    g++ -std=c++20 -O2 -I $REPO/native/jaen-detector \
+      $REPO/native/jaen-detector/context_words_test.cc $REPO/native/jaen-detector/context_words.cc \
+      -o $W/context_words_test
+    $W/context_words_test | tee $OUT/context-words-unit.txt
+    MYIME_CONTEXT_WORDS=off $CTX $OUT/context-with-words-off.tsv with 4
+    python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with-words-off.tsv $OUT/context-without.tsv > $OUT/context-words-off-score.txt
     # 前後の文での並べ替えを「迷うときだけ」にする値の比べ（tools/apply_context_gate.py、tools/clause_gate_test.py）。
     # 文は句読点を含み並べ替えが働かないので、文の最初の句だけを前の文つきで変換し、候補を絞る個数（TOPK）と
     # 先頭と次の候補の点の差の上限（GAP）を変えて、正解の数・基準との違い・全体の時間（4並列）を比べる
