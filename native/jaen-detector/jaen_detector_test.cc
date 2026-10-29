@@ -130,7 +130,31 @@ int main() {
     Expect(Text("qwenwotamesu", jaen::SplitEnglish(chunks, lexicon, Parse), true) == "qwen|",
            "a q word may end inside the chunk nwo (qwen|wo)");
   }
+  {
+    // A name ending in the particle's key ("mbed|de"): the composer reads the two d's as っで in one chunk.
+    jaen::Lexicon names;
+    names.AddSignalOnly("mbed");
+    const std::vector<Chunk> chunks = {{"m", "ん", ""}, {"be", "べ", ""}, {"dde", "っで", ""},
+                                       {"su", "す", ""}, {"", "", ""}};
+    Expect(Text("mbeddesu", jaen::SplitEnglish(chunks, names, Parse), true) == "mbed|",
+           "a name may end inside the chunk dde (mbed|de)");
+  }
 
+  {
+    // A name after a particle is not stopped by a word made of the particle and the name.
+    jaen::Lexicon names;
+    for (const char* w : {"ham", "bed", "gab", "tom", "oar", "bad", "ton"}) names.Add(w);
+    for (const char* w : {"mbed", "bios", "mrna", "arxiv", "rba", "vito"}) names.AddSignalOnly(w);
+    const auto named = [&](std::string_view raw) {
+      return Text(std::string(raw), jaen::SplitEnglish(Parse(raw), names, Parse), true);
+    };
+    Expect(named("kinouhambedwotsukatta") == "mbed|", "ha|mbed: not ham + bed");
+    Expect(named("koregabiosdesu") == "bios|", "ga|bios: not gab + ios");
+    Expect(named("tomodachitomrnawotsukatta") == "mrna|", "to|mrna: not tom + rna");
+    Expect(named("aideawoarxivdeatsumete") == "arxiv|", "wo|arxiv: not oar + xiv");
+    Expect(named("rbadeshirabeta") == "rba|", "rba|de: not stopped by bad");
+    Expect(named("vitonitaihosareta").empty(), "vito|ni: ton keeps it Japanese");
+  }
   Expect(english("samewomita").empty(), "romaji-readable word stays Japanese");
   Expect(english("mademachimasu").empty(), "Japanese reading stays");
   Expect(english("kittekudasai").empty(), "lexicon word cutting a Japanese chunk is not forced");
@@ -659,7 +683,18 @@ int main() {
     };
     Expect(edit("tsuduukete", "tsudukete") == jaen::TypoPriors{}.doubled_vowel, "a doubled vowel may be dropped cheaply (つづうけて)");
     Expect(edit("ashitadesu", "shitadesu") == std::nullopt, "the first key is never edited");
-    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key is dropped only where it was typed twice");
+    Expect(edit("kaigoidesu", "kaigidesu") == jaen::TypoPriors{}.extra_key, "a key next to a key around it may be dropped at extra_key");
+    Expect(edit("kaigidesu", "kagidesu") == std::nullopt, "a key touching neither key around it is not dropped");
+    Expect(edit("kiouhadesu", "kinouhadesu") == jaen::TypoPriors{}.dropped_consonant, "a consonant left out (kiou for kinou)");
+    Expect(edit("dakeatokara", "dakeeatokara") != jaen::TypoPriors{}.long_vowel, "no long vowel is put in after e before another vowel (だけあとから)");
+    Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "a long vowel left out before a consonant (okii)");
+    {
+      jaen::TypoPriors off;
+      off.extra_key = off.dropped_consonant = jaen::TypoPriors::kOff;
+      bool offered = false;
+      for (const jaen::TypoEdit& e : jaen::ReadableTypoEdits("kaigoidesu", Parse, off)) offered |= e.keys == "kaigidesu";
+      Expect(!offered, "with extra_key off, a key is dropped only where it was typed twice");
+    }
     Expect(edit("hayyaku", "hayaku") == jaen::TypoPriors{}.doubled_consonant, "a doubled consonant costs more");
     Expect(edit("koukadesu", "kuokadesu") == std::nullopt, "ou is never made uo");
     Expect(edit("kuokadesu", "koukadesu") == jaen::TypoPriors{}.swapped_uo, "uo to ou costs more than other swaps (chuo for ちゅうおう)");

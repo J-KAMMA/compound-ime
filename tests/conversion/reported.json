@@ -184,6 +184,94 @@
    "intended": "話しといた。",
    "alternatives": [],
    "note": "2026-10-24 見直し: 一覧にない動詞の 〜といた が辞書になかった"
+  },
+  {
+   "id": "r025",
+   "category": "reported",
+   "romaji": "deatsumete",
+   "intended": "で集めて",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
+  },
+  {
+   "id": "r026",
+   "category": "reported",
+   "romaji": "minnnadeatsumete",
+   "intended": "みんなで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
+  },
+  {
+   "id": "r027",
+   "category": "reported",
+   "romaji": "gakkoudeatsumeteta.",
+   "intended": "学校で集めてた。",
+   "alternatives": [],
+   "note": "2026-10-28 利用者: で集めて が 出集めて になった"
+  },
+  {
+   "id": "r028",
+   "category": "reported",
+   "romaji": "dakeatokaratsuikashita",
+   "intended": "だけ後から追加した",
+   "alternatives": ["だけあとから追加した"],
+   "note": "2026-10-28 利用者: 後から足した入力が 高えあとから追加された になった"
+  },
+  {
+   "id": "r029",
+   "category": "reported",
+   "romaji": ",dakeatokaratsuikashita",
+   "intended": "、だけ後から追加した",
+   "alternatives": ["、だけあとから追加した"],
+   "note": "2026-10-28 利用者: 同じ（読点のあと）"
+  },
+  {
+   "id": "r030",
+   "category": "reported",
+   "romaji": "arxivdeatsumete",
+   "intended": "arXivで集めて",
+   "alternatives": ["arxivで集めて", "ArXivで集めて"],
+   "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
+  },
+  {
+   "id": "r031",
+   "category": "reported",
+   "romaji": "aideawoarxivdeatsumete",
+   "intended": "アイデアをarXivで集めて",
+   "alternatives": ["アイデアをarxivで集めて", "アイデアをArXivで集めて"],
+   "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
+  },
+  {
+   "id": "r032",
+   "category": "reported",
+   "romaji": "honwoarxivdeatsumete",
+   "intended": "本をarXivで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r033",
+   "category": "reported",
+   "romaji": "aideawoarxiv",
+   "intended": "アイデアをarXiv",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r034",
+   "category": "reported",
+   "romaji": "korehaarxivdesu",
+   "intended": "これはarXivです",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r035",
+   "category": "reported",
+   "romaji": "aideawogoogledeatsumete",
+   "intended": "アイデアをGoogleで集めて",
+   "alternatives": [],
+   "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
   }
  ]
 }

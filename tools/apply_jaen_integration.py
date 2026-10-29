@@ -2784,8 +2784,14 @@ for line in (REPO / "tools/data/domain-casing.tsv").read_text(encoding="utf-8").
 second_pairs = []
 proper_nouns = [line.split("\t") for line in (REPO / "tools/data/proper-nouns.tsv").read_text(encoding="utf-8").splitlines()
                 if line and not line.startswith("#")]
+# 英語として取れない名前（打つ形が空: adidas、ferrari）も、ほかの一覧で英語として取れたときのために、
+# 小文字の形で表示の形を引けるようにする。普通の英単語（SCOWL の common-words.txt）は除く。
+_common_path = lexdir / "common-words.txt"
+_common = set(_common_path.read_text(encoding="ascii").split()) if _common_path.exists() else set()
 for row in proper_nouns:
     shown, typed_form = row[0], row[1]
+    if not typed_form and shown.isascii() and shown.isalpha() and shown.lower() not in _common:
+        typed_form = shown.lower()
     if typed_form and typed_form not in _cased and '"' not in shown and "\\" not in shown:
         (second_pairs if row[2] == "s" else pairs).append([typed_form, shown])
         _cased.add(typed_form)
@@ -2873,6 +2879,14 @@ edit("converter/converter.cc", """      if (const std::string_view official = Br
       }
       if (const std::string_view official = BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
           !official.empty() && !EnglishLexicon().FindPlace(typed)) {""")
+
+
+# 地名も公式の書き方を先に出す（madrid -> Madrid、tokyo -> Tokyo）。漢字（東京）はそのあとに足す。
+edit("converter/converter.cc", """BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty() && !EnglishLexicon().FindPlace(typed)) {""", """BrandCasing(typed).empty() ? BrandCasing(unspaced) : BrandCasing(typed);
+          !official.empty()) {""")
+edit("converter/converter.cc", """      // typed second ("youtube" -> YouTube, youtube). Place names stay as typed.""",
+     """      // typed second ("youtube" -> YouTube, youtube; "madrid" -> Madrid).""")
 
 
 # 英語が見つかった短い入力（opencode、geminicli）で、打った英字そのものを4番目の候補に必ず入れる。
@@ -3282,6 +3296,24 @@ edit("converter/converter.cc", """        fixed_any = true;
         }
       }
     }""")
+# 英語の短い語に読まれた打ち間違い（「kusurihasohkugo」の has|oh）: MYIME_TYPO_UNREAD があれば、入力全体を
+# 1キー直してかなで読めるなら直す（FixTypoReadAsEnglish）。直したあとは1つの日本語の部分として読み直す
+edit("converter/converter.cc", """  std::vector<std::string> texts;
+  bool fixed_any = false;
+""", """  std::vector<std::string> texts;
+  bool fixed_any = false;
+  if (std::optional<std::string> fixed =
+          FixTypoReadAsEnglish(modules(), raw, pieces, EnglishLexicon(), parse, TypoKanaModel())) {
+    raw = *std::move(fixed);
+    pieces.assign(1, jaen::Piece{0, raw.size(), false});
+    split = true;
+    fixed_any = true;
+    if (typo_fixed) *typo_fixed = true;
+  }
+""")
+# 読めない打ち間違い（「agerughitsuyou」）も、MYIME_TYPO_UNREAD があれば辞書の費用で直し方を選ぶ（FixUnreadTypo）
+edit("converter/converter.cc", "jaen::FixTypo(text, parse, TypoKanaModel())",
+     "FixUnreadTypo(modules(), text, parse, TypoKanaModel())")
 edit("converter/converter.cc", "#include <optional>\n", "#include <cstdlib>\n#include <optional>\n")
 edit("converter/converter.cc", "#include <tuple>\n", "#include <tuple>\n#include <unordered_map>\n")
 # 読みの費用の記憶（打鍵をまたいで使い回す）に使う
@@ -3289,6 +3321,13 @@ edit("converter/converter.cc", "#include <tuple>\n", "#include <atomic>\n#includ
 edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
+
+# 句読点（kyouhq,ashita）を挟んだ文も、句読点の間ごとに打ち間違いを直す（FixEachRun）。直しの関数は
+# 英字だけの入力しか見ないので、句読点を打った文は今まで一度も直らなかった。
+edit("converter/converter.cc", "FixReadableTypo(modules(), text, parse, *margin)",
+     "FixEachRun(text, [&](absl::string_view run) { return FixReadableTypo(modules(), run, parse, *margin); })")
+edit("converter/converter.cc", "FixUnreadTypo(modules(), text, parse, TypoKanaModel())",
+     "FixEachRun(text, [&](absl::string_view run) { return FixUnreadTypo(modules(), run, parse, TypoKanaModel()); })")
 
 # 英単語の前後の1文節の日本語: 節: 「きのうから|sale|が始まった」の「きのうから」のような
 # 1文節の部分は、文全体の処理（2文節以上が前提）に入らず、Mozc の順位（機能から）のままだった。

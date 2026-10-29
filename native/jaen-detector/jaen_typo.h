@@ -44,6 +44,16 @@ int UnreadKeys(const std::vector<Chunk>& chunks);
 // reading) by less than |margin| (natural log), or its average log-probability
 // per kana (end mark included) is below |floor|. Only lowercase romaji typed in
 // kana mode is considered.
+// The one-key edits FixTypo weighs, one per reading (the best-scored keys for
+// it), with the kana model's score; empty when FixTypo would not look at |raw|.
+struct UnreadTypoEdit {
+  std::string keys;
+  std::string kana;
+  double score = 0;     // |model|'s log-probability, less the vowel penalty
+  bool vowel = false;   // a vowel was put in (a missing vowel is a rarer slip)
+};
+std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                            const KanaModel& model);
 std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
                                    const KanaModel& model, double margin = 3.0,
                                    double floor = -4.5);
@@ -82,6 +92,16 @@ struct TypoPriors {
   // Measured: fixes maddeo and hidda, changes none of ja400, the typo controls
   // or the loanwords in group c (beddo, baggu ...).
   int doubled_voiced = 0;
+  // kOff leaves a kind of slip out.
+  static constexpr int kOff = 1 << 30;
+  // A consonant left out before a vowel ("kiou" for kinou, "saeta" for sareta) and
+  // any key typed in by mistake ("butsai" for butai): set on the dev typo table
+  // (tests/conversion/dev-typo.json). MYIME_TYPO_PRIOR_DC and MYIME_TYPO_PRIOR_EX override them.
+  int dropped_consonant = 3000;
+  int extra_key = 2500;
+  // A key typed in by mistake that touches neither key around it ("shuogi" read as
+  // shugi, not shougi; "tepiku" as teiku): off. MYIME_TYPO_PRIOR_EXF overrides it.
+  int extra_key_far = kOff;
 };
 struct TypoEdit {
   std::string keys;  // the typed keys with the edit

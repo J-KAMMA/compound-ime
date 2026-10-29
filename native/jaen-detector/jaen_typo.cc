@@ -90,26 +90,26 @@ int UnreadKeys(const std::vector<Chunk>& chunks) {
   return unread;
 }
 
-std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
-                                   const KanaModel& model, double margin, double floor) {
+std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiParser& parse,
+                                            const KanaModel& model) {
   // Lowercase romaji only: capitals or ASCII-mode keys are typed on purpose.
   if (raw.empty() || raw.size() > kMaxRawLength ||
       !std::ranges::all_of(raw, [](char c) { return (c >= 'a' && c <= 'z') || c == '-'; })) {
-    return std::nullopt;
+    return {};
   }
   const std::vector<Chunk> typed = parse(raw);
   if (std::ranges::any_of(typed, [](const Chunk& c) {
         return std::ranges::any_of(c.conversion, IsLetter);
       })) {
-    return std::nullopt;
+    return {};
   }
   const size_t first = FirstUnread(typed);
-  if (first == std::string::npos) return std::nullopt;
+  if (first == std::string::npos) return {};
 
   // Best score per reading, with the typed keys that gave it.
-  std::map<std::string, std::pair<double, std::string>> readings;
+  std::map<std::string, UnreadTypoEdit> readings;
   const std::string text(raw);
-  const auto consider = [&](std::string candidate, double penalty) {
+  const auto consider = [&](std::string candidate, bool vowel) {
     if (candidate.empty()) return;
     const std::vector<Chunk> chunks = parse(candidate);
     if (UnreadKeys(chunks) != 0) return;
@@ -117,9 +117,9 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
     for (size_t i = 0; i < chunks.size(); ++i) {
       kana += FinalN(chunks, i) ? std::string("ん") : chunks[i].conversion + chunks[i].pending;
     }
-    const double score = model.Score(kana) - penalty;
-    auto [it, added] = readings.try_emplace(kana, score, candidate);
-    if (!added && score > it->second.first) it->second = {score, std::move(candidate)};
+    const double score = model.Score(kana) - (vowel ? kVowelPenalty : 0);
+    auto [it, added] = readings.try_emplace(kana, UnreadTypoEdit{candidate, kana, score, vowel});
+    if (!added && score > it->second.score) it->second = {std::move(candidate), kana, score, vowel};
   };
   // A slip shows up as an unread key at most a few keys later.
   const size_t lo = first >= 3 ? first - 3 : 0;
@@ -128,40 +128,48 @@ std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& par
     for (const char n : Neighbors(text[i])) {
       std::string s = text;
       s[i] = n;
-      consider(std::move(s), 0);
+      consider(std::move(s), false);
     }
     if (i + 1 < text.size() && text[i] != text[i + 1]) {
       std::string s = text;
       std::swap(s[i], s[i + 1]);
-      consider(std::move(s), 0);
+      consider(std::move(s), false);
     }
     {
       std::string s = text;
       s.erase(i, 1);
-      consider(std::move(s), 0);
+      consider(std::move(s), false);
     }
     for (const char v : std::string_view("aiueo")) {
       std::string s = text;
       s.insert(i + 1, 1, v);
-      consider(std::move(s), kVowelPenalty);
+      consider(std::move(s), true);
     }
   }
-  auto best = readings.end();
+  std::vector<UnreadTypoEdit> out;
+  out.reserve(readings.size());
+  for (auto& [kana, edit] : readings) out.push_back(std::move(edit));
+  return out;
+}
+
+std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
+                                   const KanaModel& model, double margin, double floor) {
+  const std::vector<UnreadTypoEdit> edits = UnreadTypoEdits(raw, parse, model);
+  const UnreadTypoEdit* best = nullptr;
   double runner_up = -INFINITY;
-  for (auto it = readings.begin(); it != readings.end(); ++it) {
-    if (best == readings.end() || it->second.first > best->second.first) {
-      if (best != readings.end()) runner_up = std::max(runner_up, best->second.first);
-      best = it;
+  for (const UnreadTypoEdit& edit : edits) {
+    if (best == nullptr || edit.score > best->score) {
+      if (best != nullptr) runner_up = std::max(runner_up, best->score);
+      best = &edit;
     } else {
-      runner_up = std::max(runner_up, it->second.first);
+      runner_up = std::max(runner_up, edit.score);
     }
   }
-  if (best == readings.end() || best->second.first - runner_up < margin) return std::nullopt;
+  if (best == nullptr || best->score - runner_up < margin) return std::nullopt;
   // A lone or clear winner must still look like Japanese ("googke" -> ごおけ).
-  const double per_character =
-      best->second.first / static_cast<double>(Characters(best->first).size() + 1);
+  const double per_character = best->score / static_cast<double>(Characters(best->kana).size() + 1);
   if (per_character < floor) return std::nullopt;
-  return best->second.second;
+  return best->keys;
 }
 
 std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
@@ -206,10 +214,13 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       found[*kana] = {std::move(keys), *kana, prior};
     }
   };
-  // A long vowel left out, also after the first key ("okii" for ookii).
+  // A long vowel left out, also after the first key ("okii" for ookii). Not after an e
+  // before another vowel: "dakeatokara" is だけあとから, not だけえあとから ("gakkoe" for
+  // gakkoue stays).
   for (size_t i = 0; i < text.size(); ++i) {
     const char c = text[i];
     if (std::string_view("aiueo").find(c) == std::string_view::npos) continue;
+    if (c == 'e' && i + 1 < text.size() && std::string_view("aiueo").find(text[i + 1]) != std::string_view::npos) continue;
     std::string longer{c};
     if (c == 'o' || c == 'u') longer = c == 'u' ? "u" : "ou";
     if (c == 'e') longer = "ei";
@@ -250,6 +261,26 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
       std::string s = text;
       s.insert(i + 1, 1, v);
       add(std::move(s), priors.dropped_vowel);
+    }
+    if (priors.dropped_consonant != TypoPriors::kOff &&
+        std::string_view("aiueo").find(text[i]) != std::string_view::npos) {
+      for (const char c : std::string_view("kstnhmyrwgzdbpj")) {  // a dropped consonant ("kiou")
+        std::string s = text;
+        s.insert(i, 1, c);
+        add(std::move(s), priors.dropped_consonant);
+      }
+    }
+    if (text[i] != text[i - 1] && text[i] != '\'') {
+      // A key typed in by mistake ("butsai"): next to a key around it, or any key at extra_key_far.
+      const auto touches = [&](size_t j) {
+        return j < text.size() && Neighbors(text[j]).find(text[i]) != std::string_view::npos;
+      };
+      const int prior = touches(i - 1) || touches(i + 1) ? priors.extra_key : priors.extra_key_far;
+      if (prior != TypoPriors::kOff) {
+        std::string s = text;
+        s.erase(i, 1);
+        add(std::move(s), prior);
+      }
     }
   }
   std::vector<TypoEdit> out;
