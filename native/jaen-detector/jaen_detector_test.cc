@@ -708,6 +708,47 @@ int main() {
   }
 
   {
+    // Runs longer than the fixers look at are cut after particles into parts of at most 64 keys.
+    const auto joined = [](const std::vector<std::string_view>& parts) {
+      std::string s;
+      for (const std::string_view p : parts) s += p;
+      return s;
+    };
+    const std::string_view short_run = "kinounokaigideketteishita";
+    Expect(jaen::SplitLongRomaji(short_run).size() == 1, "a run of at most 64 keys is one part");
+    // 82 keys (holdout の打ち間違い 64超 の形): 来月から新しい部署に異動することになったので引き継ぎの資料を作っている
+    const std::string_view long_run = "raigetsukaraatarashiibushoniidousurukotoninattanodehikitsuginooshiryouwotsukutteiru";
+    const auto parts = jaen::SplitLongRomaji(long_run);
+    bool short_enough = true, after_vowel = true;
+    for (const std::string_view p : parts) {
+      short_enough &= p.size() <= 64 && p.size() >= 12;
+      after_vowel &= std::string_view("aiueo").find(p.back()) != std::string_view::npos;
+    }
+    Expect(parts.size() == 2 && joined(parts) == long_run && short_enough && after_vowel,
+           "an 82-key run is cut into two parts that end on a vowel");
+    Expect(parts[0].ends_with("ni") || parts[0].ends_with("no") || parts[0].ends_with("de") ||
+               parts[0].ends_with("wo") || parts[0].ends_with("ga") || parts[0].ends_with("to"),
+           "the cut is after a particle");
+    // wo is the best cut, even with another particle closer to 64 keys.
+    const std::string with_wo = "kosowo" + std::string("katteshimattanode") + "mokunoshinaito" + "nagaku" + "nagaku" + "nagakunagakushitekudasai";
+    const auto wo_parts = jaen::SplitLongRomaji(with_wo, 64);
+    Expect(joined(wo_parts) == with_wo && wo_parts.size() >= 2, "a long run is cut and joins back");
+    // No cut inside a doubled consonant or before a vowel, ー or y.
+    for (const std::string_view p : jaen::SplitLongRomaji(
+             "kittekittekittekittekittekittekittekittekittekittekittekittekittekitte", 20, 4)) {
+      Expect(!p.starts_with("t") || p.size() == 0, "never cut between the two t of tte");
+    }
+    // A run with no vowel to cut after stays whole.
+    const std::string consonants(80, 'k');
+    Expect(jaen::SplitLongRomaji(consonants).size() == 1, "no cut after a consonant");
+    // Each part is at least 12 keys: a 70-key run is not cut 64 + 6.
+    for (const std::string_view p : jaen::SplitLongRomaji(
+             "watashihakinoutomodachitoissho" "nieiganiminiittekaerinikafedeohanashishita")) {
+      Expect(p.size() >= 12, "no part shorter than 12 keys");
+    }
+  }
+
+  {
     // 日本語に読める略語（ai: あい、ui: うい、ime: いめ）。打った並びに英字が残らない。
     // ai は独立した語として打たれたら（後ろが助詞・句読点・文末）AI にする。ui、ime などは手がかり方式のまま。
     Expect(english("aiwotsukau") == "ai|", "ai + を + 使う は AI（aiwotsukau）");
