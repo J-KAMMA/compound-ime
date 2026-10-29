@@ -3297,7 +3297,10 @@ edit("converter/converter.cc", """        fixed_any = true;
       }
     }""")
 # 英語の短い語に読まれた打ち間違い（「kusurihasohkugo」の has|oh）: MYIME_TYPO_UNREAD があれば、入力全体を
-# 1キー直してかなで読めるなら直す（FixTypoReadAsEnglish）。直したあとは1つの日本語の部分として読み直す
+# 1キー直してかなで読めるなら直す（FixTypoReadAsEnglish）。直したあとは1つの日本語の部分として読み直す。
+# 登録語・略語・5字以上の語（「machiaawseta」の aws）は厳しい規則（FixListedWordTypo）だけで直す: 前後が日本語で
+# 助詞の前でない1か所の英字、直しがその英字の中か隣、直した読みが英字を名詞1つとした読みより
+# MYIME_TYPO_EN_LISTED（既定 6000）以上安いとき
 edit("converter/converter.cc", """  std::vector<std::string> texts;
   bool fixed_any = false;
 """, """  std::vector<std::string> texts;

@@ -288,4 +288,40 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
   return out;
 }
 
+bool StartsWithParticleSpelling(std::string_view keys) {
+  constexpr std::string_view kParticles[] = {"no", "ni", "de", "wo", "ga", "wa", "ha", "to", "mo", "he", "ya"};
+  return std::ranges::any_of(kParticles, [&](std::string_view p) { return keys.starts_with(p); });
+}
+
+std::optional<std::pair<size_t, size_t>> EnglishRunBetweenJapanese(std::string_view raw,
+                                                                   const std::vector<Piece>& pieces) {
+  size_t first = pieces.size(), last = pieces.size();
+  for (size_t i = 0; i < pieces.size(); ++i) {
+    if (!pieces[i].english) continue;
+    if (first == pieces.size()) {
+      first = i;
+    } else if (last + 1 != i) {
+      return std::nullopt;  // two English runs: not one slip
+    }
+    last = i;
+  }
+  if (first == pieces.size() || first == 0 || last + 1 >= pieces.size()) return std::nullopt;
+  const size_t begin = pieces[first].begin, end = pieces[last].end;
+  if (end >= raw.size() || StartsWithParticleSpelling(raw.substr(end))) return std::nullopt;
+  return std::pair{begin, end};
+}
+
+bool EditNear(std::string_view raw, std::string_view fixed, size_t begin, size_t end) {
+  if (raw == fixed) return false;
+  size_t head = 0;
+  while (head < raw.size() && head < fixed.size() && raw[head] == fixed[head]) ++head;
+  size_t tail = 0;
+  while (tail < raw.size() - head && tail < fixed.size() - head &&
+         raw[raw.size() - 1 - tail] == fixed[fixed.size() - 1 - tail]) {
+    ++tail;
+  }
+  // The keys of |raw| the edit changed (empty for a key put in): [head, raw.size() - tail).
+  return head + 1 >= begin && raw.size() - tail <= end + 1;
+}
+
 }  // namespace jaen

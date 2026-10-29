@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "jaen_detector.h"
@@ -113,6 +114,24 @@ struct TypoEdit {
 // converter's cost of each reading plus its prior with the typed reading.
 std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
                                         const TypoPriors& priors = {});
+
+// Whether |keys| start with the spelling of a Japanese particle (no, ni, de, wo, ga,
+// wa, ha, to, mo, he, ya): an English word right before one ("aws|no", "bus|ni") was
+// meant as a word.
+bool StartsWithParticleSpelling(std::string_view keys);
+
+// A slip read as a listed word, an acronym or a long word ("machia|aws|eta",
+// "kusuriha|sohk|ugo"): the one run of English pieces of |raw|, as the half-open key
+// range [begin, end), when Japanese pieces stand right before and after it and the
+// keys after it do not start a particle spelling. nullopt when there is no such run,
+// or more than one. English at the start or the end ("aws|nosettei", "kore|house"),
+// or right before a particle ("kinou|aws|no"), was typed as English.
+std::optional<std::pair<size_t, size_t>> EnglishRunBetweenJapanese(std::string_view raw,
+                                                                   const std::vector<Piece>& pieces);
+
+// Whether the one-key edit |fixed| of |raw| changes keys only inside [begin, end) or
+// on the key just before or after it: the slip is in the English letters.
+bool EditNear(std::string_view raw, std::string_view fixed, size_t begin, size_t end);
 
 }  // namespace jaen
 
