@@ -75,6 +75,7 @@ denwabangouhazerokyuuzero        →  電話番号は090
 | 全角の英字にする | **F9** |
 | カタカナにする | **F7** |
 | 候補を1つ戻る | **↑**（一番上で押すと「そのほかの文字種」に回ります） |
+| 「今の変換は違う」と記録する | 変換中か確定の直後に **Ctrl+Shift+F12**（パソコンの中のファイルに1行残るだけ。[説明](docs/miss-report.md)） |
 
 ---
 
@@ -108,6 +109,7 @@ cd compound-ime-*/ && sudo ./install.sh && ibus restart
   - インストールのときに、変換用の人工知能を公式の配布元から取得するとき
   - 新しい版があるかを、1日1回まで GitHub の配布ページに問い合わせるとき（止め方は [tools/update-check/README.md](tools/update-check/README.md)）
 - 打った読みと選んだ候補の記録は、**既定では残しません**。
+- 例外は、自分で **Ctrl+Shift+F12** を押したときだけです。その文（打ったキー・読み・出た変換・直前の文）をパソコンの中の `misconversions.tsv` に1行残します。外へは送りません。場所と消し方は [docs/miss-report.md](docs/miss-report.md)。
 
 ---
 

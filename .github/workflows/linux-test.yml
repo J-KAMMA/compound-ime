@@ -71,6 +71,11 @@ jobs:
           python3 $GITHUB_WORKSPACE/repo/tools/katakana_english_dictionary_test.py
           python3 $GITHUB_WORKSPACE/repo/tools/jmdict_loanwords_test.py
           python3 $GITHUB_WORKSPACE/repo/tools/protobuf_text_unescape_test.py
+          # 「今の変換は違う」の記録（Ctrl+Shift+F12）の書き方と、試験の表の下書きへの変換
+          g++ -std=c++20 -O2 -Wall -I $GITHUB_WORKSPACE/repo/native/jaen-detector \
+            $GITHUB_WORKSPACE/repo/native/jaen-detector/miss_report_test.cc -o $RUNNER_TEMP/miss_report_test
+          $RUNNER_TEMP/miss_report_test
+          python3 $GITHUB_WORKSPACE/repo/tools/misconversions_to_tests_test.py
 
       - name: 上流のソースと土台の改修
         run: |
@@ -119,6 +124,8 @@ jobs:
           $PY $W/repo/tools/apply_decimal_point.py $S
           $PY $W/repo/tools/apply_emoji_context.py $S
           $PY $W/repo/tools/apply_emoji_renderable.py $S
+          # 「今の変換は違う」を Ctrl+Shift+F12 で記録する（docs/miss-report.md）
+          $PY $W/repo/tools/apply_miss_report.py $S
           $PY $W/repo/tools/decimal_transform_test.py $S
           # 辞書の更新（配布ページから辞書だけを取りに行く仕組み。docs/dict-update.md）
           $PY $W/repo/tools/apply_dict_update.py $S

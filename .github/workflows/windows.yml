@@ -129,6 +129,8 @@ jobs:
           python $R/tools/apply_decimal_point.py $S
           python $R/tools/apply_emoji_context.py $S
           python $R/tools/apply_emoji_renderable.py $S
+          # 「今の変換は違う」を Ctrl+Shift+F12 で記録する（docs/miss-report.md）
+          python $R/tools/apply_miss_report.py $S
           # 入れたあと再起動しなくても使えるように、入力の部品を版ごとの名前で置く
           python $R/tools/apply_tip_versioned.py $S
           # 右クリックのメニューの文字を大きく描く

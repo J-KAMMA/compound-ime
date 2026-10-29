@@ -77,6 +77,8 @@ python tools/apply_jaen_integration.py <src> <lex>
 
 日英判定（`native/jaen-detector`）、辞書、変換、製品名の変更（最後に `tools/apply_compound_branding.py`、アイコンは `tools/make_compound_icon.py`、Pillow が必要）をすべて適用します。成功すると `applied` と表示します。
 
+続けて、`apply_decimal_point.py`・`apply_emoji_context.py`・`apply_emoji_renderable.py` と、「今の変換は違う」を Ctrl+Shift+F12 で記録する `python tools/apply_miss_report.py <src>`（[docs/miss-report.md](docs/miss-report.md)）を 1 回ずつ実行します（順は `.github/workflows/windows.yml` と同じ）。
+
 辞書の更新（配布ページから辞書だけを取りに行く仕組み。設計は [docs/dict-update.md](docs/dict-update.md)）は、続けて次を 1 回だけ実行します。
 
 ```
