@@ -197,6 +197,9 @@ c)
   romaji $T/dev-typo.json > $W/dev-typo.txt
   $BATCH $W/dev-typo.txt $OUT/dev-typo.tsv 4
   MYIME_TYPO_UNREAD=off $BATCH $W/dev-typo.txt $OUT/dev-typo-unread-off.tsv 4
+  # 句点を打った文（kinou...shiita.）でも同じだけ直るか。採点は文末の「。」を除いて dev-typo と同じ表で
+  sed 's/$/./' $W/dev-typo.txt > $W/dev-typo-period.txt
+  $BATCH $W/dev-typo-period.txt $OUT/dev-typo-period.tsv 4
   # 隣の鍵でない余分な1キー（MYIME_TYPO_PRIOR_EXF、既定は外す）を入れたときの比べ。ja400 と typo150b も同じ重みで流し、
   # 崩れる文が出ないかを見る
   romaji $T/ja400.json > $W/ja400-c.txt
