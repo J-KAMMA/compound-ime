@@ -23,6 +23,7 @@
 #   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）。
 #      1語の表（learn-respect.tsv、50語以上）と、前の文がある複数文節の表（learn-respect-context.tsv。文脈が別の書き方を
 #      先頭にしている文で、文節の元の先頭を4回選ぶ）を流す
+#      選び直しが次の変換に効くか（learn-sticky.tsv。ひらがな・F キーの大文字・文の中の文節を2回選び、前の文が毎回違うときと前の文なしで確かめる）
 #   t: カタカナ語の英字、和製英語に付けないこと、作品名・企業名の公式の英字（tests/conversion/katakana-english.tsv、
 #      katakana-wasei.tsv、work-names.tsv、brand-names.tsv。名前だけを打って変換した候補。tools/make_katakana_english_tests.py、
 #      tools/score_katakana_english.py。期待する英字が上位10個以内か、日本語の候補が先頭のままか）
@@ -281,6 +282,14 @@ l)
     bash $REPO/tools/learn_context_guard.sh $E/session_handler_main $E $MODEL $T/learn-context-guard.tsv $OUT/learn-context-guard 2
     python3 $REPO/tools/score_learn_context_guard.py $OUT/learn-context-guard-on.tsv $OUT/learn-context-guard-off.tsv \
       | tee $OUT/learn-context-guard-score.txt
+  fi
+  # 選び直しが次の変換に効くか（tools/learn_sticky_convert.sh）。ひらがな（読みそのまま）を選ぶ、F キーや候補で英字を
+  # 大文字にする、文の中の文節で選び直す、を2回ずつしたあと、前の文が毎回違うとき（ふつうのアプリ）と前の文なしで、
+  # 別の続き（を→に）や別の文でも選んだ書き方が出るか。効かない行があれば失敗にする（tools/score_learn_sticky.py）。
+  if [ -f $T/learn-sticky.tsv ]; then
+    bash $REPO/tools/learn_sticky_convert.sh $E/session_handler_main $E $MODEL $T/learn-sticky.tsv $OUT/learn-sticky
+    python3 $REPO/tools/score_learn_sticky.py $OUT/learn-sticky-on.tsv $OUT/learn-sticky-off.tsv \
+      | tee $OUT/learn-sticky-score.txt
   fi
   ;;
 m)
