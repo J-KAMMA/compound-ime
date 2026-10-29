@@ -242,6 +242,14 @@ e1|e2)
     MYIME_TYPO_LONG=off $BATCH $W/w-long.txt $OUT/wiki-long-off-${GROUP#e}.tsv 4
   fi
   ;;
+e9)
+  # 人工知能なし（重みのファイルがない）でウィキペディアの文を打つ。誤りが辞書（Mozc）のものか人工知能のものかを分ける比べ。
+  # 既定の組には入れない（groups='["e9"]' で頼んだときだけ）
+  if [ -f $T/wiki-typing.tsv ]; then
+    grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
+    bash $REPO/tools/batch_convert.sh $E/session_handler_main $E /nonexistent.gguf $W/wiki.txt $OUT/wiki-typing-noai.tsv 4 || true
+  fi
+  ;;
 g)
   # 分野の文（プログラミング 300、仮想通貨 200 ほど）をローマ字で打つ。英字の言葉（git、npm、Python、DeFi、NFT など）は
   # 打ったまま元の文どおり出ることを期待する。採点はまとめの段で（tools/score_wiki_typing.py）
