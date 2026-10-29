@@ -4802,6 +4802,84 @@ edit(C, '''  bool result = false;
   }
   result |= DeleteEntry(fkey.LeftRight(key, value));''')
 
+# 前の文は改行までの1行がまるごと渡る。160 バイト（日本語で約53字）を超える行のあとでは、選び直しを何も覚えず、
+# 履歴での並べ替えもしなかった（止められた扱い）。長いときは前後の文ごとの記録を使わず、全体の記録で学習する。
+edit(C, '''  if (left.size() > kMaxContextWindowBytes ||
+      right.size() > kMaxContextWindowBytes) {
+    return std::string();
+  }''', '''  if (left.size() > kMaxContextWindowBytes ||
+      right.size() > kMaxContextWindowBytes) {
+    return std::nullopt;
+  }''')
+
+# 先頭の候補が文全体などで読みの切れ目が違うときも、ほかの候補の語の読み（こうえん）で覚えた選びを見つける。
+edit(C, '''  *max_candidates_size = std::max(v1_size, v2_size);''', '''  size_t v3_size = 0;
+  for (size_t i = 1; i < std::min<size_t>(segment.candidates_size(), 10); ++i) {
+    const converter::Candidate& other = segment.candidate(i);
+    if (other.key != segment.key() || other.content_key.empty() ||
+        other.content_key == segment.key() ||
+        other.content_key == segment.candidate(0).content_key) {
+      continue;
+    }
+    const KeyTriggerValue* v3 = reinterpret_cast<const KeyTriggerValue*>(
+        storage_->Lookup(other.content_key));
+    if (v3 != nullptr && v3->IsValid()) {
+      v3_size = std::max<size_t>(v3_size, v3->candidates_size());
+    }
+  }
+  *max_candidates_size = std::max({v1_size, v2_size, v3_size});''')
+
+# 調べ用: MYIME_HISTORY_TRACE があるときだけ、学習（Finish）と並べ替え（Rewrite）の判断を標準エラーに1行ずつ書く。
+edit(C, "#include <cctype>\n", "#include <cctype>\n#include <cstdio>\n#include <cstdlib>\n")
+edit(C, '''// A segment of typed English (FIXED_VALUE, its key the typed ASCII word).''', '''bool HistoryTrace() {
+  static const bool enabled = std::getenv("MYIME_HISTORY_TRACE") != nullptr;
+  return enabled;
+}
+
+const char* ScopeState(const Segment& segment) {
+  const auto& scope = segment.context_history_scope();
+  return !scope.has_value() ? "none" : scope->empty() ? "blocked" : "set";
+}
+
+// A segment of typed English (FIXED_VALUE, its key the typed ASCII word).''')
+edit(C, '''    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      const bool reranked =''', '''    if (HistoryTrace()) {
+      std::fprintf(stderr, "history finish: key=%s value=%s reranked=%d segments=%zu scope=%s\\n",
+                   segment.key().c_str(), segment.candidate(0).value.c_str(),
+                   (segment.candidate(0).attributes & converter::Attribute::RERANKED) != 0,
+                   target_segments.conversion_segments_size(), ScopeState(segment));
+    }
+    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      const bool reranked =''')
+edit(C, '''      const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
+      if (storage_->Lookup(once) != nullptr) {''', '''      const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
+      if (HistoryTrace()) {
+        std::fprintf(stderr, "history sentence choice: key=%s value=%s again=%d\\n", pair_key.c_str(),
+                     pair_value.c_str(), storage_->Lookup(once) != nullptr);
+      }
+      if (storage_->Lookup(once) != nullptr) {''')
+edit(C, '''    size_t max_candidates_size = 0;
+    if (!ShouldRewrite(*segment, &max_candidates_size) &&''', '''    size_t max_candidates_size = 0;
+    if (HistoryTrace()) {
+      size_t trace_size = 0;
+      std::fprintf(stderr, "history rewrite: key=%s top=%s top_content_key=%s span=%zu segments=%zu scope=%s triggered=%d\\n",
+                   segment->key().c_str(), segment->candidate(0).value.c_str(),
+                   segment->candidate(0).content_key.c_str(),
+                   static_cast<size_t>(segment->candidate(0).effective_converted_segment_count()),
+                   segments->conversion_segments_size(), ScopeState(*segment),
+                   ShouldRewrite(*segment, &trace_size));
+    }
+    if (!ShouldRewrite(*segment, &max_candidates_size) &&''')
+edit(C, '''    modified |= SortCandidates(scores, segment, keep_first);''', '''    const std::string trace_best = HistoryTrace() ? scores[0].candidate->value : std::string();
+    modified |= SortCandidates(scores, segment, keep_first);
+    if (HistoryTrace()) {
+      std::fprintf(stderr, "history scores: key=%s best=%s score=%u context=%d keep_first=%d now_first=%s\\n",
+                   segment->key().c_str(), trace_best.c_str(), scores[0].score,
+                   scores[0].context, keep_first, segment->candidate(0).value.c_str());
+    }''')
+
 # 3. 英字の文節（FIXED_VALUE）も履歴で並べ替える。利用者が候補を選んだ文節は替えない。
 edit(C, '''    if (segment->segment_type() == Segment::FIXED_VALUE) {
       continue;

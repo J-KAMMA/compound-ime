@@ -4,7 +4,7 @@
   python tools/score_learn_sticky.py <人工知能あり.tsv> <人工知能なし.tsv>
 
 各行は tools/learn_sticky_convert.sh の出力（前の文の扱い、種類、選ぶ入力、選ぶ書き方、確かめる入力、望み、
-学習の前、1回目、2回目、学習のあと）。学習の前に望みの書き方が入っておらず、2回とも選べた行（数える行）のうち、
+学習の前、1回目、2回目、学習のあと）。学習の前に望みの書き方が入っておらず、2回とも選べた行（F キーの行は1回目）（数える行）のうち、
 学習のあとの確定に望みの書き方が入っていない行があれば失敗にする。
 """
 import sys
@@ -20,7 +20,9 @@ def score(label, path):
     groups = defaultdict(lambda: [0, 0, 0])  # 数える行、効いた行、数えない行
     for mode, kind, pick, value, check, want, before, first, second, after in (r[:10] for r in rows):
         g = groups[(mode, kind)]
-        if want in before or want not in first or want not in second:
+        # F キーの行は2回目を押さずに確定するので、2回目は学習の結果（数える条件にしない）。
+        picked_twice = value.startswith("KEY:") or want in second
+        if want in before or want not in first or not picked_twice:
             g[2] += 1
             print(f"    数えない（{mode} {kind}）: {pick} → {value}: 学習の前 {before}、選んだ確定 {first} / {second}")
             continue

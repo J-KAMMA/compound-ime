@@ -3,8 +3,8 @@
 # 選び直しが次の変換に効くかの試験（組 l）。表（tests/conversion/learn-sticky.tsv、列: 種類<TAB>選ぶ入力のローマ字<TAB>
 # 選ぶ書き方<TAB>確かめる入力のローマ字<TAB>先頭に来てほしい書き方）の各行を、履歴を消してから次の順で流す。
 #   0. 確かめる入力を変換して確定する（学習の前。すでに望みの書き方なら、その行は数えない）。履歴を消す。
-#   1〜2. 選ぶ入力を変換し、最初の文節で選ぶ書き方を選んで確定する（2回）。選ぶ書き方が「KEY:F10 F10」の形なら、
-#      候補から選ぶ代わりにそのキーを送る（F キーで英字を大文字にする場合）。
+#   1〜2. 選ぶ入力を変換し、最初の文節で選ぶ書き方を選んで確定する（2回）。選ぶ書き方が「KEY:F10」の形なら、
+#      1回目は候補から選ぶ代わりにそのキーを送り（F キーで英字を大文字にする場合）、2回目は押さずに確定する。
 #   3. 確かめる入力を変換して、先頭のまま確定する。
 # 文節の区切りは決めず、確定した文に望みの書き方が入っているかで見る。
 # 前の文の扱いを2通り流す: ctx は変換のたびに違う前の文を渡す（ふつうのアプリと同じ。前の文は確定のたびに変わる）、
@@ -39,10 +39,11 @@ run_mode() {  # <前の文の扱い ctx|plain> <重み> <出力>
       convert "$c0" "$check" ""
       printf 'CLEAR_ALL\n'
       convert "$c1" "$pick" "$value"
-      convert "$c2" "$pick" "$value"
+      # F キーは押すたびに次の形へ回るので、2回目は押さずに先頭のまま確定する（1回目で覚えていれば望みの形）。
+      case "$value" in KEY:*) convert "$c2" "$pick" "" ;; *) convert "$c2" "$pick" "$value" ;; esac
       convert "$c3" "$check" ""
     done < "$TMP/rows.tsv"; } > "$TMP/$mode.cmd"
-  MYIME_ZENZAI_TIME_LIMIT_MS=0 MYIME_AI_BUDGET_MS=0 \
+  MYIME_HISTORY_TRACE=1 MYIME_ZENZAI_TIME_LIMIT_MS=0 MYIME_AI_BUDGET_MS=0 \
     MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$model" \
     MYIME_AZOOKEY_ZENZAI_GPU=0 TEST_TMPDIR="$TMP/$mode.prof" \
     "$EXE" --input "$TMP/$mode.cmd" --profile "$TMP/$mode.prof" --dictionary oss > "$TMP/$mode.out" 2> "$TMP/$mode.err" || true
@@ -55,6 +56,8 @@ run_mode() {  # <前の文の扱い ctx|plain> <重み> <出力>
       if (k % 4 == 0) printf "%s\t%s\t%s\t%s\t%s\t%s\n", mode, row[k / 4], got[1], got[2], got[3], got[0]
     }
   ' "$TMP/$mode.out" >> "$out"
+  # 学習と並べ替えの判断（MYIME_HISTORY_TRACE）を、調べられるように結果の横に残す。
+  grep -a "^history " "$TMP/$mode.err" > "${out%.tsv}-$mode-trace.txt" || true
   grep -h "^candidate not found: " "$TMP/$mode.err" 2> /dev/null | sed 's/^candidate not found: //' | sort -u \
     | sed "s/^/選べなかった書き方（$mode）: /" >&2 || true
 }

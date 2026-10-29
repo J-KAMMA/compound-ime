@@ -6,8 +6,7 @@ kana	tougoumachi	とうごうまち	tougoumachi	とうごうまち
 kana	tougoumachiwomita	とうごうまちを	tougoumachinisumu	とうごうまち
 kana	yariwomotsu	やりを	yarigaaru	やりが
 fkey	ail	KEY:F10	ail	AIL
-fkey	ail	KEY:F10 F10	ail	AIL
-fkey	ail	KEY:F10 F10 F10	ail	AIL
+fkey	owl	KEY:F10	owl	OWL
 upper	ail	AIL	ail	AIL
 upper	owl	OWL	owl	OWL
 word	kuro-do	Claude	kuro-do	Claude
