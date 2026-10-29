@@ -4612,6 +4612,246 @@ void PublishZenzaiStatus(const AzooKeyStatus& status) {
   LogZenzaiMemoryLockOnce(status);
 """)
 
+# 前の文の語: 節: 入力欄の前の文（GetSurroundingContext の左、最後の 200 字）に出た語を、同じ読みが
+# 今の変換の文節の頭から始まるとき、その書き方で先頭にする（エドサル、伴馬、帰還、ヴァネッサ）。
+# 語は 2 字以上のカタカナの並び（読みはひらがなに直したもの、2 かな以上）と、2 字以上の漢字の並びの中の
+# 辞書の語（読み 3 かな以上）。辞書の語で書けない漢字の並び（伴馬、蜀地方）は、並び全体を1字ずつ
+# （または辞書の語ごとに）読んだ読みでも合わせる。読みは今の入力のかなから Mozc の辞書を前から引いて
+# （LookupPrefix）合わせるので、辞書の逆引き（全部の語をなめる）はしない。この読み方は、今の先頭がかなだけの
+# ときだけ使う（弓川 の きゅうせん で 休戦 を置き換えない）。
+# 置き方: 読みが1つの文節の頭から始まり、その文節の中で終わるときは、その文節の先頭に「語＋残りのかな」
+# （残りは今の先頭の終わりの書き方のまま：エドサルは、怪獣を → 海獣を）を置く。読みが次の文節（3 つまで）に
+# かかるときは、その文節たちを1つにまとめ、候補を「語＋残り」と元の先頭どうしをつないだものの2つにする。
+# 守り: 今の先頭がすでにその語で始まるとき、学習や利用者辞書の候補が先頭のとき、確定済み・英語・数の文節、
+# 辞書の漢字の語で今の先頭がかなだけのとき（しよう を 使用 にしない）は何もしない。
+# 英語に見えた部分（vanessa、todo）も、読みが前の文のカタカナ語と同じなら日本語として変換する。
+# MYIME_CONTEXT_WORDS=off で止める。中身は native/jaen-detector/context_words.*（単体試験は context_words_test.cc）。
+for name in ("context_words.h", "context_words.cc"):
+    write(f"converter/{name}", (REPO / "native/jaen-detector" / name).read_text(encoding="utf-8")
+          .replace('#include "context_words.h"', '#include "converter/context_words.h"'))
+edit("converter/BUILD.bazel", """        "jaen_number.cc",
+    ],""", """        "jaen_number.cc",
+        "context_words.cc",
+    ],""")
+edit("converter/BUILD.bazel", """        "jaen_number.h",
+    ],""", """        "jaen_number.h",
+        "context_words.h",
+    ],""")
+edit("converter/converter.cc", '#include "converter/jaen_number.h"\n',
+     '#include "converter/jaen_number.h"\n#include "converter/context_words.h"\n')
+edit("converter/converter.h", "  void AddPlaceKanji(Segment* segment) const;\n", """  void AddPlaceKanji(Segment* segment) const;
+
+  // Words of the text before the cursor (前の文) written the same way again: when a
+  // word's reading starts a FREE segment, the word goes first (merging the
+  // segments its reading runs into). MYIME_CONTEXT_WORDS=off turns it off.
+  void PreferContextWords(const ConversionRequest& request, Segments* segments) const;
+""")
+edit("converter/converter.cc", "void Converter::AddTypedAsIs(const ConversionRequest& request,\n", """namespace {
+bool ContextWordsEnabled() {
+  static const bool enabled = [] {
+    const char* value = std::getenv("MYIME_CONTEXT_WORDS");
+    return value == nullptr || std::string_view(value) != "off";
+  }();
+  return enabled;
+}
+
+// The dictionary words whose reading is a prefix of a key (as written, every way).
+class ContextPrefixCollector : public dictionary::DictionaryInterface::Callback {
+ public:
+  ResultType OnToken(absl::string_view key, absl::string_view actual_key,
+                     const dictionary::Token& token) override {
+    if (key == actual_key && !(token.attributes & dictionary::Token::SPELLING_CORRECTION) &&
+        !token.value.empty()) {
+      words_.push_back({std::string(token.value), std::string(key)});
+    }
+    return TRAVERSE_CONTINUE;
+  }
+  std::vector<jaen::DictionaryWord> Take() { return std::move(words_); }
+
+ private:
+  std::vector<jaen::DictionaryWord> words_;
+};
+
+// Hiragana and ー only (the AI or Mozc left it in kana).
+bool OnlyHiragana(absl::string_view text) {
+  if (text.empty()) return false;
+  for (size_t i = 0; i < text.size();) {
+    const auto b = static_cast<unsigned char>(text[i]);
+    if (b != 0xE3 || i + 3 > text.size()) return false;  // ぁ..ゖ and ー are E3 xx xx
+    const char32_t c = ((b & 0x0F) << 12) | ((static_cast<unsigned char>(text[i + 1]) & 0x3F) << 6) |
+                       (static_cast<unsigned char>(text[i + 2]) & 0x3F);
+    if (!((c >= 0x3041 && c <= 0x3096) || c == 0x30FC)) return false;
+    i += 3;
+  }
+  return true;
+}
+}  // namespace
+
+void Converter::PreferContextWords(const ConversionRequest& request, Segments* segments) const {
+  // Not after the user resized a segment: the segments they chose stay.
+  if (!ContextWordsEnabled() || request.request_type() != ConversionRequest::CONVERSION ||
+      segments->resized()) {
+    return;
+  }
+  const auto [left, right] = request.GetSurroundingContext();
+  if (left.empty() || segments->conversion_segments_size() == 0) return;
+  const jaen::ContextWords words(std::string_view(left.data(), left.size()));
+  if (words.empty()) return;
+  const dictionary::DictionaryInterface& dictionary = modules().GetDictionary();
+  const jaen::PrefixLookup lookup = [&dictionary](std::string_view key) {
+    ContextPrefixCollector collector;
+    dictionary.LookupPrefix(absl::string_view(key.data(), key.size()), &collector);
+    return collector.Take();
+  };
+  constexpr size_t kMaxSpan = 3;  // segments one word may join
+  constexpr uint32_t kUserChoice = Attribute::USER_SEGMENT_HISTORY_REWRITER | Attribute::USER_DICTIONARY;
+  for (size_t i = 0; i < segments->conversion_segments_size(); ++i) {
+    const Segment& first = segments->conversion_segment(i);
+    if (first.segment_type() != Segment::FREE || first.candidates_size() == 0 ||
+        (first.candidate(0).attributes & kUserChoice)) {
+      continue;
+    }
+    // The keys of this segment and the next FREE ones, with where each ends.
+    std::string key;
+    std::vector<size_t> ends;
+    for (size_t j = i; j < segments->conversion_segments_size() && j < i + kMaxSpan; ++j) {
+      const Segment& s = segments->conversion_segment(j);
+      if (j > i && (s.segment_type() != Segment::FREE || s.candidates_size() == 0 ||
+                    (s.candidate(0).attributes & kUserChoice))) {
+        break;
+      }
+      key.append(s.key());
+      ends.push_back(key.size());
+    }
+    for (const jaen::ContextMatch& match : words.MatchAt(std::string_view(key), 0, &lookup)) {
+      size_t last = 0;  // the segment the reading ends in
+      while (last < ends.size() && ends[last] < match.bytes) ++last;
+      if (last == ends.size()) continue;
+      std::string shown;  // what the first candidates show over those segments
+      for (size_t k = i; k <= i + last; ++k) shown.append(segments->conversion_segment(k).candidate(0).value);
+      if (shown.compare(0, match.surface.size(), match.surface) == 0) break;  // already written so
+      const bool kana_only = OnlyHiragana(shown);
+      // A kanji word of the dictionary does not replace kana the converter chose (しようと stays).
+      if (!match.katakana && !match.composed && kana_only) continue;
+      // A word read one kanji at a time only fills in kana.
+      if (match.composed && !kana_only) continue;
+      const std::string reading = key.substr(0, match.bytes);
+      const std::string tail = key.substr(match.bytes, ends[last] - match.bytes);
+      const Candidate& top = segments->conversion_segment(i + last).candidate(0);
+      std::string value;
+      if (tail.empty()) {
+        value = match.surface;
+      } else if (shown.size() >= tail.size() && shown.compare(shown.size() - tail.size(), tail.size(), tail) == 0) {
+        value = match.surface + tail;  // the rest stays in kana as shown (は、を、の)
+      } else if (last == 0 && top.content_key == reading && !top.content_value.empty() &&
+                 top.value.compare(0, top.content_value.size(), top.content_value) == 0) {
+        value = match.surface + top.value.substr(top.content_value.size());  // 潮切りに対する → 塩霧に対する
+      } else {
+        continue;
+      }
+      Segment* segment = segments->mutable_conversion_segment(i);
+      if (last == 0) {
+        bool moved = false;
+        for (size_t c = 0; c < segment->candidates_size(); ++c) {
+          if (segment->candidate(static_cast<int>(c)).value == value) {
+            segment->move_candidate(static_cast<int>(c), 0);
+            moved = true;
+            break;
+          }
+        }
+        if (!moved) {
+          const Candidate base = segment->candidate(0);
+          Candidate* added = segment->insert_candidate(0);
+          *added = base;
+          added->value = value;
+          added->content_key = reading;
+          added->content_value = match.surface;
+          added->lid = general_noun_id_;
+          if (tail.empty()) added->rid = general_noun_id_;
+          added->inner_segment_boundary.clear();
+          added->attributes = Attribute::CONTEXT_SENSITIVE;
+        }
+        break;
+      }
+      // The reading runs into the next segments: they become one segment with
+      // the word first and the old first candidates joined second.
+      const Candidate base = segment->candidate(0);
+      const Candidate& end = segments->conversion_segment(i + last).candidate(0);
+      Candidate joined = base;
+      joined.key = key.substr(0, ends[last]);
+      joined.value = shown;
+      joined.rid = end.rid;
+      joined.inner_segment_boundary.clear();
+      joined.attributes &= ~static_cast<uint32_t>(Attribute::PARTIALLY_KEY_CONSUMED);
+      joined.consumed_key_size = 0;
+      Candidate word = joined;
+      word.value = value;
+      word.content_key = reading;
+      word.content_value = match.surface;
+      word.lid = general_noun_id_;
+      if (tail.empty()) word.rid = general_noun_id_;
+      word.attributes = Attribute::CONTEXT_SENSITIVE;
+      segment->set_key(joined.key);
+      segment->clear_candidates();
+      segment->clear_meta_candidates();
+      *segment->push_back_candidate() = std::move(word);
+      *segment->push_back_candidate() = std::move(joined);
+      segments->erase_segments(segments->history_segments_size() + i + 1, last);
+      break;
+    }
+  }
+}
+
+void Converter::AddTypedAsIs(const ConversionRequest& request,
+""")
+edit("converter/converter.cc", """  MaybeApplyPredictionToConversion(request, segments);
+  ApplyPostProcessing(request, segments);
+}""", """  MaybeApplyPredictionToConversion(request, segments);
+  ApplyPostProcessing(request, segments);
+  PreferContextWords(request, segments);
+}""")
+# 英語に見えた部分が前の文のカタカナ語の読み（vanessa: ゔぁねっさ = ヴァネッサ）なら日本語にし、隣の日本語とつなぐ
+edit("converter/converter.cc", """  std::string raw;
+  for (const jaen::Chunk& chunk : chunks) raw += chunk.raw;
+  bool split = !pieces.empty();
+""", """  std::string raw;
+  for (const jaen::Chunk& chunk : chunks) raw += chunk.raw;
+  if (ContextWordsEnabled() &&
+      std::any_of(pieces.begin(), pieces.end(), [](const jaen::Piece& p) { return p.english; })) {
+    const auto [context_left, context_right] = request.GetSurroundingContext();
+    if (!context_left.empty()) {
+      const jaen::ContextWords katakana(std::string_view(context_left.data(), context_left.size()));
+      bool changed = false;
+      for (jaen::Piece& piece : pieces) {
+        if (!piece.english) continue;
+        std::string kana;
+        for (const jaen::Chunk& chunk : parse(raw.substr(piece.begin, piece.end - piece.begin))) {
+          kana += chunk.conversion.empty() && (chunk.pending == "n" || chunk.pending == "N")
+                      ? std::string("ん")
+                      : chunk.conversion + chunk.pending;
+        }
+        if (katakana.HasKatakanaReading(kana)) {
+          piece.english = false;
+          piece.spaces.clear();
+          changed = true;
+        }
+      }
+      if (changed) {
+        std::vector<jaen::Piece> merged;
+        for (const jaen::Piece& piece : pieces) {
+          if (!merged.empty() && !merged.back().english && !piece.english) {
+            merged.back().end = piece.end;
+          } else {
+            merged.push_back(piece);
+          }
+        }
+        pieces = std::move(merged);
+      }
+    }
+  }
+  bool split = !pieces.empty();
+""")
+
 # 変換エンジン（Swift）に時間の上限とメモリ固定を足す（作業ツリーが MyIME の src を持つとき）
 swift_src = src.resolve().parents[1] / "src"
 if (swift_src / "AzooKeyKanaKanjiConverter").is_dir():
