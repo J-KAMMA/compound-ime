@@ -226,6 +226,14 @@ e1|e2)
     $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
   fi
   ;;
+e8)
+  # 人工知能の候補を書き出してウィキペディアの文を打つ（MYIME_AI_DUMP、MYIME_RESEGMENT_LOG）。人工知能の答えが正しいのに
+  # 採られなかった文を数える比べ。既定の組には入れない（groups='["e8"]' で頼んだときだけ）
+  if [ -f $T/wiki-typing.tsv ]; then
+    grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
+    MYIME_AI_DUMP=$OUT/ai-wiki.txt MYIME_RESEGMENT_LOG=$OUT/reseg-wiki.txt $BATCH $W/wiki.txt $OUT/wiki-typing-dump.tsv 4 || true
+  fi
+  ;;
 e9)
   # 人工知能なし（重みのファイルがない）でウィキペディアの文を打つ。誤りが辞書（Mozc）のものか人工知能のものかを分ける比べ。
   # 既定の組には入れない（groups='["e9"]' で頼んだときだけ）
