@@ -117,7 +117,9 @@ void GroupGen(const Text& t, size_t start, size_t pos, int stage, uint64_t val, 
   if (stage >= 4 || pos >= t.size()) return;
   const std::vector<const Digit*> digits = DigitsAt(t, pos);
   auto with_multiplier = [&](const Multiplier& m, int next, bool allow_tsu) {
-    if (At(t, pos, m.reading)) {
+    // ぜん・びゃく・ぴゃく は数字のあとの読み（さんぜん）。単独では数でない（全日本 ぜんにほん）。
+    const bool voiced = m.reading[0] == U'ぜ' || m.reading[0] == U'び' || m.reading[0] == U'ぴ';
+    if (!voiced && At(t, pos, m.reading)) {
       GroupGen(t, start, pos + m.reading.size(), next, val + m.value, parts + 1, out);
     }
     for (const Digit* d : digits) {
@@ -302,6 +304,33 @@ bool IsOrdinaryNumberWord(const Text& t, size_t begin, size_t end) {
   return false;
 }
 
+bool EndsWith(const Text& t, size_t end, Piece p) {
+  return end >= p.size() && At(t, end - p.size(), p);
+}
+
+// 読みが「じゅう＋単位」と同じ普通の言葉（従事・従妹・住人）。単独や数の文脈では
+// 数（10時・10枚・10人）が決めだが、前後の語がその言葉の使われ方のときは数にしない。
+// 辞書は引けないので、使われ方で決める。
+bool IsOrdinaryJuuWord(const Text& t, size_t begin, size_t end) {
+  const auto is = [&](Piece p) { return end - begin == p.size() && At(t, begin, p); };
+  const bool at_edge = end >= t.size() || t[end] == U'。' || t[end] == U'、';
+  if (is(U"じゅうじ")) {  // 従事: 研究に従事する、従事した、従事者、経営に従事。
+    static constexpr Piece kAfter[] = {U"する", U"した", U"して", U"しま", U"しな", U"しゃ",
+                                       U"しよう", U"され", U"させ", U"せず", U"しつ"};
+    for (Piece p : kAfter) {
+      if (At(t, end, p)) return true;
+    }
+    return at_edge && EndsWith(t, begin, U"に");
+  }
+  if (is(U"じゅうまい")) {  // 従妹: 従妹の〜、〜の従妹で
+    return At(t, end, U"の") || (EndsWith(t, begin, U"の") && At(t, end, U"で"));
+  }
+  if (is(U"じゅうにん")) {  // 住人: 近所の住人。
+    return at_edge && EndsWith(t, begin, U"の");
+  }
+  return false;
+}
+
 void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
   for (const Cand& c : Numbers(t, i)) {
     for (const Unit& u : kUnits) {
@@ -314,6 +343,7 @@ void OfferNumbers(const Text& t, size_t i, std::optional<Match>& best) {
         }
       }
       if (IsOrdinaryNumberWord(t, i, end)) continue;
+      if (IsOrdinaryJuuWord(t, i, end)) continue;
       if (c.parts >= 2 || SinglePartNumber(t, i, c.end)) {
         Offer(t, best, end, Join(c.value, u.text));
       }
