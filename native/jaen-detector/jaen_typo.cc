@@ -322,6 +322,7 @@ bool EditNear(std::string_view raw, std::string_view fixed, size_t begin, size_t
   }
   // The keys of |raw| the edit changed (empty for a key put in): [head, raw.size() - tail).
   return head + 1 >= begin && raw.size() - tail <= end + 1;
+}
 
 std::vector<std::string_view> SplitLongRomaji(std::string_view run, size_t max, size_t min) {
   std::vector<std::string_view> parts;
