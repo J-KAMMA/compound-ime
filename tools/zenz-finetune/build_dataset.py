@@ -1630,9 +1630,14 @@ class Builder:
                     cut = rng.choice(starts)
                     head = "".join(t.surface for t in tokens[:cut])
                     rest = "".join(t.surface for t in tokens[cut:])
+                    rest_reading = "".join(t.reading for t in tokens[cut:])
                     if not re.search(r"[ぁ-ゖァ-ヺ一-鿿]", rest):
                         continue
-                    record = example("emoji_context", "".join(t.reading for t in tokens[cut:]), rest, attach(head))
+                    # 答えになる後半だけでも、試験の文と同じ・含む・近いものは使わない（文全体は通っても、短い後半が
+                    # 試験の文に近いことがある。run 40854121737 の「よく分かりませんよ。」「行けなかったんだよ。」）
+                    if not self.check(rest, [rest_reading]):
+                        continue
+                    record = example("emoji_context", rest_reading, rest, attach(head))
                 if self.add("emoji_context", record, group):
                     bump("context_prev" if prev else "context_split")
         self.note_shortfall("emoji")
