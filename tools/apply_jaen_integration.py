@@ -4929,6 +4929,338 @@ edit("engine/engine.cc", """  static void PreferWholePhrase(const ConversionOpti
     *segment->insert_candidate(0) = std::move(cased);
   }
   static void PreferWholePhrase(const ConversionOptions& options,""")
+# 選び直しが次の変換に効かない不具合（2026-10-29）。原因は3つ。
+# 1. 前後の文があるとき（ふつうのアプリはほぼいつも）、選び直しは「その前後の文そのもの」にだけ覚えられ
+#    （D4 の文脈ごとの記録、context_segment.db）、全体の記録（segment.db）には入らず、変換のときも全体の記録を
+#    見なかった。前の文は打つたびに変わるので、同じ前後の文は二度と来ず、覚えたことが使われなかった。
+#    選び直した（RERANKED）ときは全体の記録にも入れ、変換では、その前後の文での選びがなければ全体の記録を見る。
+# 2. 文の中で選び直した語は、隣の語ごと覚えられる。別の文では「その語だけ覚えた」扱いになり、文の先頭の候補を
+#    替えない決まり（keep_first、公演/公園の見張り）で2番目に留まった。文の中で2回選び直した書き方は、別の文でも
+#    先頭にする（CS1/CS2）。1語だけの変換で選んだもの（learn-context-guard の場合）はこれまでどおり2番目。
+#    読みそのまま（とうごうまちを）を選んだときは、ほかの候補の助詞を除いた読み（とうごうまち）でも覚え、
+#    を・に など続きが違っても当たるようにする。
+# 3. 英語として取った語（ail）は確定済みの文節（FIXED_VALUE）として作られ、Mozc の履歴はその文節を並べ替えず、
+#    さらに打った形を必ず先頭に戻していた。F キーで選んだ形（AIL）を覚えていても使われなかった。英字の文節も
+#    履歴で並べ替え（利用者が選んだ文節は除く）、覚えた書き方を打った形のあとで先頭に戻す。
+C = "rewriter/user_segment_history_rewriter.cc"
+edit(C, '''bool IsT13NCandidate(const converter::Candidate& cand) {
+  // The cand with 0-id can be the transliterated candidate.
+  return (cand.lid == 0 && cand.rid == 0);
+}
+''', '''bool IsT13NCandidate(const converter::Candidate& cand) {
+  // The cand with 0-id can be the transliterated candidate.
+  return (cand.lid == 0 && cand.rid == 0);
+}
+
+// A segment of typed English (FIXED_VALUE, its key the typed ASCII word).
+bool IsTypedEnglishSegment(const Segment& segment) {
+  const std::string key(segment.key());
+  bool letter = false;
+  for (const char c : key) {
+    if (static_cast<unsigned char>(c) >= 0x80) return false;
+    letter |= (c | 0x20) >= 'a' && (c | 0x20) <= 'z';
+  }
+  return letter;
+}
+
+// Key/value pairs under which a choice made inside a sentence is remembered
+// for other sentences: the whole segment, its content word (こうかい/公開 of
+// こうかいする/公開する), and for the reading kept as is (とうごうまちを) the
+// reading without the particle the other candidates have (とうごうまち), so
+// that a different particle after it does not matter.
+std::vector<std::pair<std::string, std::string>> StickyPairs(
+    const Segment& segment, const converter::Candidate& candidate) {
+  std::vector<std::pair<std::string, std::string>> pairs;
+  const std::string key(segment.key());
+  if (key.empty() || candidate.value.empty()) return pairs;
+  pairs.emplace_back(key, candidate.value);
+  const std::string_view whole_key(key);
+  if (!candidate.content_key.empty() && candidate.content_key.size() < key.size() &&
+      whole_key.starts_with(candidate.content_key) && !candidate.content_value.empty() &&
+      std::string_view(candidate.value).starts_with(candidate.content_value)) {
+    pairs.emplace_back(candidate.content_key, candidate.content_value);
+  } else if (candidate.value == key) {
+    const size_t size = std::min<size_t>(segment.candidates_size(), 10);
+    for (size_t i = 0; i < size; ++i) {
+      const converter::Candidate& other = segment.candidate(i);
+      if (other.content_key.empty() || other.content_key.size() >= key.size() ||
+          !whole_key.starts_with(other.content_key) ||
+          !std::string_view(other.value).ends_with(whole_key.substr(other.content_key.size()))) {
+        continue;
+      }
+      pairs.emplace_back(other.content_key, other.content_key);
+      break;
+    }
+  }
+  // The kana both end in (する of こうかいする/公開する, を of やりを/槍を) left
+  // out: the word itself, also when the candidate does not mark its content
+  // word (公開する from the AI is one piece).
+  std::string_view stem_key(key), stem_value(candidate.value);
+  const auto ends_in_hiragana = [](std::string_view text) {
+    return text.size() >= 3 && static_cast<unsigned char>(text[text.size() - 3]) == 0xE3 &&
+           (static_cast<unsigned char>(text[text.size() - 2]) == 0x81 ||
+            static_cast<unsigned char>(text[text.size() - 2]) == 0x82);
+  };
+  while (ends_in_hiragana(stem_key) && ends_in_hiragana(stem_value) &&
+         stem_key.substr(stem_key.size() - 3) == stem_value.substr(stem_value.size() - 3)) {
+    stem_key.remove_suffix(3);
+    stem_value.remove_suffix(3);
+  }
+  if (!stem_key.empty() && !stem_value.empty() && stem_key.size() < key.size() &&
+      std::none_of(pairs.begin(), pairs.end(), [&](const auto& pair) {
+        return pair.first == stem_key && pair.second == stem_value;
+      })) {
+    pairs.emplace_back(std::string(stem_key), std::string(stem_value));
+  }
+  return pairs;
+}
+''')
+# 1. 前後の文での選びがないときは、全体の記録を見る。
+edit(C, '''    const auto record = ReadScopedRecord(ScopedHistoryKey(*scope, segment.key()));
+    return record && (*record)[0] == CityFingerprint(candidate.value)
+               ? Score{90, 0, true} : Score{0, 0};
+  }''', '''    if (const auto record = ReadScopedRecord(ScopedHistoryKey(*scope, segment.key()))) {
+      return (*record)[0] == CityFingerprint(candidate.value) ? Score{90, 0, true}
+                                                              : Score{0, 0};
+    }
+    // Nothing chosen with exactly this surrounding text (it changes with every
+    // commit): use the history kept for every context below.
+  }''')
+edit(C, '''    size_t max_candidates_size = 0;
+    if (!segment->context_history_scope().has_value() &&
+        !ShouldRewrite(*segment, &max_candidates_size)) {
+      continue;
+    }''', '''    size_t max_candidates_size = 0;
+    if (!ShouldRewrite(*segment, &max_candidates_size) &&
+        !(segment->context_history_scope().has_value() &&
+          ReadScopedRecord(ScopedHistoryKey(*segment->context_history_scope(), segment->key())))) {
+      continue;
+    }''')
+edit(C, '''    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      if (segment.candidate(0).attributes & converter::Attribute::RERANKED) {
+        const std::string full_key = ScopedHistoryKey(
+            FullSpanScope(*segment.context_history_scope()), segment.key());
+        if (segment.candidate(0).effective_converted_segment_count() > 1 ||
+            ReadScopedRecord(full_key)) {
+          RememberFullSpan(segment, segments.revert_id(), scoped_revert_entries);
+        } else {
+          RememberScopedWinner(segment, segments.revert_id(), scoped_revert_entries);
+        }
+      }
+      continue;
+    }''', '''    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      const bool reranked =
+          (segment.candidate(0).attributes & converter::Attribute::RERANKED) != 0;
+      if (reranked) {
+        const std::string full_key = ScopedHistoryKey(
+            FullSpanScope(*segment.context_history_scope()), segment.key());
+        if (segment.candidate(0).effective_converted_segment_count() > 1 ||
+            ReadScopedRecord(full_key)) {
+          RememberFullSpan(segment, segments.revert_id(), scoped_revert_entries);
+        } else {
+          RememberScopedWinner(segment, segments.revert_id(), scoped_revert_entries);
+        }
+      }
+      // A choice the user made is also kept for every context (the history
+      // above holds only this exact surrounding text). A blocked scope
+      // (password, too long a context) learns nothing.
+      // Accepting what the history put first again also counts (see
+      // RememberFirstCandidate).
+      const bool learned_first = (segment.candidate(0).attributes &
+                                  converter::Attribute::USER_SEGMENT_HISTORY_REWRITER) != 0;
+      if (!(reranked || learned_first) || segment.context_history_scope()->empty() ||
+          segment.candidate(0).effective_converted_segment_count() > 1) {
+        continue;
+      }
+    }''')
+edit(C, '''  if (seg.context_history_scope().has_value()) return;
+
+  const bool context_sensitive =''', '''  if (seg.context_history_scope().has_value() &&
+      (seg.context_history_scope()->empty() ||
+       !(candidate.attributes & (converter::Attribute::RERANKED |
+                                 converter::Attribute::USER_SEGMENT_HISTORY_REWRITER)))) {
+    return;
+  }
+
+  const bool context_sensitive =''')
+# 2. 文の中で選び直した書き方を数え、2回目からは別の文でも先頭にする。
+edit(C, '''  // learn CloseBracket when OpenBracket is fixed.
+  absl::string_view close_bracket_key;
+  absl::string_view close_bracket_value;''', '''  // A choice made inside a sentence (not a word converted on its own) is
+  // counted; the second one keeps it first in other sentences too (GetScore).
+  // Accepting again what the history already put first counts too: the
+  // second choice in the same sentence finds it first and is not RERANKED.
+  const bool learned_first =
+      (candidate.attributes & converter::Attribute::USER_SEGMENT_HISTORY_REWRITER) != 0;
+  if ((force_insert || learned_first) && segments.conversion_segments_size() >= 2) {
+    for (const auto& [pair_key, pair_value] : StickyPairs(seg, candidate)) {
+      const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
+      if (storage_->Lookup(once) != nullptr) {
+        Insert(StrJoinWithTabs("CS2", pair_key, pair_value), true, revert_entries);
+      }
+      Insert(once, true, revert_entries);
+      if (pair_key != seg.key()) {
+        // Lets ShouldRewrite look at a segment read with another particle.
+        KeyTriggerValue trigger;
+        trigger.set_candidates_size(seg.candidates_size());
+        storage_->Insert(pair_key, reinterpret_cast<const char*>(&trigger));
+      }
+    }
+  }
+
+  // learn CloseBracket when OpenBracket is fixed.
+  absl::string_view close_bracket_key;
+  absl::string_view close_bracket_value;''')
+edit(C, '''  const bool is_replaceable = Replaceable(request, top_candidate, candidate);
+  if (!context_sensitive && is_replaceable) {''', '''  // Chosen twice inside sentences: first in any sentence, like a choice made
+  // next to these neighbours (a different particle after it does not matter).
+  for (const auto& [pair_key, pair_value] : StickyPairs(segment, candidate)) {
+    score.Update(with_context(
+        Fetch(StrJoinWithTabs("CS2", pair_key, pair_value), bigram_weight)));
+  }
+
+  const bool is_replaceable = Replaceable(request, top_candidate, candidate);
+  if (!context_sensitive && is_replaceable) {''')
+# 覚えた候補を消す操作（ClearHistoryEntry）は、前後の文ごとの記録だけでなく、全体の記録と CS1/CS2 も消す。
+edit(C, '''  if (const auto& scope = segment.context_history_scope(); scope.has_value()) {
+    const auto& selected = segment.candidate(candidate_index);''', '''  bool scoped_deleted = false;
+  if (const auto& scope = segment.context_history_scope(); scope.has_value()) {
+    const auto& selected = segment.candidate(candidate_index);''')
+edit(C, '''    deleted |= record && (*record)[0] == CityFingerprint(selected.value) &&
+               scoped_storage_->Delete(key);
+    return deleted;
+  }''', '''    deleted |= record && (*record)[0] == CityFingerprint(selected.value) &&
+               scoped_storage_->Delete(key);
+    if (scope->empty()) return deleted;
+    // The choice was also kept for every context (Finish): forget it there too.
+    scoped_deleted = deleted;
+  }''')
+edit(C, '''  bool result = false;
+  result |= DeleteEntry(fkey.LeftRight(key, value));''', '''  bool result = scoped_deleted;
+  for (const auto& [pair_key, pair_value] : StickyPairs(segment, candidate)) {
+    result |= DeleteEntry(StrJoinWithTabs("CS1", pair_key, pair_value));
+    result |= DeleteEntry(StrJoinWithTabs("CS2", pair_key, pair_value));
+  }
+  result |= DeleteEntry(fkey.LeftRight(key, value));''')
+
+# 前の文は改行までの1行がまるごと渡る。160 バイト（日本語で約53字）を超える行のあとでは、選び直しを何も覚えず、
+# 履歴での並べ替えもしなかった（止められた扱い）。長いときは前後の文ごとの記録を使わず、全体の記録で学習する。
+edit(C, '''  if (left.size() > kMaxContextWindowBytes ||
+      right.size() > kMaxContextWindowBytes) {
+    return std::string();
+  }''', '''  if (left.size() > kMaxContextWindowBytes ||
+      right.size() > kMaxContextWindowBytes) {
+    return std::nullopt;
+  }''')
+
+# 先頭の候補が文全体などで読みの切れ目が違うときも、ほかの候補の語の読み（こうえん）で覚えた選びを見つける。
+edit(C, '''  *max_candidates_size = std::max(v1_size, v2_size);''', '''  // The words under which a choice inside a sentence was kept (StickyPairs).
+  size_t v3_size = 0;
+  for (size_t i = 0; i < std::min<size_t>(segment.candidates_size(), 10); ++i) {
+    for (const auto& [pair_key, pair_value] : StickyPairs(segment, segment.candidate(i))) {
+      if (pair_key == segment.key()) continue;
+      const KeyTriggerValue* v3 = reinterpret_cast<const KeyTriggerValue*>(
+          storage_->Lookup(pair_key));
+      if (v3 != nullptr && v3->IsValid()) {
+        v3_size = std::max<size_t>(v3_size, v3->candidates_size());
+      }
+    }
+  }
+  *max_candidates_size = std::max({v1_size, v2_size, v3_size});''')
+
+# 調べ用: MYIME_HISTORY_TRACE があるときだけ、学習（Finish）と並べ替え（Rewrite）の判断を標準エラーに1行ずつ書く。
+edit(C, "#include <cctype>\n", "#include <cctype>\n#include <cstdio>\n#include <cstdlib>\n")
+edit(C, '''// A segment of typed English (FIXED_VALUE, its key the typed ASCII word).''', '''bool HistoryTrace() {
+  static const bool enabled = std::getenv("MYIME_HISTORY_TRACE") != nullptr;
+  return enabled;
+}
+
+const char* ScopeState(const Segment& segment) {
+  const auto& scope = segment.context_history_scope();
+  return !scope.has_value() ? "none" : scope->empty() ? "blocked" : "set";
+}
+
+// A segment of typed English (FIXED_VALUE, its key the typed ASCII word).''')
+edit(C, '''    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      const bool reranked =''', '''    if (HistoryTrace()) {
+      std::fprintf(stderr, "history finish: key=%s value=%s reranked=%d segments=%zu scope=%s\\n",
+                   std::string(segment.key()).c_str(), segment.candidate(0).value.c_str(),
+                   (segment.candidate(0).attributes & converter::Attribute::RERANKED) != 0,
+                   target_segments.conversion_segments_size(), ScopeState(segment));
+    }
+    if (segment.context_history_scope().has_value()) {
+      // Passive acceptance must not create or refresh scoped history.
+      const bool reranked =''')
+edit(C, '''      const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
+      if (storage_->Lookup(once) != nullptr) {''', '''      const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
+      if (HistoryTrace()) {
+        std::fprintf(stderr, "history sentence choice: key=%s value=%s again=%d\\n", pair_key.c_str(),
+                     pair_value.c_str(), storage_->Lookup(once) != nullptr);
+      }
+      if (storage_->Lookup(once) != nullptr) {''')
+edit(C, '''    size_t max_candidates_size = 0;
+    if (!ShouldRewrite(*segment, &max_candidates_size) &&''', '''    size_t max_candidates_size = 0;
+    if (HistoryTrace()) {
+      size_t trace_size = 0;
+      std::fprintf(stderr, "history rewrite: key=%s top=%s top_content_key=%s span=%zu segments=%zu scope=%s triggered=%d\\n",
+                   std::string(segment->key()).c_str(), segment->candidate(0).value.c_str(),
+                   segment->candidate(0).content_key.c_str(),
+                   static_cast<size_t>(segment->candidate(0).effective_converted_segment_count()),
+                   segments->conversion_segments_size(), ScopeState(*segment),
+                   ShouldRewrite(*segment, &trace_size));
+    }
+    if (!ShouldRewrite(*segment, &max_candidates_size) &&''')
+edit(C, '''    modified |= SortCandidates(scores, segment, keep_first);''', '''    const std::string trace_best = HistoryTrace() ? scores[0].candidate->value : std::string();
+    modified |= SortCandidates(scores, segment, keep_first);
+    if (HistoryTrace()) {
+      std::fprintf(stderr, "history scores: key=%s best=%s score=%u context=%d keep_first=%d now_first=%s\\n",
+                   std::string(segment->key()).c_str(), trace_best.c_str(), scores[0].score,
+                   scores[0].context, keep_first, segment->candidate(0).value.c_str());
+    }''')
+
+# 3. 英字の文節（FIXED_VALUE）も履歴で並べ替える。利用者が候補を選んだ文節は替えない。
+edit(C, '''    if (segment->segment_type() == Segment::FIXED_VALUE) {
+      continue;
+    }
+
+    if (IsPunctuation(*segment, segment->candidate(0))) {''', '''    if (segment->segment_type() == Segment::FIXED_VALUE &&
+        (!IsTypedEnglishSegment(*segment) ||
+         std::any_of(segment->candidates().begin(), segment->candidates().end(),
+                     [](const converter::Candidate* c) {
+                       return c == nullptr ||
+                              (c->attributes & converter::Attribute::RERANKED);
+                     }))) {
+      continue;
+    }
+
+    if (IsPunctuation(*segment, segment->candidate(0))) {''')
+# 英字の書き方（ail と AIL）は同じ音の別の語ではないので、文の中でも覚えた形を先頭にする。
+edit(C, '''    const bool keep_first =
+        segments->conversion_segments_size() >= 2 && !scores[0].context &&
+        scores[0].candidate != &segment->candidate(0);''', '''    const bool keep_first =
+        segments->conversion_segments_size() >= 2 && !scores[0].context &&
+        scores[0].candidate != &segment->candidate(0) &&
+        segment->segment_type() != Segment::FIXED_VALUE;''')
+# 英字の文節: 打った形・公式の書き方を先頭にしたあと、履歴で先頭になった書き方（F キーで選んだ AIL など）を戻す。
+edit("converter/converter.cc", '''      const std::string& typed = (next++)->second;
+      PutTypedValueFirst(typed, &segment);''', '''      const std::string& typed = (next++)->second;
+      // The user's learned spelling (AIL chosen with F10 for "ail") wins
+      // over the typed and the official spellings below.
+      const std::string learned =
+          segment.candidates_size() > 0 &&
+                  (segment.candidate(0).attributes & Attribute::USER_SEGMENT_HISTORY_REWRITER)
+              ? segment.candidate(0).value
+              : std::string();
+      PutTypedValueFirst(typed, &segment);''')
+edit("converter/converter.cc", '''        PutTypedValueFirst(typed, &segment);
+      }
+      AddPlaceKanji(&segment);''', '''        PutTypedValueFirst(typed, &segment);
+      }
+      AddPlaceKanji(&segment);
+      if (!learned.empty()) PutTypedValueFirst(learned, &segment);''')
 
 # 変換エンジン（Swift）に時間の上限とメモリ固定を足す（作業ツリーが MyIME の src を持つとき）
 swift_src = src.resolve().parents[1] / "src"
