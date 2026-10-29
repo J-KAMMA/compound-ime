@@ -3325,8 +3325,10 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
 # 句読点（kyouhq,ashita）を挟んだ文も、句読点の間ごとに打ち間違いを直す（FixEachRun）。直しの関数は
 # 英字だけの入力しか見ないので、句読点を打った文は今まで一度も直らなかった。かなで打った数（hakko. の 8個）を
 # 壊す直しは採らない（KeepNumbers）。
+# 読める打ち間違い（FixReadableTypo）は句読点のない入力だけ。句読点の間ごとに直すと、正しく打った長い文の
+# 「ゆうご」を「融合」（ゆうごう）に直すなど、壊す方が多かった（ウィキペディアの打ち込みで 17 文）。
 edit("converter/converter.cc", "FixReadableTypo(modules(), text, parse, *margin)",
-     "FixEachRun(text, [&](absl::string_view run) { return KeepNumbers(run, parse, FixReadableTypo(modules(), run, parse, *margin)); })")
+     "KeepNumbers(text, parse, FixReadableTypo(modules(), text, parse, *margin))")
 edit("converter/converter.cc", "FixUnreadTypo(modules(), text, parse, TypoKanaModel())",
      "FixEachRun(text, [&](absl::string_view run) { return KeepNumbers(run, parse, FixUnreadTypo(modules(), run, parse, TypoKanaModel())); })")
 
