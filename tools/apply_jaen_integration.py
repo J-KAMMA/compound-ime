@@ -4678,6 +4678,26 @@ std::vector<std::pair<std::string, std::string>> StickyPairs(
       break;
     }
   }
+  // The kana both end in (する of こうかいする/公開する, を of やりを/槍を) left
+  // out: the word itself, also when the candidate does not mark its content
+  // word (公開する from the AI is one piece).
+  std::string_view stem_key(key), stem_value(candidate.value);
+  const auto ends_in_hiragana = [](std::string_view text) {
+    return text.size() >= 3 && static_cast<unsigned char>(text[text.size() - 3]) == 0xE3 &&
+           (static_cast<unsigned char>(text[text.size() - 2]) == 0x81 ||
+            static_cast<unsigned char>(text[text.size() - 2]) == 0x82);
+  };
+  while (ends_in_hiragana(stem_key) && ends_in_hiragana(stem_value) &&
+         stem_key.substr(stem_key.size() - 3) == stem_value.substr(stem_value.size() - 3)) {
+    stem_key.remove_suffix(3);
+    stem_value.remove_suffix(3);
+  }
+  if (!stem_key.empty() && !stem_value.empty() && stem_key.size() < key.size() &&
+      std::none_of(pairs.begin(), pairs.end(), [&](const auto& pair) {
+        return pair.first == stem_key && pair.second == stem_value;
+      })) {
+    pairs.emplace_back(std::string(stem_key), std::string(stem_value));
+  }
   return pairs;
 }
 ''')
@@ -4732,7 +4752,11 @@ edit(C, '''    if (segment.context_history_scope().has_value()) {
       // A choice the user made is also kept for every context (the history
       // above holds only this exact surrounding text). A blocked scope
       // (password, too long a context) learns nothing.
-      if (!reranked || segment.context_history_scope()->empty() ||
+      // Accepting what the history put first again also counts (see
+      // RememberFirstCandidate).
+      const bool learned_first = (segment.candidate(0).attributes &
+                                  converter::Attribute::USER_SEGMENT_HISTORY_REWRITER) != 0;
+      if (!(reranked || learned_first) || segment.context_history_scope()->empty() ||
           segment.candidate(0).effective_converted_segment_count() > 1) {
         continue;
       }
@@ -4741,7 +4765,8 @@ edit(C, '''  if (seg.context_history_scope().has_value()) return;
 
   const bool context_sensitive =''', '''  if (seg.context_history_scope().has_value() &&
       (seg.context_history_scope()->empty() ||
-       !(candidate.attributes & converter::Attribute::RERANKED))) {
+       !(candidate.attributes & (converter::Attribute::RERANKED |
+                                 converter::Attribute::USER_SEGMENT_HISTORY_REWRITER)))) {
     return;
   }
 
@@ -4751,7 +4776,11 @@ edit(C, '''  // learn CloseBracket when OpenBracket is fixed.
   absl::string_view close_bracket_key;
   absl::string_view close_bracket_value;''', '''  // A choice made inside a sentence (not a word converted on its own) is
   // counted; the second one keeps it first in other sentences too (GetScore).
-  if (force_insert && segments.conversion_segments_size() >= 2) {
+  // Accepting again what the history already put first counts too: the
+  // second choice in the same sentence finds it first and is not RERANKED.
+  const bool learned_first =
+      (candidate.attributes & converter::Attribute::USER_SEGMENT_HISTORY_REWRITER) != 0;
+  if ((force_insert || learned_first) && segments.conversion_segments_size() >= 2) {
     for (const auto& [pair_key, pair_value] : StickyPairs(seg, candidate)) {
       const std::string once = StrJoinWithTabs("CS1", pair_key, pair_value);
       if (storage_->Lookup(once) != nullptr) {
@@ -4813,18 +4842,16 @@ edit(C, '''  if (left.size() > kMaxContextWindowBytes ||
   }''')
 
 # 先頭の候補が文全体などで読みの切れ目が違うときも、ほかの候補の語の読み（こうえん）で覚えた選びを見つける。
-edit(C, '''  *max_candidates_size = std::max(v1_size, v2_size);''', '''  size_t v3_size = 0;
-  for (size_t i = 1; i < std::min<size_t>(segment.candidates_size(), 10); ++i) {
-    const converter::Candidate& other = segment.candidate(i);
-    if (other.key != segment.key() || other.content_key.empty() ||
-        other.content_key == segment.key() ||
-        other.content_key == segment.candidate(0).content_key) {
-      continue;
-    }
-    const KeyTriggerValue* v3 = reinterpret_cast<const KeyTriggerValue*>(
-        storage_->Lookup(other.content_key));
-    if (v3 != nullptr && v3->IsValid()) {
-      v3_size = std::max<size_t>(v3_size, v3->candidates_size());
+edit(C, '''  *max_candidates_size = std::max(v1_size, v2_size);''', '''  // The words under which a choice inside a sentence was kept (StickyPairs).
+  size_t v3_size = 0;
+  for (size_t i = 0; i < std::min<size_t>(segment.candidates_size(), 10); ++i) {
+    for (const auto& [pair_key, pair_value] : StickyPairs(segment, segment.candidate(i))) {
+      if (pair_key == segment.key()) continue;
+      const KeyTriggerValue* v3 = reinterpret_cast<const KeyTriggerValue*>(
+          storage_->Lookup(pair_key));
+      if (v3 != nullptr && v3->IsValid()) {
+        v3_size = std::max<size_t>(v3_size, v3->candidates_size());
+      }
     }
   }
   *max_candidates_size = std::max({v1_size, v2_size, v3_size});''')
