@@ -4880,7 +4880,7 @@ edit(C, '''bool IsT13NCandidate(const converter::Candidate& cand) {
 
 // A segment of typed English (FIXED_VALUE, its key the typed ASCII word).
 bool IsTypedEnglishSegment(const Segment& segment) {
-  const std::string& key = segment.key();
+  const std::string key(segment.key());
   bool letter = false;
   for (const char c : key) {
     if (static_cast<unsigned char>(c) >= 0x80) return false;
@@ -4897,7 +4897,7 @@ bool IsTypedEnglishSegment(const Segment& segment) {
 std::vector<std::pair<std::string, std::string>> StickyPairs(
     const Segment& segment, const converter::Candidate& candidate) {
   std::vector<std::pair<std::string, std::string>> pairs;
-  const std::string& key = segment.key();
+  const std::string key(segment.key());
   if (key.empty() || candidate.value.empty()) return pairs;
   pairs.emplace_back(key, candidate.value);
   const std::string_view whole_key(key);
