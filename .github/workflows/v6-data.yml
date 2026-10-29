@@ -2,7 +2,7 @@
 # v5 の作り方（mix-data.yml）に、v6 の種類（同音語・固有名詞・打ち間違い・絵文字入りの話し言葉）と、
 # 試験の文に「近い文」の除外（--near-exclusion）を足したもの。設定は finetune.ipynb ① と同じにしてある（変えるときは両方）。
 #  1. 小さな規模（2万問）: 試験の文と、その1字を替えた「近い文」をわざと各出典に混ぜ、1文も残らないことを確かめる
-#  2. 本番の規模（360万問）: Colab と同じ部品の分け方（text と wiki の2工程）で作り、除外と目録を確かめ、
+#  2. 本番の規模（340万問）: Colab と同じ部品の分け方（text と wiki の2工程）で作り、除外と目録を確かめ、
 #     部品ごとの SHA256 を v6-expected.json にまとめる（Colab ⑦が同じものを作れたかの照合に使う）
 # 練習問題そのものは成果物に入れない（材料は配らない）。成果物は目録・件数・除いた文の例・SHA256・記録だけ。
 name: v6 data
@@ -18,20 +18,20 @@ on:
         default: '20000'
       full_size:
         description: 本番の規模の練習問題の数（0 なら作らない）
-        default: '3600000'
+        default: '3400000'
 
 permissions:
   contents: read
 
 env:
-  SIZE_FULL: '3600000'
+  SIZE_FULL: '3400000'
   # 出典の割合（finetune.ipynb ① の MIX と同じ）。v5 の 300万問の作り方をそのまま残し（元の材料の再生）、
-  # v6 の 60万問（同音語 22万・固有名詞 13万・打ち間違い 20万・絵文字 5万）を足した割合
-  MIX: wiki=0.6903,persona=0.1833,tatoeba=0.0225,domain=0.0833,synthetic=0.005,emoji=0.0139
-  KINDS: wiki_whole=0.54,homophone=0.14,homophone_dict=0.125,proper_noun=0.074,typo_whole=0.114,casual=0.24,modern_words=0.32,english_phrases=0.17,business=0.07,counter=0.20,emoji_context=0.8,emoji_pick=0.2
+  # v6 の 40万問（同音語 22万・固有名詞 13万・絵文字 5万）を足した割合。打ち間違い（typo_whole）は入れない（利用者の決定）
+  MIX: wiki=0.6738,persona=0.1941,tatoeba=0.0238,domain=0.0882,synthetic=0.0053,emoji=0.0147
+  KINDS: wiki_whole=0.54,homophone=0.14,homophone_dict=0.125,proper_noun=0.074,typo_whole=0,casual=0.24,modern_words=0.32,english_phrases=0.17,business=0.07,counter=0.20,emoji_context=0.8,emoji_pick=0.2
   ORTHO: '0.8'
   PASSES: wiki=2,persona=3,tatoeba=3,domain=3,synthetic=1,emoji=2
-  V6: --near-exclusion --typo-rate 0.12 --name-rate 0.5 --easy-homophone-rate 0.15
+  V6: --near-exclusion --name-rate 0.5 --easy-homophone-rate 0.15
   WIKI_BASE: https://huggingface.co/datasets/wikimedia/wikipedia/resolve/b04c8d1ceb2f5cd4588862100d08de323dccfbaa/20231101.ja
   TOKENIZER_BASE: https://huggingface.co/Miwa-Keita/zenz-v3.1-small/resolve/344612e331bf3ba752a9bfef6633c93c6b933ebb
   MOZC_BASE: https://raw.githubusercontent.com/unok/mozc/2d993fd532c0df849ff3a5f6c7851b3757471ed6/src/data
