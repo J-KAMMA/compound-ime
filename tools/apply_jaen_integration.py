@@ -3322,6 +3322,13 @@ edit("converter/converter.cc", "namespace mozc {\nnamespace converter {\n",
      "namespace mozc {\nnamespace converter {\n"
      + (REPO / "native/jaen-detector/converter_readable_typo.inc").read_text(encoding="utf-8") + "\n")
 
+# 句読点（kyouhq,ashita）を挟んだ文も、句読点の間ごとに打ち間違いを直す（FixEachRun）。直しの関数は
+# 英字だけの入力しか見ないので、句読点を打った文は今まで一度も直らなかった。
+edit("converter/converter.cc", "FixReadableTypo(modules(), text, parse, *margin)",
+     "FixEachRun(text, [&](absl::string_view run) { return FixReadableTypo(modules(), run, parse, *margin); })")
+edit("converter/converter.cc", "FixUnreadTypo(modules(), text, parse, TypoKanaModel())",
+     "FixEachRun(text, [&](absl::string_view run) { return FixUnreadTypo(modules(), run, parse, TypoKanaModel()); })")
+
 # 英単語の前後の1文節の日本語: 節: 「きのうから|sale|が始まった」の「きのうから」のような
 # 1文節の部分は、文全体の処理（2文節以上が前提）に入らず、Mozc の順位（機能から）のままだった。
 # 英単語で区切られた部分の処理のときだけ、1文節でも人工知能に見せる。
