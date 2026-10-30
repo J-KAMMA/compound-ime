@@ -485,6 +485,9 @@ f)
     $W/context_words_test | tee $OUT/context-words-unit.txt
     MYIME_CONTEXT_WORDS=off $CTX $OUT/context-with-words-off.tsv with 4
     python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with-words-off.tsv $OUT/context-without.tsv > $OUT/context-words-off-score.txt
+    # 前の文のあとに改行があるとき（AI には渡らず、前の行の語だけを前の文の語の段が使う）と、渡さないときの比べ
+    $CTX $OUT/context-newline.tsv newline 4
+    python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-newline.tsv $OUT/context-without.tsv > $OUT/context-newline-score.txt
     # 前後の文での並べ替えを「迷うときだけ」にする値の比べ（tools/apply_context_gate.py、tools/clause_gate_test.py）。
     # 文は句読点を含み並べ替えが働かないので、文の最初の句だけを前の文つきで変換し、候補を絞る個数（TOPK）と
     # 先頭と次の候補の点の差の上限（GAP）を変えて、正解の数・基準との違い・全体の時間（4並列）を比べる
