@@ -5280,4 +5280,163 @@ edit("composer/mode_switching_handler.cc", """  if (key == "google" || key == "G
 
 """, "")
 
+# 合わせた物差しの材料の書き出し（記録だけ、出力は変えない）。MYIME_JOINT_DUMP=<ファイル> のときだけ、
+# 文全体を人工知能に尋ねるたびに、Mozc の1位の文と人工知能の候補（上位20）それぞれについて、
+# 人工知能の対数確率（ScoreZenzaiSentences）、Mozc の文節への当てはまり方（M＝文節の候補で書ける、
+# U＝書けるが固有名を守る決まりに触れる、R＝組み直しで書ける、F<番号>＝組み直しを断る、X＝試さない）、
+# Mozc の順位の和・替えた文節の数・費用の差、消える固有名やカタカナ語の数、増えるカタカナの字数を1行に書く。
+# 組み直しは写しの上で試し、断りの記録（MYIME_RESEGMENT_LOG）には書かない。
+edit("engine/engine.cc", "static thread_local size_t g_whole_phrase_min_segments = 2;\n",
+     "static thread_local size_t g_whole_phrase_min_segments = 2;\n"
+     "// 組み直しを試すだけのとき（合わせた物差しの材料）は記録せず、断り方の番号だけを残す。\n"
+     "static thread_local bool g_resegment_quiet = false;\n"
+     "static thread_local int g_resegment_refusal = -1;\n")
+edit("engine/engine.cc", """    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
+    if (!path || !*path) return;
+""", """    if (g_resegment_quiet) return;
+    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
+    if (!path || !*path) return;
+""")
+edit("engine/engine.cc", """  static bool ResegmentFail(int number, std::string_view key, const converter::Candidate& candidate) {
+""", """  static bool ResegmentFail(int number, std::string_view key, const converter::Candidate& candidate) {
+    g_resegment_refusal = number;
+""")
+edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOptions& options,\n",
+     r"""  static void DumpJointFeatures(const ConversionOptions& options,
+                                const ImmutableConverterInterface& mozc,
+                                const dictionary::PosMatcher& pos,
+                                const Segments& segments, std::string_view key,
+                                std::string_view left, std::string_view right, const Segment& ai,
+                                const std::vector<std::vector<const converter::Candidate*>>& original) {
+    static const char* path = std::getenv("MYIME_JOINT_DUMP");
+    if (!path || !*path) return;
+    const auto clean = [](std::string_view text) {
+      return text.find('\t') == std::string_view::npos && text.find('\x01') == std::string_view::npos &&
+             text.find('\x02') == std::string_view::npos && text.find('\n') == std::string_view::npos;
+    };
+    if (!clean(key)) return;
+    const auto katakana = [](std::string_view text) {
+      size_t count = 0;
+      for (const char32_t c : Utf8AsChars32(text)) count += (c >= 0x30A1 && c <= 0x30FA) || c == 0x30FC;
+      return count;
+    };
+    std::string mozc_top;
+    int64_t mozc_cost = 0;
+    size_t mozc_katakana = 0;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (segment.candidates_size() == 0) return;
+      mozc_top += segment.candidate(0).value;
+      mozc_cost += segment.candidate(0).cost;
+      mozc_katakana += katakana(segment.candidate(0).value);
+    }
+    if (!clean(mozc_top)) return;
+    std::string joined = mozc_top;
+    size_t total = 0;
+    for (size_t c = 0; c < ai.candidates_size() && c < 20; ++c) {
+      if (!clean(ai.candidate(c).value)) break;
+      joined += '\x01';
+      joined += ai.candidate(c).value;
+      ++total;
+    }
+    std::vector<double> scores;
+    {
+      std::string text;
+      if (ScoreZenzaiSentences(key, left, right, joined, &text)) {
+        size_t at = 0;
+        while (true) {
+          const size_t tab = text.find('\t', at);
+          const std::string piece = text.substr(at, tab == std::string::npos ? std::string::npos : tab - at);
+          scores.push_back(piece == "nan" ? std::nan("") : std::strtod(piece.c_str(), nullptr));
+          if (tab == std::string::npos) break;
+          at = tab + 1;
+        }
+      }
+      if (scores.size() != total + 1) scores.assign(total + 1, std::nan(""));
+    }
+    const auto number = [](double value) {
+      char buffer[40];
+      std::snprintf(buffer, sizeof(buffer), "%.4f", value);
+      return std::string(buffer);
+    };
+    std::string line = "J\t" + std::string(key) + '\t' + (left.empty() ? '0' : '1') + (right.empty() ? '0' : '1') +
+        '\t' + std::to_string(segments.conversion_segments_size()) + '\t' + mozc_top + '\t' +
+        std::to_string(mozc_cost) + '\t' + number(scores[0]);
+    for (size_t c = 0; c < total; ++c) {
+      const converter::Candidate& candidate = ai.candidate(c);
+      std::string fit = "X";
+      int64_t rank_sum = 0, cost_delta = 0, changed = 0;
+      std::vector<int> indices;
+      const char* rejection = "Compatible";
+      const bool plain = !(candidate.attributes & (converter::Attribute::COMMAND_CANDIDATE |
+                                                   converter::Attribute::PARTIALLY_KEY_CONSUMED));
+      bool selected = MatchWholePhrase(candidate, segments, key, &indices, &rejection);
+      if (!selected && Compatible(candidate, key) && plain) {
+        if (auto found = private_surface::Find(segments, key, candidate.value, original)) {
+          indices = std::move(*found);
+          selected = true;
+        }
+      }
+      if (selected) {
+        fit = "M";
+        if (indices.size() != segments.conversion_segments_size()) fit = "U";
+        for (size_t i = 0; fit == "M" && i < indices.size(); ++i) {
+          const auto& segment = segments.conversion_segment(i);
+          if (i >= original.size() || indices[i] < 0 ||
+              static_cast<size_t>(indices[i]) >= segment.candidates_size() ||
+              std::find(original[i].begin(), original[i].end(), segment.candidates()[indices[i]]) ==
+                  original[i].end()) {
+            fit = "U";
+            break;
+          }
+          const Util::ScriptType script = Util::GetScriptType(segment.candidate(indices[i]).value);
+          if (indices[i] != 0 && pos.IsUniqueNoun(segment.candidate(0).lid) &&
+              (script == Util::HIRAGANA || script == Util::KATAKANA)) fit = "U";
+          rank_sum += indices[i];
+          changed += indices[i] != 0;
+          cost_delta += static_cast<int64_t>(segment.candidate(indices[i]).cost) - segment.candidate(0).cost;
+        }
+      } else if (indices.empty() && plain) {
+        Segments trial(segments);
+        g_resegment_quiet = true;
+        g_resegment_refusal = -1;
+        const bool done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+        g_resegment_quiet = false;
+        if (done) {
+          fit = "R";
+          int64_t cost = 0;
+          for (const auto& segment : trial.conversion_segments())
+            if (segment.candidates_size() > 0) cost += segment.candidate(0).cost;
+          cost_delta = cost - mozc_cost;
+          changed = static_cast<int64_t>(trial.conversion_segments_size());
+        } else {
+          fit = "F" + std::to_string(g_resegment_refusal);
+        }
+      }
+      int64_t lost = 0;
+      for (const auto& segment : segments.conversion_segments()) {
+        const auto& top = segment.candidate(0);
+        if ((pos.IsUniqueNoun(top.lid) || katakana(top.value) > 0) &&
+            candidate.value.find(top.content_value) == std::string::npos) ++lost;
+      }
+      const int64_t extra = static_cast<int64_t>(katakana(candidate.value)) - static_cast<int64_t>(mozc_katakana);
+      line += '\t' + candidate.value + '\x02' + number(scores[c + 1]) + '\x02' + fit + '\x02' +
+              std::to_string(rank_sum) + '\x02' + std::to_string(changed) + '\x02' + std::to_string(cost_delta) +
+              '\x02' + std::to_string(lost) + '\x02' + std::to_string(extra) + '\x02' +
+              std::to_string(Util::CharsLen(candidate.value));
+    }
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fputc('\n', f);
+      std::fclose(f);
+    }
+  }
+  static void PreferWholePhrase(const ConversionOptions& options,
+""")
+edit("engine/engine.cc", "    if (!HasLoadedZenzaiModelForReading(key)) return;\n    size_t candidate_index = 0;\n",
+     "    if (!HasLoadedZenzaiModelForReading(key)) return;\n"
+     "    DumpJointFeatures(options, mozc, pos, *segments, key, left, right, full.conversion_segment(0), original);\n"
+     "    size_t candidate_index = 0;\n")
+
 print("applied")

@@ -247,8 +247,18 @@ e8)
   # 採られなかった文を数える比べ。既定の組には入れない（groups='["e8"]' で頼んだときだけ）
   if [ -f $T/wiki-typing.tsv ]; then
     grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
-    MYIME_AI_DUMP=$OUT/ai-wiki.txt MYIME_RESEGMENT_LOG=$OUT/reseg-wiki.txt $BATCH $W/wiki.txt $OUT/wiki-typing-dump.tsv 4 || true
+    MYIME_AI_DUMP=$OUT/ai-wiki.txt MYIME_RESEGMENT_LOG=$OUT/reseg-wiki.txt MYIME_JOINT_DUMP=$OUT/joint-wiki.txt \
+      $BATCH $W/wiki.txt $OUT/wiki-typing-dump.tsv 4 || true
   fi
+  # 合わせた物差しの最後の確かめ用（重みを学ぶのには使わない）: 確かめ用の表、日本語の400文、話し言葉、分野の文
+  romaji $T/holdout/holdout.json > $W/holdout.txt
+  MYIME_JOINT_DUMP=$OUT/joint-holdout.txt $BATCH $W/holdout.txt $OUT/holdout-dump.tsv 4 || true
+  romaji $T/ja400.json > $W/ja400.txt
+  MYIME_JOINT_DUMP=$OUT/joint-ja400.txt $BATCH $W/ja400.txt $OUT/ja400-dump.tsv 4 || true
+  for n in colloquial domain-prog domain-crypto; do
+    grep -v '^#' $T/$n.tsv | cut -f1 > $W/$n.txt
+    MYIME_JOINT_DUMP=$OUT/joint-$n.txt $BATCH $W/$n.txt $OUT/$n-dump.tsv 4 || true
+  done
   ;;
 e9)
   # 人工知能なし（重みのファイルがない）でウィキペディアの文を打つ。誤りが辞書（Mozc）のものか人工知能のものかを分ける比べ。
