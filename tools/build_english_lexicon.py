@@ -24,6 +24,9 @@ URL = "https://downloads.sourceforge.net/project/wordlist/SCOWL/2020.12.07/scowl
 SHA256 = "5587667caa20c4891390c2d42dbb4d5c4c3f41bee77af1457ece3ba23fb859cc"
 LEVELS = (10, 20, 35, 40, 50, 55, 60, 70, 80, 95)
 WORD = re.compile(r"[a-z][a-z']{0,31}")
+# 日本語のローマ字として切れ目なく読める綴り（子音＋母音、母音、ん、っ の重ね）。
+PLAIN_ROMAJI = re.compile(r"(?:(?:ky|gy|sh|ch|ts|ny|hy|by|py|my|ry|dy|ty|j|f|[kgsztdnhbpmyrwv])?[aiueo]"
+                          r"|n(?![aiueoy])|([kgsztdhbpmrjfc])(?=\1))+")
 
 
 def main():
@@ -76,13 +79,15 @@ def main():
     # 分野の文書に出る英字の語（tools/build_domain_words.py）。英単語の一覧に足す。4文字以下の語だけ
     # 厳選の語（api、dao）として足し、5文字以上は普通の語にする（かなが日本語の読みになる語を
     # 厳選にすると、日本語の文を英語にしてしまう）。
+    # ローマ字としてそのまま読める語（todo とど、dai だい、uri うり、gen げん）は厳選にしない。文書に出ただけの語で、
+    # 日本語のつもりで打った かな を英語にしてしまう（2026-10-30、todo を日本語で打つと英字になった）。
     domain_path = Path(__file__).with_name("data") / "jaen-domain-words.txt"
     if domain_path.exists():
         for line in domain_path.read_text(encoding="utf-8").splitlines():
             word = line.strip()
             if WORD.fullmatch(word):
                 words.add(word)
-                if len(word) <= 4:
+                if len(word) <= 4 and not PLAIN_ROMAJI.fullmatch(word):
                     curated.add(word)
 
     args.out.mkdir(parents=True, exist_ok=True)
