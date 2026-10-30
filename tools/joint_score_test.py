@@ -24,13 +24,13 @@ def check(name, ok):
 
 weights = json.loads((HERE / "data/joint-score/weights.json").read_text(encoding="utf-8"))
 check("重みの名前が特徴の並びと同じ", weights["names"] == j.NAMES)
-check("重みの数", len(weights["weights"]) == len(j.NAMES) == 14)
+check("重みの数", len(weights["weights"]) == len(j.NAMES) == 17)
 
 # C++ の特徴の並び（apply_jaen_integration.py の PreferJointScore）が Python の features と同じ数か
 source = (HERE / "apply_jaen_integration.py").read_text(encoding="utf-8")
-block = source[source.index("const double feature[14] = {"):]
+block = source[source.index("const double feature[17] = {"):]
 block = block[:block.index("};")]
-check("C++ の特徴の数", len(re.findall(r",\n", block)) == 14)
+check("C++ の特徴の数", len(re.findall(r",[ ]*(?://[^\n]*)?\n", block)) == 17)
 
 # かなだけ
 check("カタカナだけ", j.kana_only("トクソドン"))
@@ -47,21 +47,25 @@ def rec(mozc, cands):
 
 
 w = weights["weights"]
-# 人工知能が Mozc の1位よりはっきり確からしい1位の文は採る
-r = rec("足を負った", [{"value": "足を折った", "lp": -12.0}])
-check("確からしい1位を採る", (j.choose(r, w, "lenient", True) or {}).get("value") == "足を折った")
-# 人工知能のほうが確からしくないなら Mozc のまま
-r = rec("那覇空港", [{"value": "名は空港", "lp": -30.0, "lost": 1}])
-check("確からしくなければ Mozc のまま", j.choose(r, w, "lenient", True) is None)
+j.TOP = weights["top"]
+check("比べるのは上位3つ", j.TOP == 3)
+check("対数確率の重みは 0（人工知能を呼び直さない）", w[1] == 0 and w[2] == 0)
+# Mozc の文が人工知能の候補になく、人工知能の1位が Mozc の文節の候補で書けるなら採る
+r = rec("足を負った", [{"value": "足を折った"}])
+check("1位を採る", (j.choose(r, w, "lenient", False) or {}).get("value") == "足を折った")
+# Mozc の1位と同じ文は候補にしない
+r = rec("木の葉", [{"value": "木の葉"}])
+check("Mozc と同じ文は比べない", j.choose(r, w, "lenient", False) is None)
 # 当てはまらない候補（V、断る決まりを外しても書けない F5）は選ばない
-r = rec("あ", [{"value": "亜", "lp": 0.0, "fit": "V"}, {"value": "阿", "lp": 0.0, "fit": "F5"}])
-check("当てはまらない候補は選ばない", j.choose(r, w, "lenient", True) is None)
+r = rec("あ", [{"value": "亜", "fit": "V"}, {"value": "阿", "fit": "F5"}])
+check("当てはまらない候補は選ばない", j.choose(r, w, "lenient", False) is None)
 # 上位3つより下は比べない
-r = rec("x", [{"value": f"候補{i}", "lp": -40.0, "fit": "V"} for i in range(3)] + [{"value": "四位", "lp": 0.0}])
-check("上位3つだけ", j.choose(r, w, "lenient", True) is None)
-# 断る決まりを外せば組み直せる文も比べる
-r = rec("ベース", [{"value": "米須", "lp": -5.0, "fit": "F1L"}])
-check("決まりを外した組み直しも比べる", (j.choose(r, w, "lenient", True) or {}).get("value") == "米須")
+r = rec("x", [{"value": f"候補{i}", "fit": "V"} for i in range(3)] + [{"value": "四位"}])
+check("上位3つだけ", j.choose(r, w, "lenient", False) is None)
+# Mozc の文が人工知能の1位で、2位の文は名前を消し文節を大きく替える → Mozc のまま
+r = rec("那覇空港", [{"value": "那覇空港"}, {"value": "名は空港", "fit": "F1L", "lost": 3, "changed": 10,
+                                              "cost_delta": 20000, "extra": 10}])
+check("悪い2位は採らない", j.choose(r, w, "lenient", False) is None)
 
 # ローマ字の読み戻し
 check("読み戻し", j.to_kana("kyouhaiitenkidesu.") == "きょうはいいてんきです。")

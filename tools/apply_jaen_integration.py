@@ -5458,22 +5458,18 @@ edit("engine/engine.cc", "    if (!HasLoadedZenzaiModelForReading(key)) return;\
 
 # 合わせた物差しで文を選ぶ（MYIME_JOINT_SCORE=off で今までの順番の手順と断る決まりに戻す）。
 # 文全体を人工知能に尋ねたあと、Mozc の1位の文（0点）と、人工知能の上位3つの文のうち Mozc の文節に当てはまるもの
-# （文節の候補で書ける、組み直しで書ける、断る決まりを外せば組み直せる）を、人工知能の対数確率の差・順位・
-# Mozc の順位と費用・消える名前・増えるカタカナなどの線形の足し合わせで比べ、0点より高い一番の文を採る。
-# 人工知能をもう一度呼ぶのは、比べる文があるときの採点1回（Mozc の1位と最大3文。段階3の入り口があれば
-# 共通の前半を1回だけ計算する ScoreZenzaiSuffixes、tools/apply_selector_stage3.py）だけ。
+# （文節の候補で書ける、組み直しで書ける、断る決まりを外せば組み直せる）を、人工知能の順位・Mozc の文が人工知能の
+# 候補の何位か・Mozc の順位と費用・消える名前・増えるカタカナなどの線形の足し合わせで比べ、0点より高い一番の文を採る。
+# 人工知能はもう一度呼ばない（文の対数確率を足すと見込みは +48 文に伸びるが、採点で空白キーの中央値が約 1.8 倍に
+# なったので採らない。特徴の2つ目・3つ目は対数確率の場所で、重みは 0）。英語で区切った一部分（PreferWholePhraseRuns）
+# には使わない（学んだのは文全体だけ。英語の前の「私は」が「わたしは」になった）。
 # 重みは tools/joint_score_fit.py が組 e8 の材料（ウィキペディアの文）から学んだもの（tools/data/joint-score/weights.json）。
 import json as _json  # noqa: E402
 _joint = _json.loads((REPO / "tools/data/joint-score/weights.json").read_text(encoding="utf-8"))
-assert len(_joint["weights"]) == 14, _joint
+assert len(_joint["weights"]) == 17 and _joint["top"] == 3, _joint
 _joint_weights = ", ".join(repr(float(x)) for x in _joint["weights"])
 edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOptions& options,\n",
-     r"""  // 合わせた物差しの採点（段階3が入れば共通の前半を1回だけ計算する採点に替わる）
-  static bool JointScoreTexts(std::string_view key, std::string_view left, std::string_view right,
-                              const std::string& joined, std::string* scores) {
-    return ScoreZenzaiSentences(key, left, right, joined, scores);
-  }
-  // かなだけの文（tools/joint_score_fit.py の kana_only と同じ）
+     r"""  // かなだけの文（tools/joint_score_fit.py の kana_only と同じ）
   static bool JointKanaOnly(std::string_view text) {
     bool katakana = false;
     size_t hiragana_count = 0;
@@ -5500,8 +5496,10 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
       const char* value = std::getenv("MYIME_JOINT_SCORE");
       return !value || std::string_view(value) != "off";
     }();
-    if (!enabled) return false;
-    static constexpr double kWeights[14] = {""" + _joint_weights + r"""};
+    if (!enabled || g_whole_phrase_min_segments != 2) return false;
+    (void)left;  // 前後の文は、人工知能の候補を通して効く
+    (void)right;
+    static constexpr double kWeights[17] = {""" + _joint_weights + r"""};
     const auto clean = [](std::string_view text) {
       return text.find('\t') == std::string_view::npos && text.find('\x01') == std::string_view::npos &&
              text.find('\n') == std::string_view::npos;
@@ -5599,33 +5597,22 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
       ResegmentLog("JOINT\t" + std::string(key) + "\tKEEP\t" + mozc_top);
       return true;
     }
-    std::string joined = mozc_top;
-    for (const auto& option : found) {
-      joined += '\x01';
-      joined += option.candidate->value;
+    // Mozc の1位の文が人工知能の候補（上位20）の何位か（ないときは 25）
+    size_t mozc_rank = 25;
+    for (size_t c = 0; c < ai.candidates_size() && c < 20; ++c) {
+      if (ai.candidate(c).value == mozc_top) {
+        mozc_rank = c;
+        break;
+      }
     }
-    std::string text;
-    if (!JointScoreTexts(key, left, right, joined, &text)) return false;
-    std::vector<double> scores;
-    for (size_t at = 0;;) {
-      const size_t tab = text.find('\t', at);
-      const std::string piece = text.substr(at, tab == std::string::npos ? std::string::npos : tab - at);
-      scores.push_back(piece == "nan" ? std::nan("") : std::strtod(piece.c_str(), nullptr));
-      if (tab == std::string::npos) break;
-      at = tab + 1;
-    }
-    if (scores.size() != found.size() + 1 || !std::isfinite(scores[0])) return false;
     const Option* best = nullptr;
     double best_score = 0;
     for (size_t o = 0; o < found.size(); ++o) {
       const Option& option = found[o];
-      if (!std::isfinite(scores[o + 1])) continue;
-      const double diff = scores[o + 1] - scores[0];
-      const double chars = static_cast<double>(std::max<size_t>(Util::CharsLen(option.candidate->value), 1));
-      const double feature[14] = {
+      const double feature[17] = {
           1.0,
-          diff / 10.0,
-          diff / chars,
+          0.0,  // 人工知能の対数確率の差（使わない）
+          0.0,  // 1字あたりの差（使わない）
           option.rank == 0 ? 1.0 : 0.0,
           std::log1p(static_cast<double>(option.rank)),
           option.kind == 2 ? 1.0 : 0.0,
@@ -5637,9 +5624,12 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
           static_cast<double>(std::min<int64_t>(option.lost, 3)),
           static_cast<double>(std::clamp<int64_t>(option.extra, 0, 10)) / 5.0,
           JointKanaOnly(option.candidate->value) ? 1.0 : 0.0,
+          mozc_rank < 25 ? 1.0 : 0.0,
+          option.rank == 0 ? std::log1p(static_cast<double>(mozc_rank)) : 0.0,
+          option.rank == 0 && (option.kind == 0 || option.kind == 2) ? 1.0 : 0.0,
       };
       double score = 0;
-      for (size_t f = 0; f < 14; ++f) score += kWeights[f] * feature[f];
+      for (size_t f = 0; f < 17; ++f) score += kWeights[f] * feature[f];
       if (score > best_score) {
         best = &option;
         best_score = score;

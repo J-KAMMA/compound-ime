@@ -149,11 +149,20 @@ APPLICABLE = {"strict": lambda f: f in ("M", "R"),
               "lenient": lambda f: f in ("M", "R", "U") or (f.startswith("F") and f.endswith("L"))}
 
 
+def mozc_rank(rec):
+    """Mozc の1位の文が人工知能の候補（上位20）の何位か。ないときは 25"""
+    for c in rec["cands"]:
+        if c["value"] == rec["mozc"]:
+            return min(c["rank"], 25)
+    return 25
+
+
 def features(rec, c, use_lp):
     lp_d = c["lp"] - rec["mozc_lp"] if use_lp else 0.0
     if not math.isfinite(lp_d):
         lp_d = 0.0
     fit = c["fit"]
+    mr = mozc_rank(rec)
     f = [
         1.0,                                   # 切片（Mozc のままより候補を採る気持ち）
         lp_d / 10.0,                           # 人工知能の対数確率の差（Mozc の1位の文と比べて）
@@ -169,6 +178,9 @@ def features(rec, c, use_lp):
         min(c["lost"], 3),                     # 消える固有名・カタカナ語
         min(max(c["extra"], 0), 10) / 5.0,     # 増えるカタカナ
         1.0 if kana_only(c["value"]) else 0.0, # かなだけ
+        1.0 if mr < 25 else 0.0,               # Mozc の1位の文が人工知能の候補にある
+        math.log1p(mr) if c["rank"] == 0 else 0.0,  # 人工知能の1位のとき、Mozc の文の順位（遠いほど人工知能は自信がある）
+        1.0 if c["rank"] == 0 and fit in ("M", "R") else 0.0,  # 今の決まりでも採る1位
     ]
     if not use_lp:
         f[1] = f[2] = 0.0
@@ -176,14 +188,18 @@ def features(rec, c, use_lp):
 
 
 NAMES = ["切片", "対数確率の差/10", "1字あたりの差", "人工知能の1位", "log(1+順位)", "組み直し", "決まりを外す",
-         "固有名をかな", "Mozc 順位の和/10", "替えた文節/5", "費用の差/5000", "消える名前", "増えるカタカナ/5", "かなだけ"]
+         "固有名をかな", "Mozc 順位の和/10", "替えた文節/5", "費用の差/5000", "消える名前", "増えるカタカナ/5", "かなだけ",
+         "Mozc の文が候補にある", "1位×log(1+Mozc の順位)", "今の決まりでも採る1位"]
 
 
-def options(rec, mode, use_lp, top=3):
+TOP = 1  # 比べる人工知能の候補の数（上位いくつまで）
+
+
+def options(rec, mode, use_lp, top=None):
     """選べる候補（Mozc の1位と同じ文は除く）と特徴"""
     out = []
     seen = {rec["mozc"]}
-    for c in rec["cands"][:top]:
+    for c in rec["cands"][:top or TOP]:
         if c["value"] in seen or not APPLICABLE[mode](c["fit"]):
             continue
         seen.add(c["value"])
@@ -281,6 +297,7 @@ def main():
     ap.add_argument("--repo", type=Path, default=Path(__file__).resolve().parent.parent)
     ap.add_argument("--export", type=Path)
     ap.add_argument("--show", type=int, default=0)
+    ap.add_argument("--top", type=int, default=1, help="書き出す重みの上位いくつ（対数確率なし）")
     args = ap.parse_args()
     T = args.repo / "tests/conversion"
     wiki = load_set(args.results, "joint-wiki.txt", T / "wiki-typing.tsv", "wiki-typing-dump.tsv")
@@ -317,10 +334,12 @@ def main():
     rnd = random.Random(1)
     shuffled = items[:]; rnd.shuffle(shuffled)
     folds += [(shuffled[:half], shuffled[half:]), (shuffled[half:], shuffled[:half])]
+    global TOP
     results = {}
-    for mode in ("strict", "lenient"):
-        for use_lp in (False, True):
-            tag = f"{mode}{'+対数確率' if use_lp else ''}"
+    for mode, use_lp, top in (("strict", False, 1), ("lenient", False, 1), ("lenient", False, 3), ("lenient", True, 3)):
+        if True:
+            TOP = top
+            tag = f"{mode}{'+対数確率' if use_lp else ''} 上位{top}"
             tot = {"cur": 0, "new": 0, "better": 0, "worse": 0, "changed": 0, "unsure": 0}
             for i, (tr, te) in enumerate(folds):
                 w = fit_weights([(r, a) for r, a, _ in tr if r], mode, use_lp)
@@ -330,9 +349,10 @@ def main():
             # 4つの折り（前半/後半、混ぜた半分×2）の合計を2で割ると全体の1回分
             print(f"[{tag}] 交差（全体1回分）: 今 {tot['cur']/2:.0f} → 新 {tot['new']/2:.0f}（{(tot['new']-tot['cur'])/2:+.1f}、"
                   f"良 {tot['better']/2:.1f}・悪 {tot['worse']/2:.1f}、替えた {tot['changed']/2:.0f}、うち後段で変わる {tot['unsure']/2:.0f}）")
-            results[tag] = (mode, use_lp)
+            results[tag] = (mode, use_lp, top)
     # 全部で学んだ重みと、学習に使わない表での確かめ
-    for tag, (mode, use_lp) in results.items():
+    for tag, (mode, use_lp, top) in results.items():
+        TOP = top
         w = fit_weights([(r, a) for r, a, _ in items if r], mode, use_lp)
         print(f"[{tag}] 重み: " + "、".join(f"{n} {x:+.2f}" for n, x in zip(NAMES, w)))
         for name, dump, cases, out in (("確かめ用", "joint-holdout.txt", T / "holdout/holdout.json", "holdout-dump.tsv"),
@@ -347,8 +367,8 @@ def main():
             print(f"    {name}: {len(s[0])} 文（材料 {s[1]}）今 {e['cur']} → 新 {e['new']}（良 {e['better']}・悪 {e['worse']}、替えた {e['changed']}）")
             for line in e["examples"]:
                 print(line)
-        if args.export and tag == "lenient+対数確率":
-            args.export.write_text(json.dumps({"names": NAMES, "weights": [round(float(x), 4) for x in w]},
+        if args.export and (mode, use_lp, top) == ("lenient", False, args.top):
+            args.export.write_text(json.dumps({"top": top, "names": NAMES, "weights": [round(float(x), 4) for x in w]},
                                               ensure_ascii=False, indent=1), encoding="utf-8")
 
 
