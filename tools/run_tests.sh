@@ -695,6 +695,11 @@ p)
     MYIME_BATCH_SCORE=0 $LAT $W/lat-$name.tsv $OUT/seqscore-$name
   done
   MYIME_BATCH_SCORE=0 LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/seqscore-real-nopace
+  # 合わせた物差し（MYIME_JOINT_SCORE）を切った同じ試験。同じ計算機での前後比べ（名前の頭は jointoff-）
+  for name in ja400 wiki ctx-with; do
+    MYIME_JOINT_SCORE=off $LAT $W/lat-$name.tsv $OUT/jointoff-$name
+  done
+  MYIME_JOINT_SCORE=off LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/jointoff-real-nopace
   python3 $REPO/tools/latency_report.py $OUT seqscore- | tee $OUT/latency-report-seqscore.txt
   # 一括採点が実際に使われたか、順に戻ったかの記録（前の文あり・なしの句の試験と、日本語だけの先頭100文）
   MYIME_CTX_LOG=$OUT/batch-log-clause.txt $LAT $W/lat-clause-with.tsv $OUT/logrun-clause

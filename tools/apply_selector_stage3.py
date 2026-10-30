@@ -507,5 +507,12 @@ edit(mozc, E, "    ScoreCandidates(*segments, left_context, right_context);\n",
 edit(mozc, E, "  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。",
      SELECTOR + "  // MYIME_SELECTOR_FEATURES=<ファイル>: 選び手の段階2の材料（記録だけ）。")
 edit(mozc, E, "#include <chrono>\n#include <cmath>\n", "#include <array>\n#include <chrono>\n#include <cmath>\n")
+# 合わせた物差し（tools/apply_jaen_integration.py の PreferJointScore）の採点も、共通の前半を1回だけ計算する形にする。
+# 物差しは Mozc の1位の文との対数確率の差だけを使うので、点は同じ差になる。
+edit(mozc, E, """    return ScoreZenzaiSentences(key, left, right, joined, scores);
+  }
+  // かなだけの文""", """    return ScoreZenzaiSuffixes(key, left, right, joined, scores);
+  }
+  // かなだけの文""")
 
 print("applied selector stage 3")

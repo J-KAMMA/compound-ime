@@ -22,7 +22,7 @@ import re
 import sys
 from pathlib import Path
 
-import numpy as np
+
 
 # ---- ローマ字 → かな（Mozc の既定の表のうち、試験の文に出る範囲） ----
 _V = "aiueo"
@@ -179,7 +179,7 @@ NAMES = ["切片", "対数確率の差/10", "1字あたりの差", "人工知能
          "固有名をかな", "Mozc 順位の和/10", "替えた文節/5", "費用の差/5000", "消える名前", "増えるカタカナ/5", "かなだけ"]
 
 
-def options(rec, mode, use_lp, top=20):
+def options(rec, mode, use_lp, top=3):
     """選べる候補（Mozc の1位と同じ文は除く）と特徴"""
     out = []
     seen = {rec["mozc"]}
@@ -191,8 +191,9 @@ def options(rec, mode, use_lp, top=20):
     return out
 
 
-def fit_weights(train, mode, use_lp, l2=0.3, iters=600):
+def fit_weights(train, mode, use_lp, l2=0.03, iters=600):
     """条件付きロジット: 正しい文が候補か Mozc のままにあるときだけ学ぶ"""
+    import numpy as np  # 学ぶときだけ要る
     data = []
     for rec, answers in train:
         opts = options(rec, mode, use_lp)
@@ -224,7 +225,7 @@ def fit_weights(train, mode, use_lp, l2=0.3, iters=600):
 def choose(rec, w, mode, use_lp, margin=0.0):
     best, best_s = None, margin
     for c, f in options(rec, mode, use_lp):
-        s = float(np.dot(w, f))
+        s = sum(a * b for a, b in zip(w, f))
         if s > best_s:
             best, best_s = c, s
     return best
