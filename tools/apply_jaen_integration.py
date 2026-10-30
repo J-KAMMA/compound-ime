@@ -3922,7 +3922,10 @@ edit(T, """  input->set_id(id_);
   if (!preceding_text_.empty()) input->mutable_context()->set_preceding_text(preceding_text_);
   commands::Command command;""")
 edit(T, """  } else if (command == "SET_SELECTION_TEXT") {""", """  } else if (command == "SET_PRECEDING_TEXT") {
-    client_->SetPrecedingText(args.size() >= 2 ? args[1] : "");
+    // 「\\n」と書いた所は改行にする（前の行がある試験）
+    std::string text = args.size() >= 2 ? std::string(args[1]) : std::string();
+    for (size_t at; (at = text.find("\\\\n")) != std::string::npos;) text.replace(at, 2, "\\n");
+    client_->SetPrecedingText(text);
   } else if (command == "SET_SELECTION_TEXT") {""")
 
 # 落ちないかの試験（tools/run_tests.sh の組 j）: 実際の打ち込みと同じく、入力欄の後ろの文と、
@@ -4652,7 +4655,8 @@ void PublishZenzaiStatus(const AzooKeyStatus& status) {
   LogZenzaiMemoryLockOnce(status);
 """)
 
-# 前の文の語: 節: 入力欄の前の文（GetSurroundingContext の左、最後の 200 字）に出た語を、同じ読みが
+# 前の文の語: 節: 入力欄の前の文（改行より前の行も含めた最後の 200 字。アプリが前の文を渡さないときは、
+# さっき確定した文字 recent_committed_text）に出た語を、同じ読みが
 # 今の変換の文節の頭から始まるとき、その書き方で先頭にする（エドサル、伴馬、帰還、ヴァネッサ）。
 # 語は 2 字以上のカタカナの並び（読みはひらがなに直したもの、2 かな以上）と、2 字以上の漢字の並びの中の
 # 辞書の語（読み 3 かな以上）。辞書の語で書けない漢字の並び（伴馬、蜀地方）は、並び全体を1字ずつ
@@ -4695,6 +4699,15 @@ bool ContextWordsEnabled() {
   return enabled;
 }
 
+// The text whose words count: the field's text before the cursor with its earlier lines too
+// (GetSurroundingContext keeps only the last line, so after Enter it is empty), else what this
+// session just committed (recent_committed_text, set only when the client gave no preceding text).
+// Only the dictionary looks at it, so the AI is no slower.
+std::string ContextWordsText(const ConversionRequest& request) {
+  const std::string& preceding = request.context().preceding_text();
+  return preceding.empty() ? request.context().recent_committed_text() : preceding;
+}
+
 // The dictionary words whose reading is a prefix of a key (as written, every way).
 class ContextPrefixCollector : public dictionary::DictionaryInterface::Callback {
  public:
@@ -4733,7 +4746,7 @@ void Converter::PreferContextWords(const ConversionRequest& request, Segments* s
       segments->resized()) {
     return;
   }
-  const auto [left, right] = request.GetSurroundingContext();
+  const std::string left = ContextWordsText(request);
   if (left.empty() || segments->conversion_segments_size() == 0) return;
   const jaen::ContextWords words(std::string_view(left.data(), left.size()));
   if (words.empty()) return;
@@ -4858,7 +4871,7 @@ edit("converter/converter.cc", """  std::string raw;
   for (const jaen::Chunk& chunk : chunks) raw += chunk.raw;
   if (ContextWordsEnabled() &&
       std::any_of(pieces.begin(), pieces.end(), [](const jaen::Piece& p) { return p.english; })) {
-    const auto [context_left, context_right] = request.GetSurroundingContext();
+    const std::string context_left = ContextWordsText(request);
     if (!context_left.empty()) {
       const jaen::ContextWords katakana(std::string_view(context_left.data(), context_left.size()));
       bool changed = false;

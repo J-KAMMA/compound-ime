@@ -1,5 +1,5 @@
 #!/bin/bash
-# context_convert.sh <session_handler_main> <engine dir> <model.gguf> <context.tsv> <out.tsv> <with|without> [並列数]
+# context_convert.sh <session_handler_main> <engine dir> <model.gguf> <context.tsv> <out.tsv> <with|without|newline> [並列数]
 # 前後の文がある試験: context.tsv（ローマ字<TAB>元の文<TAB>前の文）の各行を、with では前の文を
 # 入力欄の前の文として渡して、without では渡さずに変換・確定し、「ローマ字<TAB>文節|…<TAB>確定」を書く。
 set -e
@@ -11,6 +11,8 @@ for f in $w/part.*; do
     { printf 'SEND_KEY\tON\n'
       while IFS=$'\t' read -r raw _ before; do
         [ "$MODE" = with ] && printf 'SET_PRECEDING_TEXT\t%s\n' "$before"
+        # newline: 前の文のあとに改行がある（チャットやメモで Enter のあと）。改行は「\n」と書いて渡す
+        [ "$MODE" = newline ] && printf 'SET_PRECEDING_TEXT\t%s%s\n' "$before" '\n'
         printf 'SEND_KEYS\t%s\nSEND_KEY\tSpace\nSHOW_OUTPUT\nSEND_KEY\tEnter\nSHOW_OUTPUT\nCLEAR_ALL\nRESET_CONTEXT\nSET_PRECEDING_TEXT\nSEND_KEY\tON\n' "$raw"
       done < $f; } > $f.cmd
     MYIME_ZENZAI_TIME_LIMIT_MS="${MYIME_ZENZAI_TIME_LIMIT_MS:-0}" MYIME_ZENZAI_STATS_FILE="$OUT.zstats" MYIME_AI_BUDGET_MS=0 MYIME_HERMETIC_TEST=1 MYIME_AZOOKEY_DLL_DIR="$ENGINE" MYIME_AZOOKEY_ZENZAI_WEIGHT="$MODEL" \
