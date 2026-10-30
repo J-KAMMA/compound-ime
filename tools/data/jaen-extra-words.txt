@@ -22,7 +22,9 @@ config
 crypto
 css
 csv
+dao
 debug
+defi
 deploy
 discord
 docker
