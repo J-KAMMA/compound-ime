@@ -5519,6 +5519,11 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
       mozc_katakana += katakana(segment.candidate(0).value);
     }
     if (!clean(mozc_top)) return false;
+    // 数字を含む文は今までの手順に任せる（学んだウィキペディアの文に数字の並びは少ない。nijuu20nenn が 二十20年 でなく
+    // 二重20年 になった）
+    for (const char32_t c : Utf8AsChars32(mozc_top)) {
+      if ((c >= '0' && c <= '9') || (c >= 0xFF10 && c <= 0xFF19)) return false;
+    }
     // 当てはめ方: 0 文節の候補で書ける、1 書けるが固有名をかなにする、2 組み直しで書ける、3 断る決まりを外せば組み直せる
     struct Option {
       size_t rank = 0;
