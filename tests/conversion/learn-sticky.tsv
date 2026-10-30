@@ -1,0 +1,17 @@
+# 選び直しが次の変換に効くかの試験（組 l）。列: 種類<TAB>選ぶ入力のローマ字<TAB>選ぶ書き方<TAB>確かめる入力のローマ字<TAB>先頭に来てほしい書き方。
+# tools/learn_sticky_convert.sh が、最初の文節で選ぶ書き方を2回選んで確定したあと、確かめる入力の確定に望みの書き方が入るかを、
+# 前の文が毎回違うとき（ctx）と前の文なし（plain）で見る。選ぶ書き方が KEY: で始まるときは、候補から選ぶ代わりにそのキーを送る。
+# 学習の前から望みの書き方だった行と、選べなかった行は数えない。ん は nn、ー は - で書く。
+kana	tougoumachi	とうごうまち	tougoumachi	とうごうまち
+kana	tougoumachiwomita	とうごうまちを	tougoumachinisumu	とうごうまち
+kana	yariwomotsu	やりを	yarigaaru	やりが
+fkey	ail	KEY:F10	ail	AIL
+fkey	owl	KEY:F10	owl	OWL
+upper	ail	AIL	ail	AIL
+upper	owl	OWL	owl	OWL
+word	kuro-do	Claude	kuro-do	Claude
+word	kouenn	講演	kouenn	講演
+sentence	kuro-dowotsukau	Claudeを	kuro-dogakaita	Claude
+sentence	yariwomotsu	槍を	yarigaaru	槍
+sentence	koukaisuruyotei	公開する	koukaishitahi	公開
+sentence	kouennnikiita	講演に	kouenngaowatta	講演

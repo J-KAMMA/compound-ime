@@ -23,6 +23,7 @@
 #   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）。
 #      1語の表（learn-respect.tsv、50語以上）と、前の文がある複数文節の表（learn-respect-context.tsv。文脈が別の書き方を
 #      先頭にしている文で、文節の元の先頭を4回選ぶ）を流す
+#      選び直しが次の変換に効くか（learn-sticky.tsv。ひらがな・F キーの大文字・文の中の文節を2回選び、前の文が毎回違うときと前の文なしで確かめる）
 #   t: カタカナ語の英字、和製英語に付けないこと、作品名・企業名の公式の英字（tests/conversion/katakana-english.tsv、
 #      katakana-wasei.tsv、work-names.tsv、brand-names.tsv。名前だけを打って変換した候補。tools/make_katakana_english_tests.py、
 #      tools/score_katakana_english.py。期待する英字が上位10個以内か、日本語の候補が先頭のままか）
@@ -208,6 +209,12 @@ c)
     MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/ja400-c.txt $OUT/ja400-exf$x.tsv 4
     MYIME_TYPO_PRIOR_EXF=$x $BATCH $W/typo150b.txt $OUT/typo150b-exf$x.tsv 4
   done
+  # 子音の抜けの上乗せ（MYIME_TYPO_PRIOR_DC、既定 1000。前は 3000）を変えたときの比べ。ja400 と typo150b も同じ重みで流す
+  for x in 0 2000 3000; do
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/dev-typo.txt $OUT/dev-typo-dc$x.tsv 4
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/ja400-c.txt $OUT/ja400-dc$x.tsv 4
+    MYIME_TYPO_PRIOR_DC=$x $BATCH $W/typo150b.txt $OUT/typo150b-dc$x.tsv 4
+  done
   $BATCH $W/ja400-c.txt $OUT/ja400-pdefault.tsv 4
   ;;
 d1|d2)
@@ -219,11 +226,20 @@ d1|d2)
   ;;
 e1|e2)
   # ウィキペディアの文をローマ字で打つ（前半と後半。採点はまとめの段で）
+  # 辞書にない外来語をカタカナ1語にする決め方（tools/apply_loanword_katakana.py）の単体試験は g++ で動く
+  if [ "$GROUP" = e1 ]; then
+    g++ -std=c++20 -O2 $REPO/native/jaen-detector/loanword_katakana_test.cc -o $W/loanword_katakana_test
+    $W/loanword_katakana_test | tee $OUT/loanword-katakana.txt
+  fi
   if [ -f $T/wiki-typing.tsv ]; then
     grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
     half=$(( ($(wc -l < $W/wiki.txt) + 1) / 2 ))
     if [ "$GROUP" = e1 ]; then head -n $half $W/wiki.txt > $W/w.txt; else tail -n +$((half + 1)) $W/wiki.txt > $W/w.txt; fi
     $BATCH $W/w.txt $OUT/wiki-typing-${GROUP#e}.tsv 4
+    # 64 キーより長いローマ字の区間も区切って打ち間違いを直す（MYIME_TYPO_LONG、既定で入）を止めたときとの比べ。
+    # 長い区間がある文だけを流し、wiki-typing の同じ行と比べる（正しく打った文なので、変わった行は誤った直し）
+    grep -E "[a-z'-]{65,}" $W/w.txt > $W/w-long.txt || true
+    MYIME_TYPO_LONG=off $BATCH $W/w-long.txt $OUT/wiki-long-off-${GROUP#e}.tsv 4
   fi
   ;;
 g)
@@ -271,6 +287,14 @@ l)
     bash $REPO/tools/learn_context_guard.sh $E/session_handler_main $E $MODEL $T/learn-context-guard.tsv $OUT/learn-context-guard 2
     python3 $REPO/tools/score_learn_context_guard.py $OUT/learn-context-guard-on.tsv $OUT/learn-context-guard-off.tsv \
       | tee $OUT/learn-context-guard-score.txt
+  fi
+  # 選び直しが次の変換に効くか（tools/learn_sticky_convert.sh）。ひらがな（読みそのまま）を選ぶ、F キーや候補で英字を
+  # 大文字にする、文の中の文節で選び直す、を2回ずつしたあと、前の文が毎回違うとき（ふつうのアプリ）と前の文なしで、
+  # 別の続き（を→に）や別の文でも選んだ書き方が出るか。効かない行があれば失敗にする（tools/score_learn_sticky.py）。
+  if [ -f $T/learn-sticky.tsv ]; then
+    bash $REPO/tools/learn_sticky_convert.sh $E/session_handler_main $E $MODEL $T/learn-sticky.tsv $OUT/learn-sticky
+    python3 $REPO/tools/score_learn_sticky.py $OUT/learn-sticky-on.tsv $OUT/learn-sticky-off.tsv \
+      | tee $OUT/learn-sticky-score.txt
   fi
   ;;
 m)
@@ -447,6 +471,14 @@ f)
     t1=$(date +%s.%N)
     $CTX $OUT/context-without.tsv without 4
     python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with.tsv $OUT/context-without.tsv | tee $OUT/context-score.txt | head -30
+    # 前の文の語（エドサル、伴馬、帰還）を先頭にする段（MYIME_CONTEXT_WORDS）を止めたときとの比べ。
+    # 単体試験（Mozc を組み立てずに g++ で動く）も
+    g++ -std=c++20 -O2 -I $REPO/native/jaen-detector \
+      $REPO/native/jaen-detector/context_words_test.cc $REPO/native/jaen-detector/context_words.cc \
+      -o $W/context_words_test
+    $W/context_words_test | tee $OUT/context-words-unit.txt
+    MYIME_CONTEXT_WORDS=off $CTX $OUT/context-with-words-off.tsv with 4
+    python3 $REPO/tools/score_context.py $T/context.tsv $OUT/context-with-words-off.tsv $OUT/context-without.tsv > $OUT/context-words-off-score.txt
     # 前後の文での並べ替えを「迷うときだけ」にする値の比べ（tools/apply_context_gate.py、tools/clause_gate_test.py）。
     # 文は句読点を含み並べ替えが働かないので、文の最初の句だけを前の文つきで変換し、候補を絞る個数（TOPK）と
     # 先頭と次の候補の点の差の上限（GAP）を変えて、正解の数・基準との違い・全体の時間（4並列）を比べる
