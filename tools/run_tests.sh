@@ -243,6 +243,32 @@ e1|e2)
     MYIME_TYPO_LONG=off $BATCH $W/w-long.txt $OUT/wiki-long-off-${GROUP#e}.tsv 4
   fi
   ;;
+e8)
+  # 人工知能の候補を書き出してウィキペディアの文を打つ（MYIME_AI_DUMP、MYIME_RESEGMENT_LOG）。人工知能の答えが正しいのに
+  # 採られなかった文を数える比べ。既定の組には入れない（groups='["e8"]' で頼んだときだけ）
+  if [ -f $T/wiki-typing.tsv ]; then
+    grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
+    MYIME_AI_DUMP=$OUT/ai-wiki.txt MYIME_RESEGMENT_LOG=$OUT/reseg-wiki.txt MYIME_JOINT_DUMP=$OUT/joint-wiki.txt \
+      $BATCH $W/wiki.txt $OUT/wiki-typing-dump.tsv 4 || true
+  fi
+  # 合わせた物差しの最後の確かめ用（重みを学ぶのには使わない）: 確かめ用の表、日本語の400文、話し言葉、分野の文
+  romaji $T/holdout/holdout.json > $W/holdout.txt
+  MYIME_JOINT_DUMP=$OUT/joint-holdout.txt $BATCH $W/holdout.txt $OUT/holdout-dump.tsv 4 || true
+  romaji $T/ja400.json > $W/ja400.txt
+  MYIME_JOINT_DUMP=$OUT/joint-ja400.txt $BATCH $W/ja400.txt $OUT/ja400-dump.tsv 4 || true
+  for n in colloquial domain-prog domain-crypto; do
+    grep -v '^#' $T/$n.tsv | cut -f1 > $W/$n.txt
+    MYIME_JOINT_DUMP=$OUT/joint-$n.txt $BATCH $W/$n.txt $OUT/$n-dump.tsv 4 || true
+  done
+  ;;
+e9)
+  # 人工知能なし（重みのファイルがない）でウィキペディアの文を打つ。誤りが辞書（Mozc）のものか人工知能のものかを分ける比べ。
+  # 既定の組には入れない（groups='["e9"]' で頼んだときだけ）
+  if [ -f $T/wiki-typing.tsv ]; then
+    grep -v '^#' $T/wiki-typing.tsv | cut -f1 > $W/wiki.txt
+    bash $REPO/tools/batch_convert.sh $E/session_handler_main $E /nonexistent.gguf $W/wiki.txt $OUT/wiki-typing-noai.tsv 4 || true
+  fi
+  ;;
 g)
   # 分野の文（プログラミング 300、仮想通貨 200 ほど）をローマ字で打つ。英字の言葉（git、npm、Python、DeFi、NFT など）は
   # 打ったまま元の文どおり出ることを期待する。採点はまとめの段で（tools/score_wiki_typing.py）
@@ -678,6 +704,11 @@ p)
     MYIME_BATCH_SCORE=0 $LAT $W/lat-$name.tsv $OUT/seqscore-$name
   done
   MYIME_BATCH_SCORE=0 LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/seqscore-real-nopace
+  # 合わせた物差し（MYIME_JOINT_SCORE）を切った同じ試験。同じ計算機での前後比べ（名前の頭は jointoff-）
+  for name in ja400 wiki ctx-with; do
+    MYIME_JOINT_SCORE=off $LAT $W/lat-$name.tsv $OUT/jointoff-$name
+  done
+  MYIME_JOINT_SCORE=off LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/jointoff-real-nopace
   python3 $REPO/tools/latency_report.py $OUT seqscore- | tee $OUT/latency-report-seqscore.txt
   # 一括採点が実際に使われたか、順に戻ったかの記録（前の文あり・なしの句の試験と、日本語だけの先頭100文）
   MYIME_CTX_LOG=$OUT/batch-log-clause.txt $LAT $W/lat-clause-with.tsv $OUT/logrun-clause

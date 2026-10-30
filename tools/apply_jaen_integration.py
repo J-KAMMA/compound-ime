@@ -5293,4 +5293,387 @@ edit("composer/mode_switching_handler.cc", """  if (key == "google" || key == "G
 
 """, "")
 
+# 合わせた物差しの材料の書き出し（記録だけ、出力は変えない）。MYIME_JOINT_DUMP=<ファイル> のときだけ、
+# 文全体を人工知能に尋ねるたびに、Mozc の1位の文と人工知能の候補（上位20）それぞれについて、
+# 人工知能の対数確率（ScoreZenzaiSentences）、Mozc の文節への当てはまり方（M＝文節の候補で書ける、
+# U＝書けるが固有名を守る決まりに触れる、R＝組み直しで書ける、F<番号>＝組み直しを断る、X＝試さない）、
+# Mozc の順位の和・替えた文節の数・費用の差、消える固有名やカタカナ語の数、増えるカタカナの字数を1行に書く。
+# 組み直しは写しの上で試し、断りの記録（MYIME_RESEGMENT_LOG）には書かない。
+edit("engine/engine.cc", "static thread_local size_t g_whole_phrase_min_segments = 2;\n",
+     "static thread_local size_t g_whole_phrase_min_segments = 2;\n"
+     "// 組み直しを試すだけのとき（合わせた物差しの材料）は記録せず、断り方の番号だけを残す。\n"
+     "static thread_local bool g_resegment_quiet = false;\n"
+     "static thread_local int g_resegment_refusal = -1;\n"
+     "// 断る決まりのうち、固有名・カタカナ・一字のかな・記号の決まりを外して組み直す（構造の断りは残す）。\n"
+     "static thread_local bool g_resegment_lenient = false;\n")
+# 外せる断り: 1（Mozc の先頭の固有名・カタカナ語が消える）、3（一字のかなの区切り）、8（固有名をかなに）、
+# 9（増えるカタカナ）、10（一字の記号だけの区切り）と、MakePieceWhole の固有名・語尾・助詞・カタカナの決まり。
+for _n in (1, 3, 8, 9, 10):
+    edit("engine/engine.cc", f"return ResegmentFail({_n}, key, candidate);",
+         f"{{ if (!g_resegment_lenient) return ResegmentFail({_n}, key, candidate); }}")
+for _old in ("      if (pos.IsUniqueNoun(top.lid) && piece_value.find(top.content_value) == std::string::npos) return false;\n",
+             "    if (is_hiragana(mozc_last) && mozc_last != last_char(piece_value)) return false;\n",
+             "      if (count(piece_value) < count(mozc_value)) return false;\n",
+             "        if (!run.empty() && !known(run)) return false;\n"):
+    edit("engine/engine.cc", _old, _old.replace(") return false;", " && !g_resegment_lenient) return false;"))
+edit("engine/engine.cc", """    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
+    if (!path || !*path) return;
+""", """    if (g_resegment_quiet) return;
+    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
+    if (!path || !*path) return;
+""")
+edit("engine/engine.cc", """  static bool ResegmentFail(int number, std::string_view key, const converter::Candidate& candidate) {
+""", """  static bool ResegmentFail(int number, std::string_view key, const converter::Candidate& candidate) {
+    g_resegment_refusal = number;
+""")
+edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOptions& options,\n",
+     r"""  static void DumpJointFeatures(const ConversionOptions& options,
+                                const ImmutableConverterInterface& mozc,
+                                const dictionary::PosMatcher& pos,
+                                const Segments& segments, std::string_view key,
+                                std::string_view left, std::string_view right, const Segment& ai,
+                                const std::vector<std::vector<const converter::Candidate*>>& original) {
+    static const char* path = std::getenv("MYIME_JOINT_DUMP");
+    if (!path || !*path) return;
+    const auto clean = [](std::string_view text) {
+      return text.find('\t') == std::string_view::npos && text.find('\x01') == std::string_view::npos &&
+             text.find('\x02') == std::string_view::npos && text.find('\n') == std::string_view::npos;
+    };
+    if (!clean(key)) return;
+    const auto katakana = [](std::string_view text) {
+      size_t count = 0;
+      for (const char32_t c : Utf8AsChars32(text)) count += (c >= 0x30A1 && c <= 0x30FA) || c == 0x30FC;
+      return count;
+    };
+    std::string mozc_top;
+    int64_t mozc_cost = 0;
+    size_t mozc_katakana = 0;
+    for (const auto& segment : segments.conversion_segments()) {
+      if (segment.candidates_size() == 0) return;
+      mozc_top += segment.candidate(0).value;
+      mozc_cost += segment.candidate(0).cost;
+      mozc_katakana += katakana(segment.candidate(0).value);
+    }
+    if (!clean(mozc_top)) return;
+    std::string joined = mozc_top;
+    size_t total = 0;
+    for (size_t c = 0; c < ai.candidates_size() && c < 20; ++c) {
+      if (!clean(ai.candidate(c).value)) break;
+      joined += '\x01';
+      joined += ai.candidate(c).value;
+      ++total;
+    }
+    std::vector<double> scores;
+    {
+      std::string text;
+      if (ScoreZenzaiSentences(key, left, right, joined, &text)) {
+        size_t at = 0;
+        while (true) {
+          const size_t tab = text.find('\t', at);
+          const std::string piece = text.substr(at, tab == std::string::npos ? std::string::npos : tab - at);
+          scores.push_back(piece == "nan" ? std::nan("") : std::strtod(piece.c_str(), nullptr));
+          if (tab == std::string::npos) break;
+          at = tab + 1;
+        }
+      }
+      if (scores.size() != total + 1) scores.assign(total + 1, std::nan(""));
+    }
+    const auto number = [](double value) {
+      char buffer[40];
+      std::snprintf(buffer, sizeof(buffer), "%.4f", value);
+      return std::string(buffer);
+    };
+    std::string line = "J\t" + std::string(key) + '\t' + (left.empty() ? '0' : '1') + (right.empty() ? '0' : '1') +
+        '\t' + std::to_string(segments.conversion_segments_size()) + '\t' + mozc_top + '\t' +
+        std::to_string(mozc_cost) + '\t' + number(scores[0]);
+    for (size_t c = 0; c < total; ++c) {
+      const converter::Candidate& candidate = ai.candidate(c);
+      std::string fit = "X";
+      int64_t rank_sum = 0, cost_delta = 0, changed = 0;
+      std::vector<int> indices;
+      const char* rejection = "Compatible";
+      const bool plain = !(candidate.attributes & (converter::Attribute::COMMAND_CANDIDATE |
+                                                   converter::Attribute::PARTIALLY_KEY_CONSUMED));
+      bool selected = MatchWholePhrase(candidate, segments, key, &indices, &rejection);
+      if (!selected && Compatible(candidate, key) && plain) {
+        if (auto found = private_surface::Find(segments, key, candidate.value, original)) {
+          indices = std::move(*found);
+          selected = true;
+        }
+      }
+      if (selected) {
+        fit = "M";
+        if (indices.size() != segments.conversion_segments_size()) fit = "V";
+        for (size_t i = 0; fit != "V" && i < indices.size(); ++i) {
+          const auto& segment = segments.conversion_segment(i);
+          if (i >= original.size() || indices[i] < 0 ||
+              static_cast<size_t>(indices[i]) >= segment.candidates_size() ||
+              std::find(original[i].begin(), original[i].end(), segment.candidates()[indices[i]]) ==
+                  original[i].end()) {
+            fit = "V";
+            break;
+          }
+          const Util::ScriptType script = Util::GetScriptType(segment.candidate(indices[i]).value);
+          if (indices[i] != 0 && pos.IsUniqueNoun(segment.candidate(0).lid) &&
+              (script == Util::HIRAGANA || script == Util::KATAKANA)) fit = "U";
+          rank_sum += indices[i];
+          changed += indices[i] != 0;
+          cost_delta += static_cast<int64_t>(segment.candidate(indices[i]).cost) - segment.candidate(0).cost;
+        }
+      } else if (indices.empty() && plain) {
+        Segments trial(segments);
+        g_resegment_quiet = true;
+        g_resegment_refusal = -1;
+        bool done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+        fit = done ? std::string("R") : "F" + std::to_string(g_resegment_refusal);
+        if (!done) {
+          // 断る決まりを外せば組み直せるか（F<番号>L）。断ったときは trial に手を付けていない
+          g_resegment_lenient = true;
+          done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+          g_resegment_lenient = false;
+          if (done) fit += "L";
+        }
+        g_resegment_quiet = false;
+        if (done) {
+          int64_t cost = 0;
+          for (const auto& segment : trial.conversion_segments())
+            if (segment.candidates_size() > 0) cost += segment.candidate(0).cost;
+          cost_delta = cost - mozc_cost;
+          changed = static_cast<int64_t>(trial.conversion_segments_size());
+        }
+      }
+      int64_t lost = 0;
+      for (const auto& segment : segments.conversion_segments()) {
+        const auto& top = segment.candidate(0);
+        if ((pos.IsUniqueNoun(top.lid) || katakana(top.value) > 0) &&
+            candidate.value.find(top.content_value) == std::string::npos) ++lost;
+      }
+      const int64_t extra = static_cast<int64_t>(katakana(candidate.value)) - static_cast<int64_t>(mozc_katakana);
+      line += '\t' + candidate.value + '\x02' + number(scores[c + 1]) + '\x02' + fit + '\x02' +
+              std::to_string(rank_sum) + '\x02' + std::to_string(changed) + '\x02' + std::to_string(cost_delta) +
+              '\x02' + std::to_string(lost) + '\x02' + std::to_string(extra) + '\x02' +
+              std::to_string(Util::CharsLen(candidate.value));
+    }
+    static std::mutex mutex;
+    std::lock_guard<std::mutex> lock(mutex);
+    if (FILE* f = std::fopen(path, "ab")) {
+      std::fwrite(line.data(), 1, line.size(), f);
+      std::fputc('\n', f);
+      std::fclose(f);
+    }
+  }
+  static void PreferWholePhrase(const ConversionOptions& options,
+""")
+edit("engine/engine.cc", "    if (!HasLoadedZenzaiModelForReading(key)) return;\n    size_t candidate_index = 0;\n",
+     "    if (!HasLoadedZenzaiModelForReading(key)) return;\n"
+     "    DumpJointFeatures(options, mozc, pos, *segments, key, left, right, full.conversion_segment(0), original);\n"
+     "    size_t candidate_index = 0;\n")
+
+# 合わせた物差しで文を選ぶ（MYIME_JOINT_SCORE=off で今までの順番の手順と断る決まりに戻す）。
+# 文全体を人工知能に尋ねたあと、Mozc の1位の文（0点）と、人工知能の上位3つの文のうち Mozc の文節に当てはまるもの
+# （文節の候補で書ける、組み直しで書ける、断る決まりを外せば組み直せる）を、人工知能の順位・Mozc の文が人工知能の
+# 候補の何位か・Mozc の順位と費用・消える名前・増えるカタカナなどの線形の足し合わせで比べ、0点より高い一番の文を採る。
+# 人工知能はもう一度呼ばない（文の対数確率を足すと見込みは +48 文に伸びるが、採点で空白キーの中央値が約 1.8 倍に
+# なったので採らない。特徴の2つ目・3つ目は対数確率の場所で、重みは 0）。英語で区切った一部分（PreferWholePhraseRuns）
+# には使わない（学んだのは文全体だけ。英語の前の「私は」が「わたしは」になった）。
+# 重みは tools/joint_score_fit.py が組 e8 の材料（ウィキペディアの文）から学んだもの（tools/data/joint-score/weights.json）。
+import json as _json  # noqa: E402
+_joint = _json.loads((REPO / "tools/data/joint-score/weights.json").read_text(encoding="utf-8"))
+assert len(_joint["weights"]) == 17 and _joint["top"] == 3, _joint
+_joint_weights = ", ".join(repr(float(x)) for x in _joint["weights"])
+edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOptions& options,\n",
+     r"""  // かなだけの文（tools/joint_score_fit.py の kana_only と同じ）
+  static bool JointKanaOnly(std::string_view text) {
+    bool katakana = false;
+    size_t hiragana_count = 0;
+    for (const char32_t c : Utf8AsChars32(text)) {
+      if ((c >= 0x30A1 && c <= 0x30FA) || c == 0x30FC) { katakana = true; continue; }
+      const bool kanji = (c >= 0x3400 && c <= 0x4DBF) || (c >= 0x4E00 && c <= 0x9FFF) ||
+                         (c >= 0xF900 && c <= 0xFAFF) || c == 0x3005;
+      const bool letter_or_digit = (c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') ||
+                                   (c >= 0xFF10 && c <= 0xFF19) || (c >= 0xFF21 && c <= 0xFF3A) ||
+                                   (c >= 0xFF41 && c <= 0xFF5A);
+      if (kanji || letter_or_digit) return false;
+      hiragana_count += c >= 0x3041 && c <= 0x309F;
+    }
+    return katakana ? hiragana_count == 0 : hiragana_count >= 20;
+  }
+  // true: 合わせた物差しで決めた（採った文に替えたか、Mozc のまま）。false: 今までの手順に任せる。
+  static bool PreferJointScore(const ConversionOptions& options,
+                               const ImmutableConverterInterface& mozc,
+                               const dictionary::PosMatcher& pos, Segments* segments,
+                               std::string_view key, std::string_view left, std::string_view right,
+                               const Segment& ai,
+                               const std::vector<std::vector<const converter::Candidate*>>& original) {
+    static const bool enabled = [] {
+      const char* value = std::getenv("MYIME_JOINT_SCORE");
+      return !value || std::string_view(value) != "off";
+    }();
+    if (!enabled || g_whole_phrase_min_segments != 2) return false;
+    (void)left;  // 前後の文は、人工知能の候補を通して効く
+    (void)right;
+    static constexpr double kWeights[17] = {""" + _joint_weights + r"""};
+    const auto clean = [](std::string_view text) {
+      return text.find('\t') == std::string_view::npos && text.find('\x01') == std::string_view::npos &&
+             text.find('\n') == std::string_view::npos;
+    };
+    const auto katakana = [](std::string_view text) {
+      size_t count = 0;
+      for (const char32_t c : Utf8AsChars32(text)) count += (c >= 0x30A1 && c <= 0x30FA) || c == 0x30FC;
+      return count;
+    };
+    std::string mozc_top;
+    int64_t mozc_cost = 0;
+    size_t mozc_katakana = 0;
+    for (const auto& segment : segments->conversion_segments()) {
+      if (segment.candidates_size() == 0) return false;
+      mozc_top += segment.candidate(0).value;
+      mozc_cost += segment.candidate(0).cost;
+      mozc_katakana += katakana(segment.candidate(0).value);
+    }
+    if (!clean(mozc_top)) return false;
+    // 数字を含む文は今までの手順に任せる（学んだウィキペディアの文に数字の並びは少ない。nijuu20nenn が 二十20年 でなく
+    // 二重20年 になった）
+    for (const char32_t c : Utf8AsChars32(mozc_top)) {
+      if ((c >= '0' && c <= '9') || (c >= 0xFF10 && c <= 0xFF19)) return false;
+    }
+    // 当てはめ方: 0 文節の候補で書ける、1 書けるが固有名をかなにする、2 組み直しで書ける、3 断る決まりを外せば組み直せる
+    struct Option {
+      size_t rank = 0;
+      const converter::Candidate* candidate = nullptr;
+      int kind = 0;
+      std::vector<int> indices;
+      int64_t rank_sum = 0, changed = 0, cost_delta = 0, lost = 0, extra = 0;
+    };
+    std::vector<Option> found;
+    std::vector<std::string> seen{mozc_top};
+    for (size_t c = 0; c < ai.candidates_size() && c < 3; ++c) {
+      const converter::Candidate& candidate = ai.candidate(c);
+      if (std::find(seen.begin(), seen.end(), candidate.value) != seen.end() || !clean(candidate.value)) continue;
+      Option option;
+      option.rank = c;
+      option.candidate = &candidate;
+      const char* rejection = "Compatible";
+      const bool plain = !(candidate.attributes & (converter::Attribute::COMMAND_CANDIDATE |
+                                                   converter::Attribute::PARTIALLY_KEY_CONSUMED));
+      bool selected = MatchWholePhrase(candidate, *segments, key, &option.indices, &rejection);
+      if (!selected && Compatible(candidate, key) && plain) {
+        if (auto path = private_surface::Find(*segments, key, candidate.value, original)) {
+          option.indices = std::move(*path);
+          selected = true;
+        }
+      }
+      if (selected) {
+        bool usable = option.indices.size() == segments->conversion_segments_size();
+        for (size_t i = 0; usable && i < option.indices.size(); ++i) {
+          const auto& segment = segments->conversion_segment(i);
+          const int index = option.indices[i];
+          if (i >= original.size() || index < 0 || static_cast<size_t>(index) >= segment.candidates_size() ||
+              std::find(original[i].begin(), original[i].end(), segment.candidates()[index]) == original[i].end()) {
+            usable = false;
+            break;
+          }
+          const Util::ScriptType script = Util::GetScriptType(segment.candidate(index).value);
+          if (index != 0 && pos.IsUniqueNoun(segment.candidate(0).lid) &&
+              (script == Util::HIRAGANA || script == Util::KATAKANA)) option.kind = 1;
+          option.rank_sum += index;
+          option.changed += index != 0;
+          option.cost_delta += static_cast<int64_t>(segment.candidate(index).cost) - segment.candidate(0).cost;
+        }
+        if (!usable) continue;
+      } else if (option.indices.empty() && plain) {
+        Segments trial(*segments);
+        g_resegment_quiet = true;
+        bool done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+        option.kind = 2;
+        if (!done) {
+          g_resegment_lenient = true;
+          done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+          g_resegment_lenient = false;
+          option.kind = 3;
+        }
+        g_resegment_quiet = false;
+        if (!done) continue;
+        int64_t cost = 0;
+        for (const auto& segment : trial.conversion_segments())
+          if (segment.candidates_size() > 0) cost += segment.candidate(0).cost;
+        option.cost_delta = cost - mozc_cost;
+        option.changed = static_cast<int64_t>(trial.conversion_segments_size());
+      } else {
+        continue;
+      }
+      for (const auto& segment : segments->conversion_segments()) {
+        const auto& top = segment.candidate(0);
+        if ((pos.IsUniqueNoun(top.lid) || katakana(top.value) > 0) &&
+            candidate.value.find(top.content_value) == std::string::npos) ++option.lost;
+      }
+      option.extra = static_cast<int64_t>(katakana(candidate.value)) - static_cast<int64_t>(mozc_katakana);
+      seen.push_back(candidate.value);
+      found.push_back(std::move(option));
+    }
+    if (found.empty()) {
+      ResegmentLog("JOINT\t" + std::string(key) + "\tKEEP\t" + mozc_top);
+      return true;
+    }
+    // Mozc の1位の文が人工知能の候補（上位20）の何位か（ないときは 25）
+    size_t mozc_rank = 25;
+    for (size_t c = 0; c < ai.candidates_size() && c < 20; ++c) {
+      if (ai.candidate(c).value == mozc_top) {
+        mozc_rank = c;
+        break;
+      }
+    }
+    const Option* best = nullptr;
+    double best_score = 0;
+    for (size_t o = 0; o < found.size(); ++o) {
+      const Option& option = found[o];
+      const double feature[17] = {
+          1.0,
+          0.0,  // 人工知能の対数確率の差（使わない）
+          0.0,  // 1字あたりの差（使わない）
+          option.rank == 0 ? 1.0 : 0.0,
+          std::log1p(static_cast<double>(option.rank)),
+          option.kind == 2 ? 1.0 : 0.0,
+          option.kind == 3 ? 1.0 : 0.0,
+          option.kind == 1 ? 1.0 : 0.0,
+          static_cast<double>(std::min<int64_t>(option.rank_sum, 20)) / 10.0,
+          static_cast<double>(std::min<int64_t>(option.changed, 10)) / 5.0,
+          static_cast<double>(std::clamp<int64_t>(option.cost_delta, -20000, 20000)) / 5000.0,
+          static_cast<double>(std::min<int64_t>(option.lost, 3)),
+          static_cast<double>(std::clamp<int64_t>(option.extra, 0, 10)) / 5.0,
+          JointKanaOnly(option.candidate->value) ? 1.0 : 0.0,
+          mozc_rank < 25 ? 1.0 : 0.0,
+          option.rank == 0 ? std::log1p(static_cast<double>(mozc_rank)) : 0.0,
+          option.rank == 0 && (option.kind == 0 || option.kind == 2) ? 1.0 : 0.0,
+      };
+      double score = 0;
+      for (size_t f = 0; f < 17; ++f) score += kWeights[f] * feature[f];
+      if (score > best_score) {
+        best = &option;
+        best_score = score;
+      }
+    }
+    if (!best) {
+      ResegmentLog("JOINT\t" + std::string(key) + "\tKEEP\t" + mozc_top);
+      return true;
+    }
+    if (best->kind <= 1) {
+      for (size_t i = 0; i < best->indices.size(); ++i)
+        segments->mutable_conversion_segment(i)->move_candidate(best->indices[i], 0);
+    } else {
+      g_resegment_lenient = best->kind == 3;
+      const bool done = ResegmentToWholePhrase(options, mozc, pos, *best->candidate, key, segments);
+      g_resegment_lenient = false;
+      if (!done) return false;
+    }
+    ResegmentLog("JOINT\t" + std::string(key) + "\tTAKE" + std::to_string(best->rank) + "\t" + best->candidate->value);
+    return true;
+  }
+  static void PreferWholePhrase(const ConversionOptions& options,
+""")
+edit("engine/engine.cc",
+     "    DumpJointFeatures(options, mozc, pos, *segments, key, left, right, full.conversion_segment(0), original);\n",
+     "    DumpJointFeatures(options, mozc, pos, *segments, key, left, right, full.conversion_segment(0), original);\n"
+     "    if (PreferJointScore(options, mozc, pos, segments, key, left, right, full.conversion_segment(0), original)) return;\n")
+
 print("applied")

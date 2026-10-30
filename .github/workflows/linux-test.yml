@@ -71,6 +71,7 @@ jobs:
           python3 $GITHUB_WORKSPACE/repo/tools/katakana_english_dictionary_test.py
           python3 $GITHUB_WORKSPACE/repo/tools/jmdict_loanwords_test.py
           python3 $GITHUB_WORKSPACE/repo/tools/protobuf_text_unescape_test.py
+          python3 $GITHUB_WORKSPACE/repo/tools/joint_score_test.py
 
       - name: 上流のソースと土台の改修
         run: |
