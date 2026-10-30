@@ -5290,7 +5290,19 @@ edit("engine/engine.cc", "static thread_local size_t g_whole_phrase_min_segments
      "static thread_local size_t g_whole_phrase_min_segments = 2;\n"
      "// 組み直しを試すだけのとき（合わせた物差しの材料）は記録せず、断り方の番号だけを残す。\n"
      "static thread_local bool g_resegment_quiet = false;\n"
-     "static thread_local int g_resegment_refusal = -1;\n")
+     "static thread_local int g_resegment_refusal = -1;\n"
+     "// 断る決まりのうち、固有名・カタカナ・一字のかな・記号の決まりを外して組み直す（構造の断りは残す）。\n"
+     "static thread_local bool g_resegment_lenient = false;\n")
+# 外せる断り: 1（Mozc の先頭の固有名・カタカナ語が消える）、3（一字のかなの区切り）、8（固有名をかなに）、
+# 9（増えるカタカナ）、10（一字の記号だけの区切り）と、MakePieceWhole の固有名・語尾・助詞・カタカナの決まり。
+for _n in (1, 3, 8, 9, 10):
+    edit("engine/engine.cc", f"return ResegmentFail({_n}, key, candidate);",
+         f"{{ if (!g_resegment_lenient) return ResegmentFail({_n}, key, candidate); }}")
+for _old in ("      if (pos.IsUniqueNoun(top.lid) && piece_value.find(top.content_value) == std::string::npos) return false;\n",
+             "    if (is_hiragana(mozc_last) && mozc_last != last_char(piece_value)) return false;\n",
+             "      if (count(piece_value) < count(mozc_value)) return false;\n",
+             "        if (!run.empty() && !known(run)) return false;\n"):
+    edit("engine/engine.cc", _old, _old.replace(") return false;", " && !g_resegment_lenient) return false;"))
 edit("engine/engine.cc", """    static const char* path = std::getenv("MYIME_RESEGMENT_LOG");
     if (!path || !*path) return;
 """, """    if (g_resegment_quiet) return;
@@ -5378,14 +5390,14 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
       }
       if (selected) {
         fit = "M";
-        if (indices.size() != segments.conversion_segments_size()) fit = "U";
-        for (size_t i = 0; fit == "M" && i < indices.size(); ++i) {
+        if (indices.size() != segments.conversion_segments_size()) fit = "V";
+        for (size_t i = 0; fit != "V" && i < indices.size(); ++i) {
           const auto& segment = segments.conversion_segment(i);
           if (i >= original.size() || indices[i] < 0 ||
               static_cast<size_t>(indices[i]) >= segment.candidates_size() ||
               std::find(original[i].begin(), original[i].end(), segment.candidates()[indices[i]]) ==
                   original[i].end()) {
-            fit = "U";
+            fit = "V";
             break;
           }
           const Util::ScriptType script = Util::GetScriptType(segment.candidate(indices[i]).value);
@@ -5399,17 +5411,22 @@ edit("engine/engine.cc", "  static void PreferWholePhrase(const ConversionOption
         Segments trial(segments);
         g_resegment_quiet = true;
         g_resegment_refusal = -1;
-        const bool done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+        bool done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+        fit = done ? std::string("R") : "F" + std::to_string(g_resegment_refusal);
+        if (!done) {
+          // 断る決まりを外せば組み直せるか（F<番号>L）。断ったときは trial に手を付けていない
+          g_resegment_lenient = true;
+          done = ResegmentToWholePhrase(options, mozc, pos, candidate, key, &trial);
+          g_resegment_lenient = false;
+          if (done) fit += "L";
+        }
         g_resegment_quiet = false;
         if (done) {
-          fit = "R";
           int64_t cost = 0;
           for (const auto& segment : trial.conversion_segments())
             if (segment.candidates_size() > 0) cost += segment.candidate(0).cost;
           cost_delta = cost - mozc_cost;
           changed = static_cast<int64_t>(trial.conversion_segments_size());
-        } else {
-          fit = "F" + std::to_string(g_resegment_refusal);
         }
       }
       int64_t lost = 0;
