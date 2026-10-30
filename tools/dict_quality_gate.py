@@ -2,14 +2,18 @@
 
   python tools/dict_quality_gate.py data   --old-dir <いまの一覧のある所> --new-dir <取り直した一覧のある所> [--summary out.md]
   python tools/dict_quality_gate.py scores --base <基準の結果の所> --cand <新しい辞書の結果の所> [--summary out.md] [--json out.json] [--identical]
+                                     [--added ja-wikidata.tsv ja-postal.tsv]
 
 data:   取り直した一覧（proper-nouns.tsv、supplement.tsv、english-extra.tsv）の行数が、いまの一覧と比べて決めた幅の中か。
         外れたら、試験を流す前に止める（Wikidata の取得の失敗や出典の変更を早く見つけるため）。
+        日本語の名前・住所（ja-wikidata.tsv、ja-postal.tsv）は行数の上限・下限だけ（optional: 取らなかった回は比べない）。
 scores: 同じ変換エンジンで、いまの辞書（基準）と新しい辞書（候補）を流した試験の採点（*-score.txt）を比べる。
         正解を数える項目が、許す下がり（件数）より多く下がったら止める。許す下がりは max(min_items, 総数×percent%) の切り上げ。
         候補に採点の結果がない（試験が流れなかった）ときも止める。変わった文の数（inputs.tsv）は報告だけ。
         --identical: 新しい辞書の中身がいまの辞書と同じはずのとき（Wikidata を取り直さない流し方）。両方の結果の
         *.tsv が1行も違わないことを求める。違えば、差のある文を数えて止める（同じ中身なら結果は変わらないはず）。
+        --added: 足した日本語の名前・住所の一覧。普通の文の試験（added_words.files）で結果が変わり、足した語が
+        新しく出た文を数え、added_words.max_sentences を超えたら止める（足した語が普通の語を押しのけた）。
 終了の値: 0 通ってよい、1 止める。
 """
 import argparse
@@ -33,6 +37,9 @@ def gate_data(rules, old_dir: Path, new_dir: Path):
         if name.startswith("_"):
             continue
         new = new_dir / name
+        if not new.exists() and rule.get("optional"):
+            rows.append((name, "-", "なし", "-", "OK 取っていない（この回は足さない）"))
+            continue
         if not new.exists():
             rows.append((name, "-", "なし", "-", "NG 取り直した一覧がない"))
             failures.append(f"{name}: 取り直した一覧がない")
@@ -43,6 +50,8 @@ def gate_data(rules, old_dir: Path, new_dir: Path):
         problems = []
         if n < rule.get("min_rows", 0):
             problems.append(f"行数 {n} が下限 {rule['min_rows']} より少ない")
+        if "max_rows" in rule and n > rule["max_rows"]:
+            problems.append(f"行数 {n} が上限 {rule['max_rows']} より多い")
         ratio = None
         if old:
             ratio = n / old
@@ -139,6 +148,45 @@ def gate_identical(base: Path, cand: Path):
     return failures, details
 
 
+def load_added(paths):
+    """追加の辞書に新しく足した語（日本語の名前・住所。読み<TAB>左<TAB>右<TAB>費用<TAB>表記）の表記。"""
+    surfaces = set()
+    for path in paths:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if len(f) >= 5 and len(f[4]) >= 2:
+                surfaces.add(f[4])
+    return surfaces
+
+
+def gate_added(rules, base: Path, cand: Path, surfaces):
+    """普通の文の試験で、新しい辞書にしたら結果が変わり、足した語が新しく出た文を数える
+    （足した語が普通の語を押しのけて文の中で勝った）。上限 added_words.max_sentences を超えたら止める。"""
+    spec = rules.get("added_words") or {}
+    found, failures = [], []
+    if not surfaces:
+        return found, failures
+    longest = max(len(s) for s in surfaces)
+    for name in spec.get("files", []):
+        bp, cp = base / name, cand / name
+        if not bp.exists() or not cp.exists():
+            continue
+        b = bp.read_text(encoding="utf-8").splitlines()
+        c = cp.read_text(encoding="utf-8").splitlines()
+        for i in range(min(len(b), len(c))):
+            if b[i] == c[i]:
+                continue
+            bout, cout = b[i].split("\t")[-1], c[i].split("\t")[-1]
+            new_words = {cout[s:e] for s in range(len(cout)) for e in range(s + 2, min(len(cout), s + longest) + 1)
+                         if cout[s:e] in surfaces and cout[s:e] not in bout}
+            if new_words:
+                found.append(f"{name} {i + 1} 行目: {bout[:60]} → {cout[:60]}（{'、'.join(sorted(new_words))}）")
+    limit = spec.get("max_sentences")
+    if limit is not None and len(found) > limit:
+        failures.append(f"足した語が普通の文に新しく出た: {len(found)} 文（許すのは {limit} 文まで）")
+    return found, failures
+
+
 def table(header, rows):
     out = ["| " + " | ".join(header) + " |", "|" + "|".join(["---"] * len(header)) + "|"]
     out += ["| " + " | ".join(str(c) for c in row) + " |" for row in rows]
@@ -159,6 +207,8 @@ def main():
         p.add_argument("--summary", type=Path)
         p.add_argument("--json", type=Path)
     s.add_argument("--identical", action="store_true")
+    s.add_argument("--added", type=Path, nargs="*", default=[],
+                   help="新しく足した語の一覧（ja-wikidata.tsv、ja-postal.tsv）。普通の文に新しく出た数を数える")
     args = ap.parse_args()
     rules = json.loads(args.rules.read_text(encoding="utf-8"))
     if args.cmd == "data":
@@ -178,6 +228,14 @@ def main():
         if same:
             text += "\n" + "\n".join(f"- {s}" for s in same) + "\n\n違いの例:\n" + "\n".join(f"- {d}" for d in details[:12])
         failures += [f"同じ中身なのに結果が違う: {s}" for s in same]
+    if args.cmd == "scores" and args.added:
+        found, added_failures = gate_added(rules, args.base, args.cand, load_added([p for p in args.added if p.exists()]))
+        limit = (rules.get("added_words") or {}).get("max_sentences")
+        text += (f"\n\n足した語（日本語の名前・住所）が普通の文の試験に新しく出た文: {len(found)} 文"
+                 f"（許すのは {limit} 文まで）")
+        if found:
+            text += "\n" + "\n".join(f"- {x}" for x in found[:40])
+        failures += added_failures
     verdict = "止める" if failures else "通ってよい"
     text += f"\n\n**判定: {verdict}**"
     if failures:
