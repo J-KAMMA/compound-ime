@@ -288,4 +288,91 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
   return out;
 }
 
+bool StartsWithParticleSpelling(std::string_view keys) {
+  constexpr std::string_view kParticles[] = {"no", "ni", "de", "wo", "ga", "wa", "ha", "to", "mo", "he", "ya"};
+  return std::ranges::any_of(kParticles, [&](std::string_view p) { return keys.starts_with(p); });
+}
+
+std::optional<std::pair<size_t, size_t>> EnglishRunBetweenJapanese(std::string_view raw,
+                                                                   const std::vector<Piece>& pieces) {
+  size_t first = pieces.size(), last = pieces.size();
+  for (size_t i = 0; i < pieces.size(); ++i) {
+    if (!pieces[i].english) continue;
+    if (first == pieces.size()) {
+      first = i;
+    } else if (last + 1 != i) {
+      return std::nullopt;  // two English runs: not one slip
+    }
+    last = i;
+  }
+  if (first == pieces.size() || first == 0 || last + 1 >= pieces.size()) return std::nullopt;
+  const size_t begin = pieces[first].begin, end = pieces[last].end;
+  if (end >= raw.size() || StartsWithParticleSpelling(raw.substr(end))) return std::nullopt;
+  return std::pair{begin, end};
+}
+
+bool EditNear(std::string_view raw, std::string_view fixed, size_t begin, size_t end) {
+  if (raw == fixed) return false;
+  size_t head = 0;
+  while (head < raw.size() && head < fixed.size() && raw[head] == fixed[head]) ++head;
+  size_t tail = 0;
+  while (tail < raw.size() - head && tail < fixed.size() - head &&
+         raw[raw.size() - 1 - tail] == fixed[fixed.size() - 1 - tail]) {
+    ++tail;
+  }
+  // The keys of |raw| the edit changed (empty for a key put in): [head, raw.size() - tail).
+  return head + 1 >= begin && raw.size() - tail <= end + 1;
+}
+
+std::vector<std::string_view> SplitLongRomaji(std::string_view run, size_t max, size_t min) {
+  std::vector<std::string_view> parts;
+  if (max == 0) return {run};
+  const auto vowel = [](char c) { return std::string_view("aiueo").find(c) != std::string_view::npos; };
+  // How good a cut before run[p] is: 2 after "wo", 1 after another particle, 0
+  // after any other vowel, -1 where no cut may go (inside a syllable, before ー,
+  // ', a vowel or y, or before a doubled consonant (っ: kitte)).
+  const auto rank = [&](std::string_view text, size_t p) {
+    if (p < 2 || p >= text.size() || !vowel(text[p - 1])) return -1;
+    const char next = text[p];
+    if (next < 'a' || next > 'z' || vowel(next) || next == 'y') return -1;
+    if (p + 1 < text.size() && text[p + 1] == next) return -1;
+    const std::string_view before = text.substr(p - 2, 2);
+    if (before == "wo") return 2;
+    for (const std::string_view particle : {"ga", "ni", "de", "ha", "wa", "no", "to", "mo", "he"}) {
+      if (before == particle) return 1;
+    }
+    return 0;
+  };
+  // The best cut in [low, high]: the highest rank, then the longest part.
+  const auto find = [&](std::string_view text, size_t low, size_t high, int* best_rank) {
+    size_t best = 0;
+    *best_rank = -1;
+    for (size_t p = high; p >= low && p >= 2; --p) {
+      if (text.size() - p < min) continue;  // the part after it would be too short
+      const int r = rank(text, p);
+      if (r > *best_rank) {
+        *best_rank = r;
+        best = p;
+      }
+    }
+    return best;
+  };
+  std::string_view rest = run;
+  while (rest.size() > max) {
+    const size_t high = std::min(max, rest.size() - 1);
+    // A cut in the second half of the part first, so that parts stay long.
+    int best_rank = -1;
+    size_t best = find(rest, std::max(min, high / 2), high, &best_rank);
+    if (best_rank < 0) best = find(rest, std::max<size_t>(min, 2), high, &best_rank);
+    if (best_rank < 0) {
+      // No cut after a vowel: leave the rest whole (the fixers skip it, as before).
+      break;
+    }
+    parts.push_back(rest.substr(0, best));
+    rest.remove_prefix(best);
+  }
+  parts.push_back(rest);
+  return parts;
+}
+
 }  // namespace jaen

@@ -9,6 +9,7 @@
 #include <string>
 #include <string_view>
 #include <unordered_map>
+#include <utility>
 #include <vector>
 
 #include "jaen_detector.h"
@@ -97,7 +98,11 @@ struct TypoPriors {
   // A consonant left out before a vowel ("kiou" for kinou, "saeta" for sareta) and
   // any key typed in by mistake ("butsai" for butai): set on the dev typo table
   // (tests/conversion/dev-typo.json). MYIME_TYPO_PRIOR_DC and MYIME_TYPO_PRIOR_EX override them.
-  int dropped_consonant = 3000;
+  // dropped_consonant was 3000 (6000 cheaper with the 3000 margin): 7 of the 27 such
+  // slips in dev-typo were fixed. The runs with a lower margin (the same total for this
+  // kind) fix 9 at 1000 (matasaeta, neusugite) and change no ja400 or typo150b sentence
+  // to a reading with a consonant put in; most of the rest read as other words (既往, 性悪).
+  int dropped_consonant = 1000;
   int extra_key = 2500;
   // A key typed in by mistake that touches neither key around it ("shuogi" read as
   // shugi, not shougi; "tepiku" as teiku): off. MYIME_TYPO_PRIOR_EXF overrides it.
@@ -113,6 +118,32 @@ struct TypoEdit {
 // converter's cost of each reading plus its prior with the typed reading.
 std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser& parse,
                                         const TypoPriors& priors = {});
+
+// Whether |keys| start with the spelling of a Japanese particle (no, ni, de, wo, ga,
+// wa, ha, to, mo, he, ya): an English word right before one ("aws|no", "bus|ni") was
+// meant as a word.
+bool StartsWithParticleSpelling(std::string_view keys);
+
+// A slip read as a listed word, an acronym or a long word ("machia|aws|eta",
+// "kusuriha|sohk|ugo"): the one run of English pieces of |raw|, as the half-open key
+// range [begin, end), when Japanese pieces stand right before and after it and the
+// keys after it do not start a particle spelling. nullopt when there is no such run,
+// or more than one. English at the start or the end ("aws|nosettei", "kore|house"),
+// or right before a particle ("kinou|aws|no"), was typed as English.
+std::optional<std::pair<size_t, size_t>> EnglishRunBetweenJapanese(std::string_view raw,
+                                                                   const std::vector<Piece>& pieces);
+
+// Whether the one-key edit |fixed| of |raw| changes keys only inside [begin, end) or
+// on the key just before or after it: the slip is in the English letters.
+bool EditNear(std::string_view raw, std::string_view fixed, size_t begin, size_t end);
+
+// The fixers above look at no more than 64 keys. A longer run of romaji keys
+// (a sentence typed without a comma) is cut into parts of at most |max| keys,
+// each fixed on its own: after a particle (wo first, then ga ni de ha wa no to
+// mo he) followed by a consonant, else after any vowel followed by a consonant
+// (never inside a syllable, before ー, ' or a doubled consonant). Parts are at
+// least |min| keys where a cut allows. A run of at most |max| keys is one part.
+std::vector<std::string_view> SplitLongRomaji(std::string_view run, size_t max = 64, size_t min = 12);
 
 }  // namespace jaen
 

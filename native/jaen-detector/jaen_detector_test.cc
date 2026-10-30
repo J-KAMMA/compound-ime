@@ -702,9 +702,84 @@ int main() {
     Expect(edit("okiidesu", "ookiidesu") == jaen::TypoPriors{}.long_vowel, "also after the first key (okii for ookii)");
     Expect(edit("kyohan'demo", "kyouhan'demo") == jaen::TypoPriors{}.long_vowel, "keys with n' for ん are edited too");
     Expect(edit("kazukidesu", "kaxukidesu") == std::nullopt, "no fix brings in an x or l small kana (z next to x)");
+    {
+      // A slip read as a listed word or acronym (FixTypoReadAsEnglish's stricter test): only one
+      // English run between Japanese pieces, not before a particle, with the edit in or next to it.
+      using Run = std::optional<std::pair<size_t, size_t>>;
+      const std::vector<Piece> machiawase = {{0, 11, false}, {11, 14, true}, {14, 17, false}};
+      Expect(jaen::EnglishRunBetweenJapanese("ekidemachiaawseta", machiawase) == Run{{11, 14}},
+             "machia|aws|eta: aws between Japanese is the run");
+      Expect(!jaen::EnglishRunBetweenJapanese("awsnosetteiwosuru", {{0, 3, true}, {3, 17, false}}),
+             "aws at the start stays English (awsのせっていをする)");
+      Expect(!jaen::EnglishRunBetweenJapanese("kinouawsnosettei", {{0, 5, false}, {5, 8, true}, {8, 16, false}}),
+             "aws right before の stays English (きのうawsのせってい)");
+      Expect(!jaen::EnglishRunBetweenJapanese("korehahouse", {{0, 6, false}, {6, 11, true}}),
+             "a word at the end stays English");
+      Expect(!jaen::EnglishRunBetweenJapanese("ahouseihouse", {{0, 1, false}, {1, 6, true}, {6, 7, false},
+                                                             {7, 12, true}}),
+             "two English runs are not one slip");
+      Expect(jaen::EnglishRunBetweenJapanese("konokusurihasohkugo", {{0, 10, false}, {10, 13, true},
+                                                                    {13, 15, true}, {15, 19, false}}) ==
+                 Run{{10, 15}},
+             "has|oh next to each other is one run");
+      Expect(!jaen::EnglishRunBetweenJapanese("kinouawsdeshita", {{0, 5, false}, {5, 8, true}, {8, 15, false}}),
+             "before で stays English");
+      Expect(jaen::EditNear("ekidemachiaawseta", "ekidemachiawaseta", 11, 14), "a swap inside aws");
+      Expect(jaen::EditNear("abcxyzdef", "abxxyzdef", 3, 6), "the key just before the run");
+      Expect(jaen::EditNear("abcxyzdef", "abcxyzxef", 3, 6), "the key just after the run");
+      Expect(!jaen::EditNear("abcxyzdef", "axcxyzdef", 3, 6), "two keys before the run is elsewhere");
+      Expect(!jaen::EditNear("abcxyzdefg", "abcxyzdeqg", 3, 6), "two keys after the run is elsewhere");
+      Expect(jaen::EditNear("abcxyzdef", "abcxyazdef", 3, 6), "a key put in inside the run");
+      Expect(jaen::EditNear("abcxyzdef", "abcxydef", 3, 6), "a key dropped inside the run");
+      Expect(!jaen::EditNear("abc", "abc", 0, 3), "no edit");
+      Expect(jaen::StartsWithParticleSpelling("nosettei") && jaen::StartsWithParticleSpelling("wookuru") &&
+                 !jaen::StartsWithParticleSpelling("eta") && !jaen::StartsWithParticleSpelling("kugo"),
+             "particle spellings");
+    }
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");
+  }
+
+  {
+    // Runs longer than the fixers look at are cut after particles into parts of at most 64 keys.
+    const auto joined = [](const std::vector<std::string_view>& parts) {
+      std::string s;
+      for (const std::string_view p : parts) s += p;
+      return s;
+    };
+    const std::string_view short_run = "kinounokaigideketteishita";
+    Expect(jaen::SplitLongRomaji(short_run).size() == 1, "a run of at most 64 keys is one part");
+    // 82 keys (holdout の打ち間違い 64超 の形): 来月から新しい部署に異動することになったので引き継ぎの資料を作っている
+    const std::string_view long_run = "raigetsukaraatarashiibushoniidousurukotoninattanodehikitsuginooshiryouwotsukutteiru";
+    const auto parts = jaen::SplitLongRomaji(long_run);
+    bool short_enough = true, after_vowel = true;
+    for (const std::string_view p : parts) {
+      short_enough &= p.size() <= 64 && p.size() >= 12;
+      after_vowel &= std::string_view("aiueo").find(p.back()) != std::string_view::npos;
+    }
+    Expect(parts.size() == 2 && joined(parts) == long_run && short_enough && after_vowel,
+           "an 82-key run is cut into two parts that end on a vowel");
+    Expect(parts[0].ends_with("ni") || parts[0].ends_with("no") || parts[0].ends_with("de") ||
+               parts[0].ends_with("wo") || parts[0].ends_with("ga") || parts[0].ends_with("to"),
+           "the cut is after a particle");
+    // wo is the best cut, even with another particle closer to 64 keys.
+    const std::string with_wo = "kosowo" + std::string("katteshimattanode") + "mokunoshinaito" + "nagaku" + "nagaku" + "nagakunagakushitekudasai";
+    const auto wo_parts = jaen::SplitLongRomaji(with_wo, 64);
+    Expect(joined(wo_parts) == with_wo && wo_parts.size() >= 2, "a long run is cut and joins back");
+    // No cut inside a doubled consonant or before a vowel, ー or y.
+    for (const std::string_view p : jaen::SplitLongRomaji(
+             "kittekittekittekittekittekittekittekittekittekittekittekittekittekitte", 20, 4)) {
+      Expect(!p.starts_with("t") || p.size() == 0, "never cut between the two t of tte");
+    }
+    // A run with no vowel to cut after stays whole.
+    const std::string consonants(80, 'k');
+    Expect(jaen::SplitLongRomaji(consonants).size() == 1, "no cut after a consonant");
+    // Each part is at least 12 keys: a 70-key run is not cut 64 + 6.
+    for (const std::string_view p : jaen::SplitLongRomaji(
+             "watashihakinoutomodachitoissho" "nieiganiminiittekaerinikafedeohanashishita")) {
+      Expect(p.size() >= 12, "no part shorter than 12 keys");
+    }
   }
 
   {
