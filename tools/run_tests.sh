@@ -19,7 +19,8 @@
 #      打って確定する形で（tools/english_follow_history.sh）流す。既定の版と、止めた版（MYIME_ENGLISH_FOLLOW=off）の両方。
 #      -memory.tsv / -expire.tsv は session が覚える直前の確定の試験（tools/english_follow_memory.sh、前の文は渡さない）。
 #      tools/make_english_follow_tests.py、tools/score_english_follow.py
-#   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）
+#   k: 大文字で始まる英字の固有名詞（tests/conversion/proper-nouns.tsv の文、proper-nouns-cand.tsv の候補。tools/proper_noun_test.py、tools/candidates_convert.sh）。
+#      日本語の名前・住所を読みで打った候補（tests/conversion/ja-names-cand.tsv。月1回の追加の辞書に足す語の確かめ）
 #   l: 履歴の学習（同じ会話で2番目の候補を4回選んだあと、その書き方が先頭に来るか。人工知能あり・なしで比べる）。
 #      1語の表（learn-respect.tsv、50語以上）と、前の文がある複数文節の表（learn-respect-context.tsv。文脈が別の書き方を
 #      先頭にしている文で、文節の元の先頭を4回選ぶ）を流す
@@ -288,6 +289,11 @@ k)
   if [ -f $T/proper-nouns-cand.tsv ]; then
     grep -v '^#' $T/proper-nouns-cand.tsv | cut -f1 > $W/proper-nouns-cand.txt
     bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/proper-nouns-cand.txt $OUT/proper-nouns-cand.tsv 4
+  fi
+  # 日本語の名前・住所（月1回の追加の辞書に足す Wikidata の日本語の名前と日本郵便の住所。tests/conversion/ja-names-cand.tsv）
+  if [ -f $T/ja-names-cand.tsv ]; then
+    grep -v '^#' $T/ja-names-cand.tsv | cut -f1 > $W/ja-names-cand.txt
+    bash $REPO/tools/candidates_convert.sh $E/session_handler_main $E $MODEL $W/ja-names-cand.txt $OUT/ja-names-cand.tsv 4
   fi
   ;;
 l)

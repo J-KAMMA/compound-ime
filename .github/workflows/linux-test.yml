@@ -324,6 +324,10 @@ jobs:
             python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/proper-nouns-cand.tsv results/proper-nouns-cand.tsv "固有名詞の候補" > results/proper-nouns-cand-score.txt
             head -26 results/proper-nouns-cand-score.txt
           fi
+          if [ -f results/ja-names-cand.tsv ] && [ -f repo/tests/conversion/ja-names-cand.tsv ]; then
+            python3 repo/tools/score_proper_nouns.py candidates repo/tests/conversion/ja-names-cand.tsv results/ja-names-cand.tsv "日本語の名前・住所の候補" > results/ja-names-cand-score.txt
+            head -30 results/ja-names-cand-score.txt
+          fi
           # 英単語と重なるローマ字（組 m）の採点: 既定の版、止めた版（off）、その差
           for f in mixed ja; do
             if [ -f results/allenglish-$f.tsv ] && [ -f repo/tests/conversion/allenglish-$f.tsv ]; then

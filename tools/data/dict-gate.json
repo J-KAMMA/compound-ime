@@ -4,7 +4,10 @@
     "_note": "取り直した一覧の行数が、いまのリポジトリの一覧から大きく外れたら、試験を流す前に止める（取得の失敗・出典の変更の見つけ方）。",
     "proper-nouns.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 5000},
     "supplement.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 5000},
-    "english-extra.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 10000}
+    "english-extra.tsv": {"min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 10000},
+    "_note_ja": "日本語の名前（Wikidata の日本語のラベルと読み P1814）と住所（日本郵便の郵便番号データ）。tools/build_ja_dictionary.py の出力。いまのリポジトリに一覧がないので、行数の下限・上限だけを見る。取らなかった回（ja_words が false）は比べない。値は初回の実測の前の見込み。",
+    "ja-wikidata.tsv": {"optional": true, "min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 3000, "max_rows": 150000},
+    "ja-postal.tsv": {"optional": true, "min_ratio": 0.85, "max_ratio": 1.3, "min_rows": 10000, "max_rows": 150000}
   },
   "tolerance": {
     "_note": "許す下がり（件数）は、max(min_items, 試験の総数 × percent %) の切り上げ。target は辞書を変えて直したい試験、japanese は日本語の変換を壊していないかの試験。",
@@ -33,7 +36,18 @@
     {"name": "プログラミングの文: 元の文と同じ", "file": "domain-prog-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
     {"name": "仮想通貨の文: 元の文と同じ", "file": "domain-crypto-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
     {"name": "開発の道具の名前の文: 元の文と同じ", "file": "domain-tools-score.txt", "pattern": "元の文と同じ (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
-    {"name": "話し言葉の打ち込み: 厳しい採点", "file": "colloquial-score.txt", "pattern": "厳しい (\\d+)/(\\d+)", "better": "higher", "group": "japanese"}
+    {"name": "話し言葉の打ち込み: 厳しい採点", "file": "colloquial-score.txt", "pattern": "厳しい (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "確かめ用の表（holdout）: 合計", "file": "holdout-score.txt", "pattern": "合計\\s+(\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "前後の文がある試験: 前の文あり", "file": "context-score.txt", "pattern": "前の文あり (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "前後の文がある試験: 前の文なし", "file": "context-score.txt", "pattern": "なし (\\d+)/(\\d+)", "better": "higher", "group": "japanese"},
+    {"name": "日本語の名前・住所の候補: 1ページ目", "file": "ja-names-cand-score.txt", "pattern": "1ページ目（9つ） (\\d+)/(\\d+)", "better": "higher", "group": "target"},
+    {"name": "日本語の名前・住所の候補: 候補の中", "file": "ja-names-cand-score.txt", "pattern": "候補の中 (\\d+)/(\\d+)", "better": "higher", "group": "target"}
   ],
+  "added_words": {
+    "_note": "足した日本語の名前・住所（dict_quality_gate.py scores --added）が、普通の文の試験で結果を変えて新しく出た文の数の上限。費用は普通の語に勝たないように決めているので、これを超えたら費用の決め方が甘い（押しのけた）として止める。正しく出た文も数える（区別しない）。値は案。",
+    "max_sentences": 10,
+    "files": ["inputs.tsv", "ja400.tsv", "holdout.tsv", "wiki-typing.tsv", "colloquial.tsv", "toku.tsv", "context-with.tsv", "context-without.tsv",
+              "domain-prog.tsv", "domain-crypto.tsv", "allenglish-ja.tsv", "acronyms-ja.tsv"]
+  },
   "changed_sentences": {"file": "inputs.tsv", "note": "1,298文のうち、辞書を替えて結果が変わった文の数。いまは報告だけ（基準にするには、数回の実測が要る）。"}
 }
