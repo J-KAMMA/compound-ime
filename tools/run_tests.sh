@@ -692,6 +692,12 @@ p)
   LAT_REAL=1 $LAT $W/lat-h100.tsv $OUT/latency-real-nopace
   LAT_REAL=1 $LAT $W/lat-h40.tsv $OUT/latency-real-paced 150
   LAT_REAL=1 $LAT $W/lat-h40.tsv $OUT/latency-real-fast 90
+  #   real-paced-ctx-with, real-paced-ctx-without: 前後の文がある試験の先頭40文を、1文字150ミリ秒ずつ、前の文あり・なしで
+  #   （打っている間の先回りで、前の文の分の計算が空白キーの前に済むか）
+  head -40 $W/lat-ctx-with.tsv > $W/lat-pctx-with.tsv
+  head -40 $W/lat-ctx-without.tsv > $W/lat-pctx-without.tsv
+  LAT_REAL=1 $LAT $W/lat-pctx-with.tsv $OUT/latency-real-paced-ctx-with 150
+  LAT_REAL=1 $LAT $W/lat-pctx-without.tsv $OUT/latency-real-paced-ctx-without 150
   # llama.cpp のスレッド数を変えて比べる（日本語だけの先頭60文。上限なしの設定で）。計算機は4つ（既定は3スレッド）
   head -60 $W/lat-ja400.tsv > $W/lat-h60.tsv
   for n in 1 2 3 4; do
