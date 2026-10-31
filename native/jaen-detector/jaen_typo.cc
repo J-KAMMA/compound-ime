@@ -276,7 +276,12 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
         return j < text.size() && Neighbors(text[j]).find(text[i]) != std::string_view::npos;
       };
       const int prior = touches(i - 1) || touches(i + 1) ? priors.extra_key : priors.extra_key_far;
-      if (prior != TypoPriors::kOff) {
+      // A lone c, q or v after a mora and before a particle is the letter itself ("cwomotto": cをもっと),
+      // not a key typed in by mistake: these keys start no kana before w, g, h, n, d, t or m.
+      const bool lone_letter = std::string_view("cqv").find(text[i]) != std::string_view::npos &&
+                               std::string_view("aiueon").find(text[i - 1]) != std::string_view::npos &&
+                               StartsWithParticleSpelling(std::string_view(text).substr(i + 1));
+      if (prior != TypoPriors::kOff && !lone_letter) {
         std::string s = text;
         s.erase(i, 1);
         add(std::move(s), prior);

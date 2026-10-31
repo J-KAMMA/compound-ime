@@ -355,6 +355,42 @@
     "まってください"
    ],
    "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r043",
+   "category": "reported",
+   "romaji": "cwomotto",
+   "intended": "cをもっと",
+   "alternatives": [
+    "Cをもっと",
+    "ｃをもっと",
+    "Ｃをもっと"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
+  },
+  {
+   "id": "r044",
+   "category": "reported",
+   "romaji": "konocwomottookiku",
+   "intended": "このcをもっと大きく",
+   "alternatives": [
+    "このCをもっと大きく",
+    "このｃをもっと大きく",
+    "このＣをもっと大きく"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
+  },
+  {
+   "id": "r045",
+   "category": "reported",
+   "romaji": "sorehavgaii",
+   "intended": "それはvがいい",
+   "alternatives": [
+    "それはVがいい",
+    "それはｖがいい",
+    "それはＶがいい"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
   }
  ]
 }
