@@ -304,6 +304,57 @@
     "ジェミニを使う"
    ],
    "note": "2026-10-31 報告: じぇみに が 双子座 になって不便"
+  },
+  {
+   "id": "r038",
+   "category": "reported",
+   "romaji": "matte",
+   "intended": "待って",
+   "alternatives": [
+    "まって"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r039",
+   "category": "reported",
+   "romaji": "mattene",
+   "intended": "待ってね",
+   "alternatives": [
+    "まってね"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r040",
+   "category": "reported",
+   "romaji": "mattete",
+   "intended": "待ってて",
+   "alternatives": [
+    "まってて"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r041",
+   "category": "reported",
+   "romaji": "matte,imaikukara",
+   "intended": "待って、今行くから",
+   "alternatives": [
+    "まって、今行くから",
+    "待って、いま行くから"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r042",
+   "category": "reported",
+   "romaji": "mattekudasai",
+   "intended": "待ってください",
+   "alternatives": [
+    "まってください"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
   }
  ]
 }
