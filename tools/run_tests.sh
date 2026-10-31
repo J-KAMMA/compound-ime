@@ -260,6 +260,11 @@ e8)
     grep -v '^#' $T/$n.tsv | cut -f1 > $W/$n.txt
     MYIME_JOINT_DUMP=$OUT/joint-$n.txt $BATCH $W/$n.txt $OUT/$n-dump.tsv 4 || true
   done
+  # 前後の文がある試験を前の文ありで（前の文で悪くなる文を、合わせた物差しで防げるかの材料）
+  if [ -f $T/context.tsv ]; then
+    MYIME_JOINT_DUMP=$OUT/joint-context.txt bash $REPO/tools/context_convert.sh $E/session_handler_main $E $MODEL \
+      $T/context.tsv $OUT/context-with-dump.tsv with 4 || true
+  fi
   ;;
 e9)
   # 人工知能なし（重みのファイルがない）でウィキペディアの文を打つ。誤りが辞書（Mozc）のものか人工知能のものかを分ける比べ。
