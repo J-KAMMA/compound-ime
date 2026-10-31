@@ -5676,4 +5676,24 @@ edit("engine/engine.cc",
      "    DumpJointFeatures(options, mozc, pos, *segments, key, left, right, full.conversion_segment(0), original);\n"
      "    if (PreferJointScore(options, mozc, pos, segments, key, left, right, full.conversion_segment(0), original)) return;\n")
 
+# 前の行と直前の確定を AI にも渡す（GetSurroundingContext は最後の改行より前を捨てるので、Enter のあとは空だった）。
+# 改行のあとが空白だけなら前の行を、入力欄が前の文を渡さないアプリでは直前に確定した文を使う。
+# MYIME_CONTEXT_LINES=off で今までどおり。打っている間の先回りで、前の文の分の計算はほぼ隠れる（試験 p の paced-ctx）。
+edit("request/conversion_request.h", "#include <cstdint>\n", "#include <cstdint>\n#include <cstdlib>\n")
+edit("request/conversion_request.h", """    absl::string_view left_context_view = context_->preceding_text();
+    const auto lpos = left_context_view.find_last_of("\\r\\n");
+""", """    absl::string_view left_context_view = context_->preceding_text();
+    static const bool context_lines = [] {
+      const char* value = std::getenv("MYIME_CONTEXT_LINES");
+      return value == nullptr || absl::string_view(value) != "off";
+    }();
+    if (context_lines) {
+      // An empty last line (just after Enter) takes the line before it, and a client that gives no
+      // preceding text takes what this session just committed.
+      if (left_context_view.empty()) left_context_view = context_->recent_committed_text();
+      left_context_view = absl::StripTrailingAsciiWhitespace(left_context_view);
+    }
+    const auto lpos = left_context_view.find_last_of("\\r\\n");
+""")
+
 print("applied")
