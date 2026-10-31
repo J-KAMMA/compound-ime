@@ -1244,7 +1244,10 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       const bool alone = mixed.used.size() == 1 && runs[mixed.used[0]].cuts.empty() && !after_english && !before_english;
       // 入力がまるごと日本語にも読める英単語1語（matte、made）なら日本語のまま（待って、まで）。英語の隣（直前の確定が
       // 英語）のときは今までどおり。
-      if (alone && !follow_taken && gap.begin == 0 && gap.end == raw.size() && !EnglishSentencesEnabled()) return {gap};
+      if (alone && !follow_taken && gap.begin == 0 && gap.end == raw.size() && runs[mixed.used[0]].begin == 0 &&
+          runs[mixed.used[0]].end == len && !EnglishSentencesEnabled()) {
+        return {gap};
+      }
       if (!follow_taken && mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
       std::vector<Piece> result;
       size_t at = 0;
