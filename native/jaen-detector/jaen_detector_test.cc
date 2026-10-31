@@ -736,7 +736,12 @@ int main() {
                  !jaen::StartsWithParticleSpelling("eta") && !jaen::StartsWithParticleSpelling("kugo"),
              "particle spellings");
     }
-    Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(), "a reading with a small vowel (ふぃ) is not edited");
+    for (const char* letter : {"cwomotto", "bgaii", "ynoatai", "kokohaqdeii", "fnikaeru", "pkarahajimeru"}) {
+      Expect(jaen::UnreadTypoEdits(letter, Parse, jaen::KanaModel({})).empty(), letter);
+    }
+    Expect(!jaen::UnreadTypoEdits("sorehadmeda", Parse, jaen::KanaModel({})).empty(),
+           "an unread key not before a particle is still weighed");
+    Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(),"a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");
   }

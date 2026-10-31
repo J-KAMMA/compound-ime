@@ -105,6 +105,23 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
   }
   const size_t first = FirstUnread(typed);
   if (first == std::string::npos) return {};
+  // A lone letter before a particle ("cwomotto": cをもっと, "ynoatai": yの値) is the letter itself,
+  // so the keys read as typed and nothing is fixed (user decision 2026-10-31: only keys that cannot
+  // be read are fixed). The tests had 6 such inputs broken and no slip of this shape fixed.
+  {
+    bool letters_only = true;
+    size_t at = 0;
+    for (size_t i = 0; i < typed.size() && letters_only; ++i) {
+      const Chunk& c = typed[i];
+      if (!FinalN(typed, i) && std::ranges::any_of(c.conversion + c.pending, IsLetter)) {
+        letters_only = c.raw.size() == 1 && std::string_view("aiueon").find(c.raw[0]) == std::string_view::npos &&
+                       (StartsWithParticleSpelling(raw.substr(at + 1)) || raw.substr(at + 1).starts_with("kara") ||
+                        raw.substr(at + 1).starts_with("made") || raw.substr(at + 1).starts_with("yori"));
+      }
+      at += c.raw.size();
+    }
+    if (letters_only) return {};
+  }
 
   // Best score per reading, with the typed keys that gave it.
   std::map<std::string, UnreadTypoEdit> readings;
