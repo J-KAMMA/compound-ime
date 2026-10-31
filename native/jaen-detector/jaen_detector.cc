@@ -1185,8 +1185,21 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           // 英語の文（2語以上の走り）は作らない: 英単語1語か、一覧の言い回し（see you）だけ。英文の空白の入れ方の
           // 誤りが多く、英文は IME を英字に切り替えて打てる（2026-10-31 利用者の決定「英単語だけでよい」）。
           // MYIME_ENGLISH_SENTENCES=1 で今までどおり。
+          // ただし日本語として読めない走り（ferrari: ふぇっらり、lenovo: ぇのゔぉ）は、一覧にない名前が語に分かれた
+          // ものなので残す（止めると固有名詞の文が 921 → 902）。
+          const auto readable = [&] {
+            for (size_t k = x; k < e; ++k) {
+              if (local.unread[k]) return false;
+            }
+            for (size_t k = local.kana_all_at[x]; k < local.kana_all_at[e]; ++k) {
+              for (const std::string_view small : {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゔ"}) {
+                if (local.kana_all[k].find(small) != std::string::npos) return false;
+              }
+            }
+            return true;
+          };
           if (!run.cuts.empty() && !EnglishSentencesEnabled() &&
-              !lexicon.FindPhrase(std::string_view(sub).substr(x, e - x))) {
+              !lexicon.FindPhrase(std::string_view(sub).substr(x, e - x)) && readable()) {
             continue;
           }
           runs.push_back(std::move(run));

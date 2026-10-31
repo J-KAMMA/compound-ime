@@ -739,6 +739,10 @@ int main() {
     for (const char* letter : {"cwomotto", "bgaii", "ynoatai", "kokohaqdeii", "fnikaeru", "pkarahajimeru"}) {
       Expect(jaen::UnreadTypoEdits(letter, Parse, jaen::KanaModel({})).empty(), letter);
     }
+    Expect(jaen::DropLoneLetters("道bの端") == "道の端" && jaen::DropLoneLetters("自己の損f害") == "自己の損害" &&
+               jaen::DropLoneLetters("cをもっと") == "をもっと" && jaen::DropLoneLetters("PCを買う") == "PCを買う" &&
+               jaen::DropLoneLetters("pcを買う") == "pcを買う" && jaen::DropLoneLetters("寝るz") == "寝るz",
+           "lone letters dropped");
     Expect(!jaen::UnreadTypoEdits("sorehadmeda", Parse, jaen::KanaModel({})).empty(),
            "an unread key not before a particle is still weighed");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(),"a reading with a small vowel (ふぃ) is not edited");

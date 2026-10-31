@@ -310,6 +310,17 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
   return out;
 }
 
+std::string DropLoneLetters(std::string_view text) {
+  std::string out;
+  for (size_t i = 0; i < text.size(); ++i) {
+    const bool lone = text[i] >= 'a' && text[i] <= 'z' &&
+                      (i == 0 || static_cast<unsigned char>(text[i - 1]) >= 0x80) &&
+                      i + 1 < text.size() && static_cast<unsigned char>(text[i + 1]) >= 0x80;
+    if (!lone) out += text[i];
+  }
+  return out;
+}
+
 bool StartsWithParticleSpelling(std::string_view keys) {
   constexpr std::string_view kParticles[] = {"no", "ni", "de", "wo", "ga", "wa", "ha", "to", "mo", "he", "ya"};
   return std::ranges::any_of(kParticles, [&](std::string_view p) { return keys.starts_with(p); });

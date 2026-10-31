@@ -124,6 +124,11 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
 // meant as a word.
 bool StartsWithParticleSpelling(std::string_view keys);
 
+// |text| without its lone lowercase letters, each between non-ASCII characters (or first)
+// ("道bの端" -> "道の端", "cをもっと" -> "をもっと"): the reading had the letter been a key
+// typed in by mistake. |text| itself when it has none.
+std::string DropLoneLetters(std::string_view text);
+
 // A slip read as a listed word, an acronym or a long word ("machia|aws|eta",
 // "kusuriha|sohk|ugo"): the one run of English pieces of |raw|, as the half-open key
 // range [begin, end), when Japanese pieces stand right before and after it and the
