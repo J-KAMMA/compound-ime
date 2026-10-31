@@ -5697,4 +5697,22 @@ edit("request/conversion_request.h", """    absl::string_view left_context_view 
     const auto lpos = left_context_view.find_last_of("\\r\\n");
 """)
 
+# 打ち間違いの直しを全部止める切り替え（MYIME_TYPO=off）。正しく打った文を直しがどれだけ壊すかを、止めたときと比べて
+# 測るため（tests/conversion/clean-typing.tsv、組 b）。
+edit("converter/converter.cc",
+     "std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(\n",
+     "static bool TypoFixEnabled() {\n"
+     "  static const bool enabled = [] {\n"
+     "    const char* value = std::getenv(\"MYIME_TYPO\");\n"
+     "    return value == nullptr || std::string_view(value) != \"off\";\n"
+     "  }();\n"
+     "  return enabled;\n"
+     "}\n\n"
+     "std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(\n")
+edit("converter/converter.cc", "fixed =\n          FixTypoReadAsEnglish(",
+     "fixed = !TypoFixEnabled() ? std::nullopt :\n          FixTypoReadAsEnglish(")
+edit("converter/converter.cc", "fixed = FixEachRun(", "fixed = !TypoFixEnabled() ? std::nullopt : FixEachRun(")
+edit("converter/converter.cc", "fixed = KeepNumbers(text, parse, FixReadableTypo(",
+     "fixed = !TypoFixEnabled() ? std::nullopt : KeepNumbers(text, parse, FixReadableTypo(")
+
 print("applied")
