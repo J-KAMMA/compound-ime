@@ -134,7 +134,9 @@
    "category": "reported",
    "romaji": "oppaigaowanngatadeurayamashiinaa.",
    "intended": "おっぱいがお椀型で羨ましいなあ。",
-   "alternatives": ["おっぱいがお椀型でうらやましいなあ。"],
+   "alternatives": [
+    "おっぱいがお椀型でうらやましいなあ。"
+   ],
    "note": "2026-10-18 話し言葉の試験で発見: おっぱいがおわん型で… とひらがなが残った（人工知能は正しく答えたが組み直しが断られた）"
   },
   {
@@ -214,7 +216,9 @@
    "category": "reported",
    "romaji": "dakeatokaratsuikashita",
    "intended": "だけ後から追加した",
-   "alternatives": ["だけあとから追加した"],
+   "alternatives": [
+    "だけあとから追加した"
+   ],
    "note": "2026-10-28 利用者: 後から足した入力が 高えあとから追加された になった"
   },
   {
@@ -222,7 +226,9 @@
    "category": "reported",
    "romaji": ",dakeatokaratsuikashita",
    "intended": "、だけ後から追加した",
-   "alternatives": ["、だけあとから追加した"],
+   "alternatives": [
+    "、だけあとから追加した"
+   ],
    "note": "2026-10-28 利用者: 同じ（読点のあと）"
   },
   {
@@ -230,7 +236,10 @@
    "category": "reported",
    "romaji": "arxivdeatsumete",
    "intended": "arXivで集めて",
-   "alternatives": ["arxivで集めて", "ArXivで集めて"],
+   "alternatives": [
+    "arxivで集めて",
+    "ArXivで集めて"
+   ],
    "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
   },
   {
@@ -238,7 +247,10 @@
    "category": "reported",
    "romaji": "aideawoarxivdeatsumete",
    "intended": "アイデアをarXivで集めて",
-   "alternatives": ["アイデアをarxivで集めて", "アイデアをArXivで集めて"],
+   "alternatives": [
+    "アイデアをarxivで集めて",
+    "アイデアをArXivで集めて"
+   ],
    "note": "2026-10-28 利用者: arXiv のあとの で集めて が 出集めて になった（続けて打った場合）"
   },
   {
@@ -272,6 +284,113 @@
    "intended": "アイデアをGoogleで集めて",
    "alternatives": [],
    "note": "2026-10-28 切り分け: 文の途中の arxiv が英語にならない"
+  },
+  {
+   "id": "r036",
+   "category": "reported",
+   "romaji": "jemini",
+   "intended": "Gemini",
+   "alternatives": [
+    "ジェミニ"
+   ],
+   "note": "2026-10-31 報告: じぇみに が 双子座 になって不便"
+  },
+  {
+   "id": "r037",
+   "category": "reported",
+   "romaji": "jeminiwotsukau",
+   "intended": "Geminiを使う",
+   "alternatives": [
+    "ジェミニを使う"
+   ],
+   "note": "2026-10-31 報告: じぇみに が 双子座 になって不便"
+  },
+  {
+   "id": "r038",
+   "category": "reported",
+   "romaji": "matte",
+   "intended": "待って",
+   "alternatives": [
+    "まって"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r039",
+   "category": "reported",
+   "romaji": "mattene",
+   "intended": "待ってね",
+   "alternatives": [
+    "まってね"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r040",
+   "category": "reported",
+   "romaji": "mattete",
+   "intended": "待ってて",
+   "alternatives": [
+    "まってて"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r041",
+   "category": "reported",
+   "romaji": "matte,imaikukara",
+   "intended": "待って、今行くから",
+   "alternatives": [
+    "まって、今行くから",
+    "待って、いま行くから"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r042",
+   "category": "reported",
+   "romaji": "mattekudasai",
+   "intended": "待ってください",
+   "alternatives": [
+    "まってください"
+   ],
+   "note": "2026-10-31 報告: まって が matte になる"
+  },
+  {
+   "id": "r043",
+   "category": "reported",
+   "romaji": "cwomotto",
+   "intended": "cをもっと",
+   "alternatives": [
+    "Cをもっと",
+    "ｃをもっと",
+    "Ｃをもっと"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
+  },
+  {
+   "id": "r044",
+   "category": "reported",
+   "romaji": "konocwomottookiku",
+   "intended": "このcをもっと大きく",
+   "alternatives": [
+    "このCをもっと大きく",
+    "このｃをもっと大きく",
+    "このＣをもっと大きく"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
+  },
+  {
+   "id": "r045",
+   "category": "reported",
+   "romaji": "sorehavgaii",
+   "intended": "それはvがいい",
+   "alternatives": [
+    "それはVがいい",
+    "それはｖがいい",
+    "それはＶがいい"
+   ],
+   "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
   }
  ]
 }

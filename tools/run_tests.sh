@@ -171,6 +171,14 @@ b)
   MYIME_TYPO_MARGIN=off MYIME_TYPO_UNREAD=off $BATCH $W/reported.txt $OUT/reported-typo-off.tsv 1
   bash $REPO/tools/batch_convert.sh $E/session_handler_main $E /nonexistent.gguf $W/reported.txt $OUT/reported-no-ai.tsv 1 || true
   python3 $REPO/tools/score_categories.py $OUT/reported.tsv $T/reported.json
+  # 正しく打った文で、推測（打ち間違いの直し・英語の見分け）が壊した数と直した数（止めたときとの比べ）。話し言葉の表も
+  GUESS_OFF="env MYIME_TYPO=off MYIME_ALL_ENGLISH=off"
+  for n in clean-typing colloquial; do
+    grep -v '^#' $T/$n.tsv | cut -f1 > $W/guess-$n.txt
+    $BATCH $W/guess-$n.txt $OUT/guess-$n.tsv 4
+    $GUESS_OFF $BATCH $W/guess-$n.txt $OUT/guess-$n-off.tsv 4
+    python3 $REPO/tools/score_guess_harm.py $T/$n.tsv $OUT/guess-$n.tsv $OUT/guess-$n-off.tsv | tee $OUT/guess-$n-score.txt | head -8
+  done
   ;;
 c)
   MYIME_SELECTOR_DUMP=$OUT/dump-jaen270.txt $BATCH $T/jaen270.txt $OUT/jaen270.tsv 4

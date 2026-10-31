@@ -1810,6 +1810,7 @@ subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.p
                 "--names", str(REPO / "tools/data/proper-noun-extra.tsv"),
                 "--names", str(REPO / "tools/data/proper-nouns.tsv"),
                 "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
+                "--first", str(REPO / "tools/data/proper-noun-first.tsv"),
                 "--titles", str(REPO / "tools/data/japanese-titles.tsv"),
                 "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)
@@ -5695,5 +5696,59 @@ edit("request/conversion_request.h", """    absl::string_view left_context_view 
     }
     const auto lpos = left_context_view.find_last_of("\\r\\n");
 """)
+
+# 打ち間違いの直しを全部止める切り替え（MYIME_TYPO=off）。正しく打った文を直しがどれだけ壊すかを、止めたときと比べて
+# 測るため（tests/conversion/clean-typing.tsv、組 b）。
+edit("converter/converter.cc",
+     "std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(\n",
+     "static bool TypoFixEnabled() {\n"
+     "  static const bool enabled = [] {\n"
+     "    const char* value = std::getenv(\"MYIME_TYPO\");\n"
+     "    return value == nullptr || std::string_view(value) != \"off\";\n"
+     "  }();\n"
+     "  return enabled;\n"
+     "}\n\n"
+     "std::vector<std::pair<std::string, std::string>> Converter::MarkEnglishSpans(\n")
+edit("converter/converter.cc", "fixed =\n          FixTypoReadAsEnglish(",
+     "fixed = !TypoFixEnabled() ? std::nullopt :\n          FixTypoReadAsEnglish(")
+edit("converter/converter.cc", "fixed = FixEachRun(", "fixed = !TypoFixEnabled() ? std::nullopt : FixEachRun(")
+edit("converter/converter.cc", "fixed = KeepNumbers(text, parse, FixReadableTypo(",
+     "fixed = !TypoFixEnabled() ? std::nullopt : KeepNumbers(text, parse, FixReadableTypo(")
+
+# 助詞の前の英字1文字（cwomotto: cをもっと、michibnohashi: 道bの端）は打ったとおりを1番目に残し、英字を除いた形
+# （道の端）を2番目の候補に足す。正しく打った英字と打ち間違いのキーは形では見分けられない（2026-10-31 利用者の決定:
+# 推測は候補にし、1番目は打ったとおり）。
+edit("converter/converter.h",
+     "  void AddRawAsEnglish(const ConversionRequest& request, Segments* segments) const;",
+     "  void AddRawAsEnglish(const ConversionRequest& request, Segments* segments) const;\n"
+     "  // The first candidates joined without their lone lowercase letters, as the second candidate.\n"
+     "  void AddLetterDropped(Segments* segments) const;")
+edit("converter/converter.cc", "void Converter::AddPlaceKanji(Segment* segment) const {", """void Converter::AddLetterDropped(Segments* segments) const {
+  const size_t count = segments->conversion_segments_size();
+  if (count == 0) return;
+  std::string key, value;
+  for (const Segment& segment : segments->conversion_segments()) {
+    if (segment.candidates_size() == 0) return;
+    key.append(segment.key());
+    value.append(segment.candidate(0).value);
+  }
+  const std::string dropped = jaen::DropLoneLetters(value);
+  if (dropped == value || dropped.empty()) return;
+  Segment* first = segments->mutable_conversion_segment(0);
+  for (size_t i = 0; i < first->candidates_size(); ++i) {
+    if (first->candidate(i).value == dropped) return;
+  }
+  Candidate* candidate = first->insert_candidate(std::min<size_t>(1, first->candidates_size()));
+  candidate->key = candidate->content_key = key;
+  candidate->value = candidate->content_value = dropped;
+  candidate->lid = candidate->rid = general_noun_id_;
+  candidate->cost = first->candidate(0).cost + 1;
+  candidate->converted_segment_count = static_cast<uint32_t>(count);
+  candidate->attributes |= Attribute::NO_LEARNING | Attribute::NO_VARIANTS_EXPANSION;
+}
+
+void Converter::AddPlaceKanji(Segment* segment) const {""")
+edit("converter/converter.cc", "    AddRawAsEnglish(request, segments);\n  }\n",
+     "    AddRawAsEnglish(request, segments);\n  }\n  if (!typo_fixed) AddLetterDropped(segments);\n")
 
 print("applied")

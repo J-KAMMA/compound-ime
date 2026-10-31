@@ -105,6 +105,28 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
   }
   const size_t first = FirstUnread(typed);
   if (first == std::string::npos) return {};
+  // A lone letter before a particle ("cwomotto": cをもっと, "ynoatai": yの値) is the letter itself,
+  // so the keys read as typed and nothing is fixed (user decision 2026-10-31: only keys that cannot
+  // be read are fixed). The tests had 6 such inputs broken and no slip of this shape fixed.
+  {
+    bool letters_only = true;
+    size_t at = 0;
+    for (size_t i = 0; i < typed.size() && letters_only; ++i) {
+      const Chunk& c = typed[i];
+      if (!FinalN(typed, i) && std::ranges::any_of(c.conversion + c.pending, IsLetter)) {
+        // Only first or after a particle (この|c|を, それは|v|が): in a word (michi|b|no, suui|j|wo) it is a slip.
+        static const std::array<std::string_view, 8> kAfter = {"は", "の", "を", "に", "で", "と", "も", "が"};
+        const bool after_particle =
+            i == 0 || std::ranges::find(kAfter, typed[i - 1].conversion) != kAfter.end();
+        letters_only = after_particle && c.raw.size() == 1 &&
+                       std::string_view("aiueon").find(c.raw[0]) == std::string_view::npos &&
+                       (StartsWithParticleSpelling(raw.substr(at + 1)) || raw.substr(at + 1).starts_with("kara") ||
+                        raw.substr(at + 1).starts_with("made") || raw.substr(at + 1).starts_with("yori"));
+      }
+      at += c.raw.size();
+    }
+    if (letters_only) return {};
+  }
 
   // Best score per reading, with the typed keys that gave it.
   std::map<std::string, UnreadTypoEdit> readings;
@@ -276,7 +298,12 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
         return j < text.size() && Neighbors(text[j]).find(text[i]) != std::string_view::npos;
       };
       const int prior = touches(i - 1) || touches(i + 1) ? priors.extra_key : priors.extra_key_far;
-      if (prior != TypoPriors::kOff) {
+      // A lone c, q or v after a mora and before a particle is the letter itself ("cwomotto": cをもっと),
+      // not a key typed in by mistake: these keys start no kana before w, g, h, n, d, t or m.
+      const bool lone_letter = std::string_view("cqv").find(text[i]) != std::string_view::npos &&
+                               std::string_view("aiueon").find(text[i - 1]) != std::string_view::npos &&
+                               StartsWithParticleSpelling(std::string_view(text).substr(i + 1));
+      if (prior != TypoPriors::kOff && !lone_letter) {
         std::string s = text;
         s.erase(i, 1);
         add(std::move(s), prior);
@@ -285,6 +312,17 @@ std::vector<TypoEdit> ReadableTypoEdits(std::string_view raw, const RomajiParser
   }
   std::vector<TypoEdit> out;
   for (auto& [kana, edit] : found) out.push_back(std::move(edit));
+  return out;
+}
+
+std::string DropLoneLetters(std::string_view text) {
+  std::string out;
+  for (size_t i = 0; i < text.size(); ++i) {
+    const bool lone = text[i] >= 'a' && text[i] <= 'z' &&
+                      (i == 0 || static_cast<unsigned char>(text[i - 1]) >= 0x80) &&
+                      i + 1 < text.size() && static_cast<unsigned char>(text[i + 1]) >= 0x80;
+    if (!lone) out += text[i];
+  }
   return out;
 }
 
