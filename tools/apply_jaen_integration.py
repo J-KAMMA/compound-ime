@@ -1810,6 +1810,7 @@ subprocess.run([sys.executable, str(REPO / "tools/build_proper_noun_dictionary.p
                 "--names", str(REPO / "tools/data/proper-noun-extra.tsv"),
                 "--names", str(REPO / "tools/data/proper-nouns.tsv"),
                 "--acronyms", str(REPO / "tools/data/acronyms.tsv"),
+                "--first", str(REPO / "tools/data/proper-noun-first.tsv"),
                 "--titles", str(REPO / "tools/data/japanese-titles.tsv"),
                 "--wasei", str(REPO / "tools/data/wasei.tsv"),
                 "--out", str(src / "data/dictionary_oss/dictionary14.txt.tmp"), "--install"], check=True)

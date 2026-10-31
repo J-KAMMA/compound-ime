@@ -138,6 +138,7 @@ def main():
     parser.add_argument("--default-cost", type=int, default=15000)
     parser.add_argument("--titles", type=Path, help="tools/data/japanese-titles.tsv: Japanese titles before the name")
     parser.add_argument("--acronyms", type=Path, help="tools/data/acronyms.tsv (type b rows: reading and rank)")
+    parser.add_argument("--first", type=Path, help="tools/data/proper-noun-first.tsv: reading and name, the first candidate")
     parser.add_argument("--install", action="store_true")
     args = parser.parse_args()
 
@@ -156,6 +157,15 @@ def main():
             if not HIRAGANA.fullmatch(f[3]) or f[5] not in ("1", "2", "3"):
                 raise SystemExit(f"bad acronym row: {line}")
             acronyms.append((f[1], f[3], int(f[5])))
+    # --first: names that come before every Mozc word of the reading (じぇみに: Gemini, then 双子座), like rank 1 acronyms
+    if args.first:
+        for line in args.first.read_text(encoding="utf-8").splitlines():
+            f = line.split("\t")
+            if line.startswith("#") or len(f) < 2:
+                continue
+            if not HIRAGANA.fullmatch(f[0]):
+                raise SystemExit(f"bad first row: {line}")
+            acronyms.append((f[1], f[0], 1))
     wasei = set()  # (reading variant, English word) that a wasei word merely looks like
     if args.wasei:
         for line in args.wasei.read_text(encoding="utf-8").splitlines():
