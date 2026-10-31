@@ -114,7 +114,12 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
     for (size_t i = 0; i < typed.size() && letters_only; ++i) {
       const Chunk& c = typed[i];
       if (!FinalN(typed, i) && std::ranges::any_of(c.conversion + c.pending, IsLetter)) {
-        letters_only = c.raw.size() == 1 && std::string_view("aiueon").find(c.raw[0]) == std::string_view::npos &&
+        // Only first or after a particle (この|c|を, それは|v|が): in a word (michi|b|no, suui|j|wo) it is a slip.
+        static const std::array<std::string_view, 8> kAfter = {"は", "の", "を", "に", "で", "と", "も", "が"};
+        const bool after_particle =
+            i == 0 || std::ranges::find(kAfter, typed[i - 1].conversion) != kAfter.end();
+        letters_only = after_particle && c.raw.size() == 1 &&
+                       std::string_view("aiueon").find(c.raw[0]) == std::string_view::npos &&
                        (StartsWithParticleSpelling(raw.substr(at + 1)) || raw.substr(at + 1).starts_with("kara") ||
                         raw.substr(at + 1).starts_with("made") || raw.substr(at + 1).starts_with("yori"));
       }

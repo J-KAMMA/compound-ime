@@ -1146,6 +1146,18 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
         }
       }
       if (!any_word) return {gap};
+      // [x, e) を日本語として読めるか: 読めないキーも小さい母音（ふぇ、ぇ、ゔ）もない
+      const auto readable = [&](size_t x, size_t e) {
+        for (size_t k = x; k < e; ++k) {
+          if (local.unread[k]) return false;
+        }
+        for (size_t k = local.kana_all_at[x]; k < local.kana_all_at[e]; ++k) {
+          for (const std::string_view small : {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゔ"}) {
+            if (local.kana_all[k].find(small) != std::string::npos) return false;
+          }
+        }
+        return true;
+      };
       std::vector<Run> runs;
       std::vector<EnglishEdge> edges;
       constexpr int64_t kNone = std::numeric_limits<int64_t>::max();
@@ -1187,19 +1199,8 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
           // MYIME_ENGLISH_SENTENCES=1 で今までどおり。
           // ただし日本語として読めない走り（ferrari: ふぇっらり、lenovo: ぇのゔぉ）は、一覧にない名前が語に分かれた
           // ものなので残す（止めると固有名詞の文が 921 → 902）。
-          const auto readable = [&] {
-            for (size_t k = x; k < e; ++k) {
-              if (local.unread[k]) return false;
-            }
-            for (size_t k = local.kana_all_at[x]; k < local.kana_all_at[e]; ++k) {
-              for (const std::string_view small : {"ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゔ"}) {
-                if (local.kana_all[k].find(small) != std::string::npos) return false;
-              }
-            }
-            return true;
-          };
           if (!run.cuts.empty() && !EnglishSentencesEnabled() &&
-              !lexicon.FindPhrase(std::string_view(sub).substr(x, e - x)) && readable()) {
+              !lexicon.FindPhrase(std::string_view(sub).substr(x, e - x)) && readable(x, e)) {
             continue;
           }
           runs.push_back(std::move(run));
@@ -1245,7 +1246,7 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       // 入力がまるごと日本語にも読める英単語1語（matte、made）なら日本語のまま（待って、まで）。英語の隣（直前の確定が
       // 英語）のときは今までどおり。
       if (alone && !follow_taken && gap.begin == 0 && gap.end == raw.size() && runs[mixed.used[0]].begin == 0 &&
-          runs[mixed.used[0]].end == len && !EnglishSentencesEnabled()) {
+          runs[mixed.used[0]].end == len && readable(0, len) && !EnglishSentencesEnabled()) {
         return {gap};
       }
       if (!follow_taken && mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
