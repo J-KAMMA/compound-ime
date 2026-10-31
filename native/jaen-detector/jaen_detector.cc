@@ -3,6 +3,7 @@
 #include <algorithm>
 #include <array>
 #include <cstdint>
+#include <cstdlib>
 #include <limits>
 #include <optional>
 #include <string_view>
@@ -310,6 +311,14 @@ const ContextCosts& DefaultContextCosts() {
   static const ContextCosts costs{/*word_base=*/2500, /*per_letter=*/300, /*rare_extra=*/3000, /*common_bonus=*/800,
                                   /*run_start=*/2000, /*run_end=*/0, /*short_extra=*/1000, /*particle_extra=*/2000, /*one_letter_extra=*/3000, /*margin=*/2000, /*alone_margin=*/3500, /*follow_margin=*/2000};
   return costs;
+}
+
+static bool EnglishSentencesEnabled() {
+  static const bool enabled = [] {
+    const char* value = std::getenv("MYIME_ENGLISH_SENTENCES");
+    return value != nullptr && std::string_view(value) == "1";
+  }();
+  return enabled;
 }
 
 bool EndsWithEnglishWord(std::string_view text) {
@@ -1173,6 +1182,13 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
               (last_word.size() == 1 && Lower(last_word[0]) == 'a')) {
             continue;
           }
+          // 英語の文（2語以上の走り）は作らない: 英単語1語か、一覧の言い回し（see you）だけ。英文の空白の入れ方の
+          // 誤りが多く、英文は IME を英字に切り替えて打てる（2026-10-31 利用者の決定「英単語だけでよい」）。
+          // MYIME_ENGLISH_SENTENCES=1 で今までどおり。
+          if (!run.cuts.empty() && !EnglishSentencesEnabled() &&
+              !lexicon.FindPhrase(std::string_view(sub).substr(x, e - x))) {
+            continue;
+          }
           runs.push_back(std::move(run));
           edges.push_back({local.kana_all_at[x], local.kana_all_at[e], dp[e]});
         }
@@ -1213,6 +1229,9 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       if (mixed.used.empty()) return {gap};
       // 英単語1語だけで、英語の隣でもない（日本語の文の中の1語）なら、日本語としても読めるので、決め手を厳しくする。
       const bool alone = mixed.used.size() == 1 && runs[mixed.used[0]].cuts.empty() && !after_english && !before_english;
+      // 入力がまるごと日本語にも読める英単語1語（matte、made）なら日本語のまま（待って、まで）。英語の隣（直前の確定が
+      // 英語）のときは今までどおり。
+      if (alone && !follow_taken && gap.begin == 0 && gap.end == raw.size() && !EnglishSentencesEnabled()) return {gap};
       if (!follow_taken && mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
       std::vector<Piece> result;
       size_t at = 0;
