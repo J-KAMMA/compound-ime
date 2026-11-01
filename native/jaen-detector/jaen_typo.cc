@@ -147,24 +147,20 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
   const size_t lo = first >= 3 ? first - 3 : 0;
   const size_t hi = std::min(text.size(), first + 4);
   for (size_t i = lo; i < hi; ++i) {
-    // The first key stays (as ReadableTypoEdits): a letter before a name or an ID ("jkamma") is
-    // typed on purpose, and dropping it read the rest as kana (かっま). Only a vowel may follow it.
-    if (i > 0) {
-      for (const char n : Neighbors(text[i])) {
-        std::string s = text;
-        s[i] = n;
-        consider(std::move(s), false);
-      }
-      if (i + 1 < text.size() && text[i] != text[i + 1]) {
-        std::string s = text;
-        std::swap(s[i], s[i + 1]);
-        consider(std::move(s), false);
-      }
-      {
-        std::string s = text;
-        s.erase(i, 1);
-        consider(std::move(s), false);
-      }
+    for (const char n : Neighbors(text[i])) {
+      std::string s = text;
+      s[i] = n;
+      consider(std::move(s), false);
+    }
+    if (i + 1 < text.size() && text[i] != text[i + 1]) {
+      std::string s = text;
+      std::swap(s[i], s[i + 1]);
+      consider(std::move(s), false);
+    }
+    {
+      std::string s = text;
+      s.erase(i, 1);
+      consider(std::move(s), false);
     }
     for (const char v : std::string_view("aiueo")) {
       std::string s = text;
@@ -176,6 +172,49 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
   out.reserve(readings.size());
   for (auto& [kana, edit] : readings) out.push_back(std::move(edit));
   return out;
+}
+
+std::optional<size_t> WordStartUnread(std::string_view raw, const RomajiParser& parse) {
+  const std::vector<Chunk> typed = parse(raw);
+  size_t at = 0;
+  for (size_t i = 0; i < typed.size(); ++i) {
+    const Chunk& c = typed[i];
+    if (!FinalN(typed, i) && std::ranges::any_of(c.conversion + c.pending, IsLetter)) {
+      static const std::array<std::string_view, 8> kAfter = {"は", "の", "を", "に", "で", "と", "も", "が"};
+      const bool word_start = i == 0 || std::ranges::find(kAfter, typed[i - 1].conversion) != kAfter.end();
+      const auto consonant = [](char k) { return std::string_view("aiueo").find(k) == std::string_view::npos; };
+      if (word_start && at + 1 < raw.size() && consonant(raw[at]) && raw[at] != 'n' && consonant(raw[at + 1])) {
+        return at;
+      }
+      return std::nullopt;
+    }
+    at += c.raw.size();
+  }
+  return std::nullopt;
+}
+
+std::string WordKana(std::string_view keys, size_t at, const RomajiParser& parse) {
+  const std::vector<Chunk> chunks = parse(keys);
+  std::string kana;
+  size_t offset = 0;
+  for (size_t i = 0; i < chunks.size(); ++i) {
+    const size_t next = offset + chunks[i].raw.size();
+    if (next > at) {
+      kana += FinalN(chunks, i) ? std::string("ん") : chunks[i].conversion + chunks[i].pending;
+      if (StartsWithParticleSpelling(keys.substr(next))) break;
+    }
+    offset = next;
+  }
+  return kana;
+}
+
+size_t WordEnd(std::string_view keys, size_t at, const RomajiParser& parse) {
+  size_t offset = 0;
+  for (const Chunk& chunk : parse(keys)) {
+    offset += chunk.raw.size();
+    if (offset > at && StartsWithParticleSpelling(keys.substr(offset))) return offset;
+  }
+  return keys.size();
 }
 
 std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,

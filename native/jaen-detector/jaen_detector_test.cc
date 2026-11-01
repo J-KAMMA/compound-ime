@@ -747,11 +747,14 @@ int main() {
     Expect(!jaen::UnreadTypoEdits("michibnohashi", Parse, jaen::KanaModel({})).empty(), "a letter inside a word is a slip");
     Expect(!jaen::UnreadTypoEdits("sorehadmeda", Parse, jaen::KanaModel({})).empty(),
            "an unread key not before a particle is still weighed");
-    {
-      const auto edits = jaen::UnreadTypoEdits("jkamma", Parse, jaen::KanaModel({}));
-      Expect(std::ranges::none_of(edits, [](const jaen::UnreadTypoEdit& e) { return e.keys[0] != 'j'; }),
-             "the first key is not dropped or changed (jkamma: not かっま)");
-    }
+    Expect(jaen::WordStartUnread("jkamma", Parse) == 0 && jaen::WordStartUnread("watashihajkammadesu", Parse) == 9 &&
+               jaen::WordStartUnread("sorehadmeda", Parse) == 6 && !jaen::WordStartUnread("michibnohashi", Parse),
+           "an unread consonant starting a word");
+    Expect(jaen::WordKana("sorehadameda", 6, Parse) == "だめだ" && jaen::WordKana("watashihakammadesu", 9, Parse) == "かっま" &&
+               jaen::WordKana("kamma", 0, Parse) == "かっま",
+           "the kana of the word up to a particle");
+    Expect(jaen::WordEnd("jkamma", 0, Parse) == 6 && jaen::WordEnd("watashihajkammadesu", 9, Parse) == 15,
+           "where the word ends");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(),"a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");

@@ -5751,4 +5751,31 @@ void Converter::AddPlaceKanji(Segment* segment) const {""")
 edit("converter/converter.cc", "    AddRawAsEnglish(request, segments);\n  }\n",
      "    AddRawAsEnglish(request, segments);\n  }\n  if (!typo_fixed) AddLetterDropped(segments);\n")
 
+# 語の頭の読めない子音（名前・ID）: 入力の最初か助詞の直後の、読めない子音で始まる語（「jkamma」「watashihajkammadesu」）を
+# 直しても語として読めない（FixUnreadTypo が直さない。かっま）なら、その字から次の助詞までを打ったとおりの英字の
+# 部分にする（jkamma、わたしはjkammaです）。そういう字がない入力では何もしない（変換を遅くしない）。
+_anchor = """    pieces.assign(1, jaen::Piece{0, raw.size(), false});
+    split = true;
+    fixed_any = true;
+    if (typo_fixed) *typo_fixed = true;
+  }
+"""
+edit("converter/converter.cc", _anchor, _anchor + """  for (size_t p = 0; p < pieces.size(); ++p) {
+    if (pieces[p].english) continue;
+    const jaen::Piece piece = pieces[p];
+    const std::string text = raw.substr(piece.begin, piece.end - piece.begin);
+    const std::optional<size_t> at = jaen::WordStartUnread(text, parse);
+    if (!at || FixUnreadTypo(modules(), text, parse, TypoKanaModel())) continue;
+    const size_t end = jaen::WordEnd(text, *at, parse);
+    std::vector<jaen::Piece> parts;
+    if (*at > 0) parts.push_back(jaen::Piece{piece.begin, piece.begin + *at, false});
+    parts.push_back(jaen::Piece{piece.begin + *at, piece.begin + end, true});
+    if (end < text.size()) parts.push_back(jaen::Piece{piece.begin + end, piece.end, false});
+    pieces.erase(pieces.begin() + p);
+    pieces.insert(pieces.begin() + p, parts.begin(), parts.end());
+    p += parts.size() - 1;
+    split = true;
+  }
+""")
+
 print("applied")
