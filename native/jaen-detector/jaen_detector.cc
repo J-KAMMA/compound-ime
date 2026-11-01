@@ -1246,9 +1246,10 @@ std::vector<Piece> SplitEnglish(const std::vector<Chunk>& chunks, const Lexicon&
       // 英単語1語だけで、英語の隣でもない（日本語の文の中の1語）なら、日本語としても読めるので、決め手を厳しくする。
       const bool alone = mixed.used.size() == 1 && runs[mixed.used[0]].cuts.empty() && !after_english && !before_english;
       // 入力がまるごと日本語にも読める英単語1語（matte、made）なら日本語のまま（待って、まで）。英語の隣（直前の確定が
-      // 英語）のときは今までどおり。
+      // 英語）のときは今までどおり。名前の表にだけある語（dubai、madonna）は名前として英語に取る。
       if (alone && !follow_taken && gap.begin == 0 && gap.end == raw.size() && runs[mixed.used[0]].begin == 0 &&
-          runs[mixed.used[0]].end == len && readable(0, len) && !EnglishSentencesEnabled()) {
+          runs[mixed.used[0]].end == len && readable(0, len) && lexicon.Contains(std::string_view(sub).substr(0, len)) &&
+          !EnglishSentencesEnabled()) {
         return {gap};
       }
       if (!follow_taken && mixed.cost + (alone ? costs.alone_margin : costs.margin) >= plain.cost) return {gap};
