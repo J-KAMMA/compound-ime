@@ -391,6 +391,17 @@
     "それはＶがいい"
    ],
    "note": "2026-10-31 報告: cをもっと の c が打ち間違いの直しで消える"
+  },
+  {
+   "id": "r046",
+   "category": "reported",
+   "romaji": "jkamma",
+   "intended": "jkamma",
+   "alternatives": [
+    "JKAMMA",
+    "Jkamma"
+   ],
+   "note": "2026-11-01 報告: かっま になった（入力の頭の j を打ち間違いとして消した。名前や ID の頭の字は消さない）"
   }
  ]
 }
