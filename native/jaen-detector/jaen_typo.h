@@ -55,6 +55,14 @@ struct UnreadTypoEdit {
 };
 std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiParser& parse,
                                             const KanaModel& model);
+// The key offset of an unread consonant that starts a word (first, or after a particle) and is
+// followed by another consonant ("jkamma": 0, "sorehadmeda": 6), or nullopt. Such a key may begin
+// a name or an ID, so a fix there must read as a word (WordKana).
+std::optional<size_t> WordStartUnread(std::string_view raw, const RomajiParser& parse);
+// The kana of |keys| from the chunk holding key |at| to the next particle or the end.
+std::string WordKana(std::string_view keys, size_t at, const RomajiParser& parse);
+// Where that word ends: the next particle after key |at|, or the end of |keys|.
+size_t WordEnd(std::string_view keys, size_t at, const RomajiParser& parse);
 std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
                                    const KanaModel& model, double margin = 3.0,
                                    double floor = -4.5);

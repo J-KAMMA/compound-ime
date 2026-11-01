@@ -174,6 +174,49 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
   return out;
 }
 
+std::optional<size_t> WordStartUnread(std::string_view raw, const RomajiParser& parse) {
+  const std::vector<Chunk> typed = parse(raw);
+  size_t at = 0;
+  for (size_t i = 0; i < typed.size(); ++i) {
+    const Chunk& c = typed[i];
+    if (!FinalN(typed, i) && std::ranges::any_of(c.conversion + c.pending, IsLetter)) {
+      static const std::array<std::string_view, 8> kAfter = {"は", "の", "を", "に", "で", "と", "も", "が"};
+      const bool word_start = i == 0 || std::ranges::find(kAfter, typed[i - 1].conversion) != kAfter.end();
+      const auto consonant = [](char k) { return std::string_view("aiueo").find(k) == std::string_view::npos; };
+      if (word_start && at + 1 < raw.size() && consonant(raw[at]) && raw[at] != 'n' && consonant(raw[at + 1])) {
+        return at;
+      }
+      return std::nullopt;
+    }
+    at += c.raw.size();
+  }
+  return std::nullopt;
+}
+
+std::string WordKana(std::string_view keys, size_t at, const RomajiParser& parse) {
+  const std::vector<Chunk> chunks = parse(keys);
+  std::string kana;
+  size_t offset = 0;
+  for (size_t i = 0; i < chunks.size(); ++i) {
+    const size_t next = offset + chunks[i].raw.size();
+    if (next > at) {
+      kana += FinalN(chunks, i) ? std::string("ん") : chunks[i].conversion + chunks[i].pending;
+      if (StartsWithParticleSpelling(keys.substr(next))) break;
+    }
+    offset = next;
+  }
+  return kana;
+}
+
+size_t WordEnd(std::string_view keys, size_t at, const RomajiParser& parse) {
+  size_t offset = 0;
+  for (const Chunk& chunk : parse(keys)) {
+    offset += chunk.raw.size();
+    if (offset > at && StartsWithParticleSpelling(keys.substr(offset))) return offset;
+  }
+  return keys.size();
+}
+
 std::optional<std::string> FixTypo(std::string_view raw, const RomajiParser& parse,
                                    const KanaModel& model, double margin, double floor) {
   const std::vector<UnreadTypoEdit> edits = UnreadTypoEdits(raw, parse, model);
