@@ -59,6 +59,9 @@ std::vector<UnreadTypoEdit> UnreadTypoEdits(std::string_view raw, const RomajiPa
 // followed by another consonant ("jkamma": 0, "sorehadmeda": 6), or nullopt. Such a key may begin
 // a name or an ID, so a fix there must read as a word (WordKana).
 std::optional<size_t> WordStartUnread(std::string_view raw, const RomajiParser& parse);
+// The key offset of a word that starts with っ ("kkamma": 0, "watashihakkammadesu": 9), or nullopt.
+// Few Japanese words start so, so one that also reads as no word (っかっま) is kept as typed.
+std::optional<size_t> WordStartSokuon(std::string_view raw, const RomajiParser& parse);
 // The kana of |keys| from the chunk holding key |at| to the next particle or the end.
 std::string WordKana(std::string_view keys, size_t at, const RomajiParser& parse);
 // Where that word ends: the next particle after key |at|, or the end of |keys|.
