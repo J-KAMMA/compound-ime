@@ -114,6 +114,7 @@ int main() {
   };
 
   Expect(english("kyouhagoogledekensaku") == "google|", "foreign word between Japanese");
+  Expect(english("matte").empty(), "a whole input that is a plain word read as Japanese stays Japanese (待って)");
   Expect(english("meetingwosetshita") == "meeting|set|", "word merged with wo; set before shi");
   Expect(english("downloadshita") == "download|", "adjacent words merge into one piece");
   Expect(english("youtubedemita") == "youtube|", "curated plain word");
