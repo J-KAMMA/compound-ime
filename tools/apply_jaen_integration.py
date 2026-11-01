@@ -5765,7 +5765,7 @@ edit("converter/converter.cc", _anchor, _anchor + """  for (size_t p = 0; p < pi
     const jaen::Piece piece = pieces[p];
     const std::string text = raw.substr(piece.begin, piece.end - piece.begin);
     const std::optional<size_t> at = jaen::WordStartUnread(text, parse);
-    if (!at || FixUnreadTypo(modules(), text, parse, TypoKanaModel())) continue;
+    if (!at || !UnreadWordKeptAsTyped(modules(), text, parse, TypoKanaModel())) continue;
     const size_t end = jaen::WordEnd(text, *at, parse);
     std::vector<jaen::Piece> parts;
     if (*at > 0) parts.push_back(jaen::Piece{piece.begin, piece.begin + *at, false});
