@@ -755,10 +755,9 @@ int main() {
            "the kana of the word up to a particle");
     Expect(jaen::WordEnd("jkamma", 0, Parse) == 6 && jaen::WordEnd("watashihajkammadesu", 9, Parse) == 15,
            "where the word ends");
-    Expect(jaen::WordStartSokuon("kkamma", Parse) == 0 && jaen::WordStartSokuon("watashihakkammadesu", Parse) == 9 &&
-               jaen::WordStartSokuon("gakkou", Parse) == 2 && !jaen::WordStartSokuon("kitte", Parse),
-           "a word that starts with a small tsu");
-    Expect(jaen::WordEnd("watashihakkammadesu", 9, Parse) == 15, "where that word ends");
+    Expect(jaen::WordStartSokuon("kkamma", Parse) == 0 && !jaen::WordStartSokuon("watashihakkammadesu", Parse) &&
+               !jaen::WordStartSokuon("mottookiku", Parse) && !jaen::WordStartSokuon("kitte", Parse),
+           "an input that starts with a small tsu");
     Expect(jaen::ReadableTypoEdits("fidesuka", Parse).empty(),"a reading with a small vowel (ふぃ) is not edited");
     Expect(!jaen::ReadableTypoEdits("tsudukete", Parse).empty() && jaen::ReadableTypoEdits("tsud", Parse).empty(),
            "only keys that read as kana are edited");

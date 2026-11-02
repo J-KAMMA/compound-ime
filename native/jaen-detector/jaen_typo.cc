@@ -202,7 +202,7 @@ std::optional<size_t> WordStartSokuon(std::string_view raw, const RomajiParser& 
   const std::vector<Chunk> typed = parse(raw);
   size_t at = 0;
   for (size_t i = 0; i < typed.size(); ++i) {
-    if (typed[i].conversion.starts_with("っ") && StartsWord(typed, i)) return at;
+    if (!typed[i].conversion.empty()) return typed[i].conversion.starts_with("っ") ? std::optional<size_t>(at) : std::nullopt;
     at += typed[i].raw.size();
   }
   return std::nullopt;
