@@ -402,6 +402,17 @@
     "Jkamma"
    ],
    "note": "2026-11-01 報告: かっま になった（入力の頭の j を打ち間違いとして消した。名前や ID の頭の字は消さない）"
+  },
+  {
+   "id": "r047",
+   "category": "reported",
+   "romaji": "kkamma",
+   "intended": "kkamma",
+   "alternatives": [
+    "KKAMMA",
+    "Kkamma"
+   ],
+   "note": "2026-11-02 報告: っかっま になった（語の頭の っ のあとも語として読めないものは打ったとおりの英字にする）"
   }
  ]
 }
